@@ -3,7 +3,7 @@
 #include "include/Logger.h"
 #include "ActionEventQueue.h"
 #include "L2Overlay.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 
 namespace p {
     extern ActionEventQueue * aequeue;
