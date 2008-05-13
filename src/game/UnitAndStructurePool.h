@@ -46,9 +46,11 @@
 
 #include "SDL/SDL_types.h"
 
+#include "UnitOrStructure.h"
+
 struct RA_Teamtype;
 struct UnitAndStructureMat;
-class UnitOrStructure;
+//class UnitOrStructure;
 class UnitOrStructureType;
 class INIFile;
 class L2Overlay;
