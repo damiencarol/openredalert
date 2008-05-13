@@ -1,0 +1,104 @@
+#ifndef SOUNDCOMMON_H
+#define SOUNDCOMMON_H
+
+#include <map>
+#include <vector>
+
+#include "SDL/SDL_types.h"
+#include "SDL/SDL_audio.h"
+#ifdef RA_SOUND_ENGINE
+#include "SDL/SDL_mixer.h"
+#endif
+
+#include "SoundCache.h"
+#include "SoundBuffer.h"
+#include "SoundFile.h"
+
+#define SOUND_FORMAT    AUDIO_S16SYS
+#define SOUND_CHANNELS  2
+#define SOUND_FREQUENCY 22050
+
+#define SOUND_MAX_CHUNK_SIZE        16384
+#define SOUND_MAX_UNCOMPRESSED_SIZE (SOUND_MAX_CHUNK_SIZE << 2)
+#define SOUND_MAX_COMPRESSED_SIZE   SOUND_MAX_CHUNK_SIZE
+
+//using p::second;
+
+//namespace p {
+ //   extern
+
+//class SoundFile;
+
+
+namespace {
+    SDL_AudioCVT monoconv;
+    SDL_AudioCVT eightbitconv;
+
+    bool initconv = false;
+
+    Uint8 chunk[SOUND_MAX_CHUNK_SIZE];
+    Uint8 tmpbuff[SOUND_MAX_UNCOMPRESSED_SIZE * 4];
+}
+
+enum SOUND_DECODE_STATE {
+    SOUND_DECODE_ERROR = 0,
+    SOUND_DECODE_COMPLETED = 1,
+    SOUND_DECODE_STREAMING = 2
+};
+
+namespace Sound {
+    void IMADecode(Uint8 *output, Uint8 *input, Uint16 compressed_size, Sint32& sample, Sint32& index);
+    void WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_size, Uint16 uncompressed_size);
+}
+
+namespace {
+
+struct SoundCacheCleaner : public std::unary_function<SoundCache::value_type, void>
+{
+    void operator()(const SoundCache::value_type& p) {
+        #ifdef RA_SOUND_ENGINE
+        Mix_FreeChunk(p.second->chunk);
+        delete p.second;
+        #endif
+    }
+};
+
+
+    //SoundDecoder decoder;
+    SoundFile soundDecoder;
+    SoundFile musicDecoder;
+}
+
+namespace Sound {
+
+const int Steps[89] = {
+    7,8,9,10,11,12,13,14,16,17,19,21,23,25,28,31,
+    34,37,41,45,50,55,60,66,73,80,88,97,107,118,130,143,
+    157,173,190,209,230,253,279,307,337,371,408,449,494,544,598,658,
+    724,796,876,963,1060,1166,1282,1411,1552,1707,1878,2066,2272,2499,
+    2749,3024,3327,3660,4026,4428,4871,5358,5894,6484,7132,7845,8630,
+    9493,10442,11487,12635,13899,15289,16818,18500,20350,22385,24623,
+    27086,29794,32767
+};
+
+//const int Indexes[8] = {-1,-1,-1,-1,2,4,6,8};
+const int Indexes[16] = {
+		-1, -1, -1, -1, 2, 4, 6, 8,
+		-1, -1, -1, -1, 2, 4, 6, 8
+};
+
+// Decode Westwood's ADPCM format.  Original code from ws-aud.txt by Asatur V. Nazarian
+#define HIBYTE(word) ((word) >> 8)
+#define LOBYTE(word) ((word) & 0xFF)
+
+const int WSTable2bit[4] = {-2,-1,0,1};
+const int WSTable4bit[16] = {
+    -9, -8, -6, -5, -4, -3, -2, -1,
+     0,  1,  2,  3,  4,  5,  6,  8
+};
+
+
+
+}
+
+#endif /* SOUNDCOMMON_H */

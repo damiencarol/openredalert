@@ -1,0 +1,9 @@
+#ifndef LOADSTATE_H
+#define LOADSTATE_H
+
+
+enum LOADSTATE {
+    PASSENGER_NONE = 0, PASSENGER_LOAD = 1, PASSENGER_UNLOAD = 2
+};
+
+#endif //LOADSTATE_H
