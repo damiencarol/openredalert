@@ -1,18 +1,20 @@
-#include "BTurnAnimEvent.h"
+
 #include "BAttackAnimEvent.h"
+
 #include <cmath>
+
+#include "BTurnAnimEvent.h"
 #include "include/ccmap.h"
 #include "include/common.h"
 #include "include/PlayerPool.h"
 #include "include/ProjectileAnim.h"
 #include "audio/SoundEngine.h"
-#include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
+#include "Unit.h"
+#include "UnitAndStructurePool.h"
 #include "include/weaponspool.h"
-
 #include "anim_nfo.h"
 #include "UnitOrStructure.h"
-#include "game/ActionEventQueue.h"
+#include "ActionEventQueue.h"
 #include "Structure.h"
 #include "include/Logger.h"
 
@@ -38,7 +40,7 @@ BAttackAnimEvent::BAttackAnimEvent(Uint32 p, Structure *str) :
 
 BAttackAnimEvent::~BAttackAnimEvent()
 {
-	if (strct->type->Charges())
+	if (strct->getType()->Charges())
 	{
 		frame = StartFrame;
 		if (strct->getNumbImages(0) > frame)
@@ -65,9 +67,9 @@ void BAttackAnimEvent::run()
 		return;
 	}
 
-	if ( !target->isAlive() || done)
+	if (!target->isAlive() || done)
 	{
-		if (strct->type->Charges())
+		if (strct->getType()->Charges())
 		{
 			if (strct->getNumbImages(0) > frame)
 			{
@@ -83,16 +85,17 @@ void BAttackAnimEvent::run()
 	}
 	atkpos = target->getPos();
 
-	xtiles = strct->cellpos % mwid - atkpos % mwid;
-	ytiles = strct->cellpos / mwid - atkpos / mwid;
+	xtiles = strct->getPos() % mwid - atkpos % mwid;
+	ytiles = strct->getPos() / mwid - atkpos / mwid;
+	
 	distance = abs(xtiles)>abs(ytiles)?abs(xtiles):abs(ytiles);
 
-	if( distance> strct->type->getWeapon()->getRange() /* weapons range */)
+	if( distance > strct->getType()->getWeapon()->getRange() )
 	{
 		// Since buildings can not move, give up for now.
 		// Alternatively, we could just wait to see if the target ever
 		// enters range (highly unlikely when the target is a structure)
-		if (strct->type->Charges())
+		if (strct->getType()->Charges())
 		{
 			if (strct->getNumbImages (0)> frame)
 			{
@@ -128,11 +131,11 @@ void BAttackAnimEvent::run()
 	}
 	facing = (40-(Sint8)(alpha*16/M_PI))&0x1f;
 
-	if ((strct->type->hasTurret())&&((strct->getImageNums()[0]&0x1f)!=facing))
+	if ((strct->getType()->hasTurret())&&((strct->getImageNums()[0]&0x1f)!=facing))
 	{ // turn to face target first
 		setDelay(0);
 		strct->buildAnim = new BTurnAnimEvent(strct->type->getTurnspeed(), strct, facing);
-		strct->buildAnim->setSchedule(this,true);
+		strct->buildAnim->setSchedule(this, true);
 		p::aequeue->scheduleEvent(strct->buildAnim);
 		return;
 	}
@@ -140,14 +143,14 @@ void BAttackAnimEvent::run()
 	//
 	// This is the charging animation I only know of the tesla coil that uses it.
 	//
-	if (strct->type->Charges())
+	if (strct->getType()->Charges())
 	{
 		if (frame < StartFrame+8)
 		{
 			if (NeedToCharge)
 			{
 				frame = StartFrame;
-				char *Snd = strct->type->getWeapon()->getChargingSound();
+				char *Snd = strct->getType()->getWeapon()->getChargingSound();
 				if (Snd != NULL)
 				pc::sfxeng->PlaySound(Snd);
 				NeedToCharge = false;
@@ -179,8 +182,8 @@ void BAttackAnimEvent::run()
 	}
 
 	// We can shoot
-	strct->type->getWeapon()->fire(strct, target->getBPos(strct->getPos()), target->getSubpos());
-	setDelay(strct->type->getWeapon()->getReloadTime());
+	strct->getType()->getWeapon()->fire(strct, target->getBPos(strct->getPos()), target->getSubpos());
+	setDelay(strct->getType()->getWeapon()->getReloadTime());
 	p::aequeue->scheduleEvent(this);
 }
 

@@ -5,7 +5,9 @@
 
 #include "SDL/SDL_timer.h"
 
+#include "include/ccmap.h"
 #include "include/PlayerPool.h"
+#include "Player.h"
 #include "BTurnAnimEvent.h"
 #include "BExplodeAnimEvent.h"
 #include "BuildAnimEvent.h"
@@ -13,8 +15,7 @@
 #include "BuildingAnimEvent.h"
 #include "audio/SoundEngine.h"
 #include "BAttackAnimEvent.h"
-#include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "include/weaponspool.h"
 #include "include/dispatcher.h"
 #include "BRepairUnitAnimEvent.h"
@@ -33,39 +34,17 @@
 #include "game/Projectile.h"
 #include "Weapon.h"
 #include "Unit.h"
+#include "InfantryGroup.h"
 
+namespace p {
+	extern ActionEventQueue* aequeue;
+	extern CnCMap* ccmap;
+}
 namespace pc {
     extern ConfigType Config;
     extern Ai * ai;
 }
 extern Logger * logger;
-
-StructureType::~StructureType()
-{
-    Uint16 i;
-    for (i=0;i<owners.size();++i){
-		if (owners[i] != NULL)
-			delete[] owners[i];
-		owners[i] = NULL;
-	}
-    for (i=0;i<prereqs.size();++i){
-		if (prereqs[i] != NULL)
-			delete[] prereqs[i];
-		prereqs[i] = NULL;
-	}
-	if (shpnums != NULL)
-		delete[] shpnums;
-	shpnums = NULL;
-	if (blocked != NULL)
-		delete[] blocked;
-	blocked = NULL;
-	if (shptnum != NULL)
-		delete[] shptnum;
-	shptnum = NULL;
-	if (name != NULL)
-		delete[] name;
-	name = NULL;
-}
 
 Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
         Uint16 rhealth, Uint8 facing, string trigger_name) : UnitOrStructure()
@@ -361,8 +340,8 @@ bool odam;	// Old damaged
 
 		exploding = true;
 
-		HandleTriggers ( (UnitOrStructure*)this, 7 );
-		HandleTriggers ( (UnitOrStructure*)this, 6 );
+		HandleTriggers((UnitOrStructure*)this, 7);
+		HandleTriggers((UnitOrStructure*)this, 6);
 
 		if (type->isWall()) {
 			p::uspool->removeStructure(this);
@@ -442,9 +421,10 @@ bool odam;	// Old damaged
 		}
 	}
 }
+
 void Structure::runAnim(Uint32 mode)
 {
-Uint32 speed;
+	Uint32 speed;
 
 	// If we want to sell stop current animations
 	if (mode == 9 && animating ){
@@ -461,9 +441,10 @@ Uint32 speed;
 	}
 
 
-	if (repairunitAnim != NULL)
+	if (repairunitAnim != 0){
 		return;
-
+	}
+	
 	if (!animating) {
 		animating = true;
 		if (mode == 0) { // run build anim at const speed
@@ -516,12 +497,14 @@ Uint32 speed;
 	//else
 	//	logger->note ("%s line %i: Warning: already animating\n", __FILE__, __LINE__);
 }
+
 void Structure::runSecAnim(Uint32 param, bool extraParam)
 {
-	if (this->is("BARR"))
+	if (this->is("BARR")){
 		printf ("!!!!!!!!!!!start sec anim\n");
-
-    BuildingAnimEvent* sec_anim = NULL;
+	}
+	
+    BuildingAnimEvent* sec_anim = 0;
     Uint8 secmode = type->getAnimInfo().sectype;
     if (secmode != 0) {
         switch (secmode) {
@@ -802,10 +785,13 @@ void Structure::setStructnum(Uint32 stn) {
     }
 Uint32 Structure::getNum() const {
         return structnum;
-    }
-Uint16 Structure::getPos() const {
-        return cellpos;
-    }
+}
+
+Uint16 Structure::getPos() const
+{
+	return cellpos;
+}
+
 Uint16 Structure::getSubpos() const {
         return 0;
     }

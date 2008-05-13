@@ -40,8 +40,8 @@ class BQueue;
 class INIFile;
 
 using std::map;
-
-
+using std::list;
+using std::vector;
 
 class Player
 {
@@ -82,8 +82,8 @@ public:
 
 	size_t getNumUnits() ;
 	size_t getNumStructs() const ;
-	const std::vector<Unit*>& getUnits() const ;
-	const std::vector<Structure*>& getStructures() const ;
+	const vector<Unit*>& getUnits() const ;
+	const vector<Structure*>& getStructures() const ;
 
 	Uint8 getStructpalNum() const ;
 	Uint8 getUnitpalNum() const ;
@@ -123,58 +123,75 @@ public:
 	void revealAroundWaypoint(Uint32 Waypoint);
 	enum SOB_update { SOB_SIGHT = 1, SOB_BUILD = 2 };
 	void setVisBuild(SOB_update mode, bool val);
-	std::vector<bool>& getMapVis() ;
-	std::vector<bool>& getMapBuildable() ;
+	vector<bool>& getMapVis() ;
+	vector<bool>& getMapBuildable() ;
 
 	/** Turns on a block of cells in either the sight or buildable matrix */
 	void addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode);
 	/** Turns off a block of cells in either the sight or buildable matrix */
 	void removeSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode);
 
-	bool canBuildAll() const ;
-	bool canBuildAny() const ;
-	bool canSeeAll() const ;
-	bool hasInfMoney() const ;
-	void enableBuildAll() ;
-	void enableInfMoney() ;
+	bool canBuildAll() const;
+	bool canBuildAny() const;
+	bool canSeeAll() const;
+	bool hasInfMoney() const;
+	void enableBuildAll();
+	void enableInfMoney();
+	
+	Uint8 getTechLevel();
 private:
 	/** Do not want player being constructed using default constructor*/
 	Player() ;
 	Player(const Player&) ;
 
 	/** This instead of a vector as we don't have to check ranges before operations*/
-	std::map<Uint8, BQueue*> queues;
+	map<Uint8, BQueue*> queues;
 
 	bool defeated;
-	char* playername; char* nickname;
-	Uint8 playerside; Uint8 multiside; Uint8 playernum; Uint8 radarstat; Uint8 unitpalnum; Uint8 structpalnum;
+	char* playername;
+	char* nickname;
+	Uint8 playerside;
+	Uint8 multiside;
+	Uint8 playernum;
+	Uint8 radarstat;
+	Uint8 unitpalnum;
+	Uint8 structpalnum;
+	
+	/** TechLevel of the player in the map */
+	Uint8 techLevel;
 
 	/** See the alliance code in the .cpp file*/
 	Uint8 unallycalls;
 
 	Sint32 money;
-	Uint32 powerGenerated; Uint32 powerUsed;
+	Uint32 powerGenerated; 
+	Uint32 powerUsed;
 
-	Uint32 unitkills; Uint32 unitlosses; Uint32 structurekills; Uint32 structurelosses;
+	Uint32 unitkills; 
+	Uint32 unitlosses;
+	Uint32 structurekills; 
+	Uint32 structurelosses;
 
 	Uint16 playerstart;
 
 	// All of these pointers are owned elsewhere.
-	std::vector<Unit*> unitpool;
-	std::vector<Structure*> structurepool;
-	std::map<StructureType*, std::list<Structure*> > structures_owned;
-	std::map<Uint32, std::list<Structure*> > production_groups;
-	std::map<Uint32, Structure*> primary_structure;
+	vector<Unit*> unitpool;
+	vector<Structure*> structurepool;
+	map<StructureType*, list<Structure*> > structures_owned;
+	map<Uint32, list<Structure*> > production_groups;
+	map<Uint32, Structure*> primary_structure;
 
-	std::vector<Player*> allies;
+	vector<Player*> allies;
+	
 	/**
      * players that have allied with this player, but this player
 	 * has not allied in return.  Used to force an unally when player
 	 * is defeated.
      */
-	std::vector<Player*> non_reciproc_allies;
+	vector<Player*> non_reciproc_allies;
 
-	std::vector<Uint8> sightMatrix; std::vector<Uint8> buildMatrix;
+	vector<Uint8> sightMatrix;
+	vector<Uint8> buildMatrix;
 
 	/** List of location that is visible by player */
 	vector<bool> mapVisible; 

@@ -1,6 +1,6 @@
 #include "include/PlayerPool.h"
 
-//#include <cstring>
+#include <vector>
 
 #include "ActionEventQueue.h"
 #include "Player.h"
@@ -8,6 +8,7 @@
 
 #include "misc/INIFile.h"
 
+using std::vector;
 
 namespace pc
 {
@@ -43,38 +44,7 @@ PlayerPool::~PlayerPool()
 
 const int PlayerPool::MultiColourStringToNumb(const char* colour)
 {
-	//    printf ("%s line %i: Set multi colour %s\n", __FILE__, __LINE__, colour);
-
-	if (pc::Config.gamenum == GAME_TD)
-	{
-		if (strcasecmp(colour, "yellow") == 0)
-		{
-			return 0;
-		}
-		else if (strcasecmp(colour, "red") == 0)
-		{
-			return 1;
-		}
-		else if (strcasecmp(colour, "blue") == 0)
-		{
-			return 2;
-		}
-		else if (strcasecmp(colour, "orange") == 0)
-		{
-			return 3;
-		}
-		else if (strcasecmp(colour, "green") == 0)
-		{
-			return 4;
-		}
-		else if (strcasecmp(colour, "turquoise") == 0)
-		{
-			return 5;
-		}
-	}
-	else if (pc::Config.gamenum == GAME_RA)
-	{
-		if (strcasecmp(colour, "yellow") == 0)
+	if (strcasecmp(colour, "yellow") == 0)
 		{
 			return 0;
 		}
@@ -109,11 +79,10 @@ const int PlayerPool::MultiColourStringToNumb(const char* colour)
 		else if (strcasecmp(colour, "darkred") == 0)
 		{
 			return 8;
-		}
+	} else {
+		// Error TODO -> do something better than this :)
+		return 1;
 	}
-	/// Error -> do something better than this :)
-	return 1;
-	//	printf ("Palletnumbers = %i, %i\n", unitpalnum, structpalnum);
 }
 
 void PlayerPool::setLPlayer(const char* pname)
@@ -176,6 +145,9 @@ void PlayerPool::setPlayer(Uint8 number, const char* nick, const int colour,
 Uint8 PlayerPool::getPlayerNum(const char *pname)
 {
 	Uint8 i;
+	
+	
+	
 	for (i = 0; i < playerpool.size(); i++)
 	{
 		if ( !strcasecmp(playerpool[i]->getName(), pname) )
@@ -183,7 +155,7 @@ Uint8 PlayerPool::getPlayerNum(const char *pname)
 			return i;
 		}
 	}
-	//	printf ("%s line %i: Create new player: %s\n", __FILE__, __LINE__, pname);
+	//logger->error("%s line %i: Create new player: %s\n", __FILE__, __LINE__, pname);
 	playerpool.push_back(new Player(pname, mapini));
 	playerpool[playerpool.size()-1]->setPlayerNum(static_cast<Uint8>(playerpool.size()-1));
 	return static_cast<Uint8>(playerpool.size()-1);
@@ -192,7 +164,8 @@ Uint8 PlayerPool::getPlayerNum(const char *pname)
 char RA_house[20][10] =
 { "Spain", "Greece", "Ussr", "England", "Ukraine", "Germany", "France",
 		"Turkey", "Goodguy", "Badguy", "Special", "Neutral", "Multi1",
-		"Multi2", "Multi3", "Multi4", "Multi5", "Multi6", "Multi7", "Multi8" };
+		"Multi2", "Multi3", "Multi4", "Multi5", "Multi6", "Multi7", "Multi8" 
+};
 
 int PlayerPool::getPlayerNumByHouseNum(Uint8 House)
 {
@@ -235,9 +208,9 @@ Player* PlayerPool::getPlayerByName(const char* pname)
 	return playerpool[getPlayerNum(pname)];
 }
 
-std::vector<Player*> PlayerPool::getOpponents(Player* pl)
+vector<Player*> PlayerPool::getOpponents(Player* pl)
 {
-	std::vector<Player*> opps;
+	vector<Player*> opps;
 	for (Uint8 i = 0; i < playerpool.size(); i++)
 	{
 		if (!playerpool[i]->isDefeated() && !pl->isAllied(playerpool[i]))
@@ -333,9 +306,11 @@ void PlayerPool::placeMultiUnits()
 			playerpool[i]->placeMultiUnits();
 		}
 		else
+		{
 			printf("%s line %i: Failed to get player start\n",__FILE__ , __LINE__);
 		}
 	}
+}
 
 Uint16 PlayerPool::getAStart()
 {
@@ -361,10 +336,15 @@ Uint16 PlayerPool::getAStart()
 	return rv;
 }
 
+/**
+ * Set the start position of a player in the map
+ */
 void PlayerPool::setPlayerStarts(Uint8 pos, Uint32 start)
 {
-	if (pos < 8)
+	//
+	if (pos < 8){
 		playerstarts[pos] = start;
+	}
 }
 
 bool PlayerPool::pollSidebar()
@@ -393,42 +373,52 @@ void PlayerPool::updateRadar(Uint8 status)
 {
 	radarstatus = status;
 }
+
 Uint8 PlayerPool::getNumPlayers() const
 {
 	return static_cast<Uint8>(playerpool.size());
 }
+
 Uint8 PlayerPool::getLPlayerNum() const
 {
 	return localPlayer;
 }
+
 Player *PlayerPool::getLPlayer()
 {
 	if (localPlayer < playerpool.size())
 		return playerpool[localPlayer];
 	return NULL;
 }
+
 Player *PlayerPool::getPlayer(Uint8 player)
 {
-	if (player < playerpool.size())
+	if (player < playerpool.size()){
 		return playerpool[player];
-	return NULL;
-}
-Uint8 PlayerPool::getUnitpalNum(Uint8 player) const
-{
-	if (player < playerpool.size())
-		return playerpool[player]->getUnitpalNum();
+	}
 	return 0;
 }
+
+Uint8 PlayerPool::getUnitpalNum(Uint8 player) const
+{
+	if (player < playerpool.size()){
+		return playerpool[player]->getUnitpalNum();
+	}
+	return 0;
+}
+
 Uint8 PlayerPool::getStructpalNum(Uint8 player) const
 {
 	if (player < playerpool.size())
 		return playerpool[player]->getStructpalNum();
 	return 0;
 }
+
 bool PlayerPool::hasWon() const
 {
 	return won;
 }
+
 bool PlayerPool::hasLost() const
 {
 	return lost;

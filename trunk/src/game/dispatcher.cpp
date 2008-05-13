@@ -9,7 +9,7 @@
 #include "include/Logger.h"
 #include "include/PlayerPool.h"
 #include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "vfs/vfs.h"
 #include "StructureType.h"
 #include "UnitType.h"
@@ -18,6 +18,10 @@
 #include "Unit.h"
 
 using std::string;
+
+namespace p {
+extern UnitAndStructurePool* uspool;
+}
 
 namespace Dispatcher {
 
@@ -119,7 +123,7 @@ bool Dispatcher::structurePlace(const StructureType* type, Uint32 pos, Uint8 own
             // deliberate fallthrough
         case NORMAL:
             /// XXX TEMP HACK!
-            return p::uspool->createStructure(const_cast<StructureType*>(type),pos,owner,FULLHEALTH,0,true);
+            return p::uspool->createStructure(const_cast<StructureType*>(type), pos, owner, FULLHEALTH, 0, true);
             break;
         case PLAYING:
         default:

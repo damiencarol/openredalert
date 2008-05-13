@@ -164,7 +164,7 @@ INIFile::~INIFile()
 }
 
 /** 
- * Function to extract a string from a ini file. The string is malloced 
+ * Function to extract a string from a ini file. The string is mallocated 
  * in this function so it should be freed.
  * 
  * @param the section in the file to extract string from.
@@ -204,6 +204,7 @@ char* INIFile::readString(const char* section, const char* value)
 	{
 		return 0;
 	}
+	// allocate a new string
 	retval = new char[key->second.length()+1];
 	return strcpy(retval, key->second.c_str());
 }
@@ -399,8 +400,8 @@ INIKey INIFile::readKeyValue(const char* section, Uint32 keynum)
 
 	if (keynum >= sec_new->second.size())
 	{
-		logger->error("throw 0 in INIFile::readKeyValue()");
-		throw 0;
+		logger->error("throw 0 in INIFile::readKeyValue()\n");		
+		throw KeyNotFound("Key number [????] in Section [" + string(section) + "] not found in .ini file.");
 	}
 
 	Key = sec_new->second.begin();
@@ -409,7 +410,8 @@ INIKey INIFile::readKeyValue(const char* section, Uint32 keynum)
 		Key++;
 	}
 	if (Key == sec_new->second.end()){
-		throw 0;
+		logger->error("throw 0 in INIFile::readKeyValue()\n");		
+		throw KeyNotFound("Key number [????] in Section [" + string(section) + "] not found in .ini file.");
 	}
 	return Key;
 }
@@ -503,7 +505,7 @@ bool INIFile::isSection(string section)
 int INIFile::readYesNo(const char* section, const char* value,
 		const char* defaut)
 {
-	char* tmpPtAA = this->readString(section, "AA", defaut);
+	char* tmpPtAA = this->readString(section, value, defaut);
 	string tmpAA = (string)tmpPtAA;
 	Uint32 a;
 	if (tmpAA == "yes")
@@ -531,7 +533,6 @@ int INIFile::readYesNo(const char* section, const char* value,
  \param bool keeptok - optional boolean that is to be given TRUE if the separator characters are needed to be part of the tokens
 
  \return integer that has the number of token in the resulting list
-
  */
 
 int splitStr(std::list<std::string>& l, const std::string& seq, char s1,
@@ -540,9 +541,7 @@ int splitStr(std::list<std::string>& l, const std::string& seq, char s1,
 {
 
 	typedef std::string::size_type ST;
-
 	std::vector<int> tok_s1;
-
 	std::vector<int> tok_s2;
 
 	if (l.size())
@@ -651,12 +650,9 @@ int splitStr(std::list<std::string>& l, const std::string& seq, char s1,
  \param bool removews -- Set to TRUE if requiered to remove white space characters ( space, "\n\r" etc...)
 
  \return integer that has the number of token in the resulting list
-
  */
-
 int splitStr(std::list<std::string>& L, const std::string& seq,
 		const std::string& _1cdelim, bool keeptoken, bool _removews)
-
 {
 
 	typedef std::string::size_type ST;

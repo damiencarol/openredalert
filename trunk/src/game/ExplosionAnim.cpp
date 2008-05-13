@@ -13,7 +13,8 @@ namespace p {
 extern Logger * logger;
 
 ExplosionAnim::ExplosionAnim(Uint32 p, Uint16 pos, Uint32 startimage, Uint8 animsteps, Sint8 xoff, Sint8 yoff)
-   : ActionEvent(p) {
+   : ActionEvent(p)
+{
        l2o = new L2Overlay(1);
        l2o->imagenums[0] = startimage;
        l2o->xoffsets[0] = xoff;
@@ -34,7 +35,9 @@ ExplosionAnim::~ExplosionAnim()
     l2o = NULL;
 }
 
-void ExplosionAnim::run() {
+void ExplosionAnim::run()
+{
+	// decrement the step of the anim
     if (animsteps > 0) {
     	animsteps--;
     }
@@ -43,6 +46,8 @@ void ExplosionAnim::run() {
         return;
     }
     ++l2o->imagenums[0];
+    
+    // re-Schedule this event (to continue the animation)
     p::aequeue->scheduleEvent(this);
 }
 

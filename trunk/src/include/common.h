@@ -116,17 +116,6 @@ extern int mapscaleq;
 #define M_PI_2 1.57079632679489661923
 
 
-
-/// @TODO: This shouldn't be here
-
-
-/// @TODO: This shouldn't be here
-struct powerinfo_t {
-    Uint16 power;
-    Uint16 drain;
-    bool powered;
-};
-
 /// Same as strdup but uses C++ style allocation
 /// @TODO: Obviate this function
 inline char* cppstrdup(const char* s) {

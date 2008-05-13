@@ -3,45 +3,51 @@
 #include <string>
 #include <vector>
 
+#include "SDL/SDL_types.h"
 #include "SDL/SDL_timer.h"
 
+#include "include/common.h"
 #include "include/ccmap.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
 #include "include/PlayerPool.h"
 #include "audio/SoundEngine.h"
-#include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
+#include "Unit.h"
+#include "UnitAndStructurePool.h"
 #include "ui/Sidebar.h"
 #include "video/ImageNotFound.h"
+#include "video/ImageCache.h"
+#include "video/ImageCacheEntry.h"
 #include "include/talkback.h"
 #include "include/weaponspool.h"
-#include "game/Unit.h"
 #include "InfantryGroup.h"
 #include "StructureType.h"
 #include "GameMode.h"
-#include "UnitType.h"
-
 #include "TalkbackType.h"
 #include "Weapon.h"
-
-#include "misc/INIFile.h"
 
 using std::string;
 using std::vector;
 
+namespace pc {
+	extern ImageCache* imgcache;	
+}
+namespace p {
+	extern UnitAndStructurePool* uspool;
+	extern WeaponsPool* weappool;
+}
 extern Logger * logger;
 
-UnitType::UnitType(const char *typeName, INIFile *unitini) : UnitOrStructureType(), shpnums(0), name(0), deploytarget(0)
+UnitType::UnitType(const char *typeName, INIFile* unitini) : UnitOrStructureType(), shpnums(0), name(0), deploytarget(0)
 {
-    SHPImage* shpimage;
+    SHPImage* shpimage = 0;
     Uint32 i;
     string shpname;
 #ifdef LOOPEND_TURN
 //    char* imagename;
 #endif
-    Uint32 shpnum;
-    Uint32 tmpspeed;
+	Uint32 shpnum;
+	Uint32 tmpspeed;
 
 
 	shpname = string(typeName);
@@ -220,23 +226,23 @@ UnitType::UnitType(const char *typeName, INIFile *unitini) : UnitOrStructureType
         else if (strncasecmp(miscnames,"concrete",8) == 0)
             armour = AC_concrete;
 
-        delete[] miscnames;
-    }
-    valid = true;
+		delete[] miscnames;
+	}
+	valid = true;
 
 #ifdef LOOPEND_TURN
-        animinfo.loopend = unitini->readInt(tname,"loopend",31);
-        animinfo.loopend2 = unitini->readInt(tname,"loopend2",0);
+	animinfo.loopend = unitini->readInt(tname, "loopend", 31);
+	animinfo.loopend2 = unitini->readInt(tname, "loopend2", 0);
 
-        animinfo.animspeed = unitini->readInt(tname,"animspeed", 3);
-        animinfo.animspeed = abs(animinfo.animspeed);
-        animinfo.animspeed = (animinfo.animspeed>1?animinfo.animspeed:2);
-        animinfo.animdelay = unitini->readInt(tname,"delay",0);
+	animinfo.animspeed = unitini->readInt(tname, "animspeed", 3);
+	animinfo.animspeed = abs(animinfo.animspeed);
+	animinfo.animspeed = (animinfo.animspeed>1 ? animinfo.animspeed : 2);
+	animinfo.animdelay = unitini->readInt(tname, "delay", 0);
 
-        animinfo.animtype = unitini->readInt(tname, "animtype", 0);
-        animinfo.sectype  = unitini->readInt(tname, "sectype", 0);
+	animinfo.animtype = unitini->readInt(tname, "animtype", 0);
+	animinfo.sectype = unitini->readInt(tname, "sectype", 0);
 
-        animinfo.dmgoff   = unitini->readInt(tname, "dmgoff", ((shptnum[0]-1)>>1));
+	animinfo.dmgoff = unitini->readInt(tname, "dmgoff", ((shptnum[0]-1)>>1));
 #endif
 }
 
@@ -245,20 +251,22 @@ UnitType::UnitType(const char *typeName, INIFile *unitini) : UnitOrStructureType
  */
 UnitType::~UnitType()
 {
-    Uint16 i;
+	Uint16 i;
 	if (name != NULL)
-    	delete[] name;
+		delete[] name;
 	if (shpnums != NULL)
 		delete[] shpnums;
 	if (shptnum != NULL)
 		delete[] shptnum;
 	if (deploytarget != NULL)
-    	delete[] deploytarget;
-	for (i=0;i<owners.size();++i){
+		delete[] deploytarget;
+	for (i=0; i<owners.size(); ++i)
+	{
 		if (owners[i] != NULL)
 			delete[] owners[i];
 	}
-	for (i=0;i<prereqs.size();++i){
+	for (i=0; i<prereqs.size(); ++i)
+	{
 		if (prereqs[i] != NULL)
 			delete[] prereqs[i];
 	}
@@ -266,22 +274,28 @@ UnitType::~UnitType()
 
 const char* UnitType::getRandTalk(TalkbackType type) const
 {
+	//
     if (talkback) {
         return talkback->getRandTalk(type);
     }
     return NULL;
 }
 
-bool UnitType::isInfantry() const {
-        return is_infantry;
-    }
+bool UnitType::isInfantry() const
+{
+    return is_infantry;
+}
 
-bool UnitType::isWall() const {
-        return false;
-    }
-bool UnitType::canDeploy() const {
+bool UnitType::isWall() const
+{
+	return false;
+}
+
+bool UnitType::canDeploy() const 
+{
         return deployable;
     }
+
 bool UnitType::isStructure() const {return false;}
 
 Uint8 UnitType::getType() const {
@@ -361,4 +375,9 @@ std::vector<Uint8> UnitType::getPassengerAllow() const {
 std::vector<UnitType*> UnitType::getSpecificTypeAllow() const {
         return specificTypeAllow;
     }
-Uint8 UnitType::getPQueue() const {return ptype;}
+
+Uint8 UnitType::getPQueue() const 
+{
+	return ptype;
+}
+

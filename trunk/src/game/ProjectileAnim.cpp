@@ -11,17 +11,26 @@
 #include "Warhead.h"
 #include "WarheadData.h"
 #include "Projectile.h"
+#include "Unit.h"
+#include "UnitAndStructurePool.h"
+#include "ActionEventQueue.h"
 
-#include "video/Renderer.h"
 #include "include/ccmap.h"
 #include "include/Logger.h"
 #include "audio/SoundEngine.h"
-#include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
-
 #include "video/ImageNotFound.h"
+#include "video/ImageCache.h"
+#include "video/Renderer.h"
 
 extern Logger * logger;
+namespace pc {
+	extern ImageCache* imgcache;
+}
+namespace p {
+	extern UnitAndStructurePool* uspool;
+	extern CnCMap* ccmap;
+	extern ActionEventQueue* aequeue;
+}
 
 /**
  */
@@ -58,9 +67,9 @@ ProjectileAnim::ProjectileAnim(Uint32 p, Weapon *weap, UnitOrStructure* owner,
     if (heatseek) {
 //        target = p::uspool->getUnitOrStructureAt(dest,subdest);
 		target = p::uspool->getGroundUnitAt(dest,subdest);
-		if (target == NULL){
+		if (target == 0){
 			target = p::uspool->getFlyingAt ( dest,subdest );
-			if (target == NULL){
+			if (target == 0){
 				target = p::uspool->getStructureAt ( dest,subdest,false );
 			}
 		}
@@ -204,7 +213,42 @@ void ProjectileAnim::run()
             pc::sfxeng->PlaySound(weap->getWarhead()->getExplosionsound());
         }        
         */
-    	    	
+    	
+    	//
+    	// TODO test image death
+    	//
+    	/*Uint32 imageExplosionNum;
+    	//int explosionimage = pc::imagepool->size()<<16;    
+    	Uint32 type = weap->getWarhead()->getType()->getExplosion();
+    	// 1=piff
+    	if (type==1)
+    	{
+    		// Load the image
+    		imageExplosionNum = pc::imgcache->loadImage("piff.shp");
+    		/*SHPImage* temp;
+    		try {
+    			temp = new SHPImage(, -1);
+    		} catch (...) {
+    			logger->error("Unenable to load the image of piff\n");
+    			throw new ImageNotFound("Unenable to load the image of piff");
+    		}*/
+    		/*
+    		new ExplosionAnim(1, dest, imageExplosionNum, 4, 0, 0);
+    	}*/
+    	// 2=piffs
+    	/*if (type==2)
+    	{
+    		SHPImage* temp;
+    		try {
+    			temp = new SHPImage("piffpiff.shp", -1);
+    		} catch (...) {
+    			logger->error("Unenable to load the image of piffpiff\n");
+    			throw new ImageNotFound("Unenable to load the image of piffpiff");;
+    	    }
+    	    new ExplosionAnim(1, dest, explosionimage, 8, 0, 0);
+    	}
+    	*/ 	
+    	
         starget = p::uspool->getStructureAt(dest,weap->getWall());
         if( starget != NULL ) {
             starget->applyDamage((Sint16)weap->getDamage(),weap,owner);

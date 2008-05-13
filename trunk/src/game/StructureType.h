@@ -1,3 +1,21 @@
+// StructureType.h
+// 1.5
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef STRUCTURETYPE_H
 #define STRUCTURETYPE_H
 
@@ -5,18 +23,23 @@
 
 #include "SDL/SDL_types.h"
 
-#include "include/common.h"
-#include "include/weaponspool.h"
 #include "UnitOrStructureType.h"
+#include "PowerInfo.h"
+
 #include "armour_t.h"
-#include "Weapon.h"
 #include "animinfo_t.h"
 
 class INIFile;
 class UnitType;
-class WeaponsPool;
+class Weapon;
 
-class StructureType : public UnitOrStructureType {
+using std::vector;
+
+/**
+ * Base class for structure in game
+ */
+class StructureType : public UnitOrStructureType 
+{
 public:
     StructureType(const char * typeName, INIFile* structini, INIFile * artini, const char * thext);
     ~StructureType();
@@ -29,9 +52,9 @@ public:
 
     const char * getName() const;
 
-    std::vector < char * > getDeployWith() const;
+    vector < char * > getDeployWith() const;
 
-    std::vector < char * > getOwners() const;
+    vector < char * > getOwners() const;
 
     Uint8 getNumLayers() const;
 
@@ -66,11 +89,11 @@ public:
 
     animinfo_t getAnimInfo() const;
 
-    powerinfo_t getPowerInfo() const;
+    PowerInfo getPowerInfo() const;
 
     bool isPowered();
 
-    Weapon * getWeapon(bool primary = true) const;
+    Weapon* getWeapon(bool primary = true) const;
 
     bool hasTurret() const;
 
@@ -93,6 +116,7 @@ public:
     bool isStructure() const;
 
 private:
+	/** Index in the ImagePool of the first MAKE image */
     Uint16 makeimg;
     Uint16 blckoff;
     Sint8 xoffset;
@@ -107,10 +131,10 @@ private:
     Uint8 buildlevel;
     Uint8 * blocked;
     char tname[12];
-    char * name;
-    std::vector < char * > owners;
-    std::vector < char * > deploywith;
-    powerinfo_t powerinfo;
+    char* name;
+    vector<char*> owners;
+    vector<char*> deploywith;
+    PowerInfo powerinfo;
 
     bool is_wall;
     bool turret;
@@ -118,8 +142,8 @@ private:
     bool charges;
     bool WaterBound;
     bool AirBoundUnits;
-	Uint16 *shptnum;
-    Uint16 * shpnums;
+	Uint16* shptnum;
+    Uint16* shpnums;
 };
 
-#endif
+#endif //STRUCTURETYPE_H

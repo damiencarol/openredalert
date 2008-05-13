@@ -95,7 +95,6 @@ int main(int argc, char** argv)
 
 	logger->note("Please wait, FreeRA %s is starting\n", VERSION.c_str());
 
-
 	try
 	{
 		if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_TIMER) < 0)

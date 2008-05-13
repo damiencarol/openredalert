@@ -11,7 +11,9 @@
  * Should calculate the gradients and SDL_MapRGB them to the palette.
  */
 
-// Colour for NOD structures and Soviet units and structures (red)
+/** 
+ * Colour for NOD structures and Soviet units and structures (red)
+ */
 const Uint8 palone[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -31,7 +33,9 @@ const Uint8 palone[] = {
     0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
 
-// Colour used for NOD units. (bluey gray)
+/** 
+ * Colour used for NOD units. (bluey gray)
+ */
 const Uint8 paltwo[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -51,7 +55,9 @@ const Uint8 paltwo[] = {
     0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
 
-// Colour used for a multiplayer side (fluorescent orange)
+/**
+ * Colour used for a multiplayer side (fluorescent orange)
+ */
 const Uint8 palthree[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -71,7 +77,9 @@ const Uint8 palthree[] = {
     0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
 
-// Another multiplayer colour (fluorescent green)
+/**
+ * Another multiplayer colour (fluorescent green)
+ */
 const Uint8 palfour[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -91,7 +99,9 @@ const Uint8 palfour[] = {
     0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
 
-// Another multiplayer colour (turquoise)
+/** 
+ * Another multiplayer colour (turquoise)
+ */
 const Uint8 palfive[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -113,36 +123,37 @@ const Uint8 palfive[] = {
 
 
 
-//
-//
-// Define the Red Alert unit colors
-//
-// Unit colors are determint by 16 colors witch are copied to palette pos 80 until 96
-//
-//
+/**
+ * Define the Red Alert unit colors
+ * 
+ * Unit colors are determint by 16 colors witch are copied to 
+ * palette pos 80 until 96
+ * 
+ * RedAlert color for GREECE (blue)
+ */
+SDL_Color col_greece[] = 
+{
+	{226, 230, 246, 0x0},
+	{206, 210, 234, 0xff},
+	{182, 190, 222, 0xff},
+	{161, 170, 202, 0xff},
+	{141, 149, 186, 0xff},
+	{125, 133, 174, 0xff},
+	{105, 117, 161, 0xff},
+	{89, 105, 149, 0xff},
+	{68, 85, 137, 0xff},
+	{56, 72, 125, 0xff},
+	{48, 64, 117, 0xff},
+	{40, 56, 109, 0xff},
+	{32, 44, 97, 0xff},
+	{24, 44, 85, 0xff},
+	{12, 32, 68, 0xff},
+	{8, 20, 52, 0xff}
+};
 
-
-// RedAlert color for GREECE (blue)
-SDL_Color col_greece[] = {
-				{226, 230, 246, 0x0},
-				{206, 210, 234, 0xff},
-				{182, 190, 222, 0xff},
-				{161, 170, 202, 0xff},
-				{141, 149, 186, 0xff},
-				{125, 133, 174, 0xff},
-				{105, 117, 161, 0xff},
-				{89, 105, 149, 0xff},
-				{68, 85, 137, 0xff},
-				{56, 72, 125, 0xff},
-				{48, 64, 117, 0xff},
-				{40, 56, 109, 0xff},
-				{32, 44, 97, 0xff},
-				{24, 44, 85, 0xff},
-				{12, 32, 68, 0xff},
-				{8, 20, 52, 0xff}
-				};
-
-// RedAlert color for USSR (red)
+/**
+ * RedAlert color for USSR (red)
+ */
 SDL_Color col_ussr[] =	{
 				{255, 93, 0, 0x0},
 				{255, 0, 0, 0xff},
@@ -162,7 +173,9 @@ SDL_Color col_ussr[] =	{
 				{56, 0, 0, 0xff}
 				};
 
-// RedAlert color for UK (green)
+/**
+ * RedAlert color for UK (green)
+ */
 SDL_Color col_uk[] = {
 				{255, 230, 149, 0x0},
 				{255, 230, 149, 0xff},
@@ -182,7 +195,9 @@ SDL_Color col_uk[] = {
 				{20, 20, 20, 0xff}
 				};
 
-// RedAlert color for SPAIN (yellow, gold)
+/**
+ * RedAlert color for SPAIN (yellow, gold)
+ */
 SDL_Color col_spain[] = {
 				{246, 214, 121, 0x0},
 				{230, 202, 113, 0xff},
@@ -202,7 +217,9 @@ SDL_Color col_spain[] = {
 				{40, 32, 8, 0xff}
 				};
 
-// RedAlert color for ITALY (orange)
+/**
+ * RedAlert color for ITALY (orange)
+ */
 SDL_Color col_italy[] = {
 				{255, 230, 149, 0x0},
 				{255, 214, 125, 0xff},
@@ -222,7 +239,7 @@ SDL_Color col_italy[] = {
 				{56, 0, 0, 0xff}
 				};
 
-// RedAlert color for GERMANY (gray)
+/** RedAlert color for GERMANY (gray)*/
 SDL_Color col_germany[] = {
 				{238, 238, 238, 0x0},
 				{238, 226, 218, 0xff},
@@ -242,7 +259,7 @@ SDL_Color col_germany[] = {
 				{44, 28, 24, 0xff}
 				};
 
-// RedAlert color for FRANCE (blue/green)
+/** RedAlert color for FRANCE (blue/green)*/
 SDL_Color col_france[] = {
 				{93, 194, 165, 0x0},
 				{93, 194, 165, 0xff},
@@ -263,7 +280,7 @@ SDL_Color col_france[] = {
 				};
 
 
-// RedAlert color for TURKEY (dark red)
+/** RedAlert color for TURKEY (dark red)*/
 SDL_Color col_turkey[] = {
 				{210, 153, 125, 0x0},
 				{210, 153, 125, 0xff},
@@ -283,12 +300,13 @@ SDL_Color col_turkey[] = {
 				{56, 0, 0, 0xff}
 				};
 
-// RedAlert color for making the popup window backgound red/black
-SDL_Color col_redwindow[] = {
-				{82, 8, 0x0, 0x0},
-				{255, 255, 255, 0x0}, // Not used in background
-				{255, 255, 255, 0x0}, // Not used in background
-				{49, 8, 0x0, 0x0}
-			};
+/** RedAlert color for making the popup window backgound red/black */
+SDL_Color col_redwindow[] = 
+{
+	{82, 8, 0x0, 0x0},
+	{255, 255, 255, 0x0}, // Not used in background
+	{255, 255, 255, 0x0}, // Not used in background
+	{49, 8, 0x0, 0x0}
+};
 
 #endif //PALETTES_H

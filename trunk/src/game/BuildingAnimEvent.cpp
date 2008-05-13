@@ -10,14 +10,17 @@
 #include "Structure.h"
 #include "StructureType.h"
 #include "animinfo_t.h"
+#include "include/config.h"
 
 extern Logger *logger;
 
 namespace pc {
-extern ConfigType Config;
+	extern ConfigType Config;
+	extern CnCMap* ccmap;
+	extern SoundEngine* sfxeng;
 }
 namespace p {
-extern ActionEventQueue* aequeue;
+	extern ActionEventQueue* aequeue;
 }
 
 BuildingAnimEvent::BuildingAnimEvent(Uint32 p, Structure* str, Uint8 mode) :
@@ -144,7 +147,9 @@ void BuildingAnimEvent::run() {
 		}
 		p::aequeue->scheduleEvent(this);
 	}
-void BuildingAnimEvent::updateDamaged() {
+	
+void BuildingAnimEvent::updateDamaged() 
+{
 	bool odam = anim_data.damaged;
 	anim_data.damaged = strct->checkdamage();
 	if (anim_data.damaged) {
@@ -157,7 +162,7 @@ void BuildingAnimEvent::updateDamaged() {
 				anim_data.damagedelta2 = getaniminfo().loopend2+1;
 			}
 		}
-		if (!odam && pc::sfxeng != NULL && !p::ccmap->isLoading()) {
+		if (!odam && pc::sfxeng != 0 && !p::ccmap->isLoading()) {
 			pc::sfxeng->PlaySound(pc::Config.StructureDestroyed);
 		}
 	} else {
@@ -165,6 +170,7 @@ void BuildingAnimEvent::updateDamaged() {
 		anim_data.damagedelta2 = 0;
 	}
 }
+
 animinfo_t BuildingAnimEvent::getaniminfo() {
 	return ((StructureType *)strct->getType())->getAnimInfo();
 }

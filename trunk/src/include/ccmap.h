@@ -13,6 +13,7 @@
 #include "game/MiniMapClipping.h"
 #include "game/Unit.h"
 #include "misc/INIFile.h"
+#include "misc/gametypes.h"
 
 class CellTrigger;
 class LoadingScreen;
@@ -20,6 +21,7 @@ class CnCMap;
 class MissionData;
 class TemplateImage;
 
+using std::string;
 
 struct TerrainEntry
 {
@@ -74,8 +76,10 @@ struct ScrollBookmark {
 struct ScrollData {
     Uint16 maxx, maxy;
     Uint16 curx, cury;
-    Uint16 maxxtileoffs, maxytileoffs;
-    Uint16 curxtileoffs, curytileoffs;
+    Uint16 maxxtileoffs;
+    Uint16 maxytileoffs;
+    Uint16 curxtileoffs;
+    Uint16 curytileoffs;
     Uint16 tilewidth;
 };
 
@@ -95,7 +99,8 @@ public:
     CnCMap();
     ~CnCMap();
 
-    void InitCnCMap (void);
+    void Init(gametypes gameNumber, Uint8 gameMode);
+    // old proto :: void InitCnCMap();
 
     // Comments with "C/S:" at the start are to do with the client/server split.
     // C/S: Members used in both client and server
@@ -138,30 +143,31 @@ public:
 	/** C/S: These functions are client only*/
 	Uint32 getTerrainOverlay( Uint32 pos ) ;
 
-    bool SnowTheme (void);
+    bool SnowTheme();
 
-    SDL_Surface *getMapTile( Uint32 pos ) ;
-    SDL_Surface *getShadowTile(Uint8 shadownum) ;
+    SDL_Surface *getMapTile( Uint32 pos );
+    SDL_Surface *getShadowTile(Uint8 shadownum);
 
-    RA_Teamtype *getTeamtypeByName ( std::string TeamName ) ;
+    RA_Teamtype* getTeamtypeByName(string TeamName);
 
-    RA_Teamtype *getTeamtypeByNumb ( unsigned int TeamNumb ) ;
+    RA_Teamtype* getTeamtypeByNumb(unsigned int TeamNumb);
 
-	RA_Tiggers *getTriggerByName ( std::string TriggerName ) ;
+	RA_Tiggers* getTriggerByName(string TriggerName);
 
-	void setTriggerByName ( std::string TriggerName, RA_Tiggers *Trig ) ;
+	void setTriggerByName(string TriggerName, RA_Tiggers *Trig);
 
-    RA_Tiggers *getTriggerByNumb ( unsigned int TriggerNumb ) ;
+    RA_Tiggers* getTriggerByNumb(unsigned int TriggerNumb);
 
     /**
-    * In red alert when type is bigger the 4 it is normal ore,
-    * when type is smaller or equal to 4 the resource is christal :)
-    */
+     * In red alert when type is bigger the 4 it is normal ore,
+     * when type is smaller or equal to 4 the resource is christal :)
+     */
     bool getResource(Uint32 pos, Uint8* type, Uint8* amount) const ;
 
     void decreaseResource(Uint32 pos, Uint8 amount);
 
-    /** @returns the resource data in a form best understood 
+    /** 
+     * @return the resource data in a form best understood 
      * by the imagecache/renderer
      */
     Uint32 getResourceFrame(Uint32 pos) const ;
@@ -305,9 +311,9 @@ private:
     Uint16 numShadowImg;
     std::vector<SDL_Surface*> shadowimages;
 
-    // Both
-    /// These come from the WAYPOINTS section of the inifile, and contain start
-    /// locations for multiplayer maps.
+
+    /** These come from the WAYPOINTS section of the inifile, and contain start
+     * locations for multiplayer maps.*/
     Uint32 waypoints[100];
 
     vector<Uint32> overlaymatrix;

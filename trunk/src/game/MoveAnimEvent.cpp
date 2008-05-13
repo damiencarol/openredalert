@@ -1,18 +1,22 @@
 #include "MoveAnimEvent.h"
+
 #include <cmath>
+
+#include "include/Logger.h"
 #include "UnitOrStructure.h"
-#include "game/unittypes.h"
-#include "game/TurnAnimEvent.h"
-#include "game/UAttackAnimEvent.h"
+#include "unittypes.h"
+#include "TurnAnimEvent.h"
+#include "UAttackAnimEvent.h"
 #include "Path.h"
 #include "WalkAnimEvent.h"
 #include "ActionEventQueue.h"
-#include "include/Logger.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "Unit.h"
+#include "InfantryGroup.h"
 
 namespace p {
 	extern ActionEventQueue * aequeue;
+	extern UnitAndStructurePool* uspool;
 }
 extern Logger * logger;
 
@@ -31,6 +35,7 @@ MoveAnimEvent::MoveAnimEvent(Uint32 p, Unit* un) : UnitAnimEvent(p,un)
     waiting = false;
     pathinvalid = true;
 }
+
 MoveAnimEvent::~MoveAnimEvent()
 {
     if (un->moveanim == this)
@@ -50,11 +55,13 @@ MoveAnimEvent::~MoveAnimEvent()
         un->turnanim2->stop();
     }
 }
+
 void MoveAnimEvent::stop()
 {
     stopping = true;
     //stopScheduled();
 }
+
 void MoveAnimEvent::run()
 {
     Sint8 uxoff, uyoff;
@@ -67,7 +74,7 @@ void MoveAnimEvent::run()
         return;
     }
 
-    if( path == NULL ) {
+    if (path == 0) {
         p::uspool->setCostCalcOwnerAndType(un->owner, 0);
         path = new Path(un, un->getPos(), dest, range);
         if( !path->empty() ) {
@@ -146,6 +153,7 @@ void MoveAnimEvent::update()
     stopping = false;
     range = 0;
 }
+
 void MoveAnimEvent::startMoveOne(bool wasblocked)
 {
     Unit *BlockingUnit = NULL;
@@ -258,9 +266,9 @@ void MoveAnimEvent::startMoveOne(bool wasblocked)
         }
     }
 }
+
 void MoveAnimEvent::moveDone()
 {
-//	printf ("Move done\n");
     un->xoffset = 0;
     un->yoffset = 0;
 
@@ -286,4 +294,8 @@ void MoveAnimEvent::moveDone()
         }
     }
 }
-void MoveAnimEvent::setRange(Uint32 nr) {range = nr;}
+
+void MoveAnimEvent::setRange(Uint32 nr)
+{
+	range = nr;
+}

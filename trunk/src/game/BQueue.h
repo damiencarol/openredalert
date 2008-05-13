@@ -28,13 +28,13 @@ public:
     bool Add(const UnitOrStructureType* type);
     ConStatus PauseCancel(const UnitOrStructureType* type);
 
-	ConStatus getStatus(void) const;
+	ConStatus getStatus() const;
     ConStatus getStatus(const UnitOrStructureType* type, Uint8* quantity, Uint8* progress) const;
 
     void Placed();
 
-	void Pause (void);
-	void Resume (void);
+	void Pause();
+	void Resume();
 	bool tick();
     
     const UnitOrStructureType* getCurrentType() const ;

@@ -12,6 +12,7 @@ struct animinfo_t {
     Uint8 sectype;
     Uint8 dmgoff;
     Uint8 dmgoff2;
+    /** number of image during making anim */
     Uint16 makenum;
 };
 

@@ -2,19 +2,15 @@
 
 #include <cmath>
 
-#include "include/ccmap.h"
-#include "include/common.h"
-#include "include/PlayerPool.h"
-#include "include/ProjectileAnim.h"
-#include "audio/SoundEngine.h"
-#include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
-#include "include/weaponspool.h"
 #include "anim_nfo.h"
 #include "Structure.h"
 #include "include/Logger.h"
+#include "UnitAndStructurePool.h"
 
 extern Logger * logger;
+namespace p {
+	extern UnitAndStructurePool* uspool;
+}
 
 DoorAnimEvent::DoorAnimEvent(Uint32 p, Structure* str, bool opening) : BuildingAnimEvent(p, str, 5)
 {
@@ -28,13 +24,15 @@ DoorAnimEvent::DoorAnimEvent(Uint32 p, Structure* str, bool opening) : BuildingA
 	strct = str;
 	delayCounter = 0;
 }
-DoorAnimEvent::~DoorAnimEvent ()
+
+DoorAnimEvent::~DoorAnimEvent()
 {
 	if (this->opening){
 		setDelay(20);
 		strct->runSecAnim(5, false);
 	}
 }
+
 void DoorAnimEvent::anim_func(anim_nfo* data)
 {
 	Uint8 subpos = 0;
@@ -54,7 +52,8 @@ void DoorAnimEvent::anim_func(anim_nfo* data)
 				pos = strct->getFreePos(&subpos, strct->CreateUnitType->isInfantry());
 				if (pos != 0xffff) {
 					strct->runAnim(1);
-					p::uspool->createUnit(strct->CreateUnitType, pos, subpos, strct->CreateUnitOwner, FULLHEALTH, 16);
+					// (256 = FULLHEALTH)
+					p::uspool->createUnit(strct->CreateUnitType, pos, subpos, strct->CreateUnitOwner, 256, 16);
 				} else {
 					logger->error("%s line %i: No free position for %s\n", __FILE__, __LINE__, strct->CreateUnitType->getTName());
 				}

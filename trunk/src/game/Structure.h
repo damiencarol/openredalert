@@ -1,6 +1,8 @@
 #ifndef STRUCTURE_H
 #define STRUCTURE_H
 
+#include <string>
+
 #include "SDL/SDL_types.h"
 
 #include "UnitOrStructure.h"
@@ -28,6 +30,7 @@ public:
     Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
             Uint16 rhealth, Uint8 facing, string trigger_name = "None");
     ~Structure();
+    
     Uint8 getImageNums(Uint32 **inums, Sint8 **xoffsets, Sint8 **yoffsets);
     Uint16* getImageNums() const {
         return imagenumbers;
@@ -94,13 +97,13 @@ public:
 	bool underAttack(void);
 	Uint16 getAttackerPosition(void);
 
-	std::string getTriggerName(void) ;
+	string getTriggerName(void) ;
 	
 	static bool valid_pos(StructureType *type, Uint8 PlayerNr, Uint16 pos, Uint8*);
 	static bool valid_possubpos(StructureType *type, Uint8 PlayerNr, Uint16 pos, Uint8* subpos);
 	
 private:
-	std::string TriggerName;
+	string TriggerName;
 	StructureType *type;
 	Uint32 structnum;
 	Uint16 *imagenumbers;
@@ -137,4 +140,4 @@ private:
 	BRepairUnitAnimEvent* repairunitAnim;
 };
 
-#endif
+#endif //STRUCTURE_H

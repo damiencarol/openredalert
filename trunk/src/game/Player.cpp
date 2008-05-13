@@ -30,13 +30,14 @@
 #include "include/PlayerPool.h"
 #include "include/Logger.h"
 #include "MoneyCounter.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "StructureType.h"
 #include "UnitOrStructureType.h"
 #include "Structure.h"
 #include "ConStatus.h"
 #include "pside.h"
 #include "Unit.h"
+#include "PowerInfo.h"
 
 #include "misc/INIFile.h"
 #include "BQueue.h"
@@ -45,6 +46,9 @@ using std::map;
 
 namespace pc {
     extern ConfigType Config;
+}
+namespace p {
+	extern UnitAndStructurePool* uspool;
 }
 extern Logger * logger;
 
@@ -69,6 +73,8 @@ Player::Player(const char *pname, INIFile *mapini)
     playerstart = 0;
     defeated = false;
     
+    
+    
     if( !strcmp((playername), ("GoodGuy")) ) {
     	printf ("Playerside = goodguy??\n");
         playerside = PS_GOOD;
@@ -79,7 +85,7 @@ Player::Player(const char *pname, INIFile *mapini)
         playerside = PS_BAD;
         unitpalnum = 2;
         structpalnum = 1;
-    } else if( !strcmp((playername), ("neutral")) ) {
+    } else if( !strcmp((playername), ("Neutral")) ) {
         playerside = PS_NEUTRAL;
         unitpalnum = 0;
         structpalnum = 0;
@@ -124,23 +130,28 @@ Player::Player(const char *pname, INIFile *mapini)
     powerGenerated = powerUsed = radarstat = 0;
     unitkills = unitlosses = structurekills = structurelosses = 0;
 
-    mapsize = p::ccmap->getWidth()*p::ccmap->getHeight();
+    // this size is just to size matrixs
+    //mapsize = p::ccmap->getWidth()*p::ccmap->getHeight();
+    mapsize = mapini->readInt("Map", "Width", 255)*mapini->readInt("Map", "Height", 255);
     sightMatrix.resize(mapsize);
     buildMatrix.resize(mapsize);
     mapVisible.resize(mapsize);
     mapBuildable.resize(mapsize);
 
+    // cheats ...
     allmap = buildall = buildany = infmoney = false;
 
     queues[0] = new BQueue(this);
-    /// @TODO Only play sound if this is the local player
+
     counter = new MoneyCounter(&money, this, &counter);
 
     NumbRadarStructures = 0;
 
     brad = getConfig().buildable_radius;
-    mwid = p::ccmap->getWidth();
-
+    mwid = mapini->readInt("Map", "Width", 255); // 255 -> max ???
+    
+    this->techLevel = mapini->readInt(pname, "TechLevel", 30);
+    printf("DEBUG: the player %s as Techlevel at %d\n", pname, techLevel);
 }
 
 Player::~Player()
@@ -183,12 +194,14 @@ void Player::setPlayerNum(Uint8 num)
 {
 	playernum = num;
 
+	/*
 	if (p::ccmap->getGameMode() == 0){
 		if (playernum !=  p::ppool->getLPlayerNum() && playerside != PS_NEUTRAL && playerside != PS_SPECIAL){
 			if (pc::Config.mside == "gdi")
 				setMultiColour("red");
 		}
 	}
+	*/
 }
 
 /**
@@ -448,9 +461,11 @@ BQueue* Player::getQueue(Uint8 queuenum)
 
 void Player::builtUnit(Unit* un)
 {
+	// add in the unit pool
     unitpool.push_back(un);
 
-    addSoB(un->getPos(), 1, 1, un->getType()->getSight(),SOB_SIGHT);
+	// add visible
+    addSoB(un->getPos(), 1, 1, un->getType()->getSight(), SOB_SIGHT);
 
     if (defeated) {
         defeated = false;
@@ -513,7 +528,7 @@ void Player::builtStruct(Structure* str)
     addSoB(str->getPos(), st->getXsize(), st->getYsize(), 1, SOB_BUILD);
     
     // get the power info and update constants
-    powerinfo_t newpower = st->getPowerInfo();
+    PowerInfo newpower = st->getPowerInfo();
     powerGenerated += newpower.power;
     powerUsed += newpower.drain;
     
@@ -575,7 +590,7 @@ void Player::lostStruct(Structure* str)
     std::list<Structure*>& sto = structures_owned[st];
     Uint32 i;
     removeSoB(str->getPos(), ((StructureType*)str->getType())->getXsize(), ((StructureType*)str->getType())->getYsize(), 1, SOB_BUILD);
-    powerinfo_t newpower = ((StructureType*)str->getType())->getPowerInfo();
+    PowerInfo newpower = ((StructureType*)str->getType())->getPowerInfo();
 
 //	printf ("%s line %i: Lost structure, power before = %i", __FILE__, __LINE__, powerGenerated);
     powerGenerated -= newpower.power;
@@ -764,15 +779,20 @@ void Player::didUnally(Player* pl)
 
 void Player::setAlliances()
 {
-    INIFile *mapini = p::ppool->getMapINI();
+    INIFile *mapini;
     std::vector<char*> allies_n;
     char *tmp;
 
+	// Get map ini
+	mapini = p::ppool->getMapINI();
+    
+	// populate "allies_n" with allies
     tmp = mapini->readString(playername, "Allies");
-    if( tmp != NULL ) {
-        allies_n = splitList(tmp,',');
-		if (tmp != NULL)
+    if( tmp != NULL ) {    	
+    	allies_n = splitList(tmp,',');
+		if (tmp != NULL){
 			delete[] tmp;
+		}
 		tmp = NULL;
     }
 
@@ -861,13 +881,20 @@ void Player::setPrimary(Structure* str)
     }
 }
 
-void Player::revealAroundWaypoint(Uint32 Waypoint)
+/**
+ * Reveal the map for the player around a waypoint
+ * 
+ * @param waypointNumber number of the waypoint of the map
+ */
+void Player::revealAroundWaypoint(Uint32 waypointNumber)
 {
 	Uint16 xpos;
 	Uint16 ypos;
 	Uint32 wp_cellpos;
+	
+	logger->debug("REVEAL AREA WAYPOINT !\n");
 
-	wp_cellpos = p::ccmap->getWaypoint(Waypoint);
+	wp_cellpos = p::ccmap->getWaypoint(waypointNumber);
 	//	printf ("Waypoint = %u\n", wp_cellpos);
 
 	p::ccmap->translateFromPos(wp_cellpos, &xpos, &ypos);
@@ -1057,6 +1084,12 @@ void Player::enableBuildAll()
 void Player::enableInfMoney() 
 {
 	infmoney = true;
+}
+
+
+Uint8 Player::getTechLevel()
+{
+	return techLevel;
 }
 
 Player::Player() 
