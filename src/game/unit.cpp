@@ -15,22 +15,27 @@
 #include "InfantryGroup.h"
 #include "L2Overlay.h"
 #include "MoveAnimEvent.h"
+#include "Player.h"
 #include "Projectile.h"
 #include "TurnAnimEvent.h"
 #include "UAttackAnimEvent.h"
 #include "UHarvestEvent.h"
 #include "URepairEvent.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "audio/SoundEngine.h"
 #include "include/PlayerPool.h"
 #include "include/Logger.h"
+#include "include/config.h"
 
 namespace p {
 	extern ActionEventQueue * aequeue;
+	extern CnCMap* ccmap;
+	extern PlayerPool* ppool;
 }
 namespace pc {
     extern ConfigType Config;
     extern Ai * ai;
+    extern SoundEngine* sfxeng;
 }
 extern Logger * logger;
 

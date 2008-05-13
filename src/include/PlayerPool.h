@@ -63,8 +63,9 @@ private:
 
     Uint32 playerstarts[10];
 
-    std::vector< Player *> playerpool;
-    std::vector< Uint16 > player_starts;
+    vector< Player *> playerpool;
+    vector< Uint16 > player_starts;
+    
     Uint8 localPlayer, gamemode, radarstatus;
     bool won, lost, updatesidebar;
     INIFile * mapini;

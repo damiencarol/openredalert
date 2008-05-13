@@ -5,24 +5,30 @@
 #include <string>
 #include <vector>
 
-#include "video/SHPImage.h"
-#include "video/ImageCacheEntry.h"
-#include "SHPImage.h"
-#include "ImageCacheEntry.h"
+#include "SDL/SDL_types.h"
+#include "SDL/SDL_video.h"
 
+class ImageCacheEntry;
+class SHPImage;
+
+using std::map;
+using std::string;
+using std::vector;
+
+/**
+ * Class to bufferize the SHP image pool
+ */
 class ImageCache
 {
 public:
-    ImageCache();
-    ~ImageCache();
 
 	Uint32 getNumbImages(Uint32 imgnum);
 	Uint32 getNumbImages(const char* fname);
-    void setImagePool(std::vector<SHPImage *> *imagepool);
+    void setImagePool(vector<SHPImage *> *imagepool);
     ImageCacheEntry& getImage(Uint32 imgnum);
     ImageCacheEntry& getImage(Uint32 imgnum, Uint32 frame);
 
-	void setImage(SDL_Surface*Image, SDL_Surface* Shadow, Uint32 imgnum);
+	void setImage(SDL_Surface* Image, SDL_Surface* Shadow, Uint32 imgnum);
 
     /** @TODO Arbitrary post-processing filter, e.g. colour fiddling.
      * ImageCacheEntry& getText(const char*); // Caches text
@@ -33,8 +39,9 @@ public:
      *    };
      * void applyFilter(const char* fname, const FilterFunc&);
      */
-    /// @brief Loads the shpimage fname into the imagecache.
+    /** Loads the shpimage fname into the imagecache. */
     Uint32 loadImage(const char* fname);
+    /** Loads the shpimage fname into the imagecache. */
     Uint32 loadImage(const char* fname, int scaleq);
 
     void newCache();
@@ -42,9 +49,13 @@ public:
 	void Cleanup(void);
 
 private:
-    std::map<Uint32, ImageCacheEntry> cache; std::map<Uint32, ImageCacheEntry> prevcache;
-    std::map<std::string, Uint32> namecache;
-    std::vector<SHPImage*>* imagepool;
+    map<Uint32, ImageCacheEntry> cache; 
+    map<Uint32, ImageCacheEntry> prevcache;
+    map<string, Uint32> namecache;
+    vector<SHPImage*>* imagepool; // SHP Image pool
+
+    /** @link association */
+    /*# ImageCacheEntry lnkImageCacheEntry; */
 };
 
 #endif //IMAGECACHE_H

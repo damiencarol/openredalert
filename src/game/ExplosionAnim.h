@@ -9,15 +9,21 @@
 
 struct L2Overlay;
 
+using std::multimap;
+
+/**
+ * Anim to create an Explosion Animation
+ */
 class ExplosionAnim : public ActionEvent
 {
 public:
     ExplosionAnim(Uint32 p, Uint16 pos, Uint32 startimage, Uint8 animsteps,
                   Sint8 xoff, Sint8 yoff);
     ~ExplosionAnim();
+
     void run();
 private:
-    ExplosionAnim() ;
+    ExplosionAnim() ; // Declare private constructor to force parameter in constructor
 
     L2Overlay *l2o;
     Uint16 pos;

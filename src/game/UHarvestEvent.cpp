@@ -1,19 +1,25 @@
 #include "UHarvestEvent.h"
+
 #include <cmath>
+
+#include "include/ccmap.h"
 #include "UnitOrStructure.h"
 #include "Structure.h"
-#include "game/Unit.h"
-#include "game/unittypes.h"
-#include "include/UnitAndStructurePool.h"
-#include "game/TurnAnimEvent.h"
+#include "unittypes.h"
+#include "UnitAndStructurePool.h"
+#include "TurnAnimEvent.h"
 #include "MoveAnimEvent.h"
 #include "ActionEventQueue.h"
+#include "Player.h"
 #include "include/PlayerPool.h"
 #include "include/Logger.h"
 #include "Unit.h"
 
 namespace p {
 	extern ActionEventQueue * aequeue;
+	extern CnCMap* ccmap;
+	extern PlayerPool* ppool;
+	extern UnitAndStructurePool* uspool;
 }
 extern Logger * logger;
 

@@ -24,7 +24,7 @@ public:
     void dumpstats();
 
 private:
-	Uint8	MissionNr;
+	Uint8 MissionNr;
 	Uint32 OldUptime;
     ConfigType config;
     Uint8 gamemode;

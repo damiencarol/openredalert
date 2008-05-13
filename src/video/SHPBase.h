@@ -6,9 +6,6 @@
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_video.h"
 
-#include "video/Dune2Header.h"
-#include "video/SHPHeader.h"
-
 class VFile;
 class ImageProc;
 
@@ -17,7 +14,7 @@ using std::string;
 
 class SHPBase {
 public:
-    SHPBase(const std::string& fname, Sint8 scaleq = -1);
+    SHPBase(const string& fname, Sint8 scaleq = -1);
     virtual ~SHPBase();
 
     static void setPalette(SDL_Color *pal);
@@ -27,12 +24,12 @@ public:
     static Uint8 numPalettes() ;
 
     SDL_Surface* scale(SDL_Surface *input, int quality);
-    const std::string& getFileName() const ;
+    const string& getFileName() const ;
 
 protected:
     static SDL_Color palette[32][256];
     static const Uint8 numpals;
-    std::string name;
+    string name;
     Sint8 scaleq;
     ImageProc* scaler;
 };

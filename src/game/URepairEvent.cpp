@@ -1,19 +1,26 @@
 #include "URepairEvent.h"
+
 #include <cmath>
+
 #include "UnitOrStructure.h"
-#include "game/Unit.h"
-#include "game/unittypes.h"
-#include "game/TurnAnimEvent.h"
-#include "game/UAttackAnimEvent.h"
+#include "unittypes.h"
+//#include "game/TurnAnimEvent.h"
+//#include "game/UAttackAnimEvent.h"
 #include "MoveAnimEvent.h"
 #include "Structure.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "Unit.h"
+#include "ActionEventQueue.h"
+
+namespace p {
+	extern UnitAndStructurePool* uspool;
+	extern ActionEventQueue* aequeue;
+}
 
 URepairEvent::URepairEvent(Uint32 p, Unit *un) : UnitAnimEvent(p,un)
 {
-int		un_cost;
-Sint16	health;
+	int		un_cost;
+	Sint16	health;
 
 	this->un	= un;
 	stopping	= false;

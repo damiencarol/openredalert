@@ -9,10 +9,6 @@
 #include "animinfo_t.h"
 
 class Weapon;
-class WeaponsPool;
-class Unit;
-class Structure;
-class UnitAndStructurePool;
 
 using std::vector;
 
@@ -20,21 +16,8 @@ using std::vector;
  * UnitOrStructureType is used when you can't or don't need to know whether you are dealing with a unit type or a structure
  * type.  Note that this class is abstract, it is only used for performing casts.
  */
-class UnitOrStructureType {
-protected :
-    Uint8 sight;
-    animinfo_t animinfo;
-    armour_t armour;
-    Weapon* secondary_weapon;
-    Weapon* primary_weapon;
-    Uint16 maxhealth;
-    Uint8 speed;
-    Uint16 cost;
-    Uint8 techlevel;
-    std::vector < char * > prereqs;
-    Uint8 ptype;
-    bool valid;
-
+class UnitOrStructureType 
+{
 public :
     UnitOrStructureType();
     virtual ~UnitOrStructureType();
@@ -107,13 +90,26 @@ public :
     /**
      * Returns the maximum health for this type. 
      */
-    Uint16 getMaxHealth() const ;
+    Uint16 getMaxHealth() const;
 
     /**
      * Sight range, in cells (def=1). 
      */
-    Uint8 getSight() const ;
+    Uint8 getSight() const;
+    
+protected :
+    Uint8 sight;
+    animinfo_t animinfo;
+    armour_t armour;
+    Weapon* secondary_weapon;
+    Weapon* primary_weapon;
+    Uint16 maxhealth;
+    Uint8 speed;
+    Uint16 cost;
+    Uint8 techlevel;
+    vector<char*> prereqs;
+    Uint8 ptype;
+    bool valid;
 };
-
 
 #endif //UNITORSTRUCTURETYPE_H

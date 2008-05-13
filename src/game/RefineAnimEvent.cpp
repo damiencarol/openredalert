@@ -11,9 +11,12 @@
 #include "anim_nfo.h"
 #include "Structure.h"
 
-extern Logger * logger;
+//extern Logger * logger;
+namespace p {
+	extern PlayerPool* ppool;
+}
 
-RefineAnimEvent::RefineAnimEvent(Uint32 p, Structure* str, Uint8 bails) : BuildingAnimEvent(p,str,7)
+RefineAnimEvent::RefineAnimEvent(Uint32 p, Structure* str, Uint8 bails) : BuildingAnimEvent(p, str, 7)
 {
 	updateDamaged();
 	
@@ -21,7 +24,7 @@ RefineAnimEvent::RefineAnimEvent(Uint32 p, Structure* str, Uint8 bails) : Buildi
     this->str = str;
     frame = framestart;
     
-    logger->error ("%s line %i: Start refine animation\n", __FILE__, __LINE__);
+    //logger->error ("%s line %i: Start refine animation\n", __FILE__, __LINE__);
 }
 
 void RefineAnimEvent::anim_func(anim_nfo* data)
@@ -34,6 +37,7 @@ void RefineAnimEvent::anim_func(anim_nfo* data)
         } else {
             frame = framestart;
             --bails;
+            // TODO CHANGE IT TO GET FROM STRUCTURE
             p::ppool->getPlayer(str->getOwner())->changeMoney(100);
         }
     } else {

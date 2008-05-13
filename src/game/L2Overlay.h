@@ -18,4 +18,4 @@ struct L2Overlay
     Uint8 numimages;
 };
 
-#endif
+#endif //L2OVERLAY_H

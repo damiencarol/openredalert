@@ -10,7 +10,7 @@
 #include "include/Logger.h"
 #include "include/PlayerPool.h"
 #include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "include/weaponspool.h"
 #include "audio/SoundEngine.h"
 #include "include/dispatcher.h"
@@ -28,7 +28,9 @@
 #define DEBUG_AI
 
 using p::ccmap;
-
+namespace p {
+	extern UnitAndStructurePool* uspool;
+}
 extern Logger * logger;
 
 /**
@@ -42,16 +44,17 @@ Ai::Ai()
 
 	NumbPlayers = p::ppool->getNumPlayers();
 
-	for (unsigned int i = 0; i < (unsigned)NumbPlayers; i++){
-		LastGuideTickCount.push_back (SDL_GetTicks());
-		LastBuildTickCount.push_back (SDL_GetTicks());
-		LastAttackTickCount.push_back (SDL_GetTicks());
-		LastDefendTickCount.push_back (SDL_GetTicks());
-		LastHarvestTickCount.push_back (SDL_GetTicks());
-		LastGuideGatherTickCount.push_back (SDL_GetTicks());
-		RetryDeploy.push_back (false);
-		player_targets.push_back (NULL);
-		UnitBuildMultiplexer.push_back (0);
+	for (unsigned int i = 0; i < (unsigned)NumbPlayers; i++)
+	{
+		LastGuideTickCount.push_back(SDL_GetTicks());
+		LastBuildTickCount.push_back(SDL_GetTicks());
+		LastAttackTickCount.push_back(SDL_GetTicks());
+		LastDefendTickCount.push_back(SDL_GetTicks());
+		LastHarvestTickCount.push_back(SDL_GetTicks());
+		LastGuideGatherTickCount.push_back(SDL_GetTicks());
+		RetryDeploy.push_back(false);
+		player_targets.push_back(0);
+		UnitBuildMultiplexer.push_back(0);
 	}
 //  AiDifficultyTimer.Start();
 	
@@ -61,9 +64,9 @@ Ai::Ai()
 
 	/// Load the sounds ini file
 	INIFile *rules_ini = GetConfig("rules.ini");
-
-	if (rules_ini != NULL){
-		Rules->AttackInterval	= rules_ini->readInt	("AI", "AttackInterval", 3);
+	if (rules_ini != 0)
+	{
+		Rules->AttackInterval = rules_ini->readInt	("AI", "AttackInterval", 3);
 		Rules->AttackDelay	= rules_ini->readInt	("AI", "AttackDelay", 5);
 		Rules->PatrolScan	= rules_ini->readFloat	("AI", "PatrolScan", .016);
 		Rules->CreditReserve	= rules_ini->readInt	("AI", "CreditReserve", 100);
@@ -139,13 +142,13 @@ Ai::~Ai()
 	delete Rules;
 }
 
-void Ai::SetDifficulty (int Diff)
+void Ai::SetDifficulty(int Diff)
 {
 	if (Diff <= 4)
 		this->Difficulty = Diff;
 }
 
-void Ai::DefendUnits (Player* pPlayer, int pPlayerNumb)
+void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 {
 	UnitOrStructure     *lEnemy = NULL;
 	int                 lNumbUnits;
@@ -200,9 +203,9 @@ void Ai::DefendUnits (Player* pPlayer, int pPlayerNumb)
 		}
 
 		lEnemyStructure = EnemyStructureInRange ( pPlayerNumb, lUnit );
-		if (lEnemyStructure != NULL && lUnit->canAttack()){
-
-//			Enemy  = p::uspool->getUnitOrStructureAt(EnemyStructure->getPos(), EnemyStructure->getSubpos());
+		if (lEnemyStructure != NULL && lUnit->canAttack())
+		{
+			//Enemy  = p::uspool->getUnitOrStructureAt(EnemyStructure->getPos(), EnemyStructure->getSubpos());
 
 //			if ( Enemy != NULL ){
 //				Unit->attack(Enemy);
@@ -212,6 +215,7 @@ void Ai::DefendUnits (Player* pPlayer, int pPlayerNumb)
 		}
 	}
 }
+
 void Ai::DefendComputerPlayerBaseUnderAttack (Player *Player, int PlayerNumb, UnitOrStructure *Enemy, Structure *StructureUnderAttack)
 {
 int			NumbUnits = 0;
@@ -613,16 +617,16 @@ Uint32 Ai::getDist(Uint32 pos1, Uint32 pos2)
 
 bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
 {
-Uint32	placeypos,
-		placexpos,
-		curpos;
-Uint16	xpos,
-		ypos;
-Uint32	br;
+	Uint32 placeypos;
+	Uint32 placexpos;
+	Uint32 curpos;
+	Uint16 xpos;
+	Uint16 ypos;
+	Uint32	br;
 
     p::ccmap->translateFromPos(pos, &xpos, &ypos);
 
-	StructureType* Type		= p::uspool->getStructureTypeByName(structname);
+	StructureType* Type	= p::uspool->getStructureTypeByName(structname);
 
 	std::vector<bool>& buildable = p::ppool->getPlayer(PlayerNumb)->getMapBuildable();
 

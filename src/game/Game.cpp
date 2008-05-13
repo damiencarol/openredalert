@@ -58,15 +58,16 @@ extern Logger * logger;
 
 namespace p
 {
-extern PlayerPool * ppool;
-extern ActionEventQueue* aequeue;
-extern RedAlertDataLoader * raLoader;
+	extern PlayerPool * ppool;
+	extern ActionEventQueue* aequeue;
+	extern RedAlertDataLoader * raLoader;
 }
 namespace pc
 {
-extern GraphicsEngine * gfxeng;
-extern Ai * ai;
-extern ConfigType Config;
+	extern GraphicsEngine * gfxeng;
+	extern Ai * ai;
+	extern ConfigType Config;
+	extern vector<SHPImage *> *imagepool;	
 }
 extern MIXFiles * mixfiles;
 
@@ -78,16 +79,18 @@ Game::Game()
 {
 	MissionNr = 0;
 	OldUptime = 0;
-	pc::ai = NULL;
-	pc::input = NULL;
-	pc::cursor = NULL;
-	pc::sidebar = NULL;
-	p::dispatcher = NULL;
-	p::aequeue = NULL;
-	p::ccmap = NULL;
-	pc::imagepool = NULL;
-	pc::gfxeng = NULL;
-	pc::sfxeng = NULL;
+	pc::ai = 0;
+	pc::input = 0;
+	pc::cursor = 0;
+	pc::sidebar = 0;
+	p::dispatcher = 0;
+	p::aequeue = 0;
+	p::ccmap = 0;
+	pc::imagepool = 0;
+	pc::gfxeng = 0;
+	pc::sfxeng = 0;
+	
+	// At start the sound "BattleControlTerminated" is not played
 	BattleControlTerminated = false;
 }
 
@@ -130,7 +133,7 @@ void Game::InitializeMap(string MapName)
 	try
 	{
 		p::ccmap = new CnCMap();
-		p::ccmap->InitCnCMap();
+		p::ccmap->Init(GAME_RA, this->gamemode);
 		p::ccmap->loadMap(pc::Config.mapname.c_str(), NULL);
 	}
 	catch (LoadMapError& ex)
@@ -210,7 +213,7 @@ void Game::InitializeMap(string MapName)
 
 }
 
-void Game::InitializeGameClasses(void)
+void Game::InitializeGameClasses()
 {
 	// Initialise Video
 	try
@@ -263,11 +266,7 @@ void Game::InitializeGameClasses(void)
 		throw runtime_error("Unable to initialise the RA Data loader");
 	}
 
-	// Load the music files (for background music
-	/// @TODO We've already loaded files.ini in the vfs.
-	INIFile *fileini = GetConfig("files.ini");
-	INIKey key = fileini->readIndexedKeyValue("general", pc::Config.gamenum, "play");
-	
+	// Load the music files (for background music	
 	// Create playlist with all music of RedAlert
 	if (pc::sfxeng->CreatePlaylist() != true)
 	{
@@ -406,17 +405,16 @@ void Game::FreeMemory()
 
 	VFSUtils::VFS_Destroy();
 
-	//pc::PauseMenu		= NULL;
-	pc::ai = NULL;
-	pc::input = NULL;
-	pc::cursor = NULL;
-	pc::sidebar = NULL;
-	p::dispatcher = NULL;
-	p::aequeue = NULL;
-	p::ccmap = NULL;
-	pc::imagepool = NULL;
-	pc::gfxeng = NULL;
-	pc::sfxeng = NULL;
+	pc::ai = 0;
+	pc::input = 0;
+	pc::cursor = 0;
+	pc::sidebar = 0;
+	p::dispatcher = 0;
+	p::aequeue = 0;
+	p::ccmap = 0;
+	pc::imagepool = 0;
+	pc::gfxeng = 0;
+	pc::sfxeng = 0;
 }
 
 /** 
@@ -451,7 +449,16 @@ void Game::play()
 		logger->debug("2\n");
 		exit(0);
 */
-		
+		// TODO DEBUG
+		CnCMap* themap;
+		themap = new CnCMap();
+		logger->debug("$create ok\n");
+		themap->Init(GAME_RA, GAME_MODE_SINGLE_PLAYER);
+		logger->debug("$init ok\n");
+		themap->loadMap("scg01ea", 0);
+		logger->debug("$load ok\n");
+		exit(0);
+					
 		// Load the Menu sound "intro.aud"
 		pc::sfxeng->LoadSound("intro.aud");
 		// Play this sound
@@ -583,24 +590,22 @@ void Game::play()
 				//pc::PauseMenu->HandleMenu();
 				lPauseMenu->HandleMenu();
 			}
-printf("A\n");
+
 			// Draw the scene
 			pc::gfxeng->renderScene();
-printf("B\n");
-			
+
 			// Run scheduled events
 			p::aequeue->runEvents();
-			
+
 			// Handle the input
 			pc::input->handle();
-			
+
 			// Handle the ai
 			pc::ai->handle();
-						
+
 			// Handle timing triggers
 			HandleTiming();
-			
-			
+
 			if (gamemode == 2)
 			{
 				// Synchronise events with server

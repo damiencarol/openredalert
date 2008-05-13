@@ -2,19 +2,25 @@
 
 #include <cmath>
 
-#include "include/ccmap.h"
+#include "Player.h"
 #include "include/PlayerPool.h"
-#include "include/ProjectileAnim.h"
 #include "audio/SoundEngine.h"
-#include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
+#include "Unit.h"
+#include "UnitAndStructurePool.h"
 #include "include/weaponspool.h"
 #include "anim_nfo.h"
 #include "Structure.h"
 #include "include/Logger.h"
+#include "ActionEventQueue.h"
 
+namespace p {
+	extern ActionEventQueue* aequeue;
+	extern UnitAndStructurePool* uspool;
+	extern PlayerPool* ppool;
+}
 namespace pc {
-    extern ConfigType Config;
+    //extern ConfigType Config;
+    extern SoundEngine* sfxeng;
 }
 extern Logger * logger;
 
@@ -60,9 +66,9 @@ BRepairUnitAnimEvent::~BRepairUnitAnimEvent()
 }
 void BRepairUnitAnimEvent::run()
 {
-Unit *UnitToFix = NULL;
-Sint16	health;
-Uint16	cost;
+	Unit* UnitToFix = 0;
+	Sint16 health;
+	Uint16 cost;
 
 //	updateDamaged();
 
@@ -82,7 +88,7 @@ Uint16	cost;
 
 	if (health < UnitToFix->getType()->getMaxHealth()){
 		cost = (Uint16)((double)dmg_cost/((double)UnitToFix->getType()->getMaxHealth() - (double)health));
-		Player *Owner = p::ppool->getPlayer(UnitToFix->getOwner());
+		Player* Owner = p::ppool->getPlayer(UnitToFix->getOwner());
 		if (Owner->getMoney() > cost){
 			Owner->changeMoney(-1 * cost);
 			dmg_cost -= cost;
@@ -91,7 +97,8 @@ Uint16	cost;
 		}
 	}else{
 		//printf ("%s line %i: Unit repaired\n", __FILE__, __LINE__);
-		pc::sfxeng->PlaySound(pc::Config.UnitRepaired);
+		// TODO ADD "Unit repaired" sound
+		//pc::sfxeng->PlaySound(pc::Config.UnitRepaired);
 		stop();
 	}
 

@@ -1,36 +1,39 @@
 #include "InfantryGroup.h"
+
 #include <cstdlib>
 #include <cstring>
 #include <string>
 #include <math.h>
+
 #include "SDL/SDL_timer.h"
+
 #include "include/ccmap.h"
+#include "include/weaponspool.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
 #include "include/PlayerPool.h"
 #include "audio/SoundEngine.h"
-#include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
-#include "include/weaponspool.h"
-#include "game/Unit.h"
+#include "UnitAndStructurePool.h"
 #include "Unit.h"
 
 using std::string;
 using std::vector;
 
 InfantryGroup::InfantryGroup()
-	{
-		//logger->debug("Setting up infgroup %p\n", this);
-		for (int i=0;i<5;i++){
-			positions[i] = NULL;
-		}
-		numinfantry = 0;
+{
+	//logger->debug("Setting up infgroup %p\n", this);
+	for (int i=0;i<5;i++){
+		positions[i] = NULL;
 	}
+	numinfantry = 0;
+}
+
 InfantryGroup::~InfantryGroup()
-    {
-        //logger->debug("Destructing infgroup %p\n", this);
-//		printf ("%s line %i: Destroying infgroup\n", __FILE__, __LINE__);
-    }
+{
+	//logger->debug("Destructing infgroup %p\n", this);
+	// printf ("%s line %i: Destroying infgroup\n", __FILE__, __LINE__);
+}
+
 const Sint8 InfantryGroup::unitoffsets[10] = {
     /* Theses values have been heavily tested, do NOT change them unless you're
      *        _really_ sure of what you are doing */
@@ -39,44 +42,51 @@ const Sint8 InfantryGroup::unitoffsets[10] = {
     /* Y value */
     -3, -7, -7, 1, 1
 };
+
 bool InfantryGroup::AddInfantry(Unit* inf, Uint8 subpos)
-    {
-        assert(subpos < 5);
-        assert(numinfantry < 5);
-        positions[subpos] = inf;
-        ++numinfantry;
-        return true;
-    }
+{
+	assert(subpos < 5);
+	assert(numinfantry < 5);
+	positions[subpos] = inf;
+	++numinfantry;
+	return true;
+}
+
 bool InfantryGroup::RemoveInfantry(Uint8 subpos)
-    {
-        assert(subpos < 5);
-        assert(numinfantry > 0);
-        positions[subpos] = NULL;
-        --numinfantry;
-        return true;
-    }
+{
+	assert(subpos < 5);
+	assert(numinfantry > 0);
+	positions[subpos] = NULL;
+	--numinfantry;
+	return true;
+}
+
 bool InfantryGroup::IsClear(Uint8 subpos)
-    {
-        assert(subpos < 5);
-        return (positions[subpos] == NULL);
-    }
+{
+	assert(subpos < 5);
+	return (positions[subpos] == NULL);
+}
+
 Uint8 InfantryGroup::GetNumInfantry() const
-    {
-        return numinfantry;
-    }
+{
+	return numinfantry;
+}
+
 bool InfantryGroup::IsAvailable() const
-    {
-        return (numinfantry < 5);
-    }
+{
+	return (numinfantry < 5);
+}
+
 Uint8 InfantryGroup::GetFreePos() const
-    {
-        for (int i = 0; i < 5; ++i) {
-            if (0 == positions[i]) {
-                return i;
-            }
-        }
-        return (Uint8)-1;
-    }
+{
+	for (int i = 0; i < 5; ++i) {
+		if (0 == positions[i]) {
+			return i;
+		}
+	}
+	return (Uint8)-1;
+}
+
 Unit* InfantryGroup::UnitAt(Uint8 subpos)
     {
         assert(subpos < 5);
@@ -119,11 +129,8 @@ Unit * InfantryGroup::GetNearest(Uint8 subpos){
     };
     Uint8 x;
 
-    /* The compiler will optimise this nicely with -funroll-loops,
-
-     * leaving it like this to keep it readable.
-     */
-
+    // The compiler will optimise this nicely with -funroll-loops,
+    // leaving it like this to keep it readable.
     for (x = 0; x < 4; ++x)
         if (0 != positions[lut[x + subpos * 4]]) return positions[lut[x + subpos * 4]];
     return 0;

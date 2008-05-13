@@ -7,8 +7,7 @@ class MissionData {
 public:
 	~MissionData();
 	MissionData();
-	/** used to determine what units/structures can be built */
-	Uint8 buildlevel;
+	
 	/** the name of the map */
 	char* mapname;
 	/** movie played after failed mission */
@@ -27,4 +26,4 @@ public:
 	char* theater;
 };
 
-#endif
+#endif //MISSIONDATA_H

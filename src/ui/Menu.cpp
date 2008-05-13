@@ -21,6 +21,7 @@
 #include "RA_WindowClass.h"
 #include "RA_Label.h"
 #include "DropDownListBox.h"
+#include "ListBoxClass.h"
 #include "Font.h"
 #include "Cursor.h"
 #include "TCheckBox.h"
@@ -50,7 +51,8 @@ extern Logger * logger;
 
 /**
  */ 
-Menu::Menu() : StartNewGameButton()
+Menu::Menu() :
+  StartNewGameButton()
 {
 	SDL_Color	palette[256];
 	SDL_Color	Fcolor;
@@ -63,19 +65,16 @@ Menu::Menu() : StartNewGameButton()
 	// Use the red backgound for the multiplayer menu and the mission menu
 	this->MultiPlayerMenu.setPalette(9);
 	MissionMenu1.setPalette(9);
-
 	
-
-
 	// Setup the font color
 	Fcolor.r = 205;
 	Fcolor.g = 0;
 	Fcolor.b = 0;
 
-	win95_logo	= NULL;
-	dos_logo	= NULL;
-	SDLlogo 	= NULL;
-	cursorimg	= NULL;
+	win95_logo	= 0;
+	dos_logo	= 0;
+	SDLlogo 	= 0;
+	cursorimg	= 0;
 	isDone		= false;
 	MenuState	= 1;
 
@@ -149,25 +148,30 @@ Menu::Menu() : StartNewGameButton()
 	int ButtonXpos	= display->w/2 - button_width/2;
 	int ButtonYpos	= int(200 * scale_factor);
 
-	printf ("Start create button surfaces\n");
 
-	StartNewGameButton.CreateSurface("Start New Game", ButtonXpos, ButtonYpos, button_width, button_height );
+	// Set pos and label (the string 17 is "new game" but located)
+	StartNewGameButton.CreateSurface(strFile->getString(17), ButtonXpos, ButtonYpos, button_width, button_height);
+	// Add a space
 	ButtonYpos += button_height + button_space;
 
-	InternetGameButton.CreateSurface("Internet Game", ButtonXpos, ButtonYpos, button_width, button_height  );
+	InternetGameButton.CreateSurface("Internet Game", ButtonXpos, ButtonYpos, button_width, button_height);
+	// Add a space
 	ButtonYpos += button_height + button_space;
 
-	LoadMissionButton.CreateSurface("Btitaque arienn", ButtonXpos, ButtonYpos, button_width, button_height  );
+	LoadMissionButton.CreateSurface("Btitaque arienn", ButtonXpos, ButtonYpos, button_width, button_height);
+	// Add a space
 	ButtonYpos += button_height + button_space;;
 
-	MultiplayerGameButton.CreateSurface("Multiplayer Game", ButtonXpos, ButtonYpos, button_width, button_height );
+	MultiplayerGameButton.CreateSurface("Multiplayer Game", ButtonXpos, ButtonYpos, button_width, button_height);
+	// Add a space
 	ButtonYpos += button_height + button_space;
 
-	IntroAndSneakPeekButton.CreateSurface("Intro & Sneak Peek", ButtonXpos, ButtonYpos, button_width, button_height  );
+	IntroAndSneakPeekButton.CreateSurface("Intro & Sneak Peek", ButtonXpos, ButtonYpos, button_width, button_height);
+	// Add a space
 	ButtonYpos += button_height + button_space;
 
 	// (the string 46 is "quit game" but located)
-	ExitGameButton.CreateSurface(strFile->getString(46), ButtonXpos, ButtonYpos, button_width, button_height  );
+	ExitGameButton.CreateSurface(strFile->getString(46), ButtonXpos, ButtonYpos, button_width, button_height);
 
 	
 
@@ -353,6 +357,12 @@ Menu::Menu() : StartNewGameButton()
 	// Load mission maps data
 	missionList = new MissionMapsClass();
 	
+	// Load multiPlayer maps
+	MultiPlayerMaps = new MPmapsClass();
+	
+	// Build Lisbox with mission multi
+	listBox = new ListboxClass();
+	
 	printf("end constructor menu\n");
 }
 
@@ -372,6 +382,9 @@ Menu::~Menu()
 	
 	// Free List of missions (not needed)
 	//delete missionList;
+	
+	// Free Listbox component that contains list of multi-player missions
+	delete listBox;
 }
 
 void Menu::DrawMenuBackground()
@@ -479,7 +492,7 @@ void Menu::HandleInput (void)
 			case 3:
 				this->PlayerName.HandleInput(event);
 				this->SideSelection.HandleInput(event);
-				this->ListBox.HandleInput(event);
+				this->listBox->HandleInput(event);
 				Oke.handleMouseEvent(event);
 				Cancel.handleMouseEvent(event);
 				break;
@@ -605,8 +618,8 @@ void Menu::HandleInput (void)
 							//"green"
 							//"turquoise"
 							if (Oke.MouseOver()){
-								printf ("Selected map nr = %i\n", ListBox.GetSelectionIndex ());
-								MultiPlayerMaps.getMapName(ListBox.GetSelectionIndex (), pc::Config.mapname);
+								printf ("Selected map nr = %i\n", this->listBox->GetSelectionIndex ());
+								MultiPlayerMaps->getMapName(this->listBox->GetSelectionIndex(), pc::Config.mapname);
 								// Printf ("For some reason the game crashes when skirmisch is selected??
 								pc::Config.UseFogOfWar	= true;
 								pc::Config.playernum	= 1;	// Local player player number
@@ -684,11 +697,11 @@ int Menu::HandleMenu()
 
 	// Setup the multi player listbox with all the multiplayer maps
 	i = 0;
-	while (MultiPlayerMaps.getMapDescription(i, TmpString)){
-		ListBox.AddString(TmpString);
+	while (MultiPlayerMaps->getMapDescription(i, TmpString)){
+		this->listBox->AddString(TmpString);
 		i++;
 	}
-		
+
 	// should be: Russia, England, Ukraine, Germany, France
 	SideSelection.AddEntry("Russia");
 	SideSelection.AddEntry("England");
@@ -696,14 +709,16 @@ int Menu::HandleMenu()
 	SideSelection.AddEntry("Germany");
 	SideSelection.AddEntry("France");
 
-	while( !isDone ) {
-
+	while( !isDone ) 
+	{
+		// get mouse coords
 		SDL_GetMouseState(&mx, &my);
 
 		// Draw the background pixture
 		this->DrawMenuBackground ();
 		// Draw buttons
 		this->DrawMainMenuButtons ();
+
 
 		if (MenuState == 2){
 			// first draw the buttons on the window,
@@ -726,7 +741,7 @@ int Menu::HandleMenu()
 			ButtonColTurkey.drawbutton ();
 			MultiPlayerMenu.DrawWindow();
 			PlayerName.Draw(50,35);
-			ListBox.DrawListBox (130, 80);
+			this->listBox->DrawListBox(130, 80);
 			SideSelection.Draw (220,35);
 		}
 

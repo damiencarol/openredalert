@@ -1,14 +1,15 @@
 #include "RepairAnimEvent.h"
+
 #include <cmath>
-#include "include/ccmap.h"
-#include "include/PlayerPool.h"
-#include "include/ProjectileAnim.h"
-#include "audio/SoundEngine.h"
-#include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
-#include "include/weaponspool.h"
+
 #include "anim_nfo.h"
 #include "Structure.h"
+#include "Player.h"
+#include "include/PlayerPool.h"
+
+namespace p {
+	extern PlayerPool* ppool;
+}
 
 RepairAnimEvent::RepairAnimEvent(Uint32 p, Structure* str) : BuildingAnimEvent(p,str,0)
 {
@@ -16,6 +17,7 @@ RepairAnimEvent::RepairAnimEvent(Uint32 p, Structure* str) : BuildingAnimEvent(p
 	Sint16	health;
 
 	updateDamaged();
+	
 	structure = str;
 	health = structure->getHealth();
 	str_cost = structure->getType()->getCost();
@@ -31,16 +33,19 @@ RepairAnimEvent::RepairAnimEvent(Uint32 p, Structure* str) : BuildingAnimEvent(p
 
 //	printf ("%s line %i: Repair anim CONSTRUCTOR, frame = %i\n", __FILE__, __LINE__, frame);
 }
+
 RepairAnimEvent::~RepairAnimEvent()
 {
 	updateDamaged();
-	structure->repairDone ();
+	structure->repairDone();
 //	printf ("%s line %i: Repair anim DESTRUCTOR\n", __FILE__, __LINE__);
 }
+
 void RepairAnimEvent::anim_func(anim_nfo* data)
 {
-Sint16	health;
-Uint16	cost;
+	Sint16	health;
+	Uint16	cost;
+	
 	//
 	data->frame0 = structure->getRealImageNum(0);	//(structure->getImageNums()[0]&0x7FF /*0x1f*/); //structure->getImageNum(0)&0x7FF;
 
@@ -48,7 +53,9 @@ Uint16	cost;
 
 	if (health < structure->getType()->getMaxHealth()){
 		cost = (Uint16)((double)dmg_cost/((double)structure->getType()->getMaxHealth() - (double)health));
-		Player *Owner = p::ppool->getPlayer(structure->getOwner());
+		Player *Owner;
+		// Get the owner TODO : get Player from structure
+		Owner = p::ppool->getPlayer(structure->getOwner());
 		if (Owner->getMoney() > cost){
 			Owner->changeMoney(-1 * cost);
 			dmg_cost -= cost;
@@ -88,5 +95,4 @@ Uint16	cost;
 			stop();
 		}
 	}
-
 }

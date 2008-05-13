@@ -5,15 +5,14 @@
 #include "SDL/SDL_events.h"
 #include "SDL/SDL_timer.h"
 
-#include "ui/Cursor.h"
-#include "ui/Selection.h"
-#include "ui/Sidebar.h"
+#include "Cursor.h"
+#include "Selection.h"
+#include "Sidebar.h"
 
+#include "include/ccmap.h"
 #include "include/dispatcher.h"
 #include "include/Logger.h"
 #include "include/PlayerPool.h"
-#include "include/UnitAndStructurePool.h"
-
 #include "audio/SoundEngine.h"
 #include "game/Unit.h"
 #include "game/StructureType.h"
@@ -22,10 +21,10 @@
 #include "video/ImageCache.h"
 #include "video/MessagePool.h"
 #include "include/config.h"
-
 #include "game/Player.h"
 #include "game/ConStatus.h"
 #include "game/BQueue.h"
+#include "game/UnitAndStructurePool.h"
 
 /* The defines were introduced in SDL 1.2.5, but should work with all
  * versions since mousewheel support was added.
@@ -115,7 +114,7 @@ void Input::handle()
                 if( mx >= maparea->x && mx < maparea->x + maparea->w &&
                         my >= maparea->y && my < maparea->y + maparea->h ) {
                     if( !rcd_scrolling && (event.button.button == SDL_BUTTON_LEFT )) {
-                        /* start drawing the selection square if in map */
+                        // start drawing the selection square if in map
                         lmousedown = m_map;
                         markrect.x = mx;
                         markrect.y = my;
@@ -191,7 +190,7 @@ void Input::handle()
                 rcd_scrolling = false;
             }
             break;
-            /* A key has been pressed or released */
+            // A key has been pressed or released
         case SDL_KEYDOWN:
             /* If it wasn't a press, ignore this event */
             if( event.key.state != SDL_PRESSED )
@@ -1158,13 +1157,14 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
 	Uint8		butclick;
 	createmode_t	createmode;
 
+	// Clear the selection of the player
 	selected->clearSelection();
 
 	mx -= (width-tabwidth);
 	my -= pc::sidebar->getTabLocation()->h;
 
 
-	butclick = pc::sidebar->getSpecialButton(mx,my);
+	butclick = pc::sidebar->getSpecialButton(mx, my);
 	if (butclick != 255){
 		printf ("%s line %i: Sidebar click, special button = %i\n", __FILE__, __LINE__, butclick);
 		if (butclick == 1 && pc::sidebar->getSpecialButtonState(2) == 0 || butclick == 2 && pc::sidebar->getSpecialButtonState(1) == 0 || butclick == 3){
@@ -1173,7 +1173,7 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
 	}
 
 
-    butclick = pc::sidebar->getButton(mx,my);
+    butclick = pc::sidebar->getButton(mx, my);
     if (butclick == 255) {
         currentaction = a_none;
         return;
@@ -1301,7 +1301,7 @@ Uint16 Input::checkPlace(int mx, int my)
        pos = p::ccmap->translateToPos(x,y);
     }
 
-    /* check if pos is valid and set cursor */
+    // check if pos is valid and set cursor
     placeposvalid = true;
     /// @TODO Assumes land based buildings for now
     p::uspool->setCostCalcOwnerAndType(lplayer->getPlayerNum(),0);
@@ -1349,21 +1349,28 @@ Uint16 Input::checkPlace(int mx, int my)
     }
     return pos;
 }
+
 Uint8 Input::shouldQuit()
-    {
-        if (done || pc::Config.quit_mission)
-			return true;
+{
+	if (done || pc::Config.quit_mission)
+	{
+		return true;
+	} else {
 		return false;
-    }
+	}
+}
+
 bool Input::isMinimapEnabled()
-    {
-        return minimapEnabled;
-    }
+{
+    return minimapEnabled;
+}
+
 bool Input::isDrawing()
-    {
-        return drawing;
-    }
+{
+    return drawing;
+}
+
 SDL_Rect Input::getMarkRect()
-    {
-        return markrect;
-    }
+{
+    return markrect;
+}

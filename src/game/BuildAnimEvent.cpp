@@ -2,11 +2,17 @@
 
 #include <cmath>
 
+#include "Player.h"
 #include "include/PlayerPool.h"
 #include "audio/SoundEngine.h"
-#include "include/UnitAndStructurePool.h"
+#include "game/UnitAndStructurePool.h"
 #include "anim_nfo.h"
 #include "Structure.h"
+
+namespace p {
+	extern UnitAndStructurePool* uspool;
+	extern PlayerPool* ppool;
+}
 
 BuildAnimEvent::BuildAnimEvent(Uint32 p, Structure* str, bool sell) : BuildingAnimEvent(p,str,0)
 {

@@ -12,11 +12,11 @@
 #include "include/common.h"
 #include "include/config.h"
 #include "include/Input.h"
-#include "video/ImageCache.h"
 #include "include/Logger.h"
 #include "include/PlayerPool.h"
+#include "game/Player.h"
 #include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
+#include "game/UnitAndStructurePool.h"
 #include "audio/SoundEngine.h"
 #include "include/sdllayer.h"
 #include "ui/Cursor.h"
@@ -24,8 +24,11 @@
 #include "video/MessagePool.h"
 #include "ui/Sidebar.h"
 #include "VideoError.h"
+#include "ImageCache.h"
+#include "ImageCacheEntry.h"
 
 using pc::imgcache;
+using std::string;
 using std::runtime_error;
 
 namespace pc {
@@ -255,12 +258,10 @@ void GraphicsEngine::renderScene(bool flipscreen)
 
 	// render the map, between 0.004 and  0.005 sec
 	DrawMap(dest, src, udest);
-printf("titi\n");		
+
 	// draw the level two overlays, 0.000 sec
-	try {
 	DrawL2Overlays();
-	} catch (...){}
-printf("toto\n");
+
 	// Draw the fog of war, between 0.001 and 0.002 sec
 	DrawFogOfWar(dest, src, udest);
 
@@ -1177,6 +1178,7 @@ void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 		dest.y += tilewidth;
 	}
 }
+
 /** 
  * Render the map
  */

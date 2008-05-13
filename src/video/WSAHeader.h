@@ -14,5 +14,4 @@ public:
     Uint32 *offsets;
 };
 
-
 #endif //WSAHEADER_H

@@ -36,75 +36,65 @@ class TemplateImage;
 class RA_Label;
 
 /**
- * Cursor object
+ * Cursor 
  */
 class Cursor
 {
 public:
-		Cursor();
-		~Cursor();
+	Cursor();
+	~Cursor();
 		
-		void setCursor(Uint16 cursornum, Uint8 animimages);
-		void setCursor(const char* curname);
-		void setPlaceCursor(Uint8 stw, Uint8 sth, Uint8 *icn);
-		SDL_Surface *getCursor();/*{return image[curimg];}*/
+	void setCursor(Uint16 cursornum, Uint8 animimages);
+	void setCursor(const char* curname);
+	void setPlaceCursor(Uint8 stw, Uint8 sth, Uint8 *icn);
+	SDL_Surface *getCursor();/*{return image[curimg];}*/
 
-		Uint16 getX()
-		{
-			return x+cursor_offset;
-		}
-		Uint16 getY()
-		{
-			return y+cursor_offset;
-		}
-		void setXY(Uint16 nx, Uint16 ny);
+	Uint16 getX();
+	Uint16 getY();
+	void setXY(Uint16 nx, Uint16 ny);
 
-		static Uint8 getNoScrollOffset() {
-			return nsoff;
-		}
-		//   void setY(Uint16 ny){y = ny;}
-		void reloadImages();
+	static Uint8 getNoScrollOffset();
 
-		SDL_Surface *getTooltip ( void );
-		void setTooltip (std::string TipText);
-		
+	void reloadImages();
+
+	SDL_Surface *getTooltip(void);
+	void setTooltip(std::string TipText);
+
 private:
-		Uint16 currentcursor;
+	Uint16 currentcursor;
+	Uint16 x;
+	Uint16 y;
+	Uint16 old_x;
+	Uint16 old_y;
 
-		Uint16 x;
-		Uint16 y;
-		Uint16 old_x;
-		Uint16 old_y;
+	Uint8 curimg;
+	Uint8 nimgs;
 
-		Uint8 curimg;
-		Uint8 nimgs;
+	/** Either CUR_RA_NOSCROLL_OFFSET or CUR_NOSCROLL_OFFSET */
+	static Uint8 nsoff;
 
-		/** Either CUR_RA_NOSCROLL_OFFSET or CUR_NOSCROLL_OFFSET */
-		static Uint8 nsoff;
+	SDL_Surface *image[24];
 
-		SDL_Surface *image[24];
+	Dune2Image *cursorimg;
+	TemplateImage *transicn;
+	Sint16 cursor_offset;
 
-		Dune2Image *cursorimg;
-		TemplateImage *transicn;
-		Sint16 cursor_offset;
+	CursorPool* cursorpool;
+	CursorInfo* ci;
+	SDL_Surface* transw;
+	SDL_Surface* transy;
+	SDL_Surface* transr;
 
-		CursorPool* cursorpool;
-		CursorInfo* ci;
-		SDL_Surface* transw;
-        SDL_Surface* transy;
-        SDL_Surface* transr;
+	/** Used by place cursor */
+	Uint32 oldptr;
 
-		/** Used by place cursor */
-		Uint32 oldptr;
-
-		RA_Label ToolTipLabel[2];
-
+	RA_Label ToolTipLabel[2];
 
 	//	std::string		ToolTipText;
-		SDL_Surface		*TooltipSurface;
-		Uint32 FG_color;
-		Uint32 BG_color;
-		Uint32 CK_color;
+	SDL_Surface *TooltipSurface;
+	Uint32 FG_color;
+	Uint32 BG_color;
+	Uint32 CK_color;
 };
 
-#endif // CURSOR_H
+#endif //CURSOR_H

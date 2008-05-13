@@ -25,7 +25,7 @@
 #include "include/dispatcher.h"
 #include "include/Logger.h"
 #include "include/PlayerPool.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "audio/SoundEngine.h"
 #include "ActionEvent.h"
 #include "UnitOrStructureType.h"
@@ -38,20 +38,28 @@
 namespace pc {
 	extern ConfigType Config;
 }
+namespace p {
+	extern ActionEventQueue* aequeue;
+}
 extern Logger * logger;
 
-BQueue::BQueue(Player* pPlayer) : player(pPlayer), status(BQ_EMPTY) {
+BQueue::BQueue(Player* pPlayer) : 
+	player(pPlayer), 
+	status(BQ_EMPTY) 
+{
     timer = new BQTimer(this, &timer);
 }
 
-BQueue::~BQueue() {
+BQueue::~BQueue() 
+{
     if (timer != 0) {
         timer->destroy();
     }
     timer = 0;
 }
 
-bool BQueue::Add(const UnitOrStructureType * type) {
+bool BQueue::Add(const UnitOrStructureType * type) 
+{
     switch (status) {
         case BQ_INVALID:
             logger->error("Queue %p in invalid state\n", this);
@@ -115,7 +123,8 @@ bool BQueue::Add(const UnitOrStructureType * type) {
     return false;
 }
 
-ConStatus BQueue::PauseCancel(const UnitOrStructureType * type) {
+ConStatus BQueue::PauseCancel(const UnitOrStructureType * type) 
+{
     if (BQ_EMPTY == status) {
         return BQ_EMPTY;
     }
@@ -168,11 +177,13 @@ ConStatus BQueue::PauseCancel(const UnitOrStructureType * type) {
     return BQ_CANCELLED;
 }
 
-ConStatus BQueue::getStatus(void)const {
+ConStatus BQueue::getStatus(void)const 
+{
     return status;
 }
 
-ConStatus BQueue::getStatus(const UnitOrStructureType * type, Uint8 * quantity, Uint8 * progress) const {
+ConStatus BQueue::getStatus(const UnitOrStructureType * type, Uint8 * quantity, Uint8 * progress) const
+{
     * quantity = 0;
     * progress = 100; // Default to not grey'd out.
     if (BQ_EMPTY == status || BQ_INVALID == status) {
@@ -195,20 +206,23 @@ ConStatus BQueue::getStatus(const UnitOrStructureType * type, Uint8 * quantity, 
  * Used for other bits of code to notify the buildqueue that they can continue
  * building having placed what was waiting for a position
  */
-void BQueue::Placed() {
+void BQueue::Placed() 
+{
     p::ppool->updateSidebar();
     status = BQ_RUNNING;
     next();
 }
 
-void BQueue::Pause(void) {
+void BQueue::Pause() 
+{
     if (status == BQ_RUNNING) {
         status = BQ_ALL_PAUSED;
         //p::ppool->updateSidebar();
     }
 }
 
-void BQueue::Resume(void) {
+void BQueue::Resume(void) 
+{
     if (status == BQ_ALL_PAUSED) {
         status = BQ_RUNNING;
         last = p::aequeue->getCurtick();
@@ -217,7 +231,8 @@ void BQueue::Resume(void) {
     }
 }
 
-const UnitOrStructureType * BQueue::getCurrentType() const {
+const UnitOrStructureType * BQueue::getCurrentType() const 
+{
     return * queue.begin();
 }
 
@@ -248,8 +263,11 @@ void BQueue::next()
     p::ppool->updateSidebar();
 }
 
-RQstate BQueue::requeue(const UnitOrStructureType * type) {
-    Production::iterator it = production.find(type);
+RQstate BQueue::requeue(const UnitOrStructureType * type) 
+{
+    Production::iterator it;
+    
+    it = production.find(type);
     if (it == production.end()) {
         return RQ_NEW;
     }
@@ -260,7 +278,8 @@ RQstate BQueue::requeue(const UnitOrStructureType * type) {
     return RQ_DONE;
 }
 
-bool BQueue::tick() {
+bool BQueue::tick() 
+{
     if (status != BQ_RUNNING) {
         return false;
     }
@@ -307,5 +326,6 @@ bool BQueue::tick() {
     p::ppool->updateSidebar();
     return false;
 }
+
 const Uint8 BQueue::buildspeed = 1;
 const Uint8 BQueue::maxbuild = 99;

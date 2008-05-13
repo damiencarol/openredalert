@@ -1,29 +1,17 @@
-#include <cctype>
-#include "include/common.h"
-#include "video/ImageCache.h"
-#include "include/Logger.h"
-#include "include/PlayerPool.h"
-#include "video/ImageNotFound.h"
-#include "SHPImage.h"
-#include "ImageCacheEntry.h"
 #include "ImageCache.h"
 
-using std::string;
-using std::map;
-using std::transform;
+//#include <cctype>
+//#include "include/common.h"
+//#include "include/Logger.h"
+#include "include/PlayerPool.h"
+#include "ImageNotFound.h"
+#include "SHPImage.h"
+#include "ImageCacheEntry.h"
 
-extern Logger * logger;
-
-ImageCache::ImageCache()
-{
-}
-
-ImageCache::~ImageCache()
-{
-}
 
 /** 
- * Return the numb of images contained in the shp (find the image by number)
+ * Return the numb of images contained in the shp (find the image by
+ *  number)
  */
 Uint32 ImageCache::getNumbImages(Uint32 imgnum)
 {
@@ -35,8 +23,13 @@ Uint32 ImageCache::getNumbImages(Uint32 imgnum)
  */
 Uint32 ImageCache::getNumbImages(const char* fname)
 {
-	Uint32 imgnum = loadImage(fname);
-	return getImage( imgnum ).NumbImages;
+	Uint32 imgnum; // number of main image
+	
+	// Try to load the image or return index of main image (image 0 of SHP)
+	imgnum = loadImage(fname);
+	
+	// return the number of image in the SHP
+	return getImage(imgnum).NumbImages;
 }
 
 /** 
@@ -44,10 +37,13 @@ Uint32 ImageCache::getNumbImages(const char* fname)
  * 
  * @param imagepool The imagepool to use.
  */
-void ImageCache::setImagePool(std::vector<SHPImage*>* imagepool)
+void ImageCache::setImagePool(vector<SHPImage*>* imagepool)
 {
-    this->imagepool = imagepool;
+	// set the Image pool
+    this->imagepool = imagepool;    
+    // Clear cache
     cache.clear();
+    // Clear previous cache
     prevcache.clear();
 }
 
@@ -62,11 +58,11 @@ void ImageCache::setImagePool(std::vector<SHPImage*>* imagepool)
  *           0123456701234567 01234 56701234567
  *           [index of image] [pal] [ frame # ]
  *           The index of the image, the palette to use, and the frame number
- * @returns A class containing the image and the shadow.
+ * @returns An ImageCacheEntry object containing the image and the shadow.
  */
 ImageCacheEntry& ImageCache::getImage(Uint32 imgnum)
 {
-    std::map<Uint32, ImageCacheEntry>::iterator cachepos;
+    map<Uint32, ImageCacheEntry>::iterator cachepos;
 
     // Check that index is not -1
     if (imgnum == (Uint32)-1) {
@@ -106,15 +102,15 @@ ImageCacheEntry& ImageCache::getImage(Uint32 imgnum)
     // Palette is ((imgnum>>11)&0x1f).
 //		printf ("%s line %i: Palette number = %i\n", __FILE__, __LINE__, ((imgnum>>11)&0x1f));
 
-	Uint32 NumbImages		= (*imagepool)[imgnum>>16]->getNumImg();
-	std::string ImageName	= (*imagepool)[imgnum>>16]->getFileName();
-	Uint8 palnumb			= ((imgnum>>11)&0x1f);
-	Uint16 imagenumb		= imgnum&0x7FF;
+	Uint32 NumbImages	= (*imagepool)[imgnum>>16]->getNumImg();
+	string ImageName	= (*imagepool)[imgnum>>16]->getFileName();
+	Uint8 palnumb		= ((imgnum>>11)&0x1f);
+	Uint16 imagenumb	= imgnum&0x7FF;
 
 	if ( (unsigned)imagenumb > (unsigned)NumbImages ){
 		printf ("%s line %i: Error want image %i but %s only got %i images, pal_num = %i\n", __FILE__, __LINE__, imagenumb, ImageName.c_str(), NumbImages, palnumb);
-		entry.image = NULL;
-		entry.shadow = NULL;
+		entry.image = 0;
+		entry.shadow = 0;
 		return entry;
 	}
 
@@ -122,6 +118,7 @@ ImageCacheEntry& ImageCache::getImage(Uint32 imgnum)
 	entry.NumbImages	= NumbImages;
 	(*imagepool)[imgnum>>16]->getImage(imagenumb, &(entry.image), &(entry.shadow), palnumb);
 
+	// Return the entry
     return entry;
 }
 
@@ -132,7 +129,7 @@ ImageCacheEntry& ImageCache::getImage(Uint32 imgnum, Uint32 frame)
 
 void ImageCache::setImage(SDL_Surface*Image, SDL_Surface* Shadow, Uint32 imgnum)
 {
-    std::map<Uint32, ImageCacheEntry>::iterator cachepos;
+    map<Uint32, ImageCacheEntry>::iterator cachepos;
 
     // Check that index is not -1
     if (imgnum == (Uint32)-1) {
@@ -162,15 +159,19 @@ void ImageCache::setImage(SDL_Surface*Image, SDL_Surface* Shadow, Uint32 imgnum)
     }
 }
 
+/**
+ * Load an image with this name
+ */
 Uint32 ImageCache::loadImage(const char* fname)
 {
-    return loadImage(fname, mapscaleq);
+	// Returns index in the cache of the loaded image
+    return loadImage(fname, -1);
 }
 
 Uint32 ImageCache::loadImage(const char* fname, int scaleq) 
 {
-    string name;
-    map<string, Uint32>::iterator cachentry;
+    string name; // Name of the file wanted
+    map<string, Uint32>::iterator cachentry; // Iterator use to parse cache
     
     // coppy the char* string in c++ string
     name = string(fname);
@@ -178,8 +179,13 @@ Uint32 ImageCache::loadImage(const char* fname, int scaleq)
     // UPPER the fname string
     transform(name.begin(), name.end(), name.begin(), toupper);
 
+    // Parse the vector to find the image
     cachentry = namecache.find(name);
+    
+    // if the iterator is at end (image NOT FOUND) load the image and 
+    // push it on the vector
     if (cachentry == namecache.end()) {
+    	// Get the initial index
         Uint32 size = static_cast<Uint32>(imagepool->size());
         try {
             imagepool->push_back(new SHPImage(name.c_str(), scaleq));
@@ -190,11 +196,13 @@ Uint32 ImageCache::loadImage(const char* fname, int scaleq)
         }
     }
     
-    // Check that index is not -1
+    // Check if the index is -1 and trow ImageNotFound
     if ((Uint32)-1 == namecache[name]) {
+    	// Throw an ImageNotFound exception
     	throw ImageNotFound("ImageCache::loadImage namecache[name] == -1");
     }
 
+    // Returns the number of the image in imagepool
     return cachentry->second;
 }
 
@@ -202,18 +210,22 @@ Uint32 ImageCache::loadImage(const char* fname, int scaleq)
  * Rotates caches so a new cache will be created next time an image is 
  * requested.
  */
-void ImageCache::newCache() {
-	logger->warning ("%s line %i: Rotate cache??\n", __FILE__, __LINE__);
-    prevcache.clear();
+void ImageCache::newCache() 
+{
+	// Clean previous cache
+	prevcache.clear();
+	// Swap the 2 cache (prevcache = cache AND cache = a new cache) 
     prevcache.swap(cache);
 }
 
 /** 
  * Clears both the current and previous caches
  */
-void ImageCache::flush() {
-	logger->warning ("%s line %i: Flush image cache\n", __FILE__, __LINE__);
-    prevcache.clear();
+void ImageCache::flush() 
+{
+	// Clean previous cache
+	prevcache.clear();
+	// Clean cache
     cache.clear();
 }
 
@@ -222,11 +234,14 @@ void ImageCache::flush() {
  */
 void ImageCache::Cleanup(void)
 {
-	//logger->warning ("%s line %i: Cleanup image cache\n", __FILE__, __LINE__);
+	// Delete all objects in the pool
 	for (unsigned int i = 0; i < imagepool->size(); i++){
 		delete (*imagepool)[i];
 	}
+	// clean the pool
 	imagepool->clear();
+	// clean the prevcache
 	prevcache.clear();
+	// clean the cache
 	cache.clear();
 }

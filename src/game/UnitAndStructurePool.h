@@ -19,28 +19,6 @@
 #ifndef UNITANDSTRUCTUREPOOL_H
 #define UNITANDSTRUCTUREPOOL_H
 
-#include <set>
-#include <string>
-#include <map>
-#include <vector>
-
-#include "video/Renderer.h"
-
-#include "ccmap.h"
-#include "common.h"
-#include "talkback.h"
-#include "game/InfantryGroup.h"
-#include "game/StructureType.h"
-#include "game/UnitType.h"
-#include "game/UnitOrStructureType.h"
-#include "game/L2Overlay.h"
-#include "game/Structure.h"
-#include "game/Player.h"
-#include "game/Unit.h"
-
-class UnitOrStructure;
-class INIFile;
-
 
 #define US_IS_UNIT				0x40000000
 #define US_IS_STRUCTURE			0x20000000
@@ -61,19 +39,32 @@ class INIFile;
 
 //#define US_HAS_AIRUNIT
 
+#include <set>
+#include <string>
+#include <map>
+#include <vector>
 
-struct UnitAndStructureMat{
-	Uint32 flags;				// For now don't change flag handling
-//	Uint16 unitorstructnumb;	//
-	Uint16 unitnumb;
-	Uint16 airunitnumb;
-	Uint16 structurenumb;
-};
+#include "SDL/SDL_types.h"
 
+struct RA_Teamtype;
+struct UnitAndStructureMat;
+class UnitOrStructure;
+class UnitOrStructureType;
+class INIFile;
+class L2Overlay;
+class Unit;
+class UnitType;
+class Player;
+class Structure;
+class StructureType;
+class InfantryGroup;
+class Talkback;
+class CnCMap;
 
+using std::string;
 using std::vector;
-
-
+using std::map;
+using std::multimap;
 
 /**
  * Stores all units and structures.
@@ -82,7 +73,8 @@ using std::vector;
  */
 class UnitAndStructurePool {
 public:
-    UnitAndStructurePool();
+	/** The constructor needs theater because many structures graphics depends of theater */ 
+    UnitAndStructurePool(const char* theTheater);
     ~UnitAndStructurePool();
 
 	Uint8 getStructureNum(Uint16 cellpos, Uint32 **inumbers, Sint8 **xoffsets, Sint8 **yoffsets);
@@ -95,10 +87,10 @@ public:
                                  Uint8* pcol, bool* blocked);
     bool hasL2overlay(Uint16 cellpos) const ;
     Uint8 getL2overlays(Uint16 cellpos, Uint32 **inumbers, Sint8 **xoddset, Sint8 **yoffset);
-    std::multimap<Uint16, L2Overlay*>::iterator addL2overlay(Uint16 cellpos, L2Overlay *ov);
+    multimap<Uint16, L2Overlay*>::iterator addL2overlay(Uint16 cellpos, L2Overlay *ov);
     void removeL2overlay(std::multimap<Uint16, L2Overlay*>::iterator entry);
 
-    bool createReinforcements(RA_Teamtype *Team);
+    bool createReinforcements(RA_Teamtype* Team);
 
     bool createStructure(const char* typen, Uint16 cellpos, Uint8 owner,
             Uint16 health, Uint8 facing, bool makeanim, string trigger_name = "None" );
@@ -143,7 +135,7 @@ public:
     Uint8 postMove(Unit *un, Uint16 newpos);
     void abortMove(Unit* un, Uint32 pos);
     UnitType* getUnitTypeByName(const char* unitname);
-    StructureType *getStructureTypeByName(const char *structname);
+    StructureType* getStructureTypeByName(const char* structname);
     UnitOrStructureType* getTypeByName(const char* typen);
     bool freeTile(Uint16 pos) const ;
     Uint16 getTileCost( Uint16 pos, Unit* excpUn ) const;
@@ -178,8 +170,12 @@ public:
 
     Talkback *getTalkback(const char* talkback);
 private:
-    char theaterext[5];
-
+	/** simple constructor is private to avoid creation by default */
+	UnitAndStructurePool();
+	    
+	/** String which keep 5 lettres of the theater. Many Graphics depends of theater */
+	char theaterext[5];
+	    
     std::vector<UnitAndStructureMat> unitandstructmat;
 
     std::vector<Structure *> structurepool;
@@ -188,29 +184,34 @@ private:
 
     std::vector<Unit *> unitpool;
     std::vector<UnitType *> unittypepool;
-    std::map<std::string, Uint16> unitname2typenum;
+    map<string, Uint16> unitname2typenum;
 
     std::multimap<Uint16, L2Overlay*> l2pool;
     std::map<Uint16, Uint16> numl2images;
 
-    std::multimap<StructureType*, std::vector<StructureType*>* > struct_prereqs;
-    std::multimap<UnitType*, std::vector<StructureType*>* > unit_prereqs;
+    multimap<StructureType*, std::vector<StructureType*>* > struct_prereqs;
+    multimap<UnitType*, vector<StructureType*>* > unit_prereqs;
     void splitORPreReqs(const char* prereqs, vector<StructureType*> * type_prereqs);
 
     map<string, Talkback*> talkbackpool;
 
-    INIFile *structini, *unitini, *tbackini, *artini;
+    INIFile* structini; 
+    INIFile* unitini; 
+    INIFile* tbackini; 
+    INIFile* artini;
 
     Uint8 costcalcowner;
     Uint8 costcalctype;
 
 	// Image cache numbers for worn down ground
-	Uint32 bib1, bib2, bib3;
+	Uint32 bib1; Uint32 bib2; Uint32 bib3;
 
     bool deleted_unitorstruct;
     Uint16 numdeletedunit;
     Uint16 numdeletedstruct;
-    void updateWalls(Structure* st, bool add);
+    
+    /** Update the ovrlay of walls ???? */
+    void updateWalls(Structure* st, bool add, CnCMap* theMap);
 };
 
-#endif //UNITANDSTRUCTURPOOL_H
+#endif //UNITANDSTRUCTUREPOOL_H

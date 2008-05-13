@@ -6,4 +6,4 @@ enum gametypes {
 	GAME_RA = 2
 };
 
-#endif /* GAMETYPES_H */
+#endif //GAMETYPES_H

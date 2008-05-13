@@ -1,24 +1,38 @@
 #include "StructureType.h"
-#include <cstdlib>
+
 #include <cstring>
+
+#include "include/common.h"
 #include "include/Logger.h"
+#include "include/weaponspool.h"
 #include "video/ImageNotFound.h"
 #include "video/SHPImage.h"
 #include "Weapon.h"
 #include "animinfo_t.h"
 #include "misc/INIFile.h"
+#include "video/ImageCache.h"
+#include "video/ImageCacheEntry.h"
 
 extern Logger *logger;
+namespace pc {
+	extern vector<SHPImage *>	*imagepool;
+	extern ImageCache* imgcache;
+}
+namespace p {
+	extern WeaponsPool* weappool;
+}
 
 StructureType::StructureType(const char* typeName, INIFile *structini,
 		INIFile *artini, const char* thext) :
 	UnitOrStructureType() 
 {
-	SHPImage *shpimage;
+	//SHPImage *shpimage;
 	SHPImage *makeimage;
 	Uint32 i = 0;
-	char shpname[13], imagename[8];
-	char *tmpCharges, *tmpWaterBound;
+	char shpname[13];
+	//char imagename[8];
+	char* tmpCharges;
+	char* tmpWaterBound;
 	char* tmp;
 	char blocktest[128];
 	Uint32 size;
@@ -26,7 +40,6 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 
 
 	// Check if the section exist
-	//if (structini->isSection(string("65dg46dgg6")) == false){
 	if (structini->isSection(string(typeName)) == false){
 		logger->debug("Try to read a non existant ini section %s.\n", typeName);
 		return;
@@ -36,7 +49,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	try {
 		structini->readKeyValue(typeName,0);
 	} catch (...) {
-		
+		// Log that section doesn't exist
 		logger->debug("Try to read a non existant ini section %s in StructureType constructor.\n", typeName);
 		
 		shpnums = NULL;
@@ -93,17 +106,13 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 #endif
 
 	// Determine if it's a Wall with knowed Wall structure
-	// TODO DEBUT
-	/*
-	if( !_stricmp((tname), ("BRIK")) || !_stricmp((tname), ("SBAG")) ||
-	!_stricmp((tname), ("BARB")) || !_stricmp((tname), ("WOOD")) ||
-	!_stricmp((tname), ("CYCL")) || !_stricmp((tname), ("FENC")) )
-	is_wall = true;
-	*/	
-	if( !strcmp((tname), ("BRIK")) || !strcmp((tname), ("SBAG")) ||
-	!strcmp((tname), ("BARB")) || !strcmp((tname), ("WOOD")) ||
-	!strcmp((tname), ("CYCL")) || !strcmp((tname), ("FENC")) ){
+	string strComp = string(tname);
+	if (strComp == "BRIK" || strComp == "SBAG" || strComp == "BARB" 
+		|| strComp == "CYCL" || strComp == "FENC")
+	{
 		is_wall = true;
+	} else {
+		is_wall = false;
 	}
 	
 	// the size of the structure in tiles
@@ -195,8 +204,10 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 		tmpWaterBound = NULL;
 	}
 
+	// TODO Read SHP ???????
 	for( i = 0; i < numshps; i++ ) {
-		sprintf(imagename, "image%d", i+1);
+		// TODO TRY THIS (TEST !!!!!!!!!!!)
+		/*sprintf(imagename, "image%d", i+1);
 		tmp = structini->readString(tname, imagename);
 		if( tmp == NULL ) {
 			strncpy(shpname, tname, 13);
@@ -206,13 +217,14 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 			delete[] tmp;
 			tmp = NULL;
 		}
+		
 		try {
-			shpimage = new SHPImage(shpname, mapscaleq);
+			shpimage = new SHPImage(shpname, -1);
 		} catch (ImageNotFound&) {
 			strncpy(shpname, tname, 13);
 			strncat(shpname, thext, 13);
 			try {
-				shpimage = new SHPImage(shpname, mapscaleq);
+				shpimage = new SHPImage(shpname, -1);
 			} catch (ImageNotFound&) {
 				logger->warning("Image not found: \"%s\"\n", shpname);
 				numshps = 0;
@@ -222,7 +234,19 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 		shpnums[i] = pc::imagepool->size();
 		shptnum[i] = shpimage->getNumImg();
 		pc::imagepool->push_back(shpimage);
+		*/
+		string stringShpName = string(tname);
+		if (i>0){
+			stringShpName += i;
+		}
+		stringShpName += ".shp";
+		// Load images of the structure layer in da cache
+		shpnums[i] = pc::imgcache->loadImage(stringShpName.c_str());
+		// Set the number of images
+		shptnum[i] = pc::imgcache->getImage(shpnums[i]).NumbImages;
 	}
+	
+	
 	if (!is_wall) {
 		numwalllevels = 0;
 		animinfo.loopend = structini->readInt(tname,"loopend",0);
@@ -244,16 +268,22 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 
 		defaultface = structini->readInt(tname, "defaultface", 0);
 
+		// Check if name of the structure <= 4
 		if (strlen(tname) <= 4) {
 			strncpy(shpname, tname, 13);
 			strncat(shpname, "make.shp", 13);
-		} else
-		logger->warning("%s is nonstandard!\n",tname);
+		} else {
+			logger->warning("%s is nonstandard! (name lenght > 4)\n",tname);
+		}
+		// Load the MAKE anim and store anim info
 		try {
-			makeimage = new SHPImage(shpname, mapscaleq);
-			makeimg = pc::imagepool->size();
+			makeimage = new SHPImage(shpname, -1);
 			animinfo.makenum = makeimage->getNumImg();
-			pc::imagepool->push_back(makeimage);
+			
+			makeimg = pc::imagepool->size();
+			pc::imagepool->push_back(makeimage); // Store make image
+			
+			
 		} catch (ImageNotFound&) {
 			makeimg = 0;
 			animinfo.makenum = 0;
@@ -285,12 +315,10 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 		primary_weapon = NULL;
 		secondary_weapon = NULL;
 	}
+	
+	// Read the Cost of the Structure Type
 	cost = structini->readInt(tname, "cost", 0);
-	if (0 == cost) {
-		logger->error("\"%s\" has no cost, resetting to 1\n", tname);
-		cost = 1;
-	}
-
+	
 	// Reading of the armor
 	miscnames = structini->readString(tname,"armour","none");
 	if (miscnames == NULL) {
@@ -341,6 +369,33 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	}
 }
 
+StructureType::~StructureType()
+{
+    Uint16 i;
+    for (i=0;i<owners.size();++i){
+		if (owners[i] != NULL)
+			delete[] owners[i];
+		owners[i] = NULL;
+	}
+    for (i=0;i<prereqs.size();++i){
+		if (prereqs[i] != NULL)
+			delete[] prereqs[i];
+		prereqs[i] = NULL;
+	}
+	if (shpnums != NULL)
+		delete[] shpnums;
+	shpnums = NULL;
+	if (blocked != NULL)
+		delete[] blocked;
+	blocked = NULL;
+	if (shptnum != NULL)
+		delete[] shptnum;
+	shptnum = NULL;
+	if (name != NULL)
+		delete[] name;
+	name = NULL;
+}
+
 Uint16 * StructureType::getSHPNums() {
 	return shpnums;
 }
@@ -354,15 +409,18 @@ const char * StructureType::getName() const {
 	return name;
 }
 
-std::vector < char *> StructureType::getDeployWith() const {
+vector < char *> StructureType::getDeployWith() const {
 	return deploywith;
 }
-std::vector < char *> StructureType::getOwners() const {
+
+vector < char *> StructureType::getOwners() const {
 	return owners;
 }
+
 Uint8 StructureType::getNumLayers() const {
 	return numshps;
 }
+
 Uint16 StructureType::getMakeImg() const {
 	return makeimg;
 }
@@ -399,12 +457,16 @@ Uint8 StructureType::getTurnspeed() const {
 armour_t StructureType::getArmour() const {
 	return armour;
 }
+
 animinfo_t StructureType::getAnimInfo() const {
 	return animinfo;
 }
-powerinfo_t StructureType::getPowerInfo() const {
+
+PowerInfo StructureType::getPowerInfo() const 
+{
 	return powerinfo;
 }
+
 bool StructureType::isPowered() {
 	if (powerinfo.powered)
 		return true;
@@ -418,18 +480,23 @@ Weapon * StructureType::getWeapon(bool primary) const {
 bool StructureType::hasTurret() const {
 	return turret;
 }
+
 Uint16 StructureType::getBlckOff() const {
 	return blckoff;
 }
+
 bool StructureType::isInfantry() const {
 	return false;
 }
+
 Uint8 StructureType::getNumWallLevels() const {
 	return numwalllevels;
 }
+
 Uint8 StructureType::getDefaultFace() const {
 	return defaultface;
 }
+
 Uint8 StructureType::getBuildlevel() const {
 	return buildlevel;
 }
@@ -437,18 +504,23 @@ Uint8 StructureType::getBuildlevel() const {
 bool StructureType::primarySettable() const {
 	return primarysettable;
 }
+
 bool StructureType::Charges() {
 	return charges;
 }
+
 Uint8 StructureType::getPQueue() const {
 	return 0;
 }
+
 bool StructureType::isStructure() const {
 	return true;
 }
+
 bool StructureType::isWall() const{
 	return is_wall;
 }
+
 Uint8 StructureType::getSpeed() const{
 	return 0;
 }

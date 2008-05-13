@@ -23,16 +23,9 @@ using std::string;
 
 WeaponsPool::WeaponsPool()
 {
-	//weapini = GetConfig("weapons.ini");
-	if (getConfig().gamenum == GAME_RA)
-	{
-		printf("%s line %i: Loading ra weapens ini\n",__FILE__ , __LINE__);
-		weapini = GetConfig("./ra/weapons.ini");
-	}
-	else
-	{
-		weapini = GetConfig("./td/weapons.ini");
-	}
+	// Load weapons file 
+	weapini = GetConfig("./ra/weapons.ini");
+	// TODO weapini = VFSUtils::VFS_Open("rules.ini");
 }
 
 WeaponsPool::~WeaponsPool()

@@ -1,13 +1,6 @@
 #include "BTurnAnimEvent.h"
+
 #include <cmath>
-#include "include/ccmap.h"
-#include "include/common.h"
-#include "include/PlayerPool.h"
-#include "include/ProjectileAnim.h"
-#include "audio/SoundEngine.h"
-#include "game/Unit.h"
-#include "include/UnitAndStructurePool.h"
-#include "include/weaponspool.h"
 
 #include "anim_nfo.h"
 #include "Structure.h"

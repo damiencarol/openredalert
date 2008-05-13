@@ -1,11 +1,10 @@
 #include "Cursor.h"
 
-#include <cstdlib>
-#include <cstring>
+#include <string>
 
+#include "SDL/SDL_types.h"
 #include "SDL/SDL_timer.h"
 
-#include "include/config.h"
 #include "video/GraphicsEngine.h"
 #include "include/sdllayer.h"
 #include "CursorPool.h"
@@ -21,6 +20,8 @@ namespace pc {
 }
 extern Logger * logger;
 
+using std::string;
+
 /** 
  * Constructor, load the cursorimage and set upp all surfaces to buffer
  * background in etc.
@@ -30,7 +31,7 @@ Cursor::Cursor() :
 			transy(0), transr(0) 
 {
 	// Init some Tooltip stuff
-	TooltipSurface = NULL;
+	TooltipSurface = 0;
 	FG_color = SDL_MapRGB(pc::gfxeng->get_SDL_ScreenSurface()->format, 222, 217, 149);
 	BG_color = SDL_MapRGB(pc::gfxeng->get_SDL_ScreenSurface()->format, 0, 0, 0);
 	CK_color = SDL_MapRGB(pc::gfxeng->get_SDL_ScreenSurface()->format, 255, 255, 255);
@@ -43,13 +44,9 @@ Cursor::Cursor() :
 	ToolTipLabel[1].SetFont("6point.fnt");
 
 	cursorimg = new Dune2Image("mouse.shp", -1);
-	if (getConfig().gamenum == GAME_RA) {
-		transicn = new TemplateImage("trans.icn", mapscaleq, 1);
-		nsoff = 123;
-	} else {
-		transicn = new TemplateImage("trans.icn", mapscaleq);
-		nsoff = 129;
-	}
+	
+	transicn = new TemplateImage("trans.icn", -1, 1);
+	nsoff = 123; // For TD nsoff = 129
 
 	cursorpool = new CursorPool("cursors.ini");
 
@@ -58,14 +55,15 @@ Cursor::Cursor() :
 	x = 0;
 	y = 0;
 
-	old_x = old_y = 0;
+	old_x = 0;
+	old_y = 0;
 
-	/* All cursors loaded */
+	// All cursors loaded
 	reloadImages();
 }
 
 /** 
- * Destructor, free the surfaces
+ * Destructor, free the surfaces 
  */
 Cursor::~Cursor()
 {
@@ -221,7 +219,10 @@ void Cursor::setPlaceCursor(Uint8 stw, Uint8 sth, Uint8 *icn)
 	}
 }
 
-SDL_Surface *Cursor::getCursor()
+/**
+ * Get the image of the cursor
+ */
+SDL_Surface *Cursor::getCursor() 
 {
 	static Uint32 lastchange = 0;
 	Uint32 tick = SDL_GetTicks();
@@ -234,7 +235,7 @@ SDL_Surface *Cursor::getCursor()
 	return image[curimg];
 }
 
-void Cursor::reloadImages()
+void Cursor::reloadImages() 
 {
 	int cursornum;
 
@@ -269,19 +270,21 @@ SDL_Surface *Cursor::getTooltip()
 	return TooltipSurface;
 }
 
-void Cursor::setTooltip(std::string TipText)
+void Cursor::setTooltip(string TipText)
 {
 	Uint16 w, h;
 	//Font		ToolTipFont("type.fnt");
 	SDL_Surface *tmp;
 	int splitpos = 0;
-	std::string FirstString, SecondString;
+	string FirstString;
+	string SecondString;
+	unsigned int i;
 
-	if (TooltipSurface != NULL){
+	if (TooltipSurface != 0){
 		return;
 	}
 	
-	for (unsigned int i = 0; i < TipText.size(); i++) {
+	for (i = 0; i < TipText.size(); i++) {
 		if (TipText[i] == '\n') {
 			splitpos = i;
 			break;
@@ -418,4 +421,19 @@ void Cursor::setXY(Uint16 nx, Uint16 ny)
 			TooltipSurface = NULL;
 		}
 	}
+}
+
+Uint16 Cursor::getX()
+{
+	return x+cursor_offset;
+}
+
+Uint16 Cursor::getY()
+{
+	return y+cursor_offset;
+}
+
+Uint8 Cursor::getNoScrollOffset()
+{
+	return nsoff;
 }

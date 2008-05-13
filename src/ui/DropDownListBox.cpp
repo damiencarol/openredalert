@@ -1,9 +1,13 @@
 #include "DropDownListBox.h"
+
 #include <math.h>
+
 #include "SDL/SDL_video.h"
+
 #include "RA_Label.h"
 #include "Font.h"
 #include "video/CPSImage.h"
+#include "video/SHPImage.h"
 #include "include/config.h"
 #include "video/GraphicsEngine.h"
 #include "video/ImageCache.h"
@@ -19,8 +23,10 @@ namespace pc {
 	extern GraphicsEngine * gfxeng;
 }
 
-DropDownListBox::DropDownListBox (){
+DropDownListBox::DropDownListBox ()
+{
 	List.empty();
+	
 	ListBoxSurface	= NULL;
 	DisplaySurface	= NULL;
 	WindowToDrawOn	= NULL;
@@ -56,6 +62,7 @@ DropDownListBox::DropDownListBox (){
 
 	printf (" Cache entry = %i\n", ArrowDwn);
 }
+
 DropDownListBox::~DropDownListBox()
 {
 	if (ListBoxSurface != NULL){
@@ -68,22 +75,27 @@ DropDownListBox::~DropDownListBox()
 	}
 #endif
 }
+
 bool DropDownListBox::need_redraw(void)
 {
 	return Recreate;
 }
-/** Set the surface (window) to draw the button on*/
+
+/** 
+ * Set the surface (window) to draw the button on
+ */
 void DropDownListBox::SetDrawingWindow(RA_WindowClass *Window)
 {
 	if (Window != NULL){
 		this->WindowToDrawOn = Window;
 	}
 }
+
 void DropDownListBox::Create (void)
 {
-SDL_Rect	dest;
-Uint16		Ypos;
-//char		*temp;
+	SDL_Rect	dest;
+	Uint16		Ypos;
+	//char		*temp;
 
 
 	Recreate	= false;
@@ -205,15 +217,20 @@ if (ArrowDownImage != NULL){
 // Fill the surface with the correct color
 //ArrowDownImage = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, SizeAndPosition.w, SizeAndPosition.h, 16, 0, 0, 0, 0);
 }
-/** Set the surface (window) to draw the button on*/
+	
+/** 
+ * Set the surface (window) to draw the button on
+ */
 void DropDownListBox::AddEntry(std::string Entry)
 {
 	List.push_back(Entry);
 }
+
 bool DropDownListBox::MouseOver(void)
 {
-int mx, my;
-int WinXpos = 0, WinYpos = 0;
+	int mx, my;
+	int WinXpos = 0;
+	int WinYpos = 0;
 
 	SDL_GetMouseState(&mx, &my);
 
@@ -235,7 +252,8 @@ int WinXpos = 0, WinYpos = 0;
 	}
 	return false;
 }
-bool DropDownListBox::MouseOver_button(void)
+
+bool DropDownListBox::MouseOver_button()
 {
     int mx = 0;
     int my = 0;
@@ -261,10 +279,12 @@ bool DropDownListBox::MouseOver_button(void)
     }
 	return false;
 }
-Uint32 DropDownListBox::MouseOver_entry(void)
+
+Uint32 DropDownListBox::MouseOver_entry()
 {
-int mx, my;
-int WinXpos = 0, WinYpos = 0;
+	int mx, my;
+	int WinXpos = 0;
+	int WinYpos = 0;
 
 	SDL_GetMouseState(&mx, &my);
 
@@ -287,10 +307,12 @@ int WinXpos = 0, WinYpos = 0;
 	}
 	return 0;
 }
+
 Uint32 DropDownListBox::selected(void)
 {
 	return SelectedIndex;
 }
+
 void DropDownListBox::HandleInput(SDL_Event event)
 {
     //SDL_Event event;
@@ -348,6 +370,7 @@ void DropDownListBox::HandleInput(SDL_Event event)
 			break;
 	}
 }
+
 bool DropDownListBox::Draw(int X, int Y)
 {
     Uint32 Heigth = SizeAndPosition.h;
@@ -393,6 +416,7 @@ bool DropDownListBox::Draw(int X, int Y)
 
 	return true;
 }
+
 SDL_Surface *DropDownListBox::ReadShpImage (char *Name, int ImageNumb, Uint8 palnum)
 {
 	SDL_Surface	*image;
