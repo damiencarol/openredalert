@@ -228,10 +228,10 @@ Menu::Menu() :
 	ButtonXpos = 30;
 	ButtonYpos = 70;
 	AlliesMissionButton.SetDrawingWindow (&MissionMenu1);
-	AlliesMissionButton.CreateSurface("Allies", ButtonXpos, ButtonYpos, 90, 25 );
+	AlliesMissionButton.CreateSurface(strFile->getString(473), ButtonXpos, ButtonYpos, 90, 25 );
 	ButtonXpos = 155;
 	RussianMissionButton.SetDrawingWindow (&MissionMenu1);
-	RussianMissionButton.CreateSurface("Soviet", ButtonXpos, ButtonYpos, 90, 25 );
+	RussianMissionButton.CreateSurface(strFile->getString(474), ButtonXpos, ButtonYpos, 90, 25 );
 
 	Oke.SetDrawingWindow (&MultiPlayerMenu);
 	Oke.CreateSurface(strFile->getString(23), 50, 350, 90, 25);		

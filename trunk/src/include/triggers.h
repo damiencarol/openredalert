@@ -223,7 +223,7 @@
 
 using std::string;
 
-struct RA_TriggerAction{
+class RA_TriggerAction{
 public:
 	/** trigger action */
     int Action;      

@@ -50,7 +50,7 @@
 
 struct RA_Teamtype;
 struct UnitAndStructureMat;
-//class UnitOrStructure;
+class UnitOrStructure;
 class UnitOrStructureType;
 class INIFile;
 class L2Overlay;

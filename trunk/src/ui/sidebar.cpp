@@ -45,6 +45,7 @@
 #include "game/pside.h"
 #include "game/Player.h"
 #include "game/UnitAndStructurePool.h"
+#include "misc/StringTableFile.h"
 #include "vfs/vfs.h"
 
 /// @TODO Move this into config file(s)
@@ -258,6 +259,9 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
 	QuantityLabel.setColor(0xff, 0xff, 0xff);
 	QuantityLabel.SetFont("grad6fnt.fnt");
 	QuantityLabel.UseAntiAliasing(false);
+	
+	// Create the string table object
+	stringFile = new StringTableFile("conquer.eng");
 }
 
 /**
@@ -283,6 +287,9 @@ Sidebar::~Sidebar()
 			SDL_FreeSurface(Clocks[i]);
 		}
 	}
+	
+	// Free the string table object
+	delete stringFile;
 }
 
 /**
@@ -472,22 +479,36 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
 
 	unit = ( function & sbo_unit );
 
-	UnitOrStructureType* Type;
+	UnitOrStructureType* type;
 	if (unit) {
-		Type = p::uspool->getUnitTypeByName(UnitOrStructureName);
+		type = p::uspool->getUnitTypeByName(UnitOrStructureName);
 	} else {
-		Type = p::uspool->getStructureTypeByName(UnitOrStructureName);
+		type = p::uspool->getStructureTypeByName(UnitOrStructureName);
 	}
 
-	if (Type == NULL){
+	if (type == 0){
 		return;
 	}
 	TipString.str("");
-	if (Type->getName() != NULL)
-		TipString<<Type->getName()<<"\n"<<"$"<<(unsigned int)(Type->getCost());
+	if (type->getName() != 0)
+	{
+		// Get raw name of the type
+		string nameOfType = string(type->getTName());
+		if (nameOfType=="POWR"){
+			TipString << stringFile->getString(126);
+		} else if (nameOfType=="FACF"){
+			TipString << stringFile->getString(430);				
+		} else {
+			TipString << type->getName();
+		}		
+	} 
 	else
-		TipString<<"?"<<"\n"<<"$"<<(unsigned int)(Type->getCost());
-
+	{
+		TipString << "?";
+	}
+	
+	// Complete the tooltip text with cost
+	TipString << "\n" << "$"<< type->getCost();
 
 	// Set the tooltip of the cursor
 	pc::cursor->setTooltip(TipString.str());
@@ -990,7 +1011,7 @@ void Sidebar::Build(Uint8 index, Uint8 type, char* unitname, createmode_t* creat
         // Out of range
         return;
     }
-
+        
     if (*createmode != CM_STRUCT) {
         // createmode was set to CM_INVALID in the caller of this function
         UnitType* utype = p::uspool->getUnitTypeByName(unitname);

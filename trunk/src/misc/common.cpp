@@ -12,6 +12,7 @@
 #include "ui/PauseMenu.h"
 #include "video/GraphicsEngine.h"
 #include "game/RedAlertDataLoader.h"
+#include "include/Logger.h"
 
 using std::cout; 
 using std::map; 
@@ -23,7 +24,6 @@ typedef struct TiniFile{
 } TiniFile;
 
 
-int mapscaleq = -1;
 namespace {
 	string binloc;
 }
@@ -66,8 +66,9 @@ INIFile* GetConfig(string name)
 	return TempIniFile.inifile;
 }
 
-void CleanConfig (void)
+void CleanConfig()
 {
+	
 	for (Uint32 i = 0; i < p::Setting.size(); i++){
 		delete p::Setting[i].inifile;
 	}
@@ -83,7 +84,7 @@ namespace pc {
 	SoundEngine		*sfxeng = 0;
 	GraphicsEngine	*gfxeng = 0;
 	MessagePool		*msg = 0;
-	std::vector<SHPImage *>	*imagepool = 0;
+	vector<SHPImage *>	*imagepool = 0;
 	ImageCache		*imgcache = 0;
 	Sidebar			*sidebar = 0;
 	Cursor			*cursor = 0;
@@ -98,10 +99,12 @@ namespace pc {
 namespace ps {
 }
 
+extern Logger* logger;
+
 // Server only
 std::vector<char*> splitList(char* line, char delim)
 {
-    std::vector<char*> retval;
+    vector<char*> retval;
     char* tmp;
     Uint32 i,i2;
     tmp = NULL;

@@ -27,11 +27,12 @@
 #define LEFT_SIDE_BUTTON 1
 #define RIGHT_SIDE_BUTTON 2
 
-
-
+/**
+ * Button of the Sidebar
+ */
 class SidebarButton {
 public:
-    SidebarButton(Sint16 x, Sint16 y, const char* fname, Uint8 f,
+    SidebarButton(Sint16 x, Sint16 y, const char* fname, Uint8 func,
             const char* theatre, Uint8 palnum);
     ~SidebarButton();
     
@@ -47,11 +48,13 @@ public:
 private:
     Uint32 picnum;
     SDL_Surface *pic;
-    Uint8 function; Uint8 palnum;
+    Uint8 function; 
+    Uint8 palnum;
     const char* theatre;
 
     bool using_fallback;
     const char *fallbackfname;
+    
     /** Destination rect (on the sidebar) */
     SDL_Rect picloc;	
 

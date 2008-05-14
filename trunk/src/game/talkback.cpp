@@ -10,18 +10,21 @@
 #include "misc/INIFile.h"
 #include "include/Logger.h"
 #include "audio/SoundEngine.h"
-#include "include/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "TalkbackType.h"
+#include "include/common.h"
 
 using std::map;
 using std::string;
 using std::vector;
 
+namespace pc {
+	extern SoundEngine* sfxeng;
+}
+extern Logger * logger;
 
 map<string, TalkbackType> Talkback::talktype;
 bool Talkback::talktype_init;
-
-extern Logger * logger;
 
 Talkback::Talkback()
 {

@@ -4,11 +4,13 @@
 #include "SDL/SDL_types.h"
 
 #include "ActionEvent.h"
-#include "Player.h"
+
+class Player;
+
 
 class MoneyCounter : public ActionEvent {
 public:
-    MoneyCounter(Sint32 *, Player *, MoneyCounter * *);
+    MoneyCounter(Sint32* money, Player* player, MoneyCounter * * backref);
     ~MoneyCounter();
     void run();
 
@@ -22,7 +24,7 @@ public:
 private:
     static const Uint8 delta = 5;
 
-    Sint32 & money;
+    Sint32* money;
     Player * player;
     bool queued;
     // Seperate because we want both credit and debit sounds being played

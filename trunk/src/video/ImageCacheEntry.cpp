@@ -3,32 +3,47 @@
 #include "SDL/SDL_video.h"
 
 /** 
- * @brief Ensure that the pointers start off pointing somewhere that's safe to
+ * Ensure that the pointers start off pointing somewhere that's safe to
  * delete.
  */
-ImageCacheEntry::ImageCacheEntry() : image(0), shadow(0) {}
+ImageCacheEntry::ImageCacheEntry()
+{
+	// Set pointer to NULL
+	image = 0;
+	// Set pointer to NULL
+	shadow = 0;
+}
 
 /** 
- * @brief Frees the surfaces.  If the destructor is invoked by 
+ * Frees the surfaces.  If the destructor is invoked by 
  * a copy of the main instance, the program will most likely
  * crash or otherwise mess up horribly.
  */
-ImageCacheEntry::~ImageCacheEntry() {
-	if (image != NULL){
+ImageCacheEntry::~ImageCacheEntry()
+{
+	// If pointer are not NULL
+	if (image != NULL)
+	{
+		// Free surface
 		SDL_FreeSurface(image);
+		// Set pointer to NULL
 		image = NULL;
 	}
-	if (shadow != NULL){
-    	SDL_FreeSurface(shadow);
+	// If pointer are not NULL
+	if (shadow != NULL)
+	{
+		// Free surface
+		SDL_FreeSurface(shadow);
+		// Set pointer to NULL
 		shadow = NULL;
 	}
 }
 
 /**
- * @brief This function exists because we don't have shared
- *  pointers.
+ * This function exists because we don't have shared pointers.
  */
-void ImageCacheEntry::clear() {
-    image = 0;
-    shadow = 0;
+void ImageCacheEntry::clear()
+{
+	image = 0;
+	shadow = 0;
 }

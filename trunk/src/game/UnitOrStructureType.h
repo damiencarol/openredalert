@@ -56,9 +56,6 @@ public :
     /** @returns the external name, e.g. Minigunner */
     virtual const char * getName() const = 0;
 
-    /** @returns the level the player has to have reached before can be built */
-    virtual Uint8 getBuildlevel() const = 0;
-
     /** @returns the names of the sides that can build this */
     virtual std::vector < char * > getOwners() const = 0;
 
@@ -76,10 +73,10 @@ public :
     virtual bool isStructure() const = 0;
 
     /** Returns the prerequisites. */
-    std::vector < char * > getPrereqs() const;
+    vector <char* > getPrereqs() const;
 
     /** tech level required to build this [-1 means can't build] (def=-1)*/
-    Uint8 getTechlevel() const;
+    Sint32 getTechLevel() const;
 
     /** Cost to build object (in credits).*/
     Uint16 getCost() const;
@@ -106,7 +103,7 @@ protected :
     Uint16 maxhealth;
     Uint8 speed;
     Uint16 cost;
-    Uint8 techlevel;
+    Sint32 techLevel;
     vector<char*> prereqs;
     Uint8 ptype;
     bool valid;

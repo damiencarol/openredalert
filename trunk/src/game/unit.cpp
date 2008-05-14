@@ -153,7 +153,7 @@ Unit::~Unit()
 				pc::sfxeng->PlaySound("hvydoor1.aud");
 			}
 		}
-        p::uspool->createStructure(type->getDeployTarget(),calcDeployPos(),owner,(Uint16)(ratio*256.0f),0,true);
+        p::uspool->createStructure(type->getDeployTarget(), calcDeployPos(), owner, (Uint16)(ratio*256.0f), 0, true);
 /*
 	//printf ("Deploy\n");
 	if (!pc::sidebar->getVisible()){

@@ -28,7 +28,9 @@ UnitOrStructureType::~UnitOrStructureType()
 }
 
 UnitOrStructureType::UnitOrStructureType() :
-	ptype(0), valid(false)
+	ptype(0), 
+	valid(false),
+	techLevel(-1)
 {
 }
 
@@ -37,9 +39,9 @@ vector < char *> UnitOrStructureType::getPrereqs() const
 	return prereqs;
 }
 
-Uint8 UnitOrStructureType::getTechlevel() const
+Sint32 UnitOrStructureType::getTechLevel() const
 {
-	return techlevel;
+	return techLevel;
 }
 
 Uint16 UnitOrStructureType::getCost() const

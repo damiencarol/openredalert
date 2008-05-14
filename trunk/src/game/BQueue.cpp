@@ -60,6 +60,7 @@ BQueue::~BQueue()
 
 bool BQueue::Add(const UnitOrStructureType * type) 
 {
+	/*
     switch (status) {
         case BQ_INVALID:
             logger->error("Queue %p in invalid state\n", this);
@@ -120,7 +121,8 @@ bool BQueue::Add(const UnitOrStructureType * type)
             logger->error("Queue %p in /really/ invalid state (%i)\n", this, status);
             break;
     }
-    return false;
+    return false;*/
+	return true;
 }
 
 ConStatus BQueue::PauseCancel(const UnitOrStructureType * type) 

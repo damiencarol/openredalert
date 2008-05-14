@@ -27,7 +27,7 @@ public:
 	Uint32 getWidth() const;
 	Uint32 getHeight() const;
 	Uint16 getNumImg() const;
-	std::string getFileName() const;
+	string getFileName() const;
 
 private:
 	static SDL_Color shadowpal[2];

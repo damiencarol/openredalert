@@ -35,6 +35,8 @@ class Dune2Image;
 class TemplateImage;
 class RA_Label;
 
+using std::string;
+
 /**
  * Cursor 
  */
@@ -57,8 +59,8 @@ public:
 
 	void reloadImages();
 
-	SDL_Surface *getTooltip(void);
-	void setTooltip(std::string TipText);
+	SDL_Surface* getTooltip();
+	void setTooltip(string TipText);
 
 private:
 	Uint16 currentcursor;

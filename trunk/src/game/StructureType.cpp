@@ -26,11 +26,11 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 		INIFile *artini, const char* thext) :
 	UnitOrStructureType() 
 {
-	//SHPImage *shpimage;
+	SHPImage *shpimage;
 	SHPImage *makeimage;
 	Uint32 i = 0;
 	char shpname[13];
-	//char imagename[8];
+	char imagename[8];
 	char* tmpCharges;
 	char* tmpWaterBound;
 	char* tmp;
@@ -98,7 +98,9 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	if (owners.empty()) {
 		logger->warning("%s has no owners\n", tname);
 	}
-#if 1
+	
+#if 0
+	// DEBUG
 	logger->debug("%s line %i: Structure: %s \n",__FILE__ , __LINE__, tname);
 	for (unsigned int j = 0; j < owners.size(); j++) {
 		logger->debug("owners = %s\n", owners[j]);
@@ -116,8 +118,8 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	}
 	
 	// the size of the structure in tiles
-	xsize = artini->readInt(tname, "xsize",1);
-	ysize = artini->readInt(tname, "ysize",1);
+	xsize = artini->readInt(tname, "xsize", 1);
+	ysize = artini->readInt(tname, "ysize", 1);
 
 	// Get the blockers
 	blckoff = 0;
@@ -171,11 +173,10 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	shpnums = new Uint16[(is_wall?numshps:numshps+1)];
 	shptnum = new Uint16[numshps];
 
-	buildlevel = structini->readInt(tname,"buildlevel",100);
-	techlevel = structini->readInt(tname,"techlevel",99);
-	if (buildlevel == 100) {
-		logger->warning("%s does not have a buildlevel\n",tname);
-	}
+	// Read the Tech level
+	// TODO : refactor this !!!!!!!
+	//techLevel = structini->readInt(tname,"TechLevel", -1);
+	techLevel = (Sint32)structini->readInt(tname,"techlevel", (Sint32)-1);
 
 	powerinfo.power = structini->readInt(tname, "power", 0);
 	powerinfo.drain = structini->readInt(tname, "drain", 0);
@@ -207,11 +208,11 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	// TODO Read SHP ???????
 	for( i = 0; i < numshps; i++ ) {
 		// TODO TRY THIS (TEST !!!!!!!!!!!)
-		/*sprintf(imagename, "image%d", i+1);
+		sprintf(imagename, "image%d", i+1);
 		tmp = structini->readString(tname, imagename);
 		if( tmp == NULL ) {
 			strncpy(shpname, tname, 13);
-			strncat(shpname, ".SHP", 13);
+			strncat(shpname, ".shp", 13);
 		} else {
 			strncpy(shpname, tmp, 13);
 			delete[] tmp;
@@ -234,7 +235,8 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 		shpnums[i] = pc::imagepool->size();
 		shptnum[i] = shpimage->getNumImg();
 		pc::imagepool->push_back(shpimage);
-		*/
+		
+		/*
 		string stringShpName = string(tname);
 		if (i>0){
 			stringShpName += i;
@@ -244,6 +246,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 		shpnums[i] = pc::imgcache->loadImage(stringShpName.c_str());
 		// Set the number of images
 		shptnum[i] = pc::imgcache->getImage(shpnums[i]).NumbImages;
+		*/
 	}
 	
 	

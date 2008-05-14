@@ -73,9 +73,19 @@ Player::Player(const char *pname, INIFile *mapini)
     playerstart = 0;
     defeated = false;
     
-    
-    
-    if( !strcmp((playername), ("GoodGuy")) ) {
+    if( !strcmp((playername), ("Greece"))) 
+    {
+    	playerside = PS_GOOD;
+    	unitpalnum = 1;
+    	structpalnum = 1;
+    } 
+    else if( !strcmp((playername), ("USSR"))) 
+    {
+    	playerside = PS_BAD;
+    	unitpalnum = 2;
+    	structpalnum = 2;
+    } 
+    else if( !strcmp((playername), ("GoodGuy")) ) {
     	printf ("Playerside = goodguy??\n");
         playerside = PS_GOOD;
         unitpalnum = 0;
@@ -386,12 +396,13 @@ Sint32 Player::getMoney() const
 
 bool Player::startBuilding(UnitOrStructureType *type)
 {
-    BQueue* queue = getQueue(type->getPQueue());
+    BQueue* queue = getQueue(type->getPQueue());    
     if (0 == queue) {
         logger->error("Didn't find build queue for \"%s\" (pqueue: %i)\n",
                 type->getTName(), type->getPQueue());
         return false;
     }
+    printf("here");
     return queue->Add(type);
 }
 

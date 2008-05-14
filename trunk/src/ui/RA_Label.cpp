@@ -138,7 +138,7 @@ void RA_Label::underline(bool status)
 	recreate = true;
 }
 
-void RA_Label::Draw ( int X, int Y)
+void RA_Label::Draw(int X, int Y)
 {
 	SDL_Rect BackupDest;
 
@@ -154,17 +154,19 @@ void RA_Label::Draw ( int X, int Y)
 
 	// Recreate the Label surface if needed
 	if (recreate)
-		Create ();
+		Create();
 
-	if (LabelSurface == NULL)
+	if (LabelSurface == 0)
 		return;
 
-	if (DrawingSurface == NULL && DrawingWindow == NULL)
+	if (DrawingSurface == 0 && DrawingWindow == 0)
 		return;
 
 	if (DrawingSurface != NULL){
 		SDL_BlitSurface(LabelSurface, NULL, DrawingSurface, &LabelDest);
-	}else if (DrawingWindow != NULL){
+	}
+	else if (DrawingWindow != NULL)
+	{
 		if (BackgroundBackup == NULL){
 			BackgroundBackup = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, LabelDest.w, LabelFont.getHeight(), 16, 0, 0, 0, 0);
 			BackupDest.x = 0; BackupDest.y = 0; BackupDest.w = LabelDest.w; BackupDest.h = LabelDest.h;
@@ -179,15 +181,15 @@ void RA_Label::Draw ( int X, int Y)
 
 void RA_Label::Draw(SDL_Surface *DrawingSurface, int X, int Y)
 {
-	SetDrawingSurface (DrawingSurface);
-	Draw ( X, Y);
+	SetDrawingSurface(DrawingSurface);
+	Draw(X, Y);
 }
 
 void RA_Label::Draw(const string& text, SDL_Surface *DrawingSurface, int X, int Y)
 {
 	setText(text);
-	SetDrawingSurface (DrawingSurface);
-	Draw ( X, Y);
+	SetDrawingSurface(DrawingSurface);
+	Draw(X, Y);
 }
 
 void RA_Label::Draw(const string& text, SDL_Surface *DrawingSurface, SDL_Color Fcolor, int X, int Y)
@@ -198,12 +200,12 @@ void RA_Label::Draw(const string& text, SDL_Surface *DrawingSurface, SDL_Color F
 	Draw(X, Y);
 }
 
-void RA_Label::Redraw ( void )
+void RA_Label::Redraw()
 {
-	Draw ( LabelDest.x, LabelDest.y);
+	Draw(LabelDest.x, LabelDest.y);
 }
 
-void RA_Label::Create (void)
+void RA_Label::Create()
 {
 	SDL_Rect dest;
 	SDL_Surface	*tmp;
@@ -239,7 +241,7 @@ void RA_Label::Create (void)
 	if (DrawingSurface != NULL)
 		LabelFont.drawText(LabelText, DrawingSurface, LabelDest.x, LabelDest.y, LabelSurface, LabelFontColor, 0, 0);
 	else if (DrawingWindow != NULL){
-		LabelFont.drawText(LabelText, DrawingWindow->GetWindowSurface (), LabelDest.x, LabelDest.y, LabelSurface, LabelFontColor, 0, 0);
+		LabelFont.drawText(LabelText, DrawingWindow->GetWindowSurface(), LabelDest.x, LabelDest.y, LabelSurface, LabelFontColor, 0, 0);
 	}
 
 	SDL_SetColorKey(LabelSurface, SDL_SRCCOLORKEY, 0);
@@ -253,15 +255,16 @@ void RA_Label::Create (void)
 	recreate = false;
 }
 
-void RA_Label::setText (const string text)
+void RA_Label::setText(const string text)
 {
-	if (LabelText != text){
-		if (BackgroundBackup != NULL && DrawingWindow != NULL){
+	if (LabelText != text)
+	{
+		if (BackgroundBackup != NULL && DrawingWindow != NULL)
+		{
 			SDL_BlitSurface(BackgroundBackup, NULL, DrawingWindow->GetWindowSurface (), &LabelDest);
 			SDL_FreeSurface(BackgroundBackup);
 			BackgroundBackup = NULL;
 		}
-
 		LabelText = text;
 		recreate = true;
 	}

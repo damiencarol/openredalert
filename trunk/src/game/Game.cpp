@@ -134,7 +134,10 @@ void Game::InitializeMap(string MapName)
 	{
 		p::ccmap = new CnCMap();
 		p::ccmap->Init(GAME_RA, this->gamemode);
-		p::ccmap->loadMap(pc::Config.mapname.c_str(), NULL);
+		p::ccmap->loadMap(MapName.c_str(), 0);
+		// TODO TRY THIS TO DEBUG INTERIOR MAPS
+		//char* toto = strdup("scg10eb");
+		//p::ccmap->loadMap(toto, 0);
 	}
 	catch (LoadMapError& ex)
 	{
@@ -142,7 +145,7 @@ void Game::InitializeMap(string MapName)
 		// loadmap will have printed the error
 		throw GameError("Error during load of the Map in Game::InitializeMap\n");
 	}
-
+	
 	p::dispatcher = new Dispatcher::Dispatcher();
 	switch (pc::Config.dispatch_mode)
 	{
@@ -162,16 +165,15 @@ void Game::InitializeMap(string MapName)
 
 	switch (gamemode)
 	{
-	case 0:
+	case GAME_MODE_SINGLE_PLAYER:
 		try
 		{
 			// Try to Play the "Briefing" Movie
-			char * tmpBrief;
-			tmpBrief = new char[strlen(p::ccmap->getMissionData()->brief)+1];
-			strcpy(tmpBrief, p::ccmap->getMissionData()->brief);
-			logger->note ("%s line %i: Brief = %s\n", __FILE__, __LINE__, tmpBrief);
-			VQAMovie movBrief(tmpBrief);
-			movBrief.play();
+			string briefMovieName;
+			briefMovieName = string(p::ccmap->getMissionData()->brief);
+			logger->note ("%s line %i: Brief = %s\n", __FILE__, __LINE__, briefMovieName.c_str());
+			VQAMovie* movBrief = new VQAMovie(briefMovieName.c_str());
+			movBrief->play();
 
 			// Try to Play the "Action" Movie
 			char * tmpAction;
@@ -186,8 +188,8 @@ void Game::InitializeMap(string MapName)
 		{
 		}
 		break;
-	case 1:
-	case 2:
+	case GAME_MODE_SKIRMISH:
+	case GAME_MODE_MULTI_PLAYER:
 	default:
 		break;
 	}
@@ -195,7 +197,9 @@ void Game::InitializeMap(string MapName)
 	// init sidebar
 	try
 	{
-		pc::sidebar = new Sidebar( p::ppool->getLPlayer(), pc::gfxeng->getHeight(), p::ccmap->getMissionData()->theater );
+		pc::sidebar = new Sidebar(p::ppool->getLPlayer(), 
+				pc::gfxeng->getHeight(), 
+				p::ccmap->getMissionData()->theater );
 	}
 	catch (SidebarError)
 	{
@@ -450,7 +454,7 @@ void Game::play()
 		exit(0);
 */
 		// TODO DEBUG
-		CnCMap* themap;
+	/*	CnCMap* themap;
 		themap = new CnCMap();
 		logger->debug("$create ok\n");
 		themap->Init(GAME_RA, GAME_MODE_SINGLE_PLAYER);
@@ -458,7 +462,7 @@ void Game::play()
 		themap->loadMap("scg01ea", 0);
 		logger->debug("$load ok\n");
 		exit(0);
-					
+	*/				
 		// Load the Menu sound "intro.aud"
 		pc::sfxeng->LoadSound("intro.aud");
 		// Play this sound
@@ -508,8 +512,8 @@ void Game::play()
 		logger->debug("Mission name = %s\n", pc::Config.mapname.c_str());
 
 		// Initialize (load) the map
-		InitializeMap( pc::Config.mapname );
-		
+		InitializeMap(pc::Config.mapname);
+
 		// Start playing the background music
 		pc::sfxeng->PlayTrack(p::ccmap->getMissionData()->theme);
 
@@ -581,6 +585,7 @@ void Game::play()
 		pc::ai = new Ai;
 		//pc::PauseMenu = new PauseMenu();
 		PauseMenu * lPauseMenu = new PauseMenu();
+
 		while (!pc::input->shouldQuit() && !pc::quit)
 		{
 

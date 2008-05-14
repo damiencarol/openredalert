@@ -59,11 +59,11 @@ PauseMenu::PauseMenu()
 	
 	// Draw the buttons on the new window..
     OptionsButton->SetDrawingWindow(PauseWindow);
-	OptionsButton->CreateSurface("game options", 120, 110, 180, 22 );	
+	OptionsButton->CreateSurface("game options", 120, 110, 180, 22);	
 	ExitButton->SetDrawingWindow(PauseWindow);
-	ExitButton->CreateSurface("abort Mission", 120, 145, 180, 22 );	
+	ExitButton->CreateSurface("abort Mission", 120, 145, 180, 22);	
 	ContinueButton->SetDrawingWindow(PauseWindow);
-	ContinueButton->CreateSurface("Resume Mission", 35, 200, 180, 22 );
+	ContinueButton->CreateSurface("Resume Mission", 35, 200, 180, 22);
 			
 	// Setup the font color
 	Font_color.r = 255;
@@ -154,15 +154,17 @@ int PauseMenu::HandleMenu()
 
 	// Keep rendering the scene as background
 	pc::gfxeng->renderScene(false);
-
+	
+	
 	// Draw the buttons on the window
 	OptionsButton->drawbutton();
 	ExitButton->drawbutton();
 	ContinueButton->drawbutton();
-
+	
 	// Draw the window (whith the buttons on it) to the screen
 	PauseWindow->DrawWindow();
 
+	// Draw the cursor
 	this->DrawMousePointer();
 
 	SDL_Flip(display);

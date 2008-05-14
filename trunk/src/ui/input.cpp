@@ -47,7 +47,9 @@ namespace pc {
 extern Logger * logger;
 
 
-/** Constructor, sets up the input handeler.
+/** 
+ * Constructor, sets up the input handeler.
+ * 
  * @param the sidebar.
  * @param the map.
  * @param the width of the screen.
@@ -1182,7 +1184,9 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
     /** TODO find a more elegant way to do this, as scrolling will blank
      *  current place.
      */
+    //placename = strdup("xxxx");
     strncpy(placename, "xxxx", 4);
+    placename[4]=0; placename[5]=0; 
     pc::sidebar->ClickButton(butclick, placename, &createmode);
 
 
@@ -1210,7 +1214,7 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
         if (BQ_PAUSED == status) {
             pc::sfxeng->PlaySound(pc::Config.BuildingOnHold);
         } else if (BQ_CANCELLED == status) {
-		pc::sfxeng->PlaySound(pc::Config.BuildingCanceled);
+        	pc::sfxeng->PlaySound(pc::Config.BuildingCanceled);
         } else {
             logger->error("Recieved an unknown status from stopBuilding: %i\n", status);
         }
@@ -1235,6 +1239,7 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
     } 
     else 
     {
+    	// add in player build queue
         lplayer->startBuilding(type);
         /// @TODO Check if we're building a unit and use "training" instead
         // Play buiding sound here!!!
@@ -1246,6 +1251,7 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
         	pc::sfxeng->PlaySound(pc::Config.StructureStartBuild);
         }
     }
+    
 }
 
 Uint16 Input::checkPlace(int mx, int my)
