@@ -3,6 +3,7 @@
 #include "RA_Label.h"
 #include "Font.h"
 #include "video/CPSImage.h"
+#include "video/SHPImage.h"
 #include "include/common.h"
 #include "include/config.h"
 #include "video/GraphicsEngine.h"
@@ -22,9 +23,9 @@ namespace pc {
 
 RA_WindowClass::RA_WindowClass()
 {
-	WindowSurface	= NULL;
+	WindowSurface	= 0; // NULL
 	DisplaySurface	= pc::gfxeng->get_SDL_ScreenSurface();
-	PalNr		= 0;
+	PalNr			= 0;
 
 //	this->SetupWindow (Xpos, Ypos, Width, Heigth);
 }
@@ -39,11 +40,11 @@ void RA_WindowClass::setPalette(Uint8 pal)
 	PalNr = pal;
 }
 
-void RA_WindowClass::DrawRaBackground (void)
+void RA_WindowClass::DrawRaBackground()
 {
-SDL_Rect	dest;
-SDL_Surface	*Image,
-		*tmp;
+	SDL_Rect	dest;
+	SDL_Surface	*Image;
+	SDL_Surface* tmp;
     int topspacing = 0;
     int botspacing = 0;
     Uint32 EdgeOffset = 0;

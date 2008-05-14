@@ -35,19 +35,23 @@ extern Logger * logger;
  */
 SHPImage::SHPImage(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
 {
-    int i, j;
-    VFile *imgfile;
-
-	lnkHeader.NumImages = 0;
+    int i; // variable use for loop
+    int j; // variable use for loop
+    VFile *imgfile; // link to the file in mix archives
 
 	// Open the file in archive
-    imgfile = VFSUtils::VFS_Open(fname);
+    imgfile = VFSUtils::VFS_Open(fname);    
+    // Check that file is loaded
     if (imgfile == NULL) {
+    	// Log it
     	logger->error("failed to load %s (SHPImage)\n", fname);
+    	// Throw an Exception
         throw ImageNotFound("failed to load (SHPImage) " + string(fname));
     }
 
+    // Allocate data for the data
     shpdata = new Uint8[imgfile->fileSize()];
+    // Read all the file
     imgfile->readByte(shpdata, imgfile->fileSize());
 
     // lnkHeader
@@ -82,14 +86,18 @@ SHPImage::SHPImage(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
  */
 SHPImage::~SHPImage()
 {
+	// Free data from the file
     delete[] shpdata;
+    // free headers vars
     delete[] lnkHeader.Offset;
     delete[] lnkHeader.Format;
     delete[] lnkHeader.RefOffs;
     delete[] lnkHeader.RefFormat;
 }
 
-/** Extract a frame from a SHP into two SDL_Surface* (shadow is separate)
+/** 
+ * Extract a frame from a SHP into two SDL_Surface* (shadow is separate)
+ * 
  * @param imgnum the index of the frame to decode.
  * @param img pointer to the SDL_Surface* into which the frame is decoded.
  * @param shadow pointer to the SDL_Surface* into which the shadow frame is
@@ -99,7 +107,6 @@ void SHPImage::getImage(Uint16 imgnum, SDL_Surface **img, SDL_Surface **shadow, 
 {
 	if (0 == img) {
 		string s = name + ": can't decode to a NULL surface";
-		/// @TODO This really should be a logic_error.
 		throw runtime_error(s);
 	}
 
@@ -174,14 +181,17 @@ void SHPImage::getImage(Uint16 imgnum, SDL_Surface **img, SDL_Surface **shadow, 
 	// Setup the colorkey
 	SDL_Surface *imgp = *img;
 	//Uint32 KeyColor = SDL_MapRGB(imgp->format, 1, 10, 1 );
-	SDL_SetColorKey(*img,SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(imgp->format, 22, 255, 22 ));
-
-
+	SDL_SetColorKey(*img, SDL_SRCCOLORKEY|SDL_RLEACCEL, SDL_MapRGB(imgp->format, 22, 255, 22 ));
+	// Free 
 	SDL_FreeSurface(imageimg);
+	
 	delete[] imgdata;
 }
-/** Extracts a SHP into a SDL_Surface* with the values mapped to different
- * levels of transparency
+
+/** 
+ * Extracts a SHP into a SDL_Surface* with the values mapped to different
+ * levels of transparency.
+ * 
  * Might be a bit of a hack, since the only valid palette values allowed
  * are 0, 12-16. However only shadows.shp seems to use this function, thus
  * its ok.
@@ -192,6 +202,7 @@ void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
 
     DecodeSprite(imgdata, imgnum);
 
+
     for (Uint16 i = 0; i < lnkHeader.Width * lnkHeader.Height; ++i)  {
         // The shadows.shp only uses 0, 12-16
         // So we map them to 0-5
@@ -199,6 +210,7 @@ void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
             imgdata[i] = 17 - imgdata[i];
         }
     }
+
 
     SDL_Surface* imageimg = SDL_CreateRGBSurfaceFrom(imgdata, lnkHeader.Width,
         lnkHeader.Height, 8, lnkHeader.Width, 0, 0, 0, 0);
@@ -235,14 +247,45 @@ void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
     delete[] imgdata;
 }
 
-Uint32 SHPImage::getWidth() const { return lnkHeader.Width; }
-Uint32 SHPImage::getHeight() const { return lnkHeader.Height; }
-Uint16 SHPImage::getNumImg() const { return lnkHeader.NumImages; }
-std::string SHPImage::getFileName() const {return name; }
-SDL_Color SHPImage::shadowpal[2] = {{0xff,0xff,0xff,0}, {0x00,0x00,0x00,0}};
-SDL_Color SHPImage::alphapal[6] = {{0x00,0x00,0x00,0x00}, {0x33,0x33,0x33,0x33}, {0x66,0x66,0x66,0x66}, {0x99,0x99,0x99,0x99}, {0xCC,0xCC,0xCC,0xCC}, {0xFF,0xFF,0xFF,0xFF}};
+Uint32 SHPImage::getWidth() const 
+{ 
+	return lnkHeader.Width; 
+}
 
-/** Method to decompress a format xx compressed image.
+Uint32 SHPImage::getHeight() const 
+{ 
+	return lnkHeader.Height; 
+}
+
+Uint16 SHPImage::getNumImg() const 
+{
+	return lnkHeader.NumImages;
+}
+
+string SHPImage::getFileName() const 
+{
+	return name; 
+}
+
+SDL_Color SHPImage::shadowpal[2] = 
+{
+	{0xff,0xff,0xff,0}, 
+	{0x00,0x00,0x00,0}
+};
+
+SDL_Color SHPImage::alphapal[6] = 
+{
+	{0x00,0x00,0x00,0x00}, 
+	{0x33,0x33,0x33,0x33}, 
+	{0x66,0x66,0x66,0x66}, 
+	{0x99,0x99,0x99,0x99}, 
+	{0xCC,0xCC,0xCC,0xCC}, 
+	{0xFF,0xFF,0xFF,0xFF}
+};
+
+/** 
+ * Method to decompress a format xx compressed image.
+ * 
  * @param imgdst The buffer in which to put the image (must contain XOR image).
  * @param imgnum The index of the frame to decompress.
  */

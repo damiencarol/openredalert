@@ -27,7 +27,7 @@
 #include "pside.h"
 #include "Player.h"
 #include "Unit.h"
-
+#include "GameMode.h"
 #include "misc/INIFile.h"
 #include "include/talkback.h"
 #include "UnitAndStructureMat.h"
@@ -60,7 +60,9 @@ UnitAndStructurePool::UnitAndStructurePool(const char* theTheater) :
 	strcpy(this->theaterext, ".");
 	strncat(this->theaterext, theTheater, 3);
 	
-    //unitandstructmat.resize((p::ccmap->getWidth()+10) * (p::ccmap->getHeight()+10));
+	// needed for populate by structures
+	//unitandstructmat.resize((p::ccmap->getWidth()+10) * (p::ccmap->getHeight()+10));
+	unitandstructmat.resize(100000);
 
 	printf("%s line %i: Loading ra unit structures ini\n", __FILE__, __LINE__);
 	structini	= GetConfig("structure.ini");
@@ -125,53 +127,42 @@ UnitAndStructurePool::~UnitAndStructurePool()
     delete p::weappool;
 }
 
-#if 0
-/** @brief Retrieve the imagenumber for the structure at the specified position
+/** 
+ * Retrieve the imagenumber for the Structure at the specified position
+ * 
  * @param cellpos the position we want to know the structure of.
  * @param inumbers pointer to array of image numbers
  * @param xoffsets pointer to array of x offsets
  * @param yoffsets pointer to array of y offsets
- * @returns the imagenumber.  */
-Uint8 UnitAndStructurePool::getUnitOrStructureNum(Uint16 cellpos, Uint32 **inumbers, Sint8 **xoffsets, Sint8 **yoffsets)
+ * @returns the imagenumber.
+ */
+Uint8 UnitAndStructurePool::getStructureNum(Uint16 cellpos, Uint32 **inumbers, Sint8 **xoffsets, Sint8 **yoffsets)
 {
 	Structure *st = 0;
 	Uint8 layers = 0;
 
-	if (cellpos >= p::ccmap->getSize())
+	// Check if the pos is correct
+	if (cellpos >= p::ccmap->getSize()){
 		return 0;
-
-	if( unitandstructmat[cellpos].flags&US_UNIT_LOWER_RIGHT ){
-		if( unitandstructmat[cellpos].flags&US_IS_UNIT ) {
-			un = getUnit ((unitandstructmat[cellpos].unitnumb)); //unitpool[(unitandstructmat[cellpos])&0xffff];
-			if (un == NULL){
-				// hmmm some error --> remove the unit from the unitandstructmat
-				logger->error ("%s line %i: UnitandStructuremat error --> correcting\n", __FILE__, __LINE__);
-				unitandstructmat[cellpos].flags &= ~(US_IS_UNIT|US_UNIT_LOWER_RIGHT);
-				return 0;
-			}
-			if( ((UnitType *)un->getType())->isInfantry() ) {
-				return un->getInfantryGroup()->GetImageNums(inumbers, xoffsets, yoffsets);
-			}
-			return un->getImageNums(inumbers, xoffsets, yoffsets);
-		}
+	}
+	
+	if ( !(unitandstructmat[cellpos].flags & 0x00400000)) {
+		return 0;
 	}
 
-	if (unitandstructmat[cellpos].flags&US_STR_LOWER_RIGHT) {
-		if( unitandstructmat[cellpos].flags&(US_IS_STRUCTURE|US_IS_WALL) ) {
-			st = getStructure((unitandstructmat[cellpos].structurenumb)); //structurepool[(unitandstructmat[cellpos])&0xffff];
-			if (st == NULL){
-				// hmmm some error --> remove the structure from the unitandstructmat
-				logger->error ("%s line %i: UnitandStructuremat error --> correcting\n", __FILE__, __LINE__);
-				unitandstructmat[cellpos].flags &= ~(US_IS_STRUCTURE|US_IS_WALL|US_STR_LOWER_RIGHT);
-				return 0;
-			}
-			layers = st->getImageNums(inumbers,xoffsets,yoffsets);
-			return layers;
+	if( unitandstructmat[cellpos].flags&(0x20000000|0x10000000) ) {
+		st = getStructure((unitandstructmat[cellpos].structurenumb)); //structurepool[(unitandstructmat[cellpos])&0xffff];
+		if (st == 0){
+			// hmmm some error --> remove the structure from the unitandstructmat
+			logger->error ("%s line %i: UnitandStructuremat error --> correcting\n", __FILE__, __LINE__);
+			unitandstructmat[cellpos].flags &= ~(0x20000000|0x10000000|0x00400000);
+			return 0;
 		}
+		layers = st->getImageNums(inumbers,xoffsets,yoffsets);
+		return layers;
 	}
 	return 0;
 }
-#endif
 
 /** 
  * Retrieve the imagenumber for the Unit at the specified position
@@ -246,55 +237,6 @@ Uint8 UnitAndStructurePool::getFlyingUnitNum(Uint16 cellpos, Uint32 **inumbers, 
 	}
 	return 0;
 }
-
-/** 
- * Retrieve the imagenumber for the Structure at the specified position
- * 
- * @param cellpos the position we want to know the structure of.
- * @param inumbers pointer to array of image numbers
- * @param xoffsets pointer to array of x offsets
- * @param yoffsets pointer to array of y offsets
- * @returns the imagenumber.
- */
-Uint8 UnitAndStructurePool::getStructureNum(Uint16 cellpos, Uint32 **inumbers, Sint8 **xoffsets, Sint8 **yoffsets)
-{
-	Structure *st = NULL;
-	Uint8 layers = 0;
-
-	// Check if the pos is correct
-	if (cellpos >= p::ccmap->getSize()){
-		return 0;
-	}
-	
-	if ( !(unitandstructmat[cellpos].flags & US_STR_LOWER_RIGHT)) {
-		return 0;
-	}
-
-	if( unitandstructmat[cellpos].flags&(US_IS_STRUCTURE|US_IS_WALL) ) {
-		st = getStructure((unitandstructmat[cellpos].structurenumb)); //structurepool[(unitandstructmat[cellpos])&0xffff];
-		if (st == NULL){
-			// hmmm some error --> remove the structure from the unitandstructmat
-			logger->error ("%s line %i: UnitandStructuremat error --> correcting\n", __FILE__, __LINE__);
-			unitandstructmat[cellpos].flags &= ~(US_IS_STRUCTURE|US_IS_WALL|US_STR_LOWER_RIGHT);
-			return 0;
-		}
-		layers = st->getImageNums(inumbers,xoffsets,yoffsets);
-		return layers;
-	}
-	return 0;
-}
-
-bool UnitAndStructurePool::createCellTrigger(Uint32 cellpos)
-{
-	if (cellpos >= p::ccmap->getSize()){
-		return false;
-	}
-	
-	unitandstructmat[cellpos].flags |= US_CELL_HAS_TRIGGER;
-
-	return true;
-}
-
 bool UnitAndStructurePool::getUnitOrStructureLimAt(Uint32 curpos, float* width,
         float* height, Uint32* cellpos, Uint8* igroup, Uint8* owner,
         Uint8* pcol, bool* blocked)
@@ -377,7 +319,10 @@ bool UnitAndStructurePool::getUnitOrStructureLimAt(Uint32 curpos, float* width,
     }
     return false;
 }
-
+bool UnitAndStructurePool::hasL2overlay(Uint16 cellpos) const 
+{
+	return (unitandstructmat[cellpos].flags&0x08000000)!=0;
+}
 /**
  * Gets a list of all flying stuff in the current tile
  */
@@ -431,203 +376,9 @@ void UnitAndStructurePool::removeL2overlay(multimap<Uint16, L2Overlay*>::iterato
     numl2images[cellpos] -= entry->second->numimages;
     l2pool.erase(entry);
     if( l2pool.find(cellpos) == l2pool.end() ) {
-        unitandstructmat[cellpos].flags&=(~US_HAS_L2OVERLAY);
+        unitandstructmat[cellpos].flags&=(~0x08000000);
     }
 }
-
-/**
- * Creates a structure
- */
-bool UnitAndStructurePool::createStructure(const char* typen, Uint16 cellpos,
-        Uint8 owner, Uint16 health, Uint8 facing, bool makeanim, string trigger_name) 
-{	
-	// Get the type of the structure with his name
-    StructureType* type = getStructureTypeByName(typen);
-    if (0 == type) {
-        logger->error("Invalid type \"%s\"\n",typen);
-        return false;
-    }
-    
-    // Create the structure
-    return createStructure(type, cellpos, owner, health, facing, makeanim, trigger_name);
-}
-
-/**
- * 
- */
-bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
-        Uint8 owner, Uint16 health, Uint8 facing, bool makeanim, string trigger_name)
-{
-	Uint16 frame;
-	Uint32 pos;
-
-	if (cellpos >= p::ccmap->getSize())
-		return false;
-
-    int x = 0, y = 0, curpos = 0;
-    Uint32 structnum = 0;
-    Structure* st = 0;
-
-    Uint32 br = cellpos + ccmap->getWidth()*(type->getYsize()-1);
-    if (cellpos > ccmap->getSize() || (br > ccmap->getSize() && 0)) {
-        logger->error("%s line %i: Attempted to create a \"%s\" at %i, outside map (%i)\n", __FILE__, __LINE__, type->getTName(), br, ccmap->getSize());
-        return false;
-    }
-
-    // Reuse an expired structnum
-    if (numdeletedstruct > 0) {
-        for (structnum = 0; structnum < structurepool.size(); ++structnum) {
-            if (0 == structurepool[structnum]) {break;}
-        }
-    } else {
-        structnum = structurepool.size();
-    }
-
-    if (type->isWall()) {
-        // walls will always be one cell
-        if (0 != getStructureAt(cellpos) || 0 != (unitandstructmat[cellpos].flags & US_IS_UNIT)|| 0 != (unitandstructmat[cellpos].flags & US_IS_AIRUNIT)) {
-            return false;
-        }
-		if (structnum > structurepool.size()){
-			logger->error ("%s line %i: ERROR create structure, structnum = %i, size = %i\n", __FILE__, __LINE__, structnum, structurepool.size());
-			structnum = structurepool.size();
-		}
-
-        unitandstructmat[cellpos].flags = (US_STR_LOWER_RIGHT|US_IS_WALL);
-		unitandstructmat[cellpos].structurenumb = structnum;
-    } else {
-        /// @TODO Rewrite this to use curpos in a more straightforward way.
-        curpos = cellpos+p::ccmap->getWidth()*(type->getYsize());
-        for (y = type->getYsize()-1; y>=0; --y) {
-            curpos -= p::ccmap->getWidth();
-            for (x = type->getXsize()-1; x>=0; --x) {
-                if (type->isBlocked(y*type->getXsize()+x)) {
-                    if (getStructureAt(curpos+x) != 0) {
-                        Uint16 tx, ty;
-                        p::ccmap->translateFromPos(curpos+x, &tx, &ty);
-                        logger->error("\"%s\" already exists at (%i, %i) [%i]\n", getStructureAt(curpos+x)->getType()->getTName(), tx, ty, curpos+x);
-                        return false;
-                    }
-                    if (0 != (unitandstructmat[curpos+x].flags & US_IS_UNIT) || 0 != (unitandstructmat[curpos+x].flags & US_IS_AIRUNIT)) {
-                        Uint16 tx, ty;
-                        p::ccmap->translateFromPos(curpos+x, &tx, &ty);
-                        logger->error("Unit(s) already exists at cell (%i, %i) %i\n", tx, ty, curpos+x);
-                        return false;
-                    }
-                }
-            }
-        }
-        // Redo the loop knowing that it's clear.  Saves having to backtrack if
-        // we have to abort the placing.
-        bool setlr = false;
-        curpos = cellpos + p::ccmap->getWidth()*(type->getYsize());
-        for (y = type->getYsize()-1; y>=0; --y) {
-            curpos -= p::ccmap->getWidth();
-            for (x = type->getXsize()-1; x>=0; --x) {
-                if (type->isBlocked(y*type->getXsize()+x)) {
-
-					if (structnum > structurepool.size()){
-						logger->error ("%s line %i: ERROR create structure, structnum = %i, size = %i\n", __FILE__, __LINE__, structnum, structurepool.size());
-						structnum = structurepool.size();
-					}
-//					unitandstructmat[curpos+x].flags = US_IS_STRUCTURE;
-//					unitandstructmat[curpos+x].structurenumb = structnum;
-					if (type->isBlocked(y*type->getXsize()+x) == 2) {
-						unitandstructmat[curpos+x].flags = US_IS_STRUCTURE|US_HIGH_COST;
-						unitandstructmat[curpos+x].structurenumb = structnum;
-					}else{
-						//unitandstructmat[curpos+x] = US_IS_STRUCTURE|structnum;
-						unitandstructmat[curpos+x].flags = US_IS_STRUCTURE;
-						unitandstructmat[curpos+x].structurenumb = structnum;
-					}
-
-                    if (!setlr) {
-                        unitandstructmat[curpos+x].flags |= US_STR_LOWER_RIGHT;
-                        setlr = true;
-                    }
-                }
-#if 1
-		// Don't place worn down ground under a naval yard!!
-		if (!type->isWaterBound()){
-				if (pc::Config.gamenum == GAME_RA){
-					// Start of new worn down ground code
-					if (bib1 == 0){
-						if (p::ccmap->SnowTheme ())
-							bib1 = pc::imgcache->loadImage("bib1.sno", -1);
-						else
-							bib1 = pc::imgcache->loadImage("bib1.tem", -1);
-					}
-
-					if (bib2 == 0){
-						if (p::ccmap->SnowTheme ())
-							bib2 = pc::imgcache->loadImage("bib2.sno", -1);
-						else
-							bib2 = pc::imgcache->loadImage("bib2.tem", -1);
-					}
-
-					if (bib3 == 0){
-						if (p::ccmap->SnowTheme ())
-							bib3 = pc::imgcache->loadImage("bib3.sno", -1);
-						else
-							bib3 = pc::imgcache->loadImage("bib3.tem", -1);
-					}
-
-					if (y < 2){
-						switch (type->getXsize()){
-							case 4:
-								frame = x+y*4;
-								pos = curpos+x+(type->getYsize()-1)*ccmap->getWidth();
-								//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
-								p::ccmap->setTerrainOverlay( pos, bib1, frame );
-								break;
-							case 3:
-								frame = x+y*3;
-								pos = curpos+x+(type->getYsize()-1)*ccmap->getWidth();
-								//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
-								p::ccmap->setTerrainOverlay( pos, bib2, frame );
-								break;
-							case 2:
-								frame = x+y*2;
-								pos = curpos+x+(type->getYsize()-1)*ccmap->getWidth();
-								//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
-								p::ccmap->setTerrainOverlay( pos, bib3, frame );
-								break;
-						}
-					}
-				}
-			}
-#endif
-            }
-        }
-    }
-
-    st = new Structure(type, cellpos, owner, health, facing, trigger_name);
-    st->referTo();
-    st->setStructnum(structnum);
-    if (structnum == structurepool.size()) {
-        structurepool.push_back(st);
-    } else {
-        structurepool[structnum] = st;
-        --numdeletedstruct;
-    }
-
-    // update the wall-images
-    if( type->isWall() ) {
-        updateWalls(st,true);
-    } else {
-        if (makeanim) {
-        	// run "build" anim at const speed
-            st->runAnim(0);
-        } else {
-            if( (type->getAnimInfo().animtype == 1) || (type->getAnimInfo().animtype == 4) ) {
-            	// looped anim building ???
-                st->runAnim(1);
-            }
-        }
-    }
-    return true;
-}
-
 bool UnitAndStructurePool::createReinforcements(RA_Teamtype *Team) 
 {
 	RA_TeamUnits RA_Unit;
@@ -664,24 +415,231 @@ bool UnitAndStructurePool::createReinforcements(RA_Teamtype *Team)
 }
 
 /**
+ * Creates a structure
+ */
+bool UnitAndStructurePool::createStructure(const char* typen, Uint16 cellpos,
+        Uint8 owner, Uint16 health, Uint8 facing, bool makeanim, string trigger_name) 
+{	
+	// Get the type of the structure with his name
+    StructureType* type = getStructureTypeByName(typen);
+    if (0 == type) {
+        logger->error("Invalid type \"%s\"\n",typen);
+        return false;
+    }
+    
+    // Create the structure
+    bool res = createStructure(type, cellpos, owner, health, facing, makeanim, trigger_name);
+    
+    // Return success
+    return res;
+}
+
+/**
+ * 
+ */
+bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
+        Uint8 owner, Uint16 health, Uint8 facing, bool makeanim, string trigger_name)
+{
+	Uint16 frame;
+	Uint32 pos;
+
+	if (cellpos >= p::ccmap->getSize())
+		return false;
+
+    int x = 0, y = 0, curpos = 0;
+    Uint32 structnum = 0;
+    Structure* st = 0;
+
+    Uint32 br = cellpos + p::ccmap->getWidth()*(type->getYsize()-1);
+    if (cellpos > p::ccmap->getSize() || (br > p::ccmap->getSize() && 0)) {
+        logger->error("%s line %i: Attempted to create a \"%s\" at %i, outside map (%i)\n", __FILE__, __LINE__, type->getTName(), br, p::ccmap->getSize());
+        return false;
+    }
+
+    // Reuse an expired structnum
+    if (numdeletedstruct > 0) {
+        for (structnum = 0; structnum < structurepool.size(); ++structnum) {
+            if (0 == structurepool[structnum]) {break;}
+        }
+    } else {
+        structnum = structurepool.size();
+    }
+
+    if (type->isWall()) {
+
+        // walls will always be one cell
+        if (0 != getStructureAt(cellpos) || 0 != (unitandstructmat[cellpos].flags & US_IS_UNIT)|| 0 != (unitandstructmat[cellpos].flags & US_IS_AIRUNIT)) {
+            return false;
+        }
+        logger->debug("***4");
+
+		if (structnum > structurepool.size()){
+			logger->error ("%s line %i: ERROR create structure, structnum = %i, size = %i\n", __FILE__, __LINE__, structnum, structurepool.size());
+			structnum = structurepool.size();
+		}
+		logger->debug("***5");
+        unitandstructmat[cellpos].flags = (US_STR_LOWER_RIGHT|US_IS_WALL);
+		unitandstructmat[cellpos].structurenumb = structnum;
+		
+		
+    } else {
+        /// @TODO Rewrite this to use curpos in a more straightforward way.
+        curpos = cellpos+p::ccmap->getWidth()*(type->getYsize());
+        for (y = type->getYsize()-1; y>=0; --y) {
+            curpos -= p::ccmap->getWidth();
+            for (x = type->getXsize()-1; x>=0; --x) {
+                if (type->isBlocked(y*type->getXsize()+x)) {
+                    if (getStructureAt(curpos+x) != 0) {
+                        Uint16 tx, ty;
+                        p::ccmap->translateFromPos(curpos+x, &tx, &ty);
+                        logger->error("\"%s\" already exists at (%i, %i) [%i]\n", getStructureAt(curpos+x)->getType()->getTName(), tx, ty, curpos+x);
+                        return false;
+                    }
+                    if (0 != (unitandstructmat[curpos+x].flags & US_IS_UNIT) || 0 != (unitandstructmat[curpos+x].flags & US_IS_AIRUNIT)) {
+                        Uint16 tx, ty;
+                        p::ccmap->translateFromPos(curpos+x, &tx, &ty);
+                        logger->error("Unit(s) already exists at cell (%i, %i) %i\n", tx, ty, curpos+x);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        // Redo the loop knowing that it's clear.  Saves having to backtrack if
+        // we have to abort the placing.
+        bool setlr = false;
+        curpos = cellpos + p::ccmap->getWidth()*(type->getYsize());
+        for (y = type->getYsize()-1; y>=0; --y) {
+            curpos -= p::ccmap->getWidth();
+            for (x = type->getXsize()-1; x>=0; --x) {
+                if (type->isBlocked(y*type->getXsize()+x)) {
+
+					if (structnum > structurepool.size()){
+						logger->error ("%s line %i: ERROR create structure, structnum = %i, size = %i\n", __FILE__, __LINE__, structnum, structurepool.size());
+						structnum = structurepool.size();
+					}
+//					unitandstructmat[curpos+x].flags = US_IS_STRUCTURE;
+//					unitandstructmat[curpos+x].structurenumb = structnum;
+					if (type->isBlocked(y*type->getXsize()+x) == 2) {
+						unitandstructmat[curpos+x].flags = US_IS_STRUCTURE|US_HIGH_COST;
+						unitandstructmat[curpos+x].structurenumb = structnum;
+					}else{
+						//unitandstructmat[curpos+x] = US_IS_STRUCTURE|structnum;
+						unitandstructmat[curpos+x].flags = US_IS_STRUCTURE;
+						unitandstructmat[curpos+x].structurenumb = structnum;
+					}
+
+                    if (!setlr) {
+                        unitandstructmat[curpos+x].flags |= US_STR_LOWER_RIGHT;
+                        setlr = true;
+                    }
+                }
+#if 1
+		// Don't place worn down ground under a naval yard!!
+		if (!type->isWaterBound())
+		{
+			// Start of new worn down ground code
+			if (bib1 == 0)
+			{
+				if (p::ccmap->SnowTheme ())
+					bib1 = pc::imgcache->loadImage("bib1.sno", -1);
+				else
+					bib1 = pc::imgcache->loadImage("bib1.tem", -1);
+			}
+			if (bib2 == 0){
+				if (p::ccmap->SnowTheme ())
+					bib2 = pc::imgcache->loadImage("bib2.sno", -1);
+						else
+							bib2 = pc::imgcache->loadImage("bib2.tem", -1);
+					}
+
+			if (bib3 == 0){
+						if (p::ccmap->SnowTheme ())
+							bib3 = pc::imgcache->loadImage("bib3.sno", -1);
+						else
+							bib3 = pc::imgcache->loadImage("bib3.tem", -1);
+			}
+			
+			if (y < 2){
+				switch (type->getXsize()){
+					case 4:
+						frame = x+y*4;
+						pos = curpos+x+(type->getYsize()-1)*p::ccmap->getWidth();
+						//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
+						p::ccmap->setTerrainOverlay( pos, bib1, frame );
+						break;
+					case 3:
+						frame = x+y*3;
+						pos = curpos+x+(type->getYsize()-1)*p::ccmap->getWidth();
+						//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
+						p::ccmap->setTerrainOverlay( pos, bib2, frame );
+						break;
+					case 2:
+						frame = x+y*2;
+						pos = curpos+x+(type->getYsize()-1)*p::ccmap->getWidth();
+						//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
+						p::ccmap->setTerrainOverlay( pos, bib3, frame );
+						break;
+				}
+			}
+				
+			}
+#endif
+            }
+        }
+    }
+
+    st = new Structure(type, cellpos, owner, health, facing, trigger_name);
+    st->referTo();
+    st->setStructnum(structnum);
+    if (structnum == structurepool.size()) {
+        structurepool.push_back(st);
+    } else {
+        structurepool[structnum] = st;
+        --numdeletedstruct;
+    }
+
+    // update the wall-images
+    if(type->isWall()) 
+    {
+        updateWalls(st, true, p::ccmap);
+    } else {
+        if (makeanim) {
+        	// run "build" anim at const speed
+            st->runAnim(0);
+        } else {
+            if( (type->getAnimInfo().animtype == 1) || (type->getAnimInfo().animtype == 4) ) {
+            	// looped anim building ???
+                st->runAnim(1);
+            }
+        }
+    }
+    return true;
+}
+
+/**
  * Creates a unit
  */
 bool UnitAndStructurePool::createUnit(const char *typen, Uint16 cellpos, Uint8 subpos, Uint8 owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name) 
-//bool UnitAndStructurePool::createUnit(const char *typen, Uint16 cellpos, Uint8 subpos, Uint8 owner, Uint16 health, Uint8 facing) {
 {
-
-	if (cellpos >= p::ccmap->getSize()){
+	/*if (cellpos >= p::ccmap->getSize()){
 		return false;
-	}
-
+	}*/
+	
+	// Get the type of the Unit
     UnitType* type = getUnitTypeByName(typen);
     if (0 == type) {
         logger->error("Invalid type name: \"%s\"\n", typen);
         return false;
     }
 
-
-    return createUnit(type, cellpos, subpos, owner, health, facing, action, trigger_name);
+    // 
+    bool res = createUnit(type, cellpos, subpos, owner, health, facing, action, trigger_name);
+    
+    if (res==true) logger->debug("res = ok\n");
+    else logger->error("res = FAILURE !!!\n");
+    //
+    return res; 
 }
 
 /**
@@ -771,7 +729,16 @@ bool UnitAndStructurePool::createUnit(UnitType* type, Uint16 cellpos, Uint8 subp
 
     return true;
 }
+bool UnitAndStructurePool::createCellTrigger(Uint32 cellpos)
+{
+	if (cellpos >= p::ccmap->getSize()){
+		return false;
+	}
+	
+	unitandstructmat[cellpos].flags |= 0x00010000;
 
+	return true;
+}
 bool UnitAndStructurePool::spawnUnit(const char* typen, Uint8 owner) {
 
     UnitType* type = getUnitTypeByName(typen);
@@ -869,7 +836,10 @@ Unit* UnitAndStructurePool::getUnitAt(Uint32 cell)
 	
     return un;
 }
-
+Uint32 UnitAndStructurePool::getNumbUnits() 
+{
+	return unitpool.size();
+}
 Unit* UnitAndStructurePool::getUnit(Uint32 num)
 {
 	if (num < unitpool.size())
@@ -901,9 +871,22 @@ Structure* UnitAndStructurePool::getStructure(Uint32 num)
 	if (num < structurepool.size()){
 		return structurepool[num];
 	}
-	return NULL;
+	return 0;
 }
+Uint32 UnitAndStructurePool::getNumbStructures()
+{
+	return structurepool.size(); 
+}
+bool UnitAndStructurePool::cellOccupied (Uint32 cell)
+{
+	if (cell >= p::ccmap->getSize())
+		return true;
 
+	if (unitandstructmat[cell].flags & (0x20000000|0x10000000|0x40000000|0x00100000))
+		return true;
+
+	return false;
+}
 /** 
  * Retrieves ground units from a given cell like getUnitAt and
  * getStructureAt except works for either.
@@ -974,44 +957,30 @@ Unit* UnitAndStructurePool::getFlyingAt ( Uint32 cell, Uint8 subcell )
  */
 Structure* UnitAndStructurePool::getStructureAt(Uint32 cell, Uint8 subcell, bool wall)
 {
-	Structure *str = NULL;
+	Structure *str = 0;
 
 	if (cell >= p::ccmap->getSize())
-		return NULL;
+		return 0;
 
-	if (unitandstructmat[cell].flags & (US_IS_STRUCTURE|(wall?US_IS_WALL:0)) ) {
+	if (unitandstructmat[cell].flags & (0x20000000|(wall?0x10000000:0)) ) {
 		str = getStructure(unitandstructmat[cell].structurenumb);
 			return (str);
 	}
-	return NULL;
+	return 0;
 }
-
-bool UnitAndStructurePool::cellOccupied (Uint32 cell)
-{
-	if (cell >= p::ccmap->getSize())
-		return true;
-
-	if (unitandstructmat[cell].flags & (US_IS_STRUCTURE|US_IS_WALL|US_IS_UNIT|US_IS_AIRUNIT))
-		return true;
-
-	return false;
-}
-
-
 /**
  * retrieves infantry group from a given cell
  */
 InfantryGroup* UnitAndStructurePool::getInfantryGroupAt(Uint32 cell)
 {
-    if (unitandstructmat[cell].flags & US_IS_UNIT && cell < p::ccmap->getSize()) {
+    if (unitandstructmat[cell].flags & 0x40000000 && cell < p::ccmap->getSize()) {
         Unit* un = getUnit(unitandstructmat[cell].unitnumb);
         if( ((UnitType *)un->getType())->isInfantry() ) {
             return un->getInfantryGroup();
         }
     }
-    return NULL;
+    return 0;
 }
-
 Uint16 UnitAndStructurePool::getSelected(Uint32 pos)
 {
     int i = 0;
@@ -1020,10 +989,10 @@ Uint16 UnitAndStructurePool::getSelected(Uint32 pos)
 	if (pos >= p::ccmap->getSize())
 		return 0;
 
-    if( !(unitandstructmat[pos].flags&(US_UNIT_LOWER_RIGHT |US_STR_LOWER_RIGHT|US_AIRUNIT_LOWER_RIGHT)) )
+    if( !(unitandstructmat[pos].flags&(0x00800000 |0x00400000|0x00020000)) )
         return 0;
 
-    if( unitandstructmat[pos].flags&US_IS_UNIT ) {
+    if( unitandstructmat[pos].flags&0x40000000 ) {
 		if ( unitpool.size () > (unitandstructmat[pos].unitnumb)){
 			if(((UnitType *)getUnit (unitandstructmat[pos].unitnumb)->getType())->isInfantry()) {  //unitpool[unitandstructmat[pos]&0xffff]->getType())->isInfantry()) {
 				selected = 0xff00;
@@ -1041,7 +1010,7 @@ Uint16 UnitAndStructurePool::getSelected(Uint32 pos)
     }
 
 
-    if( unitandstructmat[pos].flags&US_IS_AIRUNIT ) {
+    if( unitandstructmat[pos].flags&0x00100000 ) {
 		if ( unitpool.size () > (unitandstructmat[pos].airunitnumb)){
 			if(((UnitType *)getUnit (unitandstructmat[pos].airunitnumb)->getType())->isInfantry()) {  //unitpool[unitandstructmat[pos]&0xffff]->getType())->isInfantry()) {
 				selected = 0xff00;
@@ -1059,7 +1028,7 @@ Uint16 UnitAndStructurePool::getSelected(Uint32 pos)
     }
 
 
-    if( unitandstructmat[pos].flags&US_IS_STRUCTURE ) {
+    if( unitandstructmat[pos].flags&0x20000000 ) {
 		if (structurepool.size() > (unitandstructmat[pos].structurenumb) ){
 			if(structurepool[unitandstructmat[pos].structurenumb]->isSelected())
 				return (((StructureType *)structurepool[unitandstructmat[pos].structurenumb]->getType())->getXsize()<<8) | 1;
@@ -1069,7 +1038,6 @@ Uint16 UnitAndStructurePool::getSelected(Uint32 pos)
 	}
     return 0;
 }
-
 /** 
  * Called by MoveAnimEvent before moving to set up the unitandstructure matrix
  * 
@@ -1084,16 +1052,16 @@ Uint16 UnitAndStructurePool::preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ym
 	Uint16 newpos = 0;
 	Sint8 unitmod = ((UnitType *)un->getType())->getMoveMod();
 
-	*BlockingUnit = NULL;
+	*BlockingUnit = 0;
 
 	switch(dir) {
 		case m_up:
-			newpos = un->getPos()-ccmap->getWidth();
+			newpos = un->getPos()-p::ccmap->getWidth();
 			*xmod = 0;
 			*ymod = -unitmod;
 			break;
 		case m_upright:
-			newpos = un->getPos()-ccmap->getWidth()+1;
+			newpos = un->getPos()-p::ccmap->getWidth()+1;
 			*xmod = unitmod;
 			*ymod = -unitmod;
 			break;
@@ -1103,17 +1071,17 @@ Uint16 UnitAndStructurePool::preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ym
 			*ymod = 0;
 			break;
 		case m_downright:
-			newpos = un->getPos()+ccmap->getWidth()+1;
+			newpos = un->getPos()+p::ccmap->getWidth()+1;
 			*xmod = unitmod;
 			*ymod = unitmod;
 			break;
 		case m_down:
-			newpos = un->getPos()+ccmap->getWidth();
+			newpos = un->getPos()+p::ccmap->getWidth();
 			*xmod = 0;
 			*ymod = unitmod;
 			break;
 		case m_downleft:
-			newpos = un->getPos()+ccmap->getWidth()-1;
+			newpos = un->getPos()+p::ccmap->getWidth()-1;
 			*xmod = -unitmod;
 			*ymod = unitmod;
 			break;
@@ -1123,7 +1091,7 @@ Uint16 UnitAndStructurePool::preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ym
 			*ymod = 0;
 			break;
 		case m_upleft:
-			newpos = un->getPos()-ccmap->getWidth()-1;
+			newpos = un->getPos()-p::ccmap->getWidth()-1;
 			*xmod = -unitmod;
 			*ymod = -unitmod;
 			break;
@@ -1133,23 +1101,23 @@ Uint16 UnitAndStructurePool::preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ym
 	}
 
 	// this is needed since tiles in fog have cost 1 in the pathfinder
-	if( ccmap->getCost(newpos, un) > 5) {
+	if( p::ccmap->getCost(newpos, un) > 5) {
 		return 0xffff;
 	}
 
-	if (unitandstructmat[newpos].flags&(US_HIGH_COST) != 0)
+	if (unitandstructmat[newpos].flags&(0x00200000) != 0)
 		printf ("%s line %i: strange tile with us high cost ??\n", __FILE__, __LINE__);
 
     /* if an infantry's position got updated */
-	if( unitandstructmat[newpos].flags&(US_IS_WALL|US_IS_STRUCTURE|US_IS_UNIT|US_MOVING_HERE) && !un->IsAirBound ()){
+	if( unitandstructmat[newpos].flags&(0x10000000|0x20000000|0x40000000|0x07000000) && !un->IsAirBound ()){
 //	if(( unitandstructmat[newpos].flags&(US_IS_WALL|US_IS_STRUCTURE|US_IS_UNIT|US_MOVING_HERE)) && ((unitandstructmat[newpos].flags&(US_HIGH_COST)) == 0 || ((UnitType *)un->getType())->isInfantry())) {
-		if( !((UnitType *)un->getType())->isInfantry()  && (unitandstructmat[newpos].flags&(US_HIGH_COST)) == 0 ) {
+		if( !((UnitType *)un->getType())->isInfantry()  && (unitandstructmat[newpos].flags&(0x00200000)) == 0 ) {
 			// remove this later when code for moving over walls and infantry is done
 			*BlockingUnit = unitpool[unitandstructmat[newpos].unitnumb];
 			return 0xffff;
 		}
 
-		if (unitandstructmat[newpos].flags&(US_IS_WALL)) {
+		if (unitandstructmat[newpos].flags&(0x10000000)) {
 			/** @todo check for tracked and wall type to allow over running some walls
 			*/
 			return 0xffff;
@@ -1258,180 +1226,6 @@ Uint8 subpos = 0;
 	}
 	return subpos;
 }
-
-Uint8 UnitAndStructurePool::unhideUnit(Unit* un, Uint16 newpos, bool unload)
-{
-	Uint8 subpos = 0;
-	Uint8 i;
-	InfantryGroup *ig = NULL;
-
-	if (newpos >= p::ccmap->getSize())
-		return 0;
-
-	/** TODO: Airborne infantry not supported jet **/
-	if( ((UnitType *)un->getType())->isInfantry() ) {
-
-		// First check that we can move here
-		if (unitandstructmat[newpos].flags & US_IS_UNIT) {
-			ig = unitpool[unitandstructmat[newpos].unitnumb]->getInfantryGroup();
-			// search for an empty sub position for the unit
-			if (ig != NULL){
-				subpos = ig->GetFreePos();
-				if (subpos > 5){
-					//assume no free pos
-					logger->error ("%s line %i: Found no free position in infantry group (****this could lead to a crash******)\n", __FILE__, __LINE__);
-					return subpos;
-				}
-			}
-		}
-
-		if (unitandstructmat[newpos].flags & US_IS_AIRUNIT) {
-			ig = unitpool[unitandstructmat[newpos].airunitnumb]->getInfantryGroup();
-			// search for an empty sub position for the unit
-			if (ig != NULL){
-				subpos = ig->GetFreePos();
-				if (subpos > 5){
-					//assume no free pos
-					logger->error ("%s line %i: Found no free position in infantry group (****this could lead to a crash******)\n", __FILE__, __LINE__);
-					return subpos;
-				}
-			}
-		}
-
-
-		subpos = un->getSubpos();
-		ig = un->getInfantryGroup();
-		if (!unload) {
-			if (ig->GetNumInfantry() == 1) {
-				// old cell is now empty
-				if (!un->IsAirBound())
-					unitandstructmat[un->getPos()].flags &= ~(US_IS_UNIT|US_UNIT_LOWER_RIGHT);
-				else
-					unitandstructmat[un->getPos()].flags &= ~(US_IS_AIRUNIT|US_AIRUNIT_LOWER_RIGHT);
-				// delete ig;
-			} else {
-				ig->RemoveInfantry(subpos);
-				if (!un->IsAirBound()){
-					if (un->getNum() == (unitandstructmat[un->getPos()].unitnumb)) {
-						//unitandstructmat[un->getPos()].flags&=0xffff0000;
-						unitandstructmat[un->getPos()].unitnumb = 0;
-						for (i = 0; i < 5; ++i)
-							if (!ig->IsClear(i))
-								break;
-
-						if (ig->UnitAt(i)->getNum() > unitpool.size()){
-						logger->error ("%s line %i: ERROR, unitnum = %i, size = %i\n", __FILE__, __LINE__, ig->UnitAt(i)->getNum(), unitpool.size());
-						}else{
-							unitandstructmat[un->getPos()].unitnumb = ig->UnitAt(i)->getNum();
-						}
-					}
-				}else{
-					// Airbound
-					if (un->getNum() == (unitandstructmat[un->getPos()].airunitnumb)) {
-						unitandstructmat[un->getPos()].unitnumb = 0;
-						for (i = 0; i < 5; ++i)
-							if (!ig->IsClear(i))
-								break;
-
-						if (ig->UnitAt(i)->getNum() > unitpool.size()){
-							logger->error ("%s line %i: ERROR, unitnum = %i, size = %i\n", __FILE__, __LINE__, ig->UnitAt(i)->getNum(), unitpool.size());
-						}else{
-							unitandstructmat[un->getPos()].airunitnumb = ig->UnitAt(i)->getNum();
-						}
-					}
-				}
-			}
-		}
-		/* check indirectly for infantry group
-		if the new cell has the US_IS_UNIT flag set, it is assumed
-		that there is an infantry group for that cell */
-		if (unitandstructmat[newpos].flags & US_IS_UNIT) {
-			ig = unitpool[unitandstructmat[newpos].unitnumb]->getInfantryGroup();
-			// search for an empty sub position for the unit
-			subpos = ig->GetFreePos();
-			if (subpos > 5){
-				//assume no free pos
-				logger->error ("%s line %i: Found no free position in infantry group (****this could lead to a crash******)\n", __FILE__, __LINE__);
-				return subpos;
-			}
-		} else { // infantry group does not exist for this cell yet
-			ig = new InfantryGroup;
-			//unitandstructmat[newpos].flags &= 0xffff0000;
-			unitandstructmat[newpos].unitnumb = 0;
-			if (un->getNum() > unitpool.size()){
-				logger->error ("%s line %i: ERROR, unitnum = %i, size = %i\n", __FILE__, __LINE__, un->getNum(), unitpool.size());
-			}else
-				unitandstructmat[newpos].unitnumb = un->getNum();
-			// note that the subpos variable stays zero (from start of function)
-		}
-		ig->AddInfantry(un, subpos);
-		un->setInfantryGroup(ig);
-		unitandstructmat[newpos].flags |= US_UNIT_LOWER_RIGHT|US_IS_UNIT;
-
-		// Check if we need to handle a trigger
-		if (unitandstructmat[newpos].flags & US_CELL_HAS_TRIGGER)
-			HandleGlobalTrigger ( TRIGGER_EVENT_ZONE_ENTRY, newpos );
-
-	} else {
-		/* easier to assign directly than bitwise AND the compliment of US_MOVING_HERE
-		then bitwise OR this value. */
-		if (un->getNum() > unitpool.size()){
-			logger->error ("%s line %i: ERROR, unitnum = %i, size = %i\n", __FILE__, __LINE__, un->getNum(), unitpool.size());
-		}else{
-#if 0
-			//unitandstructmat[newpos].flags &= (US_IS_STRUCTURE|US_STR_LOWER_RIGHT|US_HAS_L2OVERLAY|US_IS_WALL|US_HIGH_COST);
-			//printf ("%s line %i: Debug flags is 0x%x\n", __FILE__, __LINE__, unitandstructmat[newpos].flags);
-			// changed 31-01-2007
-			// unitandstructmat[newpos].flags = US_UNIT_LOWER_RIGHT|US_IS_UNIT;
-			unitandstructmat[newpos].flags = US_UNIT_LOWER_RIGHT|US_IS_UNIT;
-			unitandstructmat[newpos].unitnumb = un->getNum();
-#else
-
-			if (!un->IsAirBound()){
-				unitandstructmat[newpos].flags &= ~(US_MOVING_HERE);
-				unitandstructmat[newpos].flags |= US_UNIT_LOWER_RIGHT|US_IS_UNIT;
-				unitandstructmat[newpos].unitnumb = un->getNum();
-
-				// Check if we need to handle a trigger
-				if (unitandstructmat[newpos].flags & US_CELL_HAS_TRIGGER)
-					HandleGlobalTrigger ( TRIGGER_EVENT_ZONE_ENTRY, newpos );
-			}else{
-				unitandstructmat[newpos].flags &= ~(US_AIR_MOVING_HERE);
-				unitandstructmat[newpos].flags |= US_AIRUNIT_LOWER_RIGHT|US_IS_AIRUNIT;
-				unitandstructmat[newpos].airunitnumb = un->getNum();
-
-				// Check if we need to handle a trigger
-				if (unitandstructmat[newpos].flags & US_CELL_HAS_TRIGGER)
-					HandleGlobalTrigger ( TRIGGER_EVENT_ZONE_ENTRY, newpos );
-			}
-
-#endif
-		}
-    }
-
-    return subpos;
-}
-
-void UnitAndStructurePool::hideUnit(Unit* un)
-{
-	/** TODO: Airborne infantry not supported jet **/
-    if ( ((UnitType*)un->getType())->isInfantry() ) {
-        InfantryGroup *ig = un->getInfantryGroup();
-        if (ig->GetNumInfantry() == 1) {
-            // old cell is now empty
-            unitandstructmat[un->getPos()].flags &= ~(US_IS_UNIT|US_UNIT_LOWER_RIGHT);
-            delete un->getInfantryGroup();
-        } else {
-            ig->RemoveInfantry(un->getSubpos());
-        }
-    } else {
-		if (!un->IsAirBound())
-        	unitandstructmat[un->getPos()].flags &= ~(US_IS_UNIT|US_UNIT_LOWER_RIGHT);
-		else
-        	unitandstructmat[un->getPos()].flags &= ~(US_IS_AIRUNIT|US_AIRUNIT_LOWER_RIGHT);
-    }
-}
-
 /** 
  * resets the US_MOVING_HERE flag of a cell when the unit stops
  *  before it reaches its destination.
@@ -1440,7 +1234,7 @@ void UnitAndStructurePool::hideUnit(Unit* un)
  */
 void UnitAndStructurePool::abortMove(Unit* un, Uint32 pos)
 {
-    if( !(unitandstructmat[pos].flags & US_MOVING_HERE|US_AIR_MOVING_HERE) ) {
+    if( !(unitandstructmat[pos].flags & 0x07000000|0x00040000) ) {
         return;
     }
     if (((UnitType *)un->getType())->isInfantry()) {
@@ -1450,67 +1244,98 @@ void UnitAndStructurePool::abortMove(Unit* un, Uint32 pos)
 			logger->error ("%s line %i: abortMove error, unitandstructmat[pos] = %x\n", __FILE__, __LINE__, unitandstructmat[pos].flags);
     } else {
 		if (!un->IsAirBound())
-			unitandstructmat[pos].flags &= ~(US_MOVING_HERE);
+			unitandstructmat[pos].flags &= ~(0x07000000);
 		else
-			unitandstructmat[pos].flags &= ~(US_AIR_MOVING_HERE);
+			unitandstructmat[pos].flags &= ~(0x00040000);
     }
 }
-
-Uint16 UnitAndStructurePool::getTileCost(Uint16 pos) const
+/**
+ * Searches the UnitType pool for a unit type with a given name.
+ *  if the type can not be found, it is read in from units.ini
+ * 
+ * @param unitname the name of the unit to retrieve
+ * @returns pointer to the UnitType value
+ */
+UnitType* UnitAndStructurePool::getUnitTypeByName(const char* unitname)
 {
-	Unit		*un;
-	Structure	*str;
+    map<string, Uint16>::iterator typeentry;
+    UnitType* type;
+    Uint16 typenum;
+    string uname = (string)unitname;
+    
+    //transform(uname.begin(),uname.end(), uname.begin(), toupper);
 
-	if (pos >= p::ccmap->getSize()){
-		return 0xffff;
-	}
+    typeentry = unitname2typenum.find(uname);
 
-
-	if( unitandstructmat[pos].flags & US_IS_UNIT ) {
-
-		un = unitpool[unitandstructmat[pos].unitnumb];
-
-		/// Remove this to prevent getting other problems with movign units
-		//if( un->getOwner() == costcalcowner )
-		//	return 4;
-
-		return 0xfff0;
-	}
-
-	if( unitandstructmat[pos].flags & US_IS_AIRUNIT ) {
-
-		un = unitpool[unitandstructmat[pos].airunitnumb];
-
-		if( un->getOwner() == costcalcowner )
-			return 4;
-
-		return 0xffff;
-
-	}
-
-
-    if( tileAboutToBeUsed(pos) ) {
-			return 0xfff0;
+    //logger->debug("getUnitTypeByName(%s) \n", unitname);
+    
+    if( typeentry != unitname2typenum.end() ) {
+        typenum = typeentry->second;
+        type = unittypepool[typenum];
+    } else {
+        typenum = unittypepool.size();
+        type = new UnitType(uname.c_str(), unitini);
+        unittypepool.push_back(type);
+        unitname2typenum[uname] = typenum;
     }
-
-    if (unitandstructmat[pos].flags & (US_IS_WALL|US_IS_STRUCTURE) ){
-
-		str = structurepool[unitandstructmat[pos].structurenumb];
-
-		// Don't allow driving on a unit on a structure
-    	if( unitandstructmat[pos].flags & US_IS_UNIT ){
-			logger->error ("%s line %i: already a unit here\n", __FILE__, __LINE__);
-			return 0xfff0;
-		}
-		if (unitandstructmat[pos].flags & US_HIGH_COST){
-			return 0;
-		}else
-			return 0xfff0;
-		return 0xfff0;
-	}
+    if (type->isValid()) {
+        return type;
+    }
     return 0;
 }
 
+/** 
+ * same as getUnitTypeByName but for structures (and the ini file is structure.ini)
+ * 
+ * @param structname the name of the structure to retrieve (e.g. FACT or PROC)
+ * @param theTheater The theater of the map (because certain structure need this)
+ * @returns pointer to the StructureType value
+ */
+StructureType* UnitAndStructurePool::getStructureTypeByName(const char* structname)
+{
+	StructureType* type; // Type to return
+	Uint16 typenum;
+    map<string, Uint16>::iterator typeentry;
+    
+    
+    string sname = (string)structname;
+    
+    // UPPER sname
+    transform(sname.begin(),sname.end(),sname.begin(),toupper);
+        
+    typeentry = structname2typenum.find(sname);
+
+    if( typeentry != structname2typenum.end() ) {
+        typenum = typeentry->second;
+        type = structuretypepool[typenum];
+    } else {
+        typenum = structuretypepool.size();
+        type = new StructureType(structname, structini, artini, this->theaterext);
+        structuretypepool.push_back(type);
+        structname2typenum[sname] = typenum;
+    }
+    if (type->isValid()) {
+    	return type;
+    }
+    
+    // Return error (NULL)
+    logger->debug("StructureTypecreation = %s FAILURE !!!!\n", structname);
+    return 0;
+}
+
+UnitOrStructureType* UnitAndStructurePool::getTypeByName(const char* typen)
+{
+    UnitOrStructureType* retval;
+    retval = getUnitTypeByName(typen);
+    if (0 == retval) {
+        return getStructureTypeByName(typen);
+    }
+    return retval;
+}
+bool UnitAndStructurePool::freeTile(Uint16 pos) const 
+{
+	return (unitandstructmat[pos].flags&0x70000000)==0;
+}
 Uint16 UnitAndStructurePool::getTileCost(Uint16 pos, Unit* excpUn) const
 {
     bool AirBound = false;
@@ -1519,7 +1344,7 @@ Uint16 UnitAndStructurePool::getTileCost(Uint16 pos, Unit* excpUn) const
     Structure	*str;
 
 	// Don't allow excpUn to be NULL
-    if (excpUn == NULL){
+    if (excpUn == 0){
 		//printf ("%s line %i: Warning excpUn == NULL is not allowed in this function anymore!!\n", __FILE__, __LINE__);
         return getTileCost(pos);
 	}
@@ -1528,12 +1353,12 @@ Uint16 UnitAndStructurePool::getTileCost(Uint16 pos, Unit* excpUn) const
 		return 0xffff;
     }
 
-	if (excpUn != NULL){
+	if (excpUn != 0){
 		WaterBound	= excpUn->IsWaterBound ();
 		AirBound	= excpUn->IsAirBound();
 	}
 
-	if( unitandstructmat[pos].flags & US_IS_UNIT ) {
+	if( unitandstructmat[pos].flags & 0x40000000 ) {
 
 		un = unitpool[unitandstructmat[pos].unitnumb];
 
@@ -1554,7 +1379,7 @@ Uint16 UnitAndStructurePool::getTileCost(Uint16 pos, Unit* excpUn) const
 		return 0xfff0;
 	}
 
-	if( unitandstructmat[pos].flags & US_IS_AIRUNIT ) {
+	if( unitandstructmat[pos].flags & 0x00100000 ) {
 		un = unitpool[unitandstructmat[pos].airunitnumb];
 		if (un == excpUn)
 			return 0;
@@ -1578,7 +1403,7 @@ Uint16 UnitAndStructurePool::getTileCost(Uint16 pos, Unit* excpUn) const
 			return 0xffff;
 	}
 
-    if (unitandstructmat[pos].flags & (US_IS_WALL|US_IS_STRUCTURE) ){
+    if (unitandstructmat[pos].flags & (0x10000000|0x20000000) ){
 
 		str = structurepool[unitandstructmat[pos].structurenumb];
 
@@ -1586,119 +1411,85 @@ Uint16 UnitAndStructurePool::getTileCost(Uint16 pos, Unit* excpUn) const
 			return 0xfff0;
 
 		// Don't allow driving on a unit on a structure
-    	if( unitandstructmat[pos].flags & US_IS_UNIT ){
+    	if( unitandstructmat[pos].flags & 0x40000000 ){
 			logger->error ("%s line %i: already a unit here\n", __FILE__, __LINE__);
 			return 0xfff0;
 		}
 		if (excpUn->IsAirBound())
 			return 0;
 
-		if (unitandstructmat[pos].flags & US_HIGH_COST && !((UnitType *)excpUn->getType())->isInfantry()){
+		if (unitandstructmat[pos].flags & 0x00200000 && !((UnitType *)excpUn->getType())->isInfantry()){
 			//printf ("Return half blocked\n");
         	return 0;
 		}
+		return 0xfff0;
+	}
+
+    return 0;
+}
+Uint16 UnitAndStructurePool::getTileCost(Uint16 pos) const
+{
+	Unit		*un;
+	Structure	*str;
+
+	if (pos >= p::ccmap->getSize()){
+		return 0xffff;
+	}
+
+
+	if( unitandstructmat[pos].flags & 0x40000000 ) {
+
+		un = unitpool[unitandstructmat[pos].unitnumb];
+
+		/// Remove this to prevent getting other problems with movign units
+		//if( un->getOwner() == costcalcowner )
+		//	return 4;
+
+		return 0xfff0;
+	}
+
+	if( unitandstructmat[pos].flags & 0x00100000 ) {
+
+		un = unitpool[unitandstructmat[pos].airunitnumb];
+
+		if( un->getOwner() == costcalcowner )
+			return 4;
+
+		return 0xffff;
+
+	}
+
+
+    if( tileAboutToBeUsed(pos) ) {
+			return 0xfff0;
+    }
+
+    if (unitandstructmat[pos].flags & (0x10000000|0x20000000) ){
+
+		str = structurepool[unitandstructmat[pos].structurenumb];
+
+		// Don't allow driving on a unit on a structure
+    	if( unitandstructmat[pos].flags & 0x40000000 ){
+			logger->error ("%s line %i: already a unit here\n", __FILE__, __LINE__);
+			return 0xfff0;
+		}
+		if (unitandstructmat[pos].flags & 0x00200000){
+			return 0;
+		}else
+			return 0xfff0;
 		return 0xfff0;
 	}
     return 0;
 }
 
 bool UnitAndStructurePool::tileAboutToBeUsed(Uint16 pos) const {
-    return (unitandstructmat[pos].flags & (US_MOVING_HERE|US_AIR_MOVING_HERE))!=0;
+    return (unitandstructmat[pos].flags & (0x07000000|0x00040000))!=0;
 }
-
-
-/*
-
-Uint16 *UnitAndStructurePool::getCostMatrix(Uint8 unittype)
+void UnitAndStructurePool::setCostCalcOwnerAndType(Uint8 owner, Uint8 type)
 {
-   Uint16 lastpos = ccmap->getWidth()*ccmap->getHeight();
-   Uint16 i;
-   Uint16 *cost = new Uint16[lastpos];
-
-   for( i = 0; i < lastpos; i++ ){
-      if( unitandstructmat[i] & (US_IS_WALL|US_IS_UNIT|US_IS_STRUCTURE) )
- cost[i] = 0xffff;
-      else
- cost[i] = 1;
- //cost = ccmap->getCost(i);
-   }
-   return cost;
+	costcalcowner = owner;
+	costcalctype = type;
 }
-*/
-
-/**
- * searches the UnitType pool for a unit type with a given name.
- *  if the type can not be found, it is read in from units.ini
- * @param unitname the name of the unit to retrieve
- * @returns pointer to the UnitType value
- */
-UnitType* UnitAndStructurePool::getUnitTypeByName(const char* unitname)
-{
-    map<string, Uint16>::iterator typeentry;
-    UnitType* type;
-    Uint16 typenum;
-    string uname = (string)unitname;
-    transform(uname.begin(),uname.end(), uname.begin(), toupper);
-
-    typeentry = unitname2typenum.find(uname);
-
-    if( typeentry != unitname2typenum.end() ) {
-        typenum = typeentry->second;
-        type = unittypepool[typenum];
-    } else {
-        typenum = unittypepool.size();
-        type = new UnitType(uname.c_str(), unitini);
-        unittypepool.push_back(type);
-        unitname2typenum[uname] = typenum;
-    }
-    if (type->isValid()) {
-        return type;
-    }
-    return 0;
-}
-
-/** 
- * same as getUnitTypeByName but for structures (and the ini file is structure.ini)
- * 
- * @param structname the name of the structure to retrieve (e.g. FACT or PROC)
- * @returns pointer to the StructureType value
- */
-StructureType *UnitAndStructurePool::getStructureTypeByName(const char* structname)
-{
-    Uint16 typenum;
-    map<string, Uint16>::iterator typeentry;
-    string sname = (string)structname;
-    transform(sname.begin(),sname.end(),sname.begin(),toupper);
-
-    StructureType *type;
-
-    typeentry = structname2typenum.find(sname);
-
-    if( typeentry != structname2typenum.end() ) {
-        typenum = typeentry->second;
-        type = structuretypepool[typenum];
-    } else {
-        typenum = structuretypepool.size();
-        type = new StructureType(structname, structini, artini, theaterext);
-        structuretypepool.push_back(type);
-        structname2typenum[sname] = typenum;
-    }
-    if (type->isValid()) {
-        return type;
-    }
-    return 0;
-}
-
-UnitOrStructureType* UnitAndStructurePool::getTypeByName(const char* typen)
-{
-    UnitOrStructureType* retval;
-    retval = getUnitTypeByName(typen);
-    if (0 == retval) {
-        return getStructureTypeByName(typen);
-    }
-    return retval;
-}
-
 /**
  * removes a unit from the map
  */
@@ -1706,14 +1497,14 @@ void UnitAndStructurePool::removeUnit(Unit *un)
 {
 //	printf ("%s line %i: Remove unit\n", __FILE__, __LINE__);
     int i;
-    unitpool[un->getNum()] = NULL;
+    unitpool[un->getNum()] = 0;
     if( ((UnitType *)un->getType())->isInfantry() ) {
 //		printf ("%s line %i: Remove infantry!!\n", __FILE__, __LINE__);
         InfantryGroup *infgrp = un->getInfantryGroup();
         infgrp->RemoveInfantry(un->getSubpos());
         if (infgrp->GetNumInfantry() == 0) {
             //delete infgrp;
-            unitandstructmat[un->getPos()].flags &= ~(US_UNIT_LOWER_RIGHT|US_IS_UNIT);
+            unitandstructmat[un->getPos()].flags &= ~(0x00800000|0x40000000);
         } else if ((unitandstructmat[un->getPos()].unitnumb) == un->getNum()) {
             for (i = 0; i < 5; i++) {
                 if(!infgrp->IsClear(i)) {
@@ -1723,7 +1514,7 @@ void UnitAndStructurePool::removeUnit(Unit *un)
                 }
             }
         }
-        un->setInfantryGroup(NULL);
+        un->setInfantryGroup(0);
     } else {
 //		printf ("%s line %i: Remove normal unit!!\n", __FILE__, __LINE__);
 		if (!un->IsAirBound())
@@ -1752,7 +1543,7 @@ void UnitAndStructurePool::removeStructure(Structure *st)
     structurepool[st->getNum()] = NULL;
     curpos = st->getPos();
     if (((StructureType*)st->getType())->isWall()) {
-        updateWalls(st,false);
+        updateWalls(st, false, p::ccmap);
         unitandstructmat[curpos].flags &= ~(US_STR_LOWER_RIGHT|US_IS_WALL);
     } else {
         for( y = 0; y<((StructureType *)st->getType())->getYsize(); y++ ) {
@@ -1785,92 +1576,12 @@ void UnitAndStructurePool::removeStructure(Structure *st)
     st->remove();
     //if numdeletedstruct > some_value then pack the structurepool
 }
-
-/** 
- * scans neighbouring cells of a wall for walls and updates their
- * layer zero image
- * 
- * @param st pointer to the wall to scan around
- * @param add if true, the wall has been added, if false, the wall has been
- * removed
- */
-void UnitAndStructurePool::updateWalls(Structure* st, bool add) {
-    Structure* neighbour;
-    StructureType* type;
-    int cellpos;
-
-    cellpos = st->getPos();
-    type = ((StructureType*)st->getType());
-    // left
-    if(cellpos%ccmap->getWidth() > 0) {
-        if( unitandstructmat[cellpos -1].flags & US_IS_WALL ) {
-            // check if same type
-            neighbour = structurepool[unitandstructmat[cellpos -1].structurenumb];
-            if( neighbour->getType() == type ) {
-                if (add
-                   ) {
-                    neighbour->changeImage(0, 2);
-                    st->changeImage(0, 8);
-                }
-                else {
-                    neighbour->changeImage(0,-2);
-                }
-            }
-        }
-    }
-    // right
-    if(cellpos%ccmap->getWidth() < ccmap->getWidth() - 1) {
-        if( unitandstructmat[cellpos +1].flags & US_IS_WALL ) {
-            // check if same type
-            neighbour = structurepool[unitandstructmat[cellpos +1].structurenumb];
-            if( neighbour->getType() == type ) {
-                if (add
-                   ) {
-                    neighbour->changeImage(0, 8);
-                    st->changeImage(0, 2);
-                }
-                else {
-                    neighbour->changeImage(0,-8);
-                }
-            }
-        }
-    }
-    // up
-    if(cellpos/ccmap->getWidth() > 0) {
-        if( unitandstructmat[cellpos -ccmap->getWidth()].flags & US_IS_WALL ) {
-            // check if same type
-            neighbour = structurepool[unitandstructmat[cellpos -ccmap->getWidth()].structurenumb];
-            if( neighbour->getType() == type ) {
-                if (add
-                   ) {
-                    neighbour->changeImage(0, 4);
-                    st->changeImage(0, 1);
-                }
-                else {
-                    neighbour->changeImage(0,-4);
-                }
-            }
-        }
-    }
-    // down
-    if(cellpos/ccmap->getWidth() < ccmap->getHeight() - 1) {
-        if( unitandstructmat[cellpos +ccmap->getWidth()].flags & US_IS_WALL ) {
-            // check if same type
-            neighbour = structurepool[unitandstructmat[cellpos +ccmap->getWidth()].structurenumb];
-            if( neighbour->getType() == type ) {
-                if (add
-                   ) {
-                    neighbour->changeImage(0, 1);
-                    st->changeImage(0, 4);
-                }
-                else {
-                    neighbour->changeImage(0,-1);
-                }
-            }
-        }
-    }
+bool UnitAndStructurePool::hasDeleted()
+{
+	bool retval = deleted_unitorstruct;
+	deleted_unitorstruct = false;
+	return retval;
 }
-
 /**
  * for debugging the movement code
  */
@@ -1878,9 +1589,9 @@ void UnitAndStructurePool::showMoves()
 {
     Uint32 x;
     logger->note("Current cells have US_MOVING_HERE set:\n"
-                 "cell\tvalue (US_MOVING_HERE == %u/%x)\n",US_MOVING_HERE,US_MOVING_HERE);
-    for (x=0;x < (Uint32)ccmap->getWidth()*ccmap->getHeight();++x) {
-        if (unitandstructmat[x].flags&US_MOVING_HERE){
+                 "cell\tvalue (US_MOVING_HERE == %u/%x)\n",0x07000000,0x07000000);
+    for (x=0;x < (Uint32)p::ccmap->getWidth()*p::ccmap->getHeight();++x) {
+        if (unitandstructmat[x].flags&0x07000000){
 			// Structures don't move :)
             logger->note("%i\t%u/%x\n",x,unitandstructmat[x].flags,unitandstructmat[x].unitnumb);
 		}
@@ -1898,7 +1609,7 @@ void UnitAndStructurePool::addPrerequisites(UnitType* unittype)
         logger->warning("No prerequisites for unit \"%s\"\n",unittype->getTName());
         return;
     }
-    if (strcasecmp(prereqs[0],"none") == 0) {
+    if (_stricmp((prereqs[0]), ("none")) == 0) {
         return;
     }
     for (Uint16 x=0;x<prereqs.size();++x) {
@@ -1920,7 +1631,7 @@ void UnitAndStructurePool::addPrerequisites(StructureType* structtype)
                         "Use \"none\" if this intended.\n",structtype->getTName());
         return;
     }
-    if (strcasecmp(prereqs[0],"none") == 0) {
+    if (_stricmp((prereqs[0]), ("none")) == 0) {
         return;
     }
     for (Uint16 x=0;x<prereqs.size();++x) {
@@ -1929,28 +1640,6 @@ void UnitAndStructurePool::addPrerequisites(StructureType* structtype)
         struct_prereqs.insert(make_pair(structtype,type_prereqs));
     }
 }
-
-void UnitAndStructurePool::splitORPreReqs(const char* prereqs, vector<StructureType*>* type_prereqs)
-{
-    char tmp[16];
-    Uint32 i, i2;
-    if (strcasecmp("none",prereqs) == 0) {
-        return;
-    }
-    memset(tmp,0,16);
-    for (i=0,i2=0;prereqs[i]!=0x0;++i) {
-        if ( (i2>=1024) || (tmp != NULL && (prereqs[i] == '|')) ) {
-            type_prereqs->push_back(getStructureTypeByName(tmp));
-            memset(tmp,0,16);
-            i2 = 0;
-        } else {
-            tmp[i2] = toupper(prereqs[i]);
-            ++i2;
-        }
-    }
-    type_prereqs->push_back(getStructureTypeByName(tmp));
-}
-
 /**
  * 
  */
@@ -1963,11 +1652,11 @@ void UnitAndStructurePool::preloadUnitAndStructures(Uint8 techlevel)
     try {
         for(secnum = 0;;secnum++) {
             secname = unitini->readSection(secnum);
-            ltech = unitini->readInt(secname.c_str(),"techlevel",100);
+            ltech = unitini->readInt(secname.c_str(), "TechLevel", 100);
             if (ltech == 100) {
                 logger->warning("No techlevel defined for unit \"%s\"\n",secname.c_str());
             } else {
-                if (p::ccmap->getGameMode() == 0) {
+                if (p::ccmap->getGameMode() == GAME_MODE_SINGLE_PLAYER) {
                     if (ltech <= techlevel) {
                         addPrerequisites(getUnitTypeByName(secname.c_str()));
                     }
@@ -1980,6 +1669,7 @@ void UnitAndStructurePool::preloadUnitAndStructures(Uint8 techlevel)
         }
     } catch(...) {}
 
+    
     // Try to read the TechLevel
     try {
         for (secnum = 0;;secnum++) {
@@ -2001,7 +1691,7 @@ void UnitAndStructurePool::preloadUnitAndStructures(Uint8 techlevel)
         }
     } catch(...) {
     	logger->debug("unitAndStructurPool.preloadUnitAndStructures error in TechLevel reading [%s].\n", secname.c_str());
-    }
+    }    
 }
 
 void UnitAndStructurePool::generateProductionGroups() 
@@ -2039,7 +1729,7 @@ vector<const char*> UnitAndStructurePool::getBuildableUnits(Player* pl)
     
     // Get if the player can build all
     buildall = pl->canBuildAll();
-    
+    //buildall = true;
     // Parse all the list
     for (x=0;x<unittypepool.size();++x) {
         utype = unittypepool[x];
@@ -2054,11 +1744,10 @@ vector<const char*> UnitAndStructurePool::getBuildableUnits(Player* pl)
             continue;
         }
 
-
-        if ( ( (utype->getBuildlevel() < 99) && (ccmap->getGameMode() != 0)) ||
-                (utype->getBuildlevel() <= ccmap->getMissionData()->buildlevel) ) {
-
-
+        //if ( ( (utype->getBuildlevel() < 99) && (p::ccmap->getGameMode() != 0)) ||
+         //       (utype->getBuildlevel() <= p::ccmap->getMissionData()->buildlevel) ) {
+        if (utype->getTechLevel() != -1 && utype->getTechLevel() < pl->getTechLevel())
+        {
 
             for (I i = b.first; i != b.second; ++i) {
                 // need all of these
@@ -2079,27 +1768,30 @@ vector<const char*> UnitAndStructurePool::getBuildableUnits(Player* pl)
             // NEED TO REFACTOR THIS
 //			if (strcmp ((char*)utype->getTName(), "E3") == 0)
 //				printf ("%s line %i: Found E3 unit, ovalid = %i\n", __FILE__, __LINE__, ovalid);
-            /*if (ovalid) {
-                int localPlayerSide, curside;
+            if (ovalid) {
+                int playerSide;
+                int curside;
                 char* tmpname;
-                localPlayerSide = p::ppool->getLPlayer()->getSide();
+                playerSide = pl->getSide();
                 for (y=0; y<utype->getOwners().size(); ++y) {
                     tmpname = utype->getOwners()[y];
+                    string sider = string(tmpname);
+                    
                     // note: should avoid hardcoded side names
-                    if (_stricmp((tmpname), ("gdi")) == 0) {
+                    if (sider == "gdi" || sider == "GDI") {
                         curside = PS_GOOD;
-                    } else if (strcasecmp(tmpname,"nod") == 0) {
-                        curside = PS_BAD;
+                    } else if (sider == "nod" || sider == "NOD") {
+                    	curside = PS_BAD;
                     } else {
                         curside = PS_NEUTRAL;
                     }
 
-                    if (curside == (localPlayerSide&~PS_MULTI) || (utype->isDoubleOwned() && pc::Config.gamemode != 0)) {
+                    if (curside == (playerSide&~PS_MULTI) || (utype->isDoubleOwned())){// && pc::Config.gamemode != 0)) {
                         retval.push_back(utype->getTName());
                         break;
                     }
                 }                
-            }*/
+            }
             if (ovalid)
             	retval.push_back(utype->getTName());                                    
         }
@@ -2117,6 +1809,7 @@ vector<const char*> UnitAndStructurePool::getBuildableStructures(Player* pl)
     bool ivalid, ovalid, buildall;
     StructureType* stype;
     buildall = pl->canBuildAll();
+    
     for (x=0;x<structuretypepool.size();++x) {
         stype = structuretypepool[x];
         if (!stype->isValid())
@@ -2129,9 +1822,14 @@ vector<const char*> UnitAndStructurePool::getBuildableStructures(Player* pl)
             }
             continue;
         }
-        if ( ( (stype->getBuildlevel() < 99) && (ccmap->getGameMode() != 0)) ||
-                (stype->getBuildlevel() <= ccmap->getMissionData()->buildlevel)) {
-            for (I i = b.first; i != b.second; ++i) {
+        
+        //if ( ( (stype->getBuildlevel() < 99) && (p::ccmap->getGameMode() != 0)) ||
+        //        (stype->getBuildlevel() <= p::ccmap->getMissionData()->buildlevel)) {
+        // because in inifiles that means we can't built it
+        // TODO change Techlevel to signed because it can be -1 !!!
+        if (stype->getTechLevel() != -1 && stype->getTechLevel() < pl->getTechLevel())
+        {
+        	for (I i = b.first; i != b.second; ++i) {
                 // need all of these
                 prereqs = *(i->second);
                 ivalid = false;
@@ -2146,21 +1844,28 @@ vector<const char*> UnitAndStructurePool::getBuildableStructures(Player* pl)
                     ovalid = ivalid;
                 }
             }
-            if (ovalid) {
-                int localPlayerSide, curside;
+            if (ovalid) 
+            {
+                int playerSide;
+                int curside;
                 char* tmpname;
-                localPlayerSide = (ppool->getLPlayer()->getSide())&~PS_MULTI;
-                for (y=0;y<stype->getOwners().size();++y) {
+                playerSide = pl->getSide()&~PS_MULTI;
+                for (y=0;y<stype->getOwners().size();++y)
+                {
                     tmpname = stype->getOwners()[y];
                     // note: should avoid hardcoded side names
-                    if (strcasecmp(tmpname,"gdi") == 0) {
+                    if (_stricmp((tmpname), ("gdi")) == 0 ||
+                    		_stricmp((tmpname), ("GDI")) == 0) 
+                    {
                         curside = PS_GOOD;
-                    } else if (strcasecmp(tmpname,"nod") == 0) {
+                    } else if (_stricmp((tmpname), ("nod")) == 0 ||
+                    		_stricmp((tmpname), ("NOD")) == 0) 
+                    {
                         curside = PS_BAD;
                     } else {
                         curside = PS_NEUTRAL;
                     }
-                    if (curside == localPlayerSide) {
+                    if (curside == playerSide) {
                         retval.push_back(stype->getTName());
                         break;
                     }
@@ -2169,6 +1874,184 @@ vector<const char*> UnitAndStructurePool::getBuildableStructures(Player* pl)
         }
     }
     return retval;
+}
+
+/**
+ * 
+ */
+void UnitAndStructurePool::hideUnit(Unit* un)
+{
+	// TODO: Airborne infantry not supported yet
+    if ( ((UnitType*)un->getType())->isInfantry() ) {
+        InfantryGroup *ig = un->getInfantryGroup();
+        if (ig->GetNumInfantry() == 1) {
+            // old cell is now empty
+            unitandstructmat[un->getPos()].flags &= ~(0x40000000|0x00800000);
+            delete un->getInfantryGroup();
+        } else {
+            ig->RemoveInfantry(un->getSubpos());
+        }
+    } else {
+		if (!un->IsAirBound())
+        	unitandstructmat[un->getPos()].flags &= ~(0x40000000|0x00800000);
+		else
+        	unitandstructmat[un->getPos()].flags &= ~(0x00100000|0x00020000);
+    }
+}
+
+/**
+ * 
+ */
+Uint8 UnitAndStructurePool::unhideUnit(Unit* un, Uint16 newpos, bool unload)
+{
+	Uint8 subpos = 0;
+	Uint8 i;
+	InfantryGroup *ig = 0;
+
+	if (newpos >= p::ccmap->getSize())
+		return 0;
+
+	// TODO: Airborne infantry not supported jet
+	if( ((UnitType *)un->getType())->isInfantry() ) {
+
+		// First check that we can move here
+		if (unitandstructmat[newpos].flags & 0x40000000) {
+			ig = unitpool[unitandstructmat[newpos].unitnumb]->getInfantryGroup();
+			// search for an empty sub position for the unit
+			if (ig != 0){
+				subpos = ig->GetFreePos();
+				if (subpos > 5){
+					//assume no free pos
+					logger->error ("%s line %i: Found no free position in infantry group (****this could lead to a crash******)\n", __FILE__, __LINE__);
+					return subpos;
+				}
+			}
+		}
+
+		if (unitandstructmat[newpos].flags & 0x00100000) {
+			ig = unitpool[unitandstructmat[newpos].airunitnumb]->getInfantryGroup();
+			// search for an empty sub position for the unit
+			if (ig != 0){
+				subpos = ig->GetFreePos();
+				if (subpos > 5){
+					//assume no free pos
+					logger->error ("%s line %i: Found no free position in infantry group (****this could lead to a crash******)\n", __FILE__, __LINE__);
+					return subpos;
+				}
+			}
+		}
+
+
+		subpos = un->getSubpos();
+		ig = un->getInfantryGroup();
+		if (!unload) {
+			if (ig->GetNumInfantry() == 1) {
+				// old cell is now empty
+				if (!un->IsAirBound())
+					unitandstructmat[un->getPos()].flags &= ~(0x40000000|0x00800000);
+				else
+					unitandstructmat[un->getPos()].flags &= ~(0x00100000|0x00020000);
+				// delete ig;
+			} else {
+				ig->RemoveInfantry(subpos);
+				if (!un->IsAirBound()){
+					if (un->getNum() == (unitandstructmat[un->getPos()].unitnumb)) {
+						//unitandstructmat[un->getPos()].flags&=0xffff0000;
+						unitandstructmat[un->getPos()].unitnumb = 0;
+						for (i = 0; i < 5; ++i)
+							if (!ig->IsClear(i))
+								break;
+
+						if (ig->UnitAt(i)->getNum() > unitpool.size()){
+						logger->error ("%s line %i: ERROR, unitnum = %i, size = %i\n", __FILE__, __LINE__, ig->UnitAt(i)->getNum(), unitpool.size());
+						}else{
+							unitandstructmat[un->getPos()].unitnumb = ig->UnitAt(i)->getNum();
+						}
+					}
+				}else{
+					// Airbound
+					if (un->getNum() == (unitandstructmat[un->getPos()].airunitnumb)) {
+						unitandstructmat[un->getPos()].unitnumb = 0;
+						for (i = 0; i < 5; ++i)
+							if (!ig->IsClear(i))
+								break;
+
+						if (ig->UnitAt(i)->getNum() > unitpool.size()){
+							logger->error ("%s line %i: ERROR, unitnum = %i, size = %i\n", __FILE__, __LINE__, ig->UnitAt(i)->getNum(), unitpool.size());
+						}else{
+							unitandstructmat[un->getPos()].airunitnumb = ig->UnitAt(i)->getNum();
+						}
+					}
+				}
+			}
+		}
+		// check indirectly for infantry group
+		// if the new cell has the US_IS_UNIT flag set, it is assumed
+		// that there is an infantry group for that cell
+		if (unitandstructmat[newpos].flags & 0x40000000) {
+			ig = unitpool[unitandstructmat[newpos].unitnumb]->getInfantryGroup();
+			// search for an empty sub position for the unit
+			subpos = ig->GetFreePos();
+			if (subpos > 5){
+				//assume no free pos
+				logger->error ("%s line %i: Found no free position in infantry group (****this could lead to a crash******)\n", __FILE__, __LINE__);
+				return subpos;
+			}
+		} else { // infantry group does not exist for this cell yet
+			ig = new InfantryGroup;
+			//unitandstructmat[newpos].flags &= 0xffff0000;
+			unitandstructmat[newpos].unitnumb = 0;
+			if (un->getNum() > unitpool.size()){
+				logger->error ("%s line %i: ERROR, unitnum = %i, size = %i\n", __FILE__, __LINE__, un->getNum(), unitpool.size());
+			}else
+				unitandstructmat[newpos].unitnumb = un->getNum();
+			// note that the subpos variable stays zero (from start of function)
+		}
+		ig->AddInfantry(un, subpos);
+		un->setInfantryGroup(ig);
+		unitandstructmat[newpos].flags |= 0x00800000|0x40000000;
+
+		// Check if we need to handle a trigger
+		if (unitandstructmat[newpos].flags & 0x00010000)
+			HandleGlobalTrigger ( 24, newpos );
+
+	} else {
+		// easier to assign directly than bitwise AND the compliment 
+		// of US_MOVING_HERE then bitwise OR this value.
+		if (un->getNum() > unitpool.size()){
+			logger->error ("%s line %i: ERROR, unitnum = %i, size = %i\n", __FILE__, __LINE__, un->getNum(), unitpool.size());
+		}else{
+#if 0
+			//unitandstructmat[newpos].flags &= (US_IS_STRUCTURE|US_STR_LOWER_RIGHT|US_HAS_L2OVERLAY|US_IS_WALL|US_HIGH_COST);
+			//printf ("%s line %i: Debug flags is 0x%x\n", __FILE__, __LINE__, unitandstructmat[newpos].flags);
+			// changed 31-01-2007
+			// unitandstructmat[newpos].flags = US_UNIT_LOWER_RIGHT|US_IS_UNIT;
+			unitandstructmat[newpos].flags = US_UNIT_LOWER_RIGHT|US_IS_UNIT;
+			unitandstructmat[newpos].unitnumb = un->getNum();
+#else
+
+			if (!un->IsAirBound()){
+				unitandstructmat[newpos].flags &= ~(0x07000000);
+				unitandstructmat[newpos].flags |= 0x00800000|0x40000000;
+				unitandstructmat[newpos].unitnumb = un->getNum();
+
+				// Check if we need to handle a trigger
+				if (unitandstructmat[newpos].flags & 0x00010000)
+					HandleGlobalTrigger ( 24, newpos );
+			}else{
+				unitandstructmat[newpos].flags &= ~(0x00040000);
+				unitandstructmat[newpos].flags |= 0x00020000|0x00100000;
+				unitandstructmat[newpos].airunitnumb = un->getNum();
+
+				// Check if we need to handle a trigger
+				if (unitandstructmat[newpos].flags & 0x00010000)
+					HandleGlobalTrigger ( 24, newpos );
+			}
+#endif
+		}
+    }
+
+    return subpos;
 }
 
 Talkback* UnitAndStructurePool::getTalkback(const char* talkback)
@@ -2187,35 +2070,119 @@ Talkback* UnitAndStructurePool::getTalkback(const char* talkback)
     return tb;
 }
 
-bool UnitAndStructurePool::hasL2overlay(Uint16 cellpos) const 
+void UnitAndStructurePool::splitORPreReqs(const char* prereqs, vector<StructureType*>* type_prereqs)
 {
-	return (unitandstructmat[cellpos].flags&0x08000000)!=0;
+    char tmp[16];
+    Uint32 i, i2;
+    if (_stricmp(("none"), (prereqs)) == 0) {
+        return;
+    }
+    memset(tmp,0,16);
+    for (i=0,i2=0;prereqs[i]!=0x0;++i) {
+        if ( (i2>=1024) || (tmp != 0 && (prereqs[i] == '|')) ) {
+            type_prereqs->push_back(getStructureTypeByName(tmp));
+            memset(tmp,0,16);
+            i2 = 0;
+        } else {
+            tmp[i2] = toupper(prereqs[i]);
+            ++i2;
+        }
+    }
+    type_prereqs->push_back(getStructureTypeByName(tmp));
 }
 
-Uint32 UnitAndStructurePool::getNumbUnits() 
+/** 
+ * scans neighbouring cells of a wall for walls and updates their
+ * layer zero image
+ * 
+ * @param st pointer to the wall to scan around
+ * @param add if true, the wall has been added, if false, the wall has been
+ * removed
+ */
+void UnitAndStructurePool::updateWalls(Structure* st, bool add, CnCMap* theMap)
 {
-	return unitpool.size();
+    Structure* neighbour;
+    StructureType* type;
+    int cellpos;
+
+    
+
+    
+    cellpos = st->getPos();
+    type = ((StructureType*)st->getType());
+    // left
+    if(cellpos% theMap->getWidth() > 0) {
+        if( unitandstructmat[cellpos -1].flags & 0x10000000 ) {
+            // check if same type
+            neighbour = structurepool[unitandstructmat[cellpos -1].structurenumb];
+            if( neighbour->getType() == type ) {
+                if (add
+                   ) {
+                    neighbour->changeImage(0, 2);
+                    st->changeImage(0, 8);
+                }
+                else {
+                    neighbour->changeImage(0,-2);
+                }
+            }
+        }
+    }
+    // right
+    if(cellpos% theMap->getWidth() <  theMap->getWidth() - 1) {
+        if( unitandstructmat[cellpos +1].flags & 0x10000000 ) {
+            // check if same type
+            neighbour = structurepool[unitandstructmat[cellpos +1].structurenumb];
+            if( neighbour->getType() == type ) {
+                if (add
+                   ) {
+                    neighbour->changeImage(0, 8);
+                    st->changeImage(0, 2);
+                }
+                else {
+                    neighbour->changeImage(0,-8);
+                }
+            }
+        }
+    }
+    // up
+    if(cellpos/ theMap->getWidth() > 0) {
+        if( unitandstructmat[cellpos - theMap->getWidth()].flags & 0x10000000 ) {
+            // check if same type
+            neighbour = structurepool[unitandstructmat[cellpos - theMap->getWidth()].structurenumb];
+            if( neighbour->getType() == type ) {
+                if (add
+                   ) {
+                    neighbour->changeImage(0, 4);
+                    st->changeImage(0, 1);
+                }
+                else {
+                    neighbour->changeImage(0,-4);
+                }
+            }
+        }
+    }
+    // down
+    if(cellpos/ theMap->getWidth() <  theMap->getHeight() - 1) {
+        if( unitandstructmat[cellpos + theMap->getWidth()].flags & 0x10000000 ) {
+            // check if same type
+            neighbour = structurepool[unitandstructmat[cellpos + theMap->getWidth()].structurenumb];
+            if( neighbour->getType() == type ) {
+                if (add
+                   ) {
+                    neighbour->changeImage(0, 1);
+                    st->changeImage(0, 4);
+                }
+                else {
+                    neighbour->changeImage(0,-1);
+                }
+            }
+        }
+    }
 }
 
-Uint32 UnitAndStructurePool::getNumbStructures()
+/** 
+ * Simple constructor is private to avoid creation by default
+ */
+UnitAndStructurePool::UnitAndStructurePool()
 {
-	return structurepool.size(); 
-}
-
-bool UnitAndStructurePool::freeTile(Uint16 pos) const 
-{
-	return (unitandstructmat[pos].flags&0x70000000)==0;
-}
-
-void UnitAndStructurePool::setCostCalcOwnerAndType(Uint8 owner, Uint8 type)
-{
-	costcalcowner = owner;
-	costcalctype = type;
-}
-
-bool UnitAndStructurePool::hasDeleted()
-{
-	bool retval = deleted_unitorstruct;
-	deleted_unitorstruct = false;
-	return retval;
 }

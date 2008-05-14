@@ -33,12 +33,12 @@ namespace pc {
 Button::Button()
 {
 
-	this->ButtonImg_up	= NULL;
-	this->ButtonImg_down	= NULL;
-	this->ButtonImg_over	= NULL;
-	this->ButtonState	= 1;
-	this->WindowToDrawOn	= NULL;
-	this->ButtonType	= 1;
+	this->ButtonImg_up = 0; // NULL
+	this->ButtonImg_down = 0; // NULL
+	this->ButtonImg_over = 0; // NULL
+	this->ButtonState = 1;
+	this->WindowToDrawOn = 0; // NULL
+	this->ButtonType = 1;
 
 	DisplaySurface = pc::gfxeng->get_SDL_ScreenSurface();
 
@@ -207,21 +207,22 @@ void Button::drawbutton()
 	if (this->ButtonState == 1 && this->ButtonImg_up != NULL){
 		SDL_BlitSurface(this->ButtonImg_up, NULL, DisplaySurface, &SizeAndPosition);
 		//printf ("Blit button up, buttontext = %s, DisplaySurface = %i\n", ButtonText.c_str(), (int)display);
-	}else if (this->ButtonState == 2 && this->ButtonImg_down != NULL){
+	} else if (this->ButtonState == 2 && this->ButtonImg_down != NULL){
 		SDL_BlitSurface(this->ButtonImg_down, NULL, DisplaySurface, &SizeAndPosition);
 		//printf ("Blit button down, buttontext = %s\n", ButtonText.c_str());
-	}else if (this->ButtonState == 3 && this->ButtonImg_over != NULL){
+	} else if (this->ButtonState == 3 && this->ButtonImg_over != NULL){
 		SDL_BlitSurface(this->ButtonImg_over, NULL, DisplaySurface, &SizeAndPosition);
 		//printf ("Blit button over, buttontext = %s\n", ButtonText.c_str());
-	}else
+	} else {
 		printf ("%s line %i: Unknown buttonstate\n", __FILE__, __LINE__);
-
+	}
 }
 
-bool Button::MouseOver(void)
+bool Button::MouseOver()
 {
-int mx, my;
-int WinXpos = 0, WinYpos = 0;
+	int mx, my;
+	int WinXpos = 0;
+	int WinYpos = 0;
 
 	SDL_GetMouseState(&mx, &my);
 

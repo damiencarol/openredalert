@@ -5,13 +5,19 @@
 #include <string>
 
 #include "include/ccmap.h"
-#include "include/UnitAndStructurePool.h"
+#include "include/config.h"
+#include "UnitAndStructurePool.h"
 #include "game/Unit.h"
 #include "audio/SoundEngine.h"
 #include "include/PlayerPool.h"
 #include "include/Logger.h"
 #include "game/RA_Tigger.h"
+#include "game/Player.h"
 
+namespace p {
+	extern CnCMap* ccmap;
+	extern UnitAndStructurePool* uspool;
+}
 namespace pc {
     extern ConfigType Config;
 }
@@ -21,6 +27,7 @@ bool GlobalVar[100];
 
 /** 
  * Check that the event parameters are correct
+ * 
  * @param Event the event that was triggerd
  * @param param1 the parameter1 needed for the event
  * @param param2 the parameter2 needed for the event
@@ -134,10 +141,11 @@ bool CheckOtherEvent (unsigned int Event, int param1, int param2, int value)
 }
 
 
-bool CheckSecondTriggerEvent (int TriggerNumb, RA_Tiggers  *Trigger)
+bool CheckSecondTriggerEvent(int TriggerNumb, RA_Tiggers  *Trigger)
 {
-int EventToCheck,
-	param2;
+	int EventToCheck;
+	int param2;
+	
 	if (TriggerNumb == 1){
 		EventToCheck	= Trigger->trigger1.event;
 		param2		= Trigger->trigger1.param2;
@@ -174,9 +182,9 @@ int EventToCheck,
  * @param param this is a event parameter ( doesn't have to be used )
  * @returns void
  */
-void HandleTriggers (UnitOrStructure* UnitOrStructure, int Event, int param )
+void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
 {
-	std::string AssociatedTriggerName;
+	string AssociatedTriggerName;
 	RA_Tiggers  *AssociatedTrigger;
 	//int			value = 0;
 
@@ -428,10 +436,10 @@ void CheckCellTriggers ( Uint32 pos )
 
     unit = (Unit*) unitOrStructure;
 */
-    unit = p::uspool->getGroundUnitAt ( pos );
+    unit = p::uspool->getGroundUnitAt(pos);
 
 	if (unit == NULL)
-    	unit = p::uspool->getFlyingAt ( pos );
+    	unit = p::uspool->getFlyingAt(pos);
 
 	if (unit == NULL)
 		return;
@@ -537,7 +545,7 @@ void ExecuteTriggerAction (unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigg
 				TeamNr = Trigger->action2.param1;
 			else
 				return;
-			Team = p::ccmap->getTeamtypeByNumb ( TeamNr );
+			Team = p::ccmap->getTeamtypeByNumb(TeamNr);
 			if (Team != NULL){
 				logger->warning ("Reinforcement team = %s\n", Team->tname.c_str());
 				p::uspool->createReinforcements(Team);
@@ -697,7 +705,10 @@ void ExecuteTriggerAction (unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigg
     }
 }
 
-void PrintTrigger ( RA_Tiggers Trigger )
+/**
+ * Print a Trigger
+ */
+void PrintTrigger(RA_Tiggers Trigger)
 {
 	printf ("%s line %i: Read trigger:\n", __FILE__, __LINE__);
 	printf ("name = \t\t\t%s\n", Trigger.name.c_str());	
@@ -722,9 +733,14 @@ void PrintTrigger ( RA_Tiggers Trigger )
     printf ("\n\n\n");
 }
 
-
-void InitializeTriggers (void)
+/**
+ * Initialize Triggers
+ * 
+ * - Reset global vars
+ */
+void InitializeTriggers()
 {
+	// Reset all the Global Vars
     for (int i = 0; i < 100; i++){
         GlobalVar[i] = false;
     }

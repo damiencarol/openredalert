@@ -10,15 +10,19 @@
 /**
  * Constructor, starts the timer
  */
-ActionEventQueue::ActionEventQueue(){
+ActionEventQueue::ActionEventQueue()
+{
+	// Save the current time
     starttick = SDL_GetTicks();
 }
 
 /** 
  * Destructor, removes the timer and empties the ActionEventQueue 
  */
-ActionEventQueue::~ActionEventQueue(){
+ActionEventQueue::~ActionEventQueue()
+{
     ActionEvent *ev;
+    // Free all action event
     while( !eventqueue.empty() ) {
         ev = eventqueue.top();
         eventqueue.pop();
@@ -33,7 +37,8 @@ ActionEventQueue::~ActionEventQueue(){
  * 
  * @param a class containing the action to run.
  */
-void ActionEventQueue::scheduleEvent(ActionEvent *ev){
+void ActionEventQueue::scheduleEvent(ActionEvent *ev)
+{
     ev->addCurtick(getCurtick());
     eventqueue.push(ev);
 }
@@ -41,9 +46,11 @@ void ActionEventQueue::scheduleEvent(ActionEvent *ev){
 /** 
  * Run all events in the actionqueue.
  */
-void ActionEventQueue::runEvents(){
+void ActionEventQueue::runEvents()
+{
     Uint32 curtick = getCurtick();
-    /* run all events in the queue with a prio lower than curtick */
+    
+    // run all events in the queue with a prio lower than curtick
     while( !eventqueue.empty() && eventqueue.top()->getPrio() <= curtick ) {
         eventqueue.top()->run();
         eventqueue.pop();
@@ -52,10 +59,10 @@ void ActionEventQueue::runEvents(){
 
 Uint32 ActionEventQueue::getElapsedTime()
 {
-    return SDL_GetTicks()-starttick;
+    return SDL_GetTicks() - starttick;
 }
 
 Uint32 ActionEventQueue::getCurtick()
 {
-    return (SDL_GetTicks()-starttick) >> 5;
+    return (SDL_GetTicks() - starttick) >> 5;
 }

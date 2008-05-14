@@ -35,6 +35,7 @@ class RadarAnimEvent;
 class SidebarButton;
 class Font;
 class Player;
+class StringTableFile;
 
 using std::vector;
 
@@ -50,15 +51,15 @@ public:
     bool getVisible() ;
     void ToggleVisible();
 
-    SDL_Surface* getTabImage() ;
+    SDL_Surface* getTabImage();
 
-    SDL_Rect* getTabLocation() ;
+    SDL_Rect* getTabLocation();
 
     /** Reloads the SDL_Surfaces */
     void ReloadImages();
 
     SDL_Surface* getSidebarImage(SDL_Rect location);
-    bool isOriginalType() ;
+    bool isOriginalType();
 
 	void GetButtonName(Uint8 index, char *Name);
 	void DrawButtonTooltip (Uint8 index);
@@ -68,14 +69,12 @@ public:
     void ScrollSidebar(bool scrollup);
     void UpdateSidebar();
 
-    void DrawPowerbar(void);
-    void UpdatePowerbar(void);
+    void DrawPowerbar();
+    void UpdatePowerbar();
     Uint8 getSpecialButton(Uint16 x,Uint16 y);
     void setSpecialButtonState(Uint8 Button, Uint8 State);
     Uint8 getSpecialButtonState(Uint8 Button);
-    void DrawSpecialIcons(void);
-
-	Uint16 width (void);
+    void DrawSpecialIcons();
 
     void StartRadarAnim(Uint8 mode, bool* minienable);
 
@@ -94,13 +93,12 @@ private:
 
     friend class RadarAnimEvent;
 
+    /** StringTable of the game. Use to set the tooltips strings */
+    StringTableFile* stringFile;
 
-//		std::string tip_text;
-//		ToolTip tip;
-
-    // True: DOS, False: GOLD
+    /** True: DOS, False: GOLD */
     bool isoriginaltype;
-    // Palette offset for structures (Nod's buildings are red)
+    /** Palette offset for structures (Nod's buildings are red) */
     Uint8 spalnum;
 
     void SetupButtons(Uint16 height);
@@ -119,7 +117,8 @@ private:
     Uint32	tab;
     SDL_Rect tablocation;
 
-    Uint32 powerbar; Uint32 power_indicator;
+    Uint32 powerbar;
+    Uint32 power_indicator;
 
     Uint32 repair_icon; Uint32 sell_icon; Uint32 map_icon;
     Uint8 repair_but_state; Uint8 sell_but_state; Uint8 map_but_state;
@@ -133,7 +132,8 @@ private:
 
 //    Font *gamefnt;
 
-    bool visible; bool vischanged;
+    bool visible; 
+    bool vischanged;
 
     const char* theatre;
 
@@ -170,7 +170,8 @@ private:
 #if 0
     SDL_Surface* FixGrey(SDL_Surface* gr, Uint8 num);
 #endif
-	SDL_Surface* Clocks[256];
+	/** Images of the clock animation */
+    SDL_Surface* Clocks[256];
 };
 
 #endif //SIDEBAR_H

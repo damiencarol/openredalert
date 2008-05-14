@@ -227,7 +227,7 @@ void CnCMap::loadMap(const char* mapname, LoadingScreen* lscreen)
 
 	loading = true;
 	// Load the ini part of the map
-	if (lscreen != NULL)
+	if (lscreen != 0)
 	{
 		lscreen->setCurrentTask(message);
 	}
@@ -1137,7 +1137,11 @@ RA_Tiggers *CnCMap::getTriggerByNumb(unsigned int TriggerNumb)
 		return NULL;
 	return &RaTriggers[TriggerNumb];
 }
-RA_Tiggers *CnCMap::getTriggerByName(std::string TriggerName)
+
+/**
+ * Get a trigger by this name
+ */
+RA_Tiggers* CnCMap::getTriggerByName(string TriggerName)
 {
 	unsigned int j;
 	for (unsigned int i = 0; i < RaTriggers.size(); ++i)
@@ -1160,7 +1164,7 @@ RA_Tiggers *CnCMap::getTriggerByName(std::string TriggerName)
 			return &RaTriggers[i];
 		}
 	}
-	return NULL;
+	return 0;
 }
 
 RA_Teamtype *CnCMap::getTeamtypeByNumb(unsigned int TeamNumb)
@@ -1992,14 +1996,18 @@ void CnCMap::advancedSections(INIFile *inifile)
 	} catch (...) {
 		logger->debug("Error during preloadUnitAndStructures() in [advancedSections()]");
 	}
-	
+	// Log it
+	logger->note("UnitAndStructurePool::preloadUnitAndStructures() ok\n");
+			
 	// Try to read techs levels
 	try {
 		p::uspool->generateProductionGroups();
 	} catch (...) {
 		logger->debug("Error during generateProductionGroups() in [advancedSections()]");
 	}
-
+	// Log it
+	logger->note("UnitAndStructurePool::generateProductionGroups() ok\n");
+		
 	//
 	// structures
 	//
@@ -2059,7 +2067,8 @@ void CnCMap::advancedSections(INIFile *inifile)
 		catch(...)
 		{}
 	}
-
+	// Log it
+	logger->note("CncMap::advanced...STRUCTURE ok\n");
 	
 	
 	//
@@ -2073,6 +2082,9 @@ void CnCMap::advancedSections(INIFile *inifile)
 			for( keynum = 0;;keynum++ )
 			{
 				key = inifile->readKeyValue("UNITS", keynum);
+				
+				logger->debug("Line read in UNIT = %s\n", key->second.c_str());
+								
 				/* , is the char which separate terraintype from action. */
 				if( sscanf(key->first.c_str(), "%d", &tmpval) == 1 &&
 						sscanf(key->second.c_str(), "%[^,],%[^,],%d,%d,%d,%[^,],%s", owner, type,
@@ -2088,13 +2100,17 @@ void CnCMap::advancedSections(INIFile *inifile)
 					p::uspool->createUnit(type, linenum, 5, p::ppool->getPlayerNum(owner), health, facing, UnitActionToNr(action), trigger);
 
 					//printf ("%s line %i: createUnit UNIT %s, trigger = %s\n", __FILE__, __LINE__, key->first.c_str(), trigger);
+				} else {
+					logger->error("ERROR DURING DECODE Line read in UNIT = %s\n", key->second.c_str());									
 				}
 			}
 		}
 		catch(...)
 		{}
 	}
-
+	// Log it
+	logger->note("CncMap::advanced...UNIT ok\n");
+		
 	//infantry
 	try
 	{
@@ -2245,7 +2261,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 	catch(...)
 	{}
 
-	/*BASE*/
+	// Load  [BASE] section
 	try
 	{
 		for( keynum = 0;;keynum++ )
@@ -2271,6 +2287,69 @@ void CnCMap::advancedSections(INIFile *inifile)
 	catch(...)
 	{}
 
+	//
+	// Digest
+	//
+	// If their are a section called "Digest"
+	if (inifile->isSection("DIGEST") == true)
+	{
+		try
+		{
+			// TODO implemente digest
+			//char mapdata[1024];
+			Uint8 mapdata[16384]; // 16k
+			Uint8 temp[16384];
+			// read packed data into array
+			mapdata[0] = 0;
+			try
+			{
+				INIKey key = inifile->readIndexedKeyValue("Digest", 0);
+				strcat(((char*)mapdata), key->second.c_str());
+			}
+			catch(...)
+			{}
+			
+			// Decode data read with Compression class
+			Compression::dec_base64(mapdata, temp, strlen(((char*)mapdata)));
+			
+			logger->debug("temp read = %s\n", temp);
+				/*
+				// decode the format80 coded data (2 chunks)
+				curpos = 0;
+				for (int tmpval = 0; tmpval < 2; tmpval++)
+				{
+					if (Compression::decode80((Uint8 *)temp+4+curpos, mapdata+8192*tmpval)
+							!= 8192)
+					{
+						logger->warning("A format80 chunk in the \"OverlayPack\" was of wrong size\n");
+					}
+					curpos = curpos + 4 + temp[curpos] + (temp[curpos+1]<<8)
+							+ (temp[curpos+2]<<16);
+				}
+
+				
+				for (ytile = y; ytile <= y+height; ++ytile)
+				{
+					for (xtile = x; xtile <= x+width; ++xtile)
+					{
+						curpos = xtile+ytile*128;
+						tilepos = xtile-x+(ytile-y)*width;
+						if (mapdata[curpos] == 0xff) // No overlay
+							continue;
+						if (mapdata[curpos] > 0x17) // Unknown overlay type
+							continue;
+						parseOverlay(tilepos, RAOverlayNames[mapdata[curpos]]);
+					}
+				}
+				*/
+				logger->debug("digest() ok\n");		
+		}
+		catch (...)
+		{}
+	}
+	
+	// Log it
+	logger->note("Map loaded.\n");
 }
 
 struct tiledata
@@ -2629,8 +2708,7 @@ void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 	Uint8 type, frame;
 	Uint16 res;
 
-printf("parseOverlay() 0  [%s] ok\n", name.c_str());
-	
+	// Hack !!
 	if (name == "BRIK" || name == "SBAG" || name == "FENC" || 
 			name == "WOOD" || name == "CYCL" || name == "BARB")
 	{
@@ -2641,8 +2719,6 @@ printf("parseOverlay() 0  [%s] ok\n", name.c_str());
 
 	string shpname;
 	shpname = name + '.' + string(missionData->theater, 3);
-
-printf("parseOverlay() 1 shpname [%s] ok\n", shpname.c_str());
 
 	try
 	{
@@ -2664,9 +2740,7 @@ printf("parseOverlay() 1 shpname [%s] ok\n", shpname.c_str());
 			throw LoadMapError("Unable to load overlay " + shpname + " (or " + name + ".SHP)");
 		}
 	}
-	
-printf("parseOverlay() 5 ok\n");
-		
+			
 	/// @TODO Generic resources?
 	if (strncasecmp(name.c_str(), "TI", 2) == 0 || strncasecmp(name.c_str(),
 			"GOLD", 4) == 0 || strncasecmp(name.c_str(), "GEM", 3) == 0)

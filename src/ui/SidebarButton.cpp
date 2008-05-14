@@ -25,10 +25,11 @@
 
 #include "SDL/SDL_types.h"
 
+#include "Sidebar.h"
 #include "include/config.h"
 #include "video/ImageCache.h"
+#include "video/ImageCacheEntry.h"
 #include "video/ImageNotFound.h"
-#include "Sidebar.h"
 
 using std::string;
 using std::runtime_error;
@@ -40,9 +41,9 @@ namespace pc
 	extern ConfigType Config;
 }
 
-SidebarButton::SidebarButton(Sint16 x, Sint16 y, const char* picname, Uint8 f,
+SidebarButton::SidebarButton(Sint16 x, Sint16 y, const char* picname, Uint8 func,
 		const char* theatre, Uint8 pal) :
-	pic(0), function(f), palnum(pal), theatre(theatre), using_fallback(false)
+	pic(0), function(func), palnum(pal), theatre(theatre), using_fallback(false)
 {
 	picloc.x = x;
 	picloc.y = y;
@@ -203,5 +204,5 @@ SDL_Rect SidebarButton::getRect() const
 
 Uint8 SidebarButton::getFunction() const
 {
-	return this->function;
+	return function;
 }

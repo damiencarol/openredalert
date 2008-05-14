@@ -8,7 +8,6 @@
 
 #include "RA_Label.h"
 #include "Font.h"
-#include "video/CPSImage.h"
 #include "include/config.h"
 #include "video/GraphicsEngine.h"
 #include "video/ImageCache.h"
@@ -17,6 +16,8 @@
 #include "RA_WindowClass.h"
 #include "TTextBox.h"
 #include "video/ImageNotFound.h"
+#include "video/CPSImage.h"
+#include "video/SHPImage.h"
 
 using std::string;
 using std::vector;
@@ -70,11 +71,12 @@ ListboxClass::~ListboxClass()
 	}
 
 }
+
 SDL_Surface *ListboxClass::ReadShpImage (char *Name, int ImageNumb, Uint8 palnum)
 {
-SDL_Surface	*image,
-		*shadow;
-SHPImage	*TempPic;
+	SDL_Surface	*image;
+	SDL_Surface *shadow;
+	SHPImage	*TempPic;
 
 	try {
 		TempPic = new SHPImage(Name, -1);

@@ -232,7 +232,7 @@ Uint32 Font::Font(const std::string& text) const {
  * @param starty is the ypos on the surface where the text will be drawn
  * @returns void
  **/
-void Font::drawText(const std::string& text, SDL_Surface *SrcSurf, Uint32 SrcStartx, Uint32 SrcStarty, SDL_Surface *DestSurf, SDL_Color FGcolor, Uint32 DestStartx, Uint32 DestStarty)
+void Font::drawText(const string& text, SDL_Surface *SrcSurf, Uint32 SrcStartx, Uint32 SrcStarty, SDL_Surface *DestSurf, SDL_Color FGcolor, Uint32 DestStartx, Uint32 DestStarty)
 {
 	Uint32 i;
 	SDL_Rect destr;
@@ -240,14 +240,21 @@ void Font::drawText(const std::string& text, SDL_Surface *SrcSurf, Uint32 SrcSta
 	destr.y = DestStarty;
 	SDL_Color OrgColor, FontColor, BGcolor;
 	SDL_Rect* src_rect;
-
-
-	for( i = 0; text[i] != '\0'; i++ ) {
-		src_rect = const_cast<SDL_Rect*>(&chrdest[text[i]]);
+	
+	
+	for( i = 0; text[i] != '\0'; i++ )
+	{
+		// We check if it's <0 to keep special chars
+		int index = text[i];
+		if (text[i]<0) index += 256;
+		src_rect = const_cast<SDL_Rect*>(&chrdest[index]);
+		// original
+		//src_rect = const_cast<SDL_Rect*>(&chrdest[text[i]]);
+		
 		for (int x = 0; x < src_rect->w; x++){
 			for (Uint32 y = 0; y < chrdest[0].h; y++){
 				// Get the pixel from our source surface
-				SDLLayer::get_pixel ( fontimg, OrgColor, src_rect->x + x, src_rect->y + y );
+				SDLLayer::get_pixel( fontimg, OrgColor, src_rect->x + x, src_rect->y + y );
 				if (OrgColor.r != 0 || OrgColor.g != 0 || OrgColor.b != 0){
 					// convert the org color to the correct font color
 					if ( lnkOptions.use_anitaliasing ){
@@ -284,7 +291,7 @@ void Font::drawText(const std::string& text, SDL_Surface *SrcSurf, Uint32 SrcSta
 	}
 }
 
-void Font::Load(std::string FontName)
+void Font::Load(string FontName)
 {
 VFile		*fontfile;
 Uint16		wpos,
@@ -402,12 +409,16 @@ SDL_Surface *OrgFonImg = NULL;
 	VFSUtils::VFS_Close(fontfile);
 }
 
-Uint32 Font::calcTextWidth(const std::string& text) const {
+Uint32 Font::calcTextWidth(const string& text) const 
+{
     Uint32 wdt = 0;
     Uint32 i;
 
-    for (i = 0; text[i] != '\0'; i++)
-        wdt += chrdest[text[i]].w+1;
+    for (i = 0; text[i] != '\0'; i++){
+    	int index = text[i];
+    	if (text[i]<0) index += 256;
+        wdt += chrdest[index].w+1;
+    }
     return wdt;
 }
 

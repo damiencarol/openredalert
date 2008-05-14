@@ -12,10 +12,16 @@ class ImageCacheEntry
 public:
     ImageCacheEntry();
     ~ImageCacheEntry();
+    
     void clear();
-	std::string ImageName;
-	int			NumbImages;
+    
+    /** Name of the SHP image file */
+	string ImageName;
+	/** Number of the image in the SHP image */
+	int	NumbImages;
+	/** Image */
     SDL_Surface *image;
+    /** shadow of the image */
     SDL_Surface *shadow;
 };
 

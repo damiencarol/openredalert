@@ -291,32 +291,31 @@ void Cursor::setTooltip(string TipText)
 		}
 	}
 
-	if (splitpos != 0) {
-		//
-		// We have two lines to draw in the tooltip
-		//
-
+	// If splitpos !=0 We have two lines to draw in the tooltip
+	if (splitpos != 0) 
+	{
 		ToolTipLabel[0].setText(TipText.substr( 0, splitpos));
 		ToolTipLabel[1].setText(TipText.substr(splitpos+1));
 
 		h = 2*ToolTipLabel[0].getHeight() + 6;
-		if (ToolTipLabel[0].getWidth() > ToolTipLabel[1].getWidth())
+		if (ToolTipLabel[0].getWidth() > ToolTipLabel[1].getWidth()){
 			w = ToolTipLabel[0].getWidth() + 10;
-		else
+		} else {
 			w = ToolTipLabel[1].getWidth() + 10;
-
+		}
 		// Create the tooltip surface
-		TooltipSurface
-				= SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, w, h, 16, 0, 0, 0, 0);
-
-		if (TooltipSurface == NULL)
+		TooltipSurface = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, w, h, 16, 0, 0, 0, 0);
+		if (TooltipSurface == 0){
 			return;
-
+		}
+		
 		tmp = SDL_DisplayFormat(TooltipSurface);
 		SDL_FreeSurface(TooltipSurface);
 		TooltipSurface = tmp;
 
-		Uint32 TopTextWidth, BottumTextWidth, TextHeigth;
+		Uint32 TopTextWidth;
+		Uint32 BottumTextWidth;
+		Uint32 TextHeigth;
 
 		// First fill the surface with the color key color
 		SDLLayer::draw_solidrectangle(TooltipSurface, CK_color, 0, 0, TooltipSurface->w,
@@ -362,24 +361,23 @@ void Cursor::setTooltip(string TipText)
 		SDL_FreeSurface(TooltipSurface);
 		TooltipSurface = tmp;
 
+		// Draw th first string
 		ToolTipLabel[0].Draw(TooltipSurface, 5, 2);
+		// Draw the second string
 		ToolTipLabel[1].Draw(TooltipSurface, 5, ToolTipLabel[0].getHeight()+4);
 		SDL_SetColorKey(TooltipSurface, SDL_SRCCOLORKEY, CK_color);
 
-	} else {
-
-		//
-		// We have one lines to draw in the tooltip
-		//
-
+	// If splitpos=0 We have one line to draw in the tooltip
+	} 
+	else 
+	{		
 		ToolTipLabel[0].setText(TipText);
 
 		h = ToolTipLabel[0].getHeight() + 4;
 		w = ToolTipLabel[0].getWidth() + 10;
 
 		// Create the tooltip surface
-		TooltipSurface
-				= SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, w, h, 16, 0, 0, 0, 0);
+		TooltipSurface = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, w, h, 16, 0, 0, 0, 0);
 
 		if (TooltipSurface == NULL)
 			return;

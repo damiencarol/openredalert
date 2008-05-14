@@ -41,15 +41,12 @@ public:
     StringTableFile(const char * filename);
     /** Destructor */
     ~StringTableFile();    
-
     
     /** Get the string by this id number */
-    string getString(Uint32 id);
-    
+    string getString(Uint32 id);    
 private:
 	/** Load all strings in a file from mix archive */
-	void loadStringFile(const char* filename);
-	
+	void loadStringFile(const char* filename);	
 	
 	/** List of string loaded from the file */
     vector <string> data;

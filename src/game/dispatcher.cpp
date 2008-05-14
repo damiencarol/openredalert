@@ -138,7 +138,7 @@ bool Dispatcher::structurePlace(const char* tname, Uint32 pos, Uint8 owner) {
         case RECORDING:
             // deliberate fallthrough
         case NORMAL:
-            return p::uspool->createStructure(tname,pos,owner,FULLHEALTH,0,true);
+            return p::uspool->createStructure(tname, pos, owner, FULLHEALTH, 0, true);
             break;
         case PLAYING:
         default:

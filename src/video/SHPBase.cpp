@@ -30,13 +30,20 @@ namespace pc {
 const Uint8 SHPBase::numpals = 9;
 SDL_Color SHPBase::palette[32][256];
 
-SHPBase::SHPBase(const std::string& fname, Sint8 scaleq) :
-	name(fname), scaleq(scaleq), scaler(new ImageProc()) {
+SHPBase::SHPBase(const string& fname, Sint8 scaleq)
+{
+	this->name = fname;
+	this->scaleq = scaleq;
+	this->scaler = new ImageProc();
 }
-SHPBase::~SHPBase() {
+
+SHPBase::~SHPBase() 
+{
 	delete scaler;
 }
-void SHPBase::setPalette(SDL_Color *pal) {
+
+void SHPBase::setPalette(SDL_Color *pal) 
+{
 	memcpy(palette[0], pal, 256*sizeof(SDL_Color));
 	memcpy(palette[1], pal, 256*sizeof(SDL_Color));
 	memcpy(palette[2], pal, 256*sizeof(SDL_Color));
@@ -48,7 +55,7 @@ void SHPBase::setPalette(SDL_Color *pal) {
 	memcpy(palette[8], pal, 256*sizeof(SDL_Color));
 	memcpy(palette[9], pal, 256*sizeof(SDL_Color)); // window background color palette red
 
-	if (pc::Config.gamenum == GAME_RA) {
+	//if (pc::Config.gamenum == GAME_RA) {
 		memcpy(palette[1]+80, col_greece, 16*sizeof(SDL_Color));
 		memcpy(palette[2]+80, col_ussr, 16*sizeof(SDL_Color));
 		memcpy(palette[3]+80, col_uk, 16*sizeof(SDL_Color));
@@ -58,9 +65,15 @@ void SHPBase::setPalette(SDL_Color *pal) {
 		memcpy(palette[7]+80, col_france, 16*sizeof(SDL_Color));
 		memcpy(palette[8]+80, col_turkey, 16*sizeof(SDL_Color));
 		memcpy(palette[9]+171, col_redwindow, 4*sizeof(SDL_Color));
-	}
+	//}
 }
-void SHPBase::calculatePalettes() {
+
+/**
+ * TODO DO NOTHING IN RA
+ */
+void SHPBase::calculatePalettes() 
+{
+	/*
 	int i;
 	if (pc::Config.gamenum == GAME_TD) {
 		for (i = 0; i < 256; i++)
@@ -73,22 +86,31 @@ void SHPBase::calculatePalettes() {
 			palette[4][i] = palette[0][palfour[i]];
 		for (i = 0; i < 256; ++i)
 			palette[5][i] = palette[0][palfive[i]];
-	}
+	}*/
 }
-SDL_Surface* SHPBase::scale(SDL_Surface *input, int quality) {
+
+SDL_Surface* SHPBase::scale(SDL_Surface *input, int quality) 
+{
 	return scaler->scale(input, quality);
 }
 
-SDL_Color* SHPBase::getPalette(Uint8 palnum) {
+SDL_Color* SHPBase::getPalette(Uint8 palnum) 
+{
 	return palette[palnum];
 }
-Uint8 SHPBase::numPalettes() {
+
+Uint8 SHPBase::numPalettes()
+{
 	return numpals;
 }
-const std::string& SHPBase::getFileName() const {
+
+const string& SHPBase::getFileName() const 
+{
 	return name;
 }
-Uint32 SHPBase::getColour(SDL_PixelFormat* fmt, Uint8 palnum, Uint16 index) {
+
+Uint32 SHPBase::getColour(SDL_PixelFormat* fmt, Uint8 palnum, Uint16 index)
+{
 	SDL_Color p = palette[palnum][index];
 	return SDL_MapRGB(fmt, p.r, p.g, p.b);
 }

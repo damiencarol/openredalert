@@ -21,17 +21,10 @@
 #include <stdexcept>
 #include <string>
 
+#include "game/ActionEventQueue.h"
 #include "include/config.h"
-#include "include/dispatcher.h"
-#include "include/Input.h"
 #include "video/ImageCache.h"
-#include "include/Logger.h"
-#include "audio/SoundEngine.h"
-#include "include/PlayerPool.h"
-#include "include/UnitAndStructurePool.h"
-#include "game/Unit.h"
-#include "vfs/vfs.h"
-#include "include/sdllayer.h"
+#include "video/ImageCacheEntry.h"
 #include "ui/Sidebar.h"
 
 
@@ -41,7 +34,9 @@ using std::runtime_error;
 namespace pc {
     extern ConfigType Config;
 }
-
+namespace p {
+	extern ActionEventQueue* aequeue;
+}
 
 RadarAnimEvent::RadarAnimEvent(Uint8 mode, bool* minienable, Uint32 radar)
     : ActionEvent(1), minienable(minienable), radar(radar)
@@ -71,7 +66,7 @@ RadarAnimEvent::RadarAnimEvent(Uint8 mode, bool* minienable, Uint32 radar)
 		if (pc::Config.gamenum == GAME_TD){
 			sdlRadar = pc::imgcache->getImage(pc::sidebar->radarlogo).image;
 		} else {
-			sdlRadar = pc::imgcache->getImage(pc::sidebar->radarlogo,1).image;
+			sdlRadar = pc::imgcache->getImage(pc::sidebar->radarlogo, 1).image;
 		}
 	}
     p::aequeue->scheduleEvent(this);
@@ -130,3 +125,5 @@ void RadarAnimEvent::run()
         return;
     }
 }
+
+

@@ -20,7 +20,6 @@ Projectile::Projectile(string pname, ProjectileDataList* data, vector<SHPImage*>
 	ProjectileData* lProjectileData = data->getData(pname);
 		
 	// Assign the Data
-
 	this->lnkProjectileData = lProjectileData;
 	
 	

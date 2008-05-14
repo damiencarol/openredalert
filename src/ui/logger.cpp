@@ -30,8 +30,6 @@ namespace pc {
 	extern MessagePool * msg;
 }
 
-
-
 Logger::Logger(const char *logname, int threshold)
 {
     logfile = VFSUtils::VFS_Open(logname, "w");
@@ -190,3 +188,4 @@ void Logger::gameMsg(const char *txt, ...)
 void Logger::renderGameMsg(bool r)    {
     rendergamemsg = r;
 }
+
