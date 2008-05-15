@@ -1609,7 +1609,7 @@ void UnitAndStructurePool::addPrerequisites(UnitType* unittype)
         logger->warning("No prerequisites for unit \"%s\"\n",unittype->getTName());
         return;
     }
-    if (_stricmp((prereqs[0]), ("none")) == 0) {
+    if (strcasecmp((prereqs[0]), ("none")) == 0) {
         return;
     }
     for (Uint16 x=0;x<prereqs.size();++x) {
@@ -1631,7 +1631,7 @@ void UnitAndStructurePool::addPrerequisites(StructureType* structtype)
                         "Use \"none\" if this intended.\n",structtype->getTName());
         return;
     }
-    if (_stricmp((prereqs[0]), ("none")) == 0) {
+    if (strcasecmp((prereqs[0]), ("none")) == 0) {
         return;
     }
     for (Uint16 x=0;x<prereqs.size();++x) {
@@ -1854,12 +1854,12 @@ vector<const char*> UnitAndStructurePool::getBuildableStructures(Player* pl)
                 {
                     tmpname = stype->getOwners()[y];
                     // note: should avoid hardcoded side names
-                    if (_stricmp((tmpname), ("gdi")) == 0 ||
-                    		_stricmp((tmpname), ("GDI")) == 0) 
+                    if (strcasecmp((tmpname), ("gdi")) == 0 ||
+                    		strcasecmp((tmpname), ("GDI")) == 0) 
                     {
                         curside = PS_GOOD;
-                    } else if (_stricmp((tmpname), ("nod")) == 0 ||
-                    		_stricmp((tmpname), ("NOD")) == 0) 
+                    } else if (strcasecmp((tmpname), ("nod")) == 0 ||
+                    		strcasecmp((tmpname), ("NOD")) == 0) 
                     {
                         curside = PS_BAD;
                     } else {
@@ -2074,7 +2074,7 @@ void UnitAndStructurePool::splitORPreReqs(const char* prereqs, vector<StructureT
 {
     char tmp[16];
     Uint32 i, i2;
-    if (_stricmp(("none"), (prereqs)) == 0) {
+    if (strcasecmp(("none"), (prereqs)) == 0) {
         return;
     }
     memset(tmp,0,16);
