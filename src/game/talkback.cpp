@@ -115,7 +115,7 @@ vector<string>& Talkback::getTypeVector(TalkbackType type)
 
 	t_talkstore::iterator ret = talkstore.find(type);
 	if (ret == talkstore.end()) {
-		assert(0 && "Unknown talkback type");
+		// TODO : change it assert(0 && "Unknown talkback type");
 	}
 	return ret->second;
 }
