@@ -1,5 +1,5 @@
 // Player.cpp
-// 1.6
+// 1.7
 
 //    This file is part of OpenRedAlert.
 //
@@ -402,7 +402,7 @@ bool Player::startBuilding(UnitOrStructureType *type)
                 type->getTName(), type->getPQueue());
         return false;
     }
-    printf("here");
+    // Add the type in the queue
     return queue->Add(type);
 }
 
