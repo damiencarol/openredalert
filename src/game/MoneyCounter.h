@@ -1,3 +1,21 @@
+// MoneyCounter.h
+// 1.4
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef MONEYCOUNTER_H
 #define MONEYCOUNTER_H
 
@@ -7,7 +25,9 @@
 
 class Player;
 
-
+/**
+ * 
+ */
 class MoneyCounter : public ActionEvent {
 public:
     MoneyCounter(Sint32* money, Player* player, MoneyCounter * * backref);
@@ -24,7 +44,7 @@ public:
 private:
     static const Uint8 delta = 5;
 
-    Sint32* money;
+    Sint32& money;
     Player * player;
     bool queued;
     // Seperate because we want both credit and debit sounds being played
@@ -40,4 +60,5 @@ private:
 
     void reshedule();
 };
+
 #endif //MONEYCOUNTER_H
