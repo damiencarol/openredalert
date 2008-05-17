@@ -1,5 +1,5 @@
 // SidebarButton.cpp
-// 1.2
+// 1.4
 
 //    This file is part of OpenRedAlert.
 //
@@ -97,9 +97,7 @@ void SidebarButton::ChangeImage(const char* fname, Uint8 number, Uint8 side)
 	else
 	{
 
-		// TODO _stricmp(
-		//if (slen>8 && strcmp(("icon.shp"), (fname+slen-8))==0) {		
-		if (slen>8 && strcmp(("icon.shp"), (fname+slen-8))==0)
+		if (slen>8 && strcasecmp(("icon.shp"), (fname+slen-8))==0)
 		{
 			strcpy(goldname, fname);
 			goldname[slen-6] = 'N';
