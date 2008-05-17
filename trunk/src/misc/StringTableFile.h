@@ -51,4 +51,5 @@ private:
 	/** List of string loaded from the file */
     vector <string> data;
 };
+
 #endif //STRINGTABLEFILE_H
