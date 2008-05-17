@@ -21,7 +21,7 @@
 #include "RA_WindowClass.h"
 #include "RA_Label.h"
 #include "DropDownListBox.h"
-#include "ListBoxClass.h"
+#include "ListboxClass.h"
 #include "Font.h"
 #include "Cursor.h"
 #include "TCheckBox.h"
