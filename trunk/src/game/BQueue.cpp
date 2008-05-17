@@ -1,5 +1,5 @@
 // BQueue.cpp
-// 1.2
+// 1.4
 
 //    This file is part of OpenRedAlert.
 //
@@ -60,12 +60,11 @@ BQueue::~BQueue()
 
 bool BQueue::Add(const UnitOrStructureType * type) 
 {
-	/*
-    switch (status) {
+	switch (status) {
         case BQ_INVALID:
             logger->error("Queue %p in invalid state\n", this);
             break;
-        case BQ_EMPTY:
+        case BQ_EMPTY:        
             if (0 == (left = type->getCost())) {
                 logger->error("Type \"%s\" has no cost\n", type->getTName());
             }
@@ -121,8 +120,7 @@ bool BQueue::Add(const UnitOrStructureType * type)
             logger->error("Queue %p in /really/ invalid state (%i)\n", this, status);
             break;
     }
-    return false;*/
-	return true;
+    return false;
 }
 
 ConStatus BQueue::PauseCancel(const UnitOrStructureType * type) 
@@ -179,7 +177,7 @@ ConStatus BQueue::PauseCancel(const UnitOrStructureType * type)
     return BQ_CANCELLED;
 }
 
-ConStatus BQueue::getStatus(void)const 
+ConStatus BQueue::getStatus() const 
 {
     return status;
 }
@@ -219,7 +217,7 @@ void BQueue::Pause()
 {
     if (status == BQ_RUNNING) {
         status = BQ_ALL_PAUSED;
-        //p::ppool->updateSidebar();
+        p::ppool->updateSidebar();
     }
 }
 
@@ -280,18 +278,26 @@ RQstate BQueue::requeue(const UnitOrStructureType * type)
     return RQ_DONE;
 }
 
+/**
+ * Each tick of the timer 
+ * 
+ * - calculate a delta
+ * - decrease the money
+ * ????- reschedule ????
+ * ++ ???
+ */
 bool BQueue::tick() 
-{
+{	
     if (status != BQ_RUNNING) {
         return false;
     }
-    Uint8 delta = min((p::aequeue->getCurtick() - last) / buildspeed, left);
+	Uint8 delta = min((p::aequeue->getCurtick() - last) / buildspeed, left);
 
-    if (delta == 0) {
+	if (delta == 0) {
         return false;
     }
-    last += delta * buildspeed;
-    /// @TODO Play "tink" sound
+	last += delta * buildspeed;
+	/// @TODO Play "tink" sound
     if (!player->changeMoney(-delta)) {
         /// @TODO Play "insufficient funds" sound
         // Note: C&C didn't put build on hold when you initially run out, so you
@@ -303,11 +309,12 @@ bool BQueue::tick()
     }
     left -= delta;
 
-    if (0 != left) {
+	if (0 != left) {		
         p::ppool->updateSidebar();
         return true;
     }
-    const UnitOrStructureType * type = getCurrentType();
+	const UnitOrStructureType * type = getCurrentType();
+   
     // For structures and blocked unit production, we wait for user
     // interaction.
     status = BQ_READY;
@@ -320,7 +327,7 @@ bool BQueue::tick()
             pc::sfxeng->PlaySound(pc::Config.UnitReady);
             status = BQ_RUNNING;
             next();
-        }
+       	}
     } else {
         // Play "construction complete" sound
         pc::sfxeng->PlaySound(pc::Config.StructureReady);
