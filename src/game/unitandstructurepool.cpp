@@ -1273,10 +1273,19 @@ UnitType* UnitAndStructurePool::getUnitTypeByName(const char* unitname)
         typenum = typeentry->second;
         type = unittypepool[typenum];
     } else {
-        typenum = unittypepool.size();
-        type = new UnitType(uname.c_str(), unitini);
-        unittypepool.push_back(type);
-        unitname2typenum[uname] = typenum;
+    	// Check that there are a section for the unitType
+    	if (unitini->isSection(unitname) == true) 
+    	{
+    		typenum = unittypepool.size();
+    		type = new UnitType(uname.c_str(), unitini);
+    		unittypepool.push_back(type);
+    		unitname2typenum[uname] = typenum;
+    	}
+    	else
+    	{
+    		logger->error("TRY TO BUILT UNITTYPE[%s] THAT DON'T EXIST !!!\n", unitname);
+    		return 0;
+    	}
     }
     if (type->isValid()) {
         return type;
@@ -1319,7 +1328,6 @@ StructureType* UnitAndStructurePool::getStructureTypeByName(const char* structna
     }
     
     // Return error (NULL)
-    logger->debug("StructureTypecreation = %s FAILURE !!!!\n", structname);
     return 0;
 }
 
