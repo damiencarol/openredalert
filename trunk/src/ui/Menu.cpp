@@ -693,7 +693,10 @@ int Menu::HandleMenu()
 	string		TmpString;
 	int			i;
 	TCheckBox	CheckBox;
+    StringTableFile* strFile;
 
+    // Load located strings
+    strFile = new StringTableFile("conquer.eng");
 
 	// Setup the multi player listbox with all the multiplayer maps
 	i = 0;
@@ -703,11 +706,14 @@ int Menu::HandleMenu()
 	}
 
 	// should be: Russia, England, Ukraine, Germany, France
-	SideSelection.AddEntry("Russia");
-	SideSelection.AddEntry("England");
-	SideSelection.AddEntry("Ukraine");
-	SideSelection.AddEntry("Germany");
-	SideSelection.AddEntry("France");
+	SideSelection.AddEntry(strFile->getString(372)); //"Russia"
+	SideSelection.AddEntry(strFile->getString(369)); //"England");
+	SideSelection.AddEntry(strFile->getString(373)); //"Ukraine");
+	SideSelection.AddEntry(strFile->getString(370)); //"Germany");
+	SideSelection.AddEntry(strFile->getString(375)); //"France");
+
+    // Free strings
+    delete strFile;
 
 	while( !isDone ) 
 	{
