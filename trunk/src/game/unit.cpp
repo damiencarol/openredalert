@@ -26,6 +26,7 @@
 #include "include/PlayerPool.h"
 #include "include/Logger.h"
 #include "include/config.h"
+#include "TalkbackType.h"
 
 namespace p {
 	extern ActionEventQueue * aequeue;
@@ -113,6 +114,7 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
 	//health -= 20;
 	//updateDamaged();
 }
+
 Unit::~Unit()
 {
 	tm		*Tm;
@@ -143,17 +145,17 @@ Unit::~Unit()
 			//printf ("%s line %i: Numb infantry not 0\n", __FILE__, __LINE__);
 //        }
     }
+    
     if (deployed) {
-        /** @todo This is a client thing. Will dispatch a "play these sounds"
-         * event when the time comes.
-         */
+        // TODO This is a client thing. Will dispatch a 
+    	// "play these sounds" event when the time comes.
 		if (this->getOwner() == p::ppool->getLPlayerNum()){
 			pc::sfxeng->PlaySound(pc::Config.UnitDeployed);
 			if (pc::Config.gamenum == GAME_TD) {
 				pc::sfxeng->PlaySound("hvydoor1.aud");
 			}
 		}
-        p::uspool->createStructure(type->getDeployTarget(), calcDeployPos(), owner, (Uint16)(ratio*256.0f), 0, true);
+        p::uspool->createStructure(type->getDeployTarget(),calcDeployPos(),owner,(Uint16)(ratio*256.0f),0, true, "None");
 /*
 	//printf ("Deploy\n");
 	if (!pc::sidebar->getVisible()){
