@@ -93,11 +93,14 @@ public:
     void removeL2overlay(std::multimap<Uint16, L2Overlay*>::iterator entry);
 
     bool createReinforcements(RA_Teamtype* Team);
-
+    
+    /** Create a structure in a map with this pool */
     bool createStructure(const char* typen, Uint16 cellpos, Uint8 owner,
-            Uint16 health, Uint8 facing, bool makeanim, string trigger_name = "None" );
+                Uint16 health, Uint8 facing, bool makeanim, string trigger_name);
+    
+    /** Create a structure in a map with this pool */
     bool createStructure(StructureType* type, Uint16 cellpos, Uint8 owner,
-            Uint16 health, Uint8 facing, bool makeanim, string trigger_name = "None" );
+            Uint16 health, Uint8 facing, bool makeanim, string trigger_name);
     bool createUnit(const char* typen, Uint16 cellpos, Uint8 subpos,
             Uint8 owner, Uint16 health, Uint8 facing, Uint8 action = COMMAND_GUARD, string trigger_name = "None");
     bool createUnit(UnitType* type, Uint16 cellpos, Uint8 subpos,
@@ -161,9 +164,9 @@ public:
     /** Generate reverse dependency information from what units we have loaded.*/
     void generateProductionGroups();
 
-    /** Used by the sidebar to know units*/
+    /** Used by the sidebar to know units */
     vector<const char*> getBuildableUnits(Player* pl);
-    /** Used by the sidebar to know structures*/
+    /** Used by the sidebar to know structures */
     vector<const char*> getBuildableStructures(Player* pl);
 
     // unit is removed from map (to be stored in transport)
@@ -174,22 +177,25 @@ public:
 private:
 	/** simple constructor is private to avoid creation by default */
 	UnitAndStructurePool();
+	
+	/** Update the ovrlay of walls ???? */
+	void updateWalls(Structure* st, bool add, CnCMap* theMap);
 	    
 	/** String which keep 5 lettres of the theater. Many Graphics depends of theater */
 	char theaterext[5];
 	    
-    std::vector<UnitAndStructureMat> unitandstructmat;
+    vector<UnitAndStructureMat> unitandstructmat;
 
-    std::vector<Structure *> structurepool;
-    std::vector<StructureType *> structuretypepool;
-    std::map<std::string, Uint16> structname2typenum;
+    vector<Structure *> structurepool;
+    vector<StructureType *> structuretypepool;
+    map<string, Uint16> structname2typenum;
 
-    std::vector<Unit *> unitpool;
-    std::vector<UnitType *> unittypepool;
+    vector<Unit *> unitpool;
+    vector<UnitType *> unittypepool;
     map<string, Uint16> unitname2typenum;
 
-    std::multimap<Uint16, L2Overlay*> l2pool;
-    std::map<Uint16, Uint16> numl2images;
+    multimap<Uint16, L2Overlay*> l2pool;
+    map<Uint16, Uint16> numl2images;
 
     multimap<StructureType*, std::vector<StructureType*>* > struct_prereqs;
     multimap<UnitType*, vector<StructureType*>* > unit_prereqs;
@@ -205,15 +211,16 @@ private:
     Uint8 costcalcowner;
     Uint8 costcalctype;
 
-	// Image cache numbers for worn down ground
-	Uint32 bib1; Uint32 bib2; Uint32 bib3;
+	/** Image cache numbers for worn down ground  for the small one */
+	Uint32 bib1; 
+	/** Image cache numbers for worn down ground  for the normal one */
+	Uint32 bib2; 
+	/** Image cache numbers for worn down ground  for the big one */
+	Uint32 bib3;
 
     bool deleted_unitorstruct;
     Uint16 numdeletedunit;
     Uint16 numdeletedstruct;
-    
-    /** Update the ovrlay of walls ???? */
-    void updateWalls(Structure* st, bool add, CnCMap* theMap);
 };
 
 #endif //UNITANDSTRUCTUREPOOL_H
