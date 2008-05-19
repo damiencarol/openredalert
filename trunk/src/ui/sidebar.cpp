@@ -27,6 +27,7 @@
 #include "SDL/SDL_video.h"
 
 #include "include/config.h"
+#include "Input.h"
 #include "Cursor.h"
 #include "SidebarButton.h"
 #include "game/RadarAnimEvent.h"
@@ -37,7 +38,6 @@
 #include "video/ImageCache.h"
 #include "video/ImageCacheEntry.h"
 #include "audio/SoundEngine.h"
-#include "include/Input.h"
 #include "include/PlayerPool.h"
 #include "include/sdllayer.h"
 #include "sidebarop.h"
