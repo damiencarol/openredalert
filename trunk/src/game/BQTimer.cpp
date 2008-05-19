@@ -26,11 +26,9 @@ namespace p
 {
  	extern ActionEventQueue* aequeue;
 }
- /*
- extern Logger * logger;
+
+/**
  */
-
-
 BQTimer::BQTimer(BQueue* queue, BQTimer** backref) :
 	ActionEvent(1), queue(queue), scheduled(false),
 			backref(backref)
