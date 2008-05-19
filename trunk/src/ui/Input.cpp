@@ -58,12 +58,10 @@ bool Input::drawing = false;
 bool Input::minimapEnabled = false;
 SDL_Rect Input::markrect;
 
-
 namespace pc {
     extern ConfigType Config;
 }
 extern Logger * logger;
-
 
 /** 
  * Constructor, sets up the input handeler.
@@ -103,6 +101,11 @@ Input::Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea) :
     this->selected = new Selection(); 
 }
 
+/**
+ * Destructor
+ * 
+ * - free selection
+ */
 Input::~Input() {
 	// Free selected object
 	delete this->selected;
@@ -212,7 +215,7 @@ void Input::handle()
             break;
             // A key has been pressed or released
         case SDL_KEYDOWN:
-            /* If it wasn't a press, ignore this event */
+            // If it wasn't a press, ignore this event
             if( event.key.state != SDL_PRESSED )
                 break;
             if (event.key.keysym.sym == config.bindablekeys[KEY_SIDEBAR]) {
@@ -448,7 +451,7 @@ void Input::handle()
     case 0: // do nothing
         break;
     case 1: // got radar
-	printf("%s line %i: got radar\n", __FILE__, __LINE__);
+	printf ("%s line %i: got radar\n", __FILE__, __LINE__);
 	if (pc::Config.gamenum == GAME_RA) {
 		pc::sfxeng->PlaySound(pc::Config.RadarUp);
 	}
@@ -456,7 +459,7 @@ void Input::handle()
         break;
     case 2: // lost radar
     case 3: // radar powered down
-	printf("%s line %i: powerdown/lost radar\n", __FILE__, __LINE__);
+	printf ("%s line %i: powerdown/lost radar\n", __FILE__, __LINE__);
         minimapEnabled = false;
         pc::sidebar->StartRadarAnim(1,&minimapEnabled);
 	if (pc::Config.gamenum == GAME_RA) {
@@ -537,7 +540,7 @@ void Input::updateMousePos()
 
         pc::cursor->setCursor(CUR_STANDARD, CUR_NOANIM);
     }
-    /* Check if we should start drawing */
+    // Check if we should start drawing
     else if( lmousedown == m_map && currentaction == a_none) {
         if( my >= maparea->y && my < maparea->y+maparea->h &&
                 mx >= maparea->x && mx < maparea->x+maparea->w )
@@ -1269,7 +1272,6 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
         	pc::sfxeng->PlaySound(pc::Config.StructureStartBuild);
         }
     }
-    
 }
 
 Uint16 Input::checkPlace(int mx, int my)
