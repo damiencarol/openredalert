@@ -44,9 +44,13 @@ Cursor::Cursor() :
 	ToolTipLabel[1].SetFont("6point.fnt");
 
 	cursorimg = new Dune2Image("mouse.shp", -1);
-	
-	transicn = new TemplateImage("trans.icn", -1, 1);
-	nsoff = 123; // For TD nsoff = 129
+	//if (getConfig().gamenum == GAME_RA) {
+		transicn = new TemplateImage("trans.icn", -1, 1);
+		nsoff = 123;
+	//} else {
+	//	transicn = new TemplateImage("trans.icn", mapscaleq);
+	//	nsoff = 129;
+	//}
 
 	cursorpool = new CursorPool("cursors.ini");
 
