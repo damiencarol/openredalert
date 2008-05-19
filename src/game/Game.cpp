@@ -21,13 +21,12 @@
 #include <stdexcept>
 
 #include "ActionEventQueue.h"
+#include "include/Logger.h"
 #include "include/ccmap.h"
 #include "include/dispatcher.h"
 #include "video/GraphicsEngine.h"
-#include "include/Input.h"
 #include "include/PlayerPool.h"
 #include "include/config.h"
-#include "ui/Sidebar.h"
 #include "audio/SoundEngine.h"
 #include "audio/SoundError.h"
 #include "game/Ai.h"
@@ -37,10 +36,11 @@
 #include "ui/Menu.h"
 #include "ui/Cursor.h"
 #include "ui/PauseMenu.h"
-#include "GameMode.h"
-#include "include/Logger.h"
-#include "game/MissionData.h"
+#include "ui/Input.h"
+#include "ui/Sidebar.h"
 #include "ui/SidebarError.h"
+#include "GameMode.h"
+#include "MissionData.h"
 #include "vfs/mix/mixvfs.h"
 #include "video/VQAMovie.h"
 #include "MissionMapsClass.h"
@@ -199,7 +199,7 @@ void Game::InitializeMap(string MapName)
 	{
 		pc::sidebar = new Sidebar(p::ppool->getLPlayer(), 
 				pc::gfxeng->getHeight(), 
-				p::ccmap->getMissionData()->theater );
+				p::ccmap->getMissionData()->theater);
 	}
 	catch (SidebarError)
 	{
@@ -213,7 +213,7 @@ void Game::InitializeMap(string MapName)
 	pc::cursor = new Cursor();
 
 	// init the input functions
-	pc::input = new Input( pc::gfxeng->getWidth(), pc::gfxeng->getHeight(), pc::gfxeng->getMapArea() );
+	pc::input = new Input(pc::gfxeng->getWidth(), pc::gfxeng->getHeight(), pc::gfxeng->getMapArea());
 
 }
 
@@ -365,20 +365,22 @@ void Game::InitializeGameClasses()
  * Free memory 
  */
 void Game::FreeMemory()
-{
-	if (pc::imgcache != NULL)
+{	
+	if (pc::imgcache != 0)
 	{
 		pc::imgcache->Cleanup();
 	}
-	if (pc::input != NULL)
+	
+	// Free input
+	if (pc::input != 0)
 	{
 		delete pc::input;
 	}
-	if (pc::cursor != NULL)
+	if (pc::cursor != 0)
 	{
 		delete pc::cursor;
 	}
-	if (pc::sidebar != NULL)
+	if (pc::sidebar != 0)
 	{
 		delete pc::sidebar;
 	}
@@ -386,13 +388,14 @@ void Game::FreeMemory()
 		delete p::dispatcher;
 	if (p::aequeue != NULL)
 		delete p::aequeue;
-	if (p::ccmap != NULL)
+	if (p::ccmap != 0){
 		delete p::ccmap;
+	}
 	if (pc::ai != NULL)
 	{
 		delete pc::ai;
 	}
-	if (pc::imagepool != NULL)
+	if (pc::imagepool != 0)
 	{
 		delete pc::imagepool;
 	}
@@ -403,7 +406,7 @@ void Game::FreeMemory()
 	if (pc::sfxeng != NULL)
 	{
 		delete pc::sfxeng;
-	}
+	}	
 
 	CleanConfig();
 

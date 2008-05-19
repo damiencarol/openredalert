@@ -138,7 +138,7 @@ public:
 	void enableBuildAll();
 	void enableInfMoney();
 	
-	Uint8 getTechLevel();
+	Sint32 getTechLevel();
 private:
 	/** Do not want player being constructed using default constructor*/
 	Player() ;
@@ -158,7 +158,7 @@ private:
 	Uint8 structpalnum;
 	
 	/** TechLevel of the player in the map */
-	Uint8 techLevel;
+	Sint32 techLevel;
 
 	/** See the alliance code in the .cpp file*/
 	Uint8 unallycalls;
