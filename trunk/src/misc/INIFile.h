@@ -51,18 +51,13 @@ public:
     std::string readSection(Uint32 secnum);
 
     int readYesNo(const char* section, const char* value, const char* defaut);
-    
-    static int splitStr(std::list<std::string>& L, const std::string& seq,
-    		const std::string& _1cdelim, bool keeptoken, bool _removews);
-    static int splitStr(std::list<std::string>& l, const std::string& seq, char s1,
-    		char s2, bool keeptok);
-    
+        
     /** Function to test if a section is in the inifile */
     bool isSection(string section);
     
 private:
-//    std::map<std::string, INISection> inidata;
-    std::map<std::string, INISection> Inidata;  // new for testing (making a unsorted list)
+    /** Internal data */
+    std::map<std::string, INISection> Inidata;
 };
 
 #endif //INIFILE_H
