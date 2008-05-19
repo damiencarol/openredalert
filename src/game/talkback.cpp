@@ -1,4 +1,22 @@
-#include "include/talkback.h"
+// Talkback.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
+#include "Talkback.h"
 
 #include <cmath>
 #include <map>
@@ -19,7 +37,7 @@ using std::string;
 using std::vector;
 
 namespace pc {
-	extern SoundEngine* sfxeng;
+    extern ConfigType Config;
 }
 extern Logger * logger;
 
@@ -39,6 +57,8 @@ Talkback::Talkback()
     }
 }
 
+/**
+ */
 void Talkback::load(string talkback, INIFile *tbini)
 {
     Uint32 keynum;
@@ -89,6 +109,8 @@ void Talkback::load(string talkback, INIFile *tbini)
     //logger->debug("report is %i big\n", talkstore[TB_report].size());
 }
 
+/**
+ */
 const char* Talkback::getRandTalk(TalkbackType type)
 {
     vector<string>& talk = getTypeVector(type);
@@ -136,8 +158,10 @@ void Talkback::merge(Talkback *mergee)
 
 TalkbackType Talkback::getTypeNum(string name)
 {
+	// lower the string
     transform(name.begin(), name.end(), name.begin(), tolower);
     typedef map<string, TalkbackType>::const_iterator TBCI;
+    
     TBCI tbtype = talktype.find(name);
     if (tbtype == talktype.end()) {
         logger->error("%s line %i: Unknown type: %s\n", __FILE__, __LINE__, name.c_str());
