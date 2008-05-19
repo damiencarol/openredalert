@@ -16,15 +16,16 @@
 #include "UnitAndStructurePool.h"
 #include "ui/Sidebar.h"
 #include "video/ImageNotFound.h"
+#include "Talkback.h"
 #include "video/ImageCache.h"
 #include "video/ImageCacheEntry.h"
-#include "include/talkback.h"
 #include "include/weaponspool.h"
 #include "InfantryGroup.h"
 #include "StructureType.h"
 #include "GameMode.h"
 #include "TalkbackType.h"
 #include "Weapon.h"
+
 
 using std::string;
 using std::vector;
@@ -65,6 +66,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) : UnitOrStructureType
     }
 
 	tname = strdup(typeName);
+
 
 	name = unitini->readString(tname, "name");
 
@@ -214,9 +216,10 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) : UnitOrStructureType
 		//size = shpimage->getWidth();
 		offset = (shpimage->getWidth()-24)>>1;
 	}
+
 	char* downed = unitini->readString(tname, "DoubleOwned");
 	doubleowned = false;
-	if (downed == NULL)
+	if (downed == 0)
 	{
 		doubleowned = false;
 	}
