@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "game/ActionEventQueue.h"
+#include "ActionEventQueue.h"
 #include "include/config.h"
 #include "video/ImageCache.h"
 #include "video/ImageCacheEntry.h"
@@ -63,11 +63,11 @@ RadarAnimEvent::RadarAnimEvent(Uint8 mode, bool* minienable, Uint32 radar)
 		// Draw grey box where radar was
 		// SDL_FillRect(pc::sidebar->sbar, dest, SDL_MapRGB(pc::sidebar->sbar->format, 0x0a, 0x0a, 0x0a));
 
-		if (pc::Config.gamenum == GAME_TD){
-			sdlRadar = pc::imgcache->getImage(pc::sidebar->radarlogo).image;
-		} else {
+		//if (pc::Config.gamenum == GAME_TD){
+		//	sdlRadar = pc::imgcache->getImage(pc::sidebar->radarlogo).image;
+		//} else {
 			sdlRadar = pc::imgcache->getImage(pc::sidebar->radarlogo, 1).image;
-		}
+		//}
 	}
     p::aequeue->scheduleEvent(this);
 }
