@@ -5,7 +5,7 @@
 #include "Player.h"
 #include "include/PlayerPool.h"
 #include "audio/SoundEngine.h"
-#include "game/UnitAndStructurePool.h"
+#include "UnitAndStructurePool.h"
 #include "anim_nfo.h"
 #include "Structure.h"
 
