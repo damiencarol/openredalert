@@ -31,5 +31,5 @@ private:
     std::multimap<Uint16, L2Overlay*>::iterator l2entry;
 };
 
-
 #endif //EXPLOSIONANIM_H
+
