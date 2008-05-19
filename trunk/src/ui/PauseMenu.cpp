@@ -154,13 +154,12 @@ int PauseMenu::HandleMenu()
 
 	// Keep rendering the scene as background
 	pc::gfxeng->renderScene(false);
-	
-	
+
 	// Draw the buttons on the window
 	OptionsButton->drawbutton();
 	ExitButton->drawbutton();
 	ContinueButton->drawbutton();
-	
+
 	// Draw the window (whith the buttons on it) to the screen
 	PauseWindow->DrawWindow();
 
