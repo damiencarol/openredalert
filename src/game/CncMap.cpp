@@ -2012,7 +2012,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 	// structures
 	//
 	// If their are a section called "STRUCTURE"
-	if (inifile->isSection(string("STRUCTURE")) == true)
+	if (inifile->isSection(string("STRUCTURES")) == true)
 	{
 		try
 		{
@@ -2990,4 +2990,3 @@ void CnCMap::reloadTiles()
 		tileimages.push_back(image);
 	}
 }
-
