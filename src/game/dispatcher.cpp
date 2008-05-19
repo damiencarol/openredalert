@@ -123,7 +123,7 @@ bool Dispatcher::structurePlace(const StructureType* type, Uint32 pos, Uint8 own
             // deliberate fallthrough
         case NORMAL:
             /// XXX TEMP HACK!
-            return p::uspool->createStructure(const_cast<StructureType*>(type), pos, owner, FULLHEALTH, 0, true);
+            return p::uspool->createStructure(const_cast<StructureType*>(type), pos, owner, FULLHEALTH, 0, true, "None");
             break;
         case PLAYING:
         default:
@@ -138,7 +138,7 @@ bool Dispatcher::structurePlace(const char* tname, Uint32 pos, Uint8 owner) {
         case RECORDING:
             // deliberate fallthrough
         case NORMAL:
-            return p::uspool->createStructure(tname, pos, owner, FULLHEALTH, 0, true);
+            return p::uspool->createStructure(tname, pos, owner, FULLHEALTH, 0, true, "None");
             break;
         case PLAYING:
         default:
