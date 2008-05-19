@@ -46,8 +46,6 @@ INIFile::INIFile(const char* filename)
 	//int MAXSTRINGLENGTH = 128;
 
 
-	// TODO DEBUG
-	//logger->debug("INIFile: Loading::%s\n", filename);
 
 	// Open the File
 	inifile = VFSUtils::VFS_Open(filename);
@@ -60,18 +58,12 @@ INIFile::INIFile(const char* filename)
 		throw runtime_error(s);
 	}
 
-	// TODO DEBUG
-	//logger->debug("... [OK]\n");
-
 	cursectionName = "";
 
 	// parse the inifile and write data to inidata
 	while (inifile->getLine(line, 1024) != 0)
 	{
 		str = line;
-
-		// TODO DEBUG
-		//logger->debug("%s\n", str);
 
 		while ((*str) == ' ' || (*str) == '\t')
 		{
@@ -206,8 +198,12 @@ char* INIFile::readString(const char* section, const char* value)
 	}
 	// allocate a new string
 	retval = new char[key->second.length()+1];
-	return strcpy(retval, key->second.c_str());
+	// copy value
+	strcpy(retval, key->second.c_str());
+	// return the good one
+	return retval;
 }
+
 /**
  * wrapper around readString to return a provided default instead of NULL
  */
@@ -219,11 +215,11 @@ char* INIFile::readString(const char* section, const char* value,
 	tmp = readString(section, value);
 	if (tmp == 0)
 	{
-		/* a new string is allocated because this guarentees
-		 * that the return value can be delete[]ed safely 
-		 */
+		// a new string is allocated because this guarentees
+		// that the return value can be delete[]ed safely 
 		tmp = cppstrdup(deflt);
 	}
+	// Return the new string
 	return tmp;
 }
 
@@ -416,6 +412,8 @@ INIKey INIFile::readKeyValue(const char* section, Uint32 keynum)
 	return Key;
 }
 
+/**
+ */
 INIKey INIFile::readIndexedKeyValue(const char* section, Uint32 index,
 		const char* prefix)
 {
@@ -519,185 +517,4 @@ int INIFile::readYesNo(const char* section, const char* value,
 	delete[] tmpPtAA;
 
 	return a;
-}
-
-
-/**
- \fn splitStr(std::list<std::string>& l, const std::string& seq, char s1, char s2, bool keeptok)
- \brief Splits a given std::string ( as param 'seq' ) into token separated by one starting character token and ending the token with a second given separator character.
- \param std::list<std::string>& reference to a string list that will receives all the resulting token
- \param std::string seq which is the string stream to split
- \param char s1 the first separator character that will start the token to be put into the resulting list
- \param char s2 the ending separator that will finish the token
-
- \param bool keeptok - optional boolean that is to be given TRUE if the separator characters are needed to be part of the tokens
-
- \return integer that has the number of token in the resulting list
- */
-
-int splitStr(std::list<std::string>& l, const std::string& seq, char s1,
-		char s2, bool keeptok)
-
-{
-
-	typedef std::string::size_type ST;
-	std::vector<int> tok_s1;
-	std::vector<int> tok_s2;
-
-	if (l.size())
-		l.clear();
-
-	ST pos=0, start=0, LEN=seq.size();
-
-	while (pos < LEN)
-	{
-
-		if (seq[pos] == s1)
-		{
-
-			start = pos;
-
-			if (s2)
-			{
-
-				while ( (pos <LEN) && (seq[pos] != s2))
-					++pos;
-
-				if (pos <LEN)
-				{
-
-					tok_s2.push_back(pos);
-
-					tok_s1.push_back(start);
-
-					start = pos+1;
-
-				}
-
-			}
-
-			else
-				tok_s1.push_back(start);
-
-		}
-
-		++pos;
-
-	}
-
-	if (s2)
-	{
-
-		if ( (tok_s1.size() != tok_s2.size() ) || (tok_s1.size() == 0))
-		{
-
-			//screwed: return the original string
-
-			l.push_back(seq);
-
-			return 1;
-
-		}
-
-		if (tok_s1.size())
-		{
-
-			if (tok_s1[0])
-				l.push_back(seq.substr(0, tok_s1[0] - (keeptok ? 0 : 1)) );
-
-			for (pos = 0; pos < tok_s1.size(); pos++)
-			{
-
-				if (pos>0)
-				{
-
-					int c = tok_s1[pos] - tok_s2[pos-1];
-
-					if (c > 1)
-						l.push_back(seq.substr(tok_s2[pos-1]+1, c-1));
-
-				}
-
-				l.push_back(seq.substr(tok_s1[pos], tok_s2[pos]-tok_s1[pos]+1));
-
-			}
-
-		}
-
-		if (tok_s2.back() < (LEN-1))
-			l.push_back(seq.substr(tok_s2.back()+1, (LEN)-(tok_s2.back()+1)));
-
-	}
-
-	return l.size();
-
-}
-
-/**
-
- \fn splitStr(std::list<std::string>& l, const std::string& seq, const std::string& _1cdelim, bool keeptoken=false, bool _removews=true )
-
- \brief Splits a string into tokens separeted by supplied delimiters as a std::string.
-
- \param std::list<std::string>& L reference to the resulting string tokens
-
- \param std::string seq The string stream to split
-
- \param std::string _lcdelim - a std::string that contains all of the single delimiters
-
- \param bool keeptok -- same as the above function
-
- \param bool removews -- Set to TRUE if requiered to remove white space characters ( space, "\n\r" etc...)
-
- \return integer that has the number of token in the resulting list
- */
-int splitStr(std::list<std::string>& L, const std::string& seq,
-		const std::string& _1cdelim, bool keeptoken, bool _removews)
-{
-
-	typedef std::string::size_type ST;
-
-	std::string delims = _1cdelim;
-
-	std::string STR;
-
-	if (delims.empty())
-		delims = "\n\r";
-
-	if (_removews)
-		delims += " ";
-
-	ST pos=0, LEN = seq.size();
-
-	while (pos < LEN)
-	{
-
-		STR=""; // Init/clear the STR token buffer
-
-		// remove any delimiters including optional (white)spaces
-
-		while ( (delims.find(seq[pos]) != std::string::npos) && (pos < LEN))
-			++pos;
-
-		// leave if @eos
-
-		if (pos==LEN)
-			return L.size();
-
-		// Save token data
-
-		while ( (delims.find(seq[pos]) == std::string::npos) && (pos < LEN))
-			STR += seq[pos++];
-
-		// put valid STR buffer into the supplied list
-
-		//std::cout << "[" << STR << "]";
-
-		if ( !STR.empty() )
-			L.push_back(STR);
-
-	}
-
-	return L.size();
-
 }
