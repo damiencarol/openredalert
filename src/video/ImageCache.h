@@ -21,7 +21,6 @@ using std::vector;
 class ImageCache
 {
 public:
-
 	Uint32 getNumbImages(Uint32 imgnum);
 	Uint32 getNumbImages(const char* fname);
     void setImagePool(vector<SHPImage *> *imagepool);

@@ -221,12 +221,15 @@ public:
     Uint16 getY() const ;
 
     /** Checks the WW coord is valid */
-    bool validCoord(Uint16 tx, Uint16 ty) const ;
+    bool validCoord(Uint16 tx, Uint16 ty) const;
     /** Converts a WW coord into a more flexible coord */
-    Uint32 normaliseCoord(Uint32 linenum) const ;
+    Uint32 normaliseCoord(Uint32 linenum) const;
     /** Converts a WW coord into a more flexible coord */
-    Uint32 normaliseCoord(Uint16 tx, Uint16 ty) const ;
-    void translateCoord(Uint32 linenum, Uint16* tx, Uint16* ty) const ;
+    Uint32 normaliseCoord(Uint16 tx, Uint16 ty) const;
+    void translateCoord(Uint32 linenum, Uint16* tx, Uint16* ty) const;
+    
+    /** Return the number with string of a COMMAND */
+    Uint8 UnitActionToNr(const string action);
 private:
     enum {
     	HAS_OVERLAY=0x100, 

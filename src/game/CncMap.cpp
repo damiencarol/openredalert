@@ -1339,8 +1339,8 @@ void CnCMap::loadIni()
 	// Try to create UnitAndStructurePool
 	try
 	{
+		// Create the UnitAndStructurePool
 		p::uspool = new UnitAndStructurePool(this->missionData->theater);
-		logger->note("UnitAndStructurePool created\n");
 	}
 	catch (...)
 	{
@@ -1365,8 +1365,8 @@ void CnCMap::loadIni()
 
 	terraintypes.resize(width*height, 0);
 	resourcematrix.resize(width*height, 0);
-logger->debug("BEFORE advancedSections()\n");
 
+	// Load advanced section of the ini
 	advancedSections(inifile);
 
 	// Unpack the section "MapPack"
@@ -1525,7 +1525,7 @@ void CnCMap::simpleSections(INIFile *inifile)
 
 /**
  */
-Uint8 UnitActionToNr(const std::string action)
+Uint8 CnCMap::UnitActionToNr(const string action)
 {
 	if (action == "Sleep")
 	{
@@ -2085,7 +2085,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 				
 				logger->debug("Line read in UNIT = %s\n", key->second.c_str());
 								
-				/* , is the char which separate terraintype from action. */
+				// ',' is the char which separate terraintype from action.
 				if( sscanf(key->first.c_str(), "%d", &tmpval) == 1 &&
 						sscanf(key->second.c_str(), "%[^,],%[^,],%d,%d,%d,%[^,],%s", owner, type,
 								&health, &linenum, &facing, action, trigger ) == 7 )
@@ -2627,12 +2627,14 @@ void CnCMap::loadOverlay(INIFile *inifile)
 	{}
 }
 
-const char
-		* RAOverlayNames[] =
-		{ "SBAG", "CYCL", "BRIK", "FENC", "WOOD", "GOLD01", "GOLD02", "GOLD03",
-				"GOLD04", "GEM01", "GEM02", "GEM03", "GEM04", "V12", "V13",
-				"V14", "V15", "V16", "V17", "V18", "FPLS", "WCRATE", "SCRATE",
-				"FENC", "SBAG" };
+const char	* RAOverlayNames[] =
+{
+	"SBAG", "CYCL", "BRIK", "FENC", "WOOD", 
+	"GOLD01", "GOLD02", "GOLD03", "GOLD04", "GEM01", 
+	"GEM02", "GEM03", "GEM04", "V12", "V13",
+	"V14", "V15", "V16", "V17", "V18", 
+	"FPLS", "WCRATE", "SCRATE",	"FENC", "SBAG"
+};
 
 void CnCMap::unOverlayPack(INIFile *inifile)
 {
@@ -2684,7 +2686,6 @@ void CnCMap::unOverlayPack(INIFile *inifile)
 				+ (temp[curpos+2]<<16);
 	}
 
-	
 	for (ytile = y; ytile <= y+height; ++ytile)
 	{
 		for (xtile = x; xtile <= x+width; ++xtile)
@@ -2698,9 +2699,6 @@ void CnCMap::unOverlayPack(INIFile *inifile)
 			parseOverlay(tilepos, RAOverlayNames[mapdata[curpos]]);
 		}
 	}
-	
-	printf("unOverlayPack() ok\n");
-		
 }
 
 void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
@@ -2712,8 +2710,11 @@ void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 	if (name == "BRIK" || name == "SBAG" || name == "FENC" || 
 			name == "WOOD" || name == "CYCL" || name == "BARB")
 	{
+		// Get the num of the player
+		Uint8 numPlayer = p::ppool->getPlayerNum("Neutral");
+		
 		// Walls are structures.
-		p::uspool->createStructure(name.c_str(), linenum, p::ppool->getPlayerNum("Neutral"), 256, 0, false);
+		p::uspool->createStructure(name.c_str(), linenum, numPlayer, 256, 0, false, "None");
 		return;
 	}
 
@@ -2728,7 +2729,7 @@ void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 	}
 	catch(ImageNotFound&)
 	{
-		shpname = name + ".SHP";
+		shpname = name + ".shp";
 		try
 		{
 			frame = pc::imgcache->loadImage(shpname.c_str()) >> 16;
@@ -2740,15 +2741,16 @@ void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 			throw LoadMapError("Unable to load overlay " + shpname + " (or " + name + ".SHP)");
 		}
 	}
-			
+
 	/// @TODO Generic resources?
 	if (strncasecmp(name.c_str(), "TI", 2) == 0 || strncasecmp(name.c_str(),
 			"GOLD", 4) == 0 || strncasecmp(name.c_str(), "GEM", 3) == 0)
 	{
 		Uint32 i = 0;
-		/* This is a hack to seed the map with semi-reasonable amounts of
-		 * resource growth.  This will hopefully become less ugly after the code
-		 * to manage resource growth has been written. */
+		// TODO CHANGE THAT
+		// This is a hack to seed the map with semi-reasonable amounts of
+		// resource growth.  This will hopefully become less ugly after the code
+		// to manage resource growth has been written.		
 		if (sscanf(name.c_str(), "TI%u", &i) == 0)
 		{
 			i = atoi(name.c_str() + (name.length() - 2));
@@ -2797,7 +2799,7 @@ void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
  * 
  * @param palette array of SDL_Colour into which palette is loaded.
  */
-void CnCMap::loadPal(const std::string& paln, SDL_Color *palette)
+void CnCMap::loadPal(const string& paln, SDL_Color *palette)
 {
 	VFile *palfile;
 	int i;
@@ -2875,9 +2877,9 @@ SDL_Surface *CnCMap::loadTile(INIFile *templini, Uint16 templ, Uint8 tile,
 	char tilenum[11];
 	char *temname;
 
-	/* The name of the file containing the template is something from
-	 * templates.ini . the three first
-	 * chars in the name of the theater eg. .DES .TEM .WIN */
+	// The name of the file containing the template is something from
+	// templates.ini . the three first
+	// chars in the name of the theater eg. .DES .TEM .WIN
 
 	sprintf(tilefilename, "TEM%d", templ);
 	sprintf(tilenum, "tiletype%d", tile);
@@ -2988,3 +2990,4 @@ void CnCMap::reloadTiles()
 		tileimages.push_back(image);
 	}
 }
+
