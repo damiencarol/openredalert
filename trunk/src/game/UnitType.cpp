@@ -125,7 +125,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) : UnitOrStructureType
 	is_infantry = false;
 
 	//buildlevel = unitini->readInt(tname, "buildlevel", 99);
-	techLevel = unitini->readInt(tname, "techlevel", -1);
+	techLevel = unitini->readInt(tname, "TechLevel", -1);
 
 	tmp = unitini->readString(tname, "owners");
 	if (tmp != NULL)
@@ -138,9 +138,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) : UnitOrStructureType
 	{
 		is_infantry = true;
 	}
-	
-
-	    
+		    
 	tmpspeed = unitini->readInt(tname, "speed");
 	if (is_infantry)
 	{

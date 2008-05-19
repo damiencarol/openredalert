@@ -85,29 +85,40 @@ Player::Player(const char *pname, INIFile *mapini)
     	unitpalnum = 2;
     	structpalnum = 2;
     } 
-    else if( !strcmp((playername), ("GoodGuy")) ) {
-    	printf ("Playerside = goodguy??\n");
-        playerside = PS_GOOD;
+    else if( !strcmp((playername), ("England"))) 
+    {
+    	playerside = PS_GOOD;
+    	unitpalnum = 3;
+    	structpalnum = 3;
+    } 
+    else if( !strcmp((playername), ("GoodGuy")) ) 
+    {
+    	playerside = PS_GOOD;
         unitpalnum = 0;
         structpalnum = 0;
-    } else if( !strcmp((playername), ("Badguy")) ) {
-    	printf ("Playerside = badguy??\n");
+    } 
+    else if( !strcmp((playername), ("Badguy")) ) 
+    {
         playerside = PS_BAD;
         unitpalnum = 2;
         structpalnum = 1;
-    } else if( !strcmp((playername), ("Neutral")) ) {
+    } 
+    else if( !strcmp((playername), ("Neutral")) ) 
+    {
         playerside = PS_NEUTRAL;
         unitpalnum = 0;
         structpalnum = 0;
-    } else if( !strcmp((playername), ("Special")) ) {
-    	printf ("Playerside = SPECIAL??\n");
+    } 
+    else if( !strcmp((playername), ("Special")) ) 
+    {
         playerside = PS_SPECIAL;
         unitpalnum = 0;
         structpalnum = 0;
-    } else if( !strncmp((playername), ("multi"), (5)) ) {
+    } 
+    else if( !strncmp((playername), ("multi"), (5)) ) 
+    {
         playerside = PS_MULTI;
 
-	printf ("Playerside = MULTI??\n");
         if (playername[5] < 49 || playername[5] > 57) {
             logger->error("Invalid builtin multi name: %s\n",playername);
             /// @TODO Nicer error handling here
@@ -128,9 +139,9 @@ Player::Player(const char *pname, INIFile *mapini)
             playerstart = p::ccmap->normaliseCoord(playerstart);
         }
 #endif
-
-	printf ("Palletnumber = %i\n", unitpalnum);
-    } else {
+	} 
+    else 
+	{
         logger->warning("Player Side \"%s\" not recognised, using gdi instead\n",pname);
         playerside = PS_GOOD;
         unitpalnum = 0;
@@ -917,8 +928,10 @@ void Player::revealAroundWaypoint(Uint32 waypointNumber)
 			if (x > 0 && y > 0){
 				Uint32 cellpos = p::ccmap->translateToPos(x, y);
 //				printf ("reveal cellpos = %u\n", cellpos);
-				if ( cellpos < mapVisible.size() )
+				if (cellpos < mapVisible.size()){
 					mapVisible[cellpos] = true;
+					logger->debug("REVEAL AREA %d %d !\n", x, y);
+				}
 			}
 		}
 	}
@@ -950,7 +963,7 @@ void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_upda
 {
     Uint32 curpos, xsize, ysize, cpos;
     Sint32 xstart, ystart;
-    std::vector<bool>* mapVoB = NULL;
+    vector<bool>* mapVoB = 0;
 
 
     if (mode == SOB_SIGHT) {
@@ -1098,7 +1111,7 @@ void Player::enableInfMoney()
 }
 
 
-Uint8 Player::getTechLevel()
+Sint32 Player::getTechLevel()
 {
 	return techLevel;
 }
