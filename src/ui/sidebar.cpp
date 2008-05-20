@@ -91,7 +91,7 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
     vischanged(true), theatre(theatre), buttondown(0), bd(false),
     radaranimating(false), unitoff(0), structoff(0), player(pl), scaleq(-1)
 {
-    const char* tmpname;
+    //const char* tmpname;
     Uint8 side = 0;
     SDL_Surface *tmp;
 
@@ -496,6 +496,14 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
 		string nameOfType = string(type->getTName());
 		if (nameOfType=="POWR"){
 			TipString << stringFile->getString(126);
+		} else if (nameOfType=="BRIK"){
+			TipString << stringFile->getString(134);				
+		} else if (nameOfType=="SBAG"){
+			TipString << stringFile->getString(132);				
+		} else if (nameOfType=="TENT"){
+			TipString << stringFile->getString(129);				
+		} else if (nameOfType=="BARR"){
+			TipString << stringFile->getString(129);				
 		} else if (nameOfType=="FACF"){
 			TipString << stringFile->getString(430);				
 		} else {
