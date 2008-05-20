@@ -1,5 +1,5 @@
 // MissionMapsClass.cpp
-// 1.2
+// 1.4
 
 //    This file is part of OpenRedAlert.
 //
@@ -60,6 +60,7 @@ void MissionMapsClass::readMissionData()
 	char Line[255];
 	string tmpString;
 	Uint32 pos;
+	Uint32 pos2;
 
 	// I am not sure how the maps from td work so...
 	if (getConfig().gamenum != GAME_RA) {
@@ -69,23 +70,18 @@ void MissionMapsClass::readMissionData()
 	// pointer to it
 	//binfile = mixes->getOffsetAndSize(binname, &offset, &size);
 	MapFile = VFSUtils::VFS_Open("mission.ini");
-
-	if (MapFile == NULL) {
+	
+	// Check if the file exist
+	if (MapFile == 0) {
 		logger->error("Unable to locate mission.ini file!\n");
 		return;
 	}
-
-	logger->debug("Success at opening mission.ini\n");
-
-	//int j=0; // debug
-	while (MapFile->getLine(Line, sizeof (Line))) {
-
-		//tmpString.empty();
+	
+	// Parse all line of the file
+	while (MapFile->getLine(Line, sizeof (Line))) 
+	{
+		// Get the string
 		tmpString = Line;
-
-		// TODO DEBUG
-		//logger->debug("line[%d]:%s", j, tmpString.c_str());
-		//j++;
 
 		//memset (Line, '\0', sizeof (Line));
 
@@ -96,18 +92,33 @@ void MissionMapsClass::readMissionData()
 			}
 			i++;
 		}
-
-		// For now we don't support the mission objective strings
-		if ((pos = tmpString.find(".INI", 0)) != (Uint32)string::npos) {
-			tmpString.erase(pos, pos+4);
-			if ((pos = tmpString.find("SCU", 0)) != (Uint32)string::npos) {
-				NodMissionMaps.push_back(tmpString);
-				//printf ("NOD ini found: %s\n", tmpString.c_str());
-			} else {
-				GdiMissionMaps.push_back(tmpString);
-				//printf ("GDI ini found: %s\n", tmpString.c_str());
+		// Check if the mission is availlable
+		VFile* tmp = VFSUtils::VFS_Open(tmpString.c_str());
+		
+		// Does it exist ?
+		if (tmp != 0)
+		{
+			// Close the file
+			VFSUtils::VFS_Close(tmp);
+		
+			// For now we don't support the mission objective strings
+			if (((pos = tmpString.find(".INI", 0)) != (Uint32)string::npos)
+					&& 
+				((pos2 = tmpString.find("A", 0)) != (Uint32)string::npos)) 
+			{
+				// remove ".ini" at the end of the string
+				tmpString.erase(pos, pos+4);
+				
+				// If it's soviets mission
+				if ((pos = tmpString.find("SCU", 0)) != (Uint32)string::npos)
+				{
+					// Add the mission in Allies Mission list
+					NodMissionMaps.push_back(tmpString);
+				} else {
+					// Add the mission in Soviets Mission list
+					GdiMissionMaps.push_back(tmpString);
+				}
 			}
-		} else {
 		}
 	}
 }
