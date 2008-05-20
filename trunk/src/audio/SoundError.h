@@ -2,7 +2,17 @@
 #ifndef SOUNDERROR_H
 #define SOUNDERROR_H
 
-class SoundError {
+#include <string>
+#include <stdexcept>
+
+using std::string;
+using std::runtime_error;
+
+class SoundError : public runtime_error
+{
+public:    
+
+    SoundError(const string& msg) ;
 };
 
-#endif
+#endif //SOUNDERROR_H
