@@ -171,9 +171,12 @@ void Game::InitializeMap(string MapName)
 			// Try to Play the "Briefing" Movie
 			string briefMovieName;
 			briefMovieName = string(p::ccmap->getMissionData()->brief);
-			logger->note ("%s line %i: Brief = %s\n", __FILE__, __LINE__, briefMovieName.c_str());
-			VQAMovie* movBrief = new VQAMovie(briefMovieName.c_str());
-			movBrief->play();
+			// Check that movie is not <none>
+			if (briefMovieName != "<none>")
+			{
+				VQAMovie* movBrief = new VQAMovie(briefMovieName.c_str());
+				movBrief->play();
+			}
 
 			// Try to Play the "Action" Movie
 			char * tmpAction;
@@ -622,8 +625,9 @@ void Game::play()
 
 		BattleControlTerminated = true;
 
-		// Stop the music
+		// Stop all the music
 		pc::sfxeng->StopMusic();
+		pc::sfxeng->StopLoopedSound(-1);
 
 		// Check if it was a single player game
 		if (gamemode == GAME_MODE_SINGLE_PLAYER)
@@ -666,10 +670,16 @@ void Game::play()
 		pc::sfxeng->StopLoopedSound(-1);
 
 		// Write game stats in the .log
-		dumpstats();
+		//dumpstats();
 
 		// Free objects
-		FreeMemory();
+		//FreeMemory();
+		
+		// Check if it's the last mission
+		if (p::ccmap->isEndOfGame()) {
+			// Game is over
+			missionWon = false;
+		}
 	}
 	while (!pc::quit);
 
