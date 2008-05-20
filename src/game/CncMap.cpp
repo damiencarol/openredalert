@@ -6,29 +6,29 @@
 #include <stdexcept>
 
 #include "Game.h"
-#include "misc/Compression.h"
-#include "include/config.h"
-#include "include/imageproc.h"
-#include "include/Logger.h"
 #include "Player.h"
-#include "include/PlayerPool.h"
 #include "UnitAndStructurePool.h"
-#include "include/triggers.h"
 #include "MissionData.h"
-#include "video/LoadingScreen.h"
-#include "video/SHPImage.h"
-#include "video/TemplateImage.h"
 #include "CellTrigger.h"
 #include "Unit.h"
+#include "LoadMapError.h"
+#include "GameMode.h"
 #include "misc/Compression.h"
 #include "misc/KeyNotFound.h"
 #include "misc/INIFile.h"
-#include "LoadMapError.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "video/ImageNotFound.h"
 #include "video/ImageCache.h"
-#include "GameMode.h"
+#include "video/LoadingScreen.h"
+#include "video/SHPImage.h"
+#include "video/TemplateImage.h"
+#include "include/common.h"
+#include "include/config.h"
+#include "include/imageproc.h"
+#include "include/Logger.h"
+#include "include/PlayerPool.h"
+#include "include/triggers.h"
 
 using std::vector;
 using std::string;
@@ -997,6 +997,7 @@ void CnCMap::translateFromPos(Uint32 pos, Uint16 *x, Uint16 *y) const
 	*y = pos/width;
 	*x = pos-((*y)*width);
 }
+
 bool CnCMap::isLoading() const
 {
 	return loading;
@@ -1018,32 +1019,38 @@ Uint8 CnCMap::getTerrainType(Uint32 pos) const
 {
 	return terraintypes[pos];
 }
+
 void CnCMap::setScrollPos(Uint32 x, Uint32 y)
 {
 	scrollpos.curx = x;
 	scrollpos.cury = y;
 }
+
 void CnCMap::prepMiniClip(Uint16 sidew, Uint16 sideh)
 {
 	miniclip.sidew = sidew;
 	miniclip.sideh = sideh;
 }
+
 bool CnCMap::toScroll()
 {
 	return toscroll;
 }
+
 Uint32 CnCMap::setSmudge(Uint32 pos, Uint8 value)
 {
 	// clear the existing smudge bits first
 	overlaymatrix[pos] &= ~(0xF0);
 	return (overlaymatrix[pos] |= (value<<4));
 }
+
 Uint32 CnCMap::setTiberium(Uint32 pos, Uint8 value)
 {
 	// clear the existing tiberium bits first
 	overlaymatrix[pos] &= ~0xF;
 	return (overlaymatrix[pos] |= value);
 }
+
 void CnCMap::setTriggerByName(std::string TriggerName, RA_Tiggers *Trig)
 {
 	for (unsigned int i = 0; i < RaTriggers.size(); i++)
@@ -1063,6 +1070,7 @@ void CnCMap::setTriggerByName(std::string TriggerName, RA_Tiggers *Trig)
 		}
 	}
 }
+
 void CnCMap::setWaypoint(Uint8 pointnr, Uint32 mappos)
 {
 	if (pointnr > 99){
@@ -1090,9 +1098,9 @@ void CnCMap::translateCoord(Uint32 linenum, Uint16* tx, Uint16* ty) const
 
 bool CnCMap::validCoord(Uint16 tx, Uint16 ty) const
 {
-	return (!(tx < x || ty < y || tx>
-					x+width || ty> height+y));
-				}
+	return (!(tx < x || ty < y || 
+			tx>	x+width || ty> height+y));
+}
 
 Uint32 CnCMap::getWaypoint(Uint8 pointnr)
 {
@@ -1103,16 +1111,19 @@ Uint32 CnCMap::getWaypoint(Uint8 pointnr)
 	}
 	return waypoints[pointnr];
 }
+
 Uint32 CnCMap::normaliseCoord(Uint32 linenum) const
 {
 	Uint16 tx, ty;
 	translateCoord(linenum, &tx, &ty);
 	return normaliseCoord(tx, ty);
 }
+
 Uint32 CnCMap::normaliseCoord(Uint16 tx, Uint16 ty) const
 {
 	return (ty-y)*width + tx - x;
 }
+
 void CnCMap::decreaseResource(Uint32 pos, Uint8 amount)
 {
 	// Recourse type 7 = tiberium, all resources lower are more expansife
@@ -1131,6 +1142,7 @@ void CnCMap::decreaseResource(Uint32 pos, Uint8 amount)
 		resourcematrix[pos] = 0;
 	}
 }
+
 RA_Tiggers *CnCMap::getTriggerByNumb(unsigned int TriggerNumb)
 {
 	if (TriggerNumb >= RaTriggers.size())
@@ -1191,8 +1203,11 @@ RA_Teamtype *CnCMap::getTeamtypeByName(std::string TeamName)
 			return &RaTeamtypes[i];
 		}
 	}
-	return NULL;
+	
+	// Return NULL
+	return 0;
 }
+
 SDL_Surface *CnCMap::getShadowTile(Uint8 shadownum)
 {
 	// ra has 48 shadow images...
@@ -1203,16 +1218,19 @@ SDL_Surface *CnCMap::getShadowTile(Uint8 shadownum)
 
 	return shadowimages[shadownum];
 }
-SDL_Surface *CnCMap::getMapTile(Uint32 pos)
+
+SDL_Surface* CnCMap::getMapTile(Uint32 pos)
 {
 	return tileimages[tilematrix[pos]];
 }
+
 Uint32 CnCMap::getTerrainOverlay(Uint32 pos)
 {
 	if (pos < terrainoverlay.size())
 		return terrainoverlay[pos];
 	return 0;
 }
+
 void CnCMap::setTerrainOverlay(Uint32 pos, Uint32 ImgNum, Uint16 Frame)
 {
 	if (pos < terrainoverlay.size())
@@ -1258,10 +1276,17 @@ Uint32 CnCMap::getSmudge(Uint32 pos) const {
 Uint32 CnCMap::getTiberium(Uint32 pos) const {
         return (overlaymatrix[pos] & 0xF);
     }
-Uint32 CnCMap::getResourceFrame(Uint32 pos) const {
-        return ((resourcebases[resourcematrix[pos] & 0xFF]<<16) +
-                (resourcematrix[pos]>>8));
-    }
+
+Uint32 CnCMap::getResourceFrame(Uint32 pos) const
+{
+	if (strncasecmp(missionData->theater, "INT", 3) == 0){
+		// no image
+		return 0;
+	}
+	
+	return ((resourcebases[resourcematrix[pos] & 0xFF]<<16) + (resourcematrix[pos]>>8));
+}
+
 bool CnCMap::getResource(Uint32 pos, Uint8* type, Uint8* amount) const {
         if (0 == type || 0 == amount) {
             return (0 != resourcematrix[pos]);
@@ -1328,9 +1353,12 @@ void CnCMap::loadIni()
 	p::ppool = new PlayerPool(inifile, gamemode);
 
 	// WARN if the ini format is not supported
-	if (inifile->readInt("basic", "newiniformat", 0) != 0)
+	if (inifile->readInt("Basic", "NewINIFormat", 0) != 3)
 	{
-		logger->error("Red Alert maps not fully supported yet\n");
+		// Log the error
+		logger->error("Only Red Alert maps are fully supported\nThe format of this Map is not supported\n");
+		// Trow an error
+		throw LoadMapError("Error in loading the ini file [" + tmpName + "], the version of the ini (NewINIFormat) is not equal to 3");			
 	}
 
 	// Read simple ini section
@@ -1345,18 +1373,16 @@ void CnCMap::loadIni()
 	catch (...)
 	{
 		// Log it
-		logger->error("Error in creating UnitAndStructurePool (p::uspool)");
+		logger->error("Error in creating UnitAndStructurePool (p::uspool)\n");
 		// Throw error
-		throw LoadMapError("Error in creating UnitAndStructurePool (p::uspool)");
+		throw LoadMapError("Error in creating UnitAndStructurePool (p::uspool)\n");
 	}
 
-	if (missionData->player != 0)
-	{
-		printf ("%s line %i: Player = %s\n", __FILE__, __LINE__, missionData->player);
-	}
-
+	
 	if (gamemode == GAME_MODE_SINGLE_PLAYER)
 	{
+		// Set the local player with House name in the BASIC section 
+		// of the .ini of the map
 		p::ppool->setLPlayer(missionData->player);
 		// TODO modify that to set the colour
 		//p::ppool->getLPlayer()->setMultiColour(pc::Config.side_colour.c_str());
@@ -1371,7 +1397,7 @@ void CnCMap::loadIni()
 
 	// Unpack the section "MapPack"
 	unMapPack(inifile);
-	
+
 	// spawn player starts for non single player games.
 	if (gamemode != GAME_MODE_SINGLE_PLAYER)
 	{
@@ -1416,12 +1442,12 @@ void CnCMap::loadIni()
 		p::ppool->placeMultiUnits();
 	}
 
-	try
-	{
-		pips = new SHPImage("hpips.shp", -1);
-	}
-	catch(ImageNotFound&)
-	{
+	//try
+	//{
+	//	pips = new SHPImage("hpips.shp", -1);
+	//}
+	//catch(ImageNotFound&)
+	//{
 		try
 		{
 			pips = new SHPImage("pips.shp", -1);
@@ -1433,7 +1459,7 @@ void CnCMap::loadIni()
 			// Throw error
 			throw LoadMapError("Unable to load the pips graphics!");
 		}
-	}
+	//}
 	pipsnum = pc::imagepool->size()<<16;
 	pc::imagepool->push_back(pips);
 	if (maptype == GAME_RA)
@@ -1796,11 +1822,11 @@ void CnCMap::advancedSections(INIFile *inifile)
 		logger->note("smudge images loaded...\n");			
 	}
 
-	// TODO REMOVE that
-	logger->note("before overlay... \n");
+	// Resize overlaymatrix (use in TERRAIN loading)
 	overlaymatrix.resize(width*height, 0);
 
-	INIFile *arts= NULL;
+	// Loading of art.ini (use in TERRAIN loading)
+	INIFile* arts = 0;
 	arts = GetConfig("art.ini");
 
 	// Loading of terrain
@@ -1809,17 +1835,16 @@ void CnCMap::advancedSections(INIFile *inifile)
 		for( keynum = 0;;keynum++ )
 		{
 			bool bad = false;
-			// TODO REMOVE that
-			//logger->note("Loading of terrain... (%d)\n", keynum);
-				
+			
+			// Try to load the number ?keynum? section 
 			key = inifile->readKeyValue("TERRAIN", keynum);
 			// , is the char which separate terraintype from action.
 
 			if( sscanf(key->first.c_str(), "%d", &linenum) == 1 &&
 					sscanf(key->second.c_str(), "%[^,],", shpname) == 1 )
 			{
-				/* Set the next entry in the terrain vector to the correct values.
-				 * the map-array and shp files vill be set later */
+				// Set the next entry in the terrain vector to the correct values.
+				// the map-array and shp files vill be set later
 				translateCoord(linenum, &tx, &ty);
 
 				if( tx < x || ty < y || tx> x+width || ty> height+y )
@@ -2009,19 +2034,48 @@ void CnCMap::advancedSections(INIFile *inifile)
 	logger->note("UnitAndStructurePool::generateProductionGroups() ok\n");
 		
 	//
-	// structures
+	// STRUCTURES
 	//
-	// If their are a section called "STRUCTURE"
+	// If their are a section called "STRUCTURES"
 	if (inifile->isSection(string("STRUCTURES")) == true)
 	{
+		// TODO DEBUG THAT !!!!
+		// TODO REFACTOR THAT
+		/*
+		INISection* sec = inifile->getSection("STRUCTURES");
+		INISection::iterator it = sec->begin();
+		while (it != sec->end())
+		{
+			string str = it->second;
+			printf("read=%s\n", str.c_str());
+			char* temp = strdup(str.c_str());
+			vector<string> lst = splitList(temp, ',');
+			
+			
+			translateCoord(linenum, &tx, &ty);
+			facing = min(31,facing>>3);
+			if( tx < x || ty < y || tx> x+width || ty> height+y )
+			{
+				continue;
+			}
+			linenum = (ty-y)*width + tx - x;
+									
+			//printf("cncmap::loadIni(%s)\n", owner);							
+									
+			p::uspool->createStructure(type, linenum, p::ppool->getPlayerNum(owner), health, facing, false, trigger);
+			//                    printf ("%s line %i: createStructure STRUCTURE %s, trigger = %s\n", __FILE__, __LINE__, type, trigger);
+								
+			
+			it++;
+		}*/
 		try
 		{
 			for( keynum = 0;;keynum++ )
 			{
 				if (maptype == GAME_RA)
-				{
+				{					
 					key = inifile->readKeyValue("STRUCTURES", keynum);
-					/* , is the char which separate terraintype from action. */
+					// ',' is the char which separate terraintype from action.
 					if( sscanf(key->first.c_str(), "%d", &tmpval) == 1 &&
 							sscanf(key->second.c_str(), "%[^,],%[^,],%d,%d,%d,%[^,]", owner, type,
 									&health, &linenum, &facing, trigger ) == 6 )
@@ -2034,7 +2088,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 						}
 						linenum = (ty-y)*width + tx - x;
 						
-						printf("cncmap::loadIni(%s)\n", owner);							
+						//printf("cncmap::loadIni(%s)\n", owner);							
 						
 						p::uspool->createStructure(type, linenum, p::ppool->getPlayerNum(owner), health, facing, false, trigger);
 						//                    printf ("%s line %i: createStructure STRUCTURE %s, trigger = %s\n", __FILE__, __LINE__, type, trigger);
@@ -2065,14 +2119,17 @@ void CnCMap::advancedSections(INIFile *inifile)
 			}
 		}
 		catch(...)
-		{}
+		{
+			// Log it
+			logger->error("error in CncMap::advanced...STRUCTURES ok\n");					
+		}
+		// Log it
+		logger->note("CncMap::advanced...STRUCTURES ok\n");			
 	}
-	// Log it
-	logger->note("CncMap::advanced...STRUCTURE ok\n");
 	
 	
 	//
-	// units
+	// Decode Units section
 	//
 	// If their are a section called "UNITS"
 	if (inifile->isSection(string("UNITS")) == true)
@@ -2081,15 +2138,15 @@ void CnCMap::advancedSections(INIFile *inifile)
 		{
 			for( keynum = 0;;keynum++ )
 			{
+				// Read the key number "keynum"
 				key = inifile->readKeyValue("UNITS", keynum);
 				
-				logger->debug("Line read in UNIT = %s\n", key->second.c_str());
-								
 				// ',' is the char which separate terraintype from action.
 				if( sscanf(key->first.c_str(), "%d", &tmpval) == 1 &&
 						sscanf(key->second.c_str(), "%[^,],%[^,],%d,%d,%d,%[^,],%s", owner, type,
 								&health, &linenum, &facing, action, trigger ) == 7 )
 				{
+					// convert hash cursor in x and y
 					translateCoord(linenum, &tx, &ty);
 					facing = min(31,facing>>3);
 					if( tx < x || ty < y || tx> x+width || ty> height+y )
@@ -2097,6 +2154,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 						continue;
 					}
 					linenum = (ty-y)*width + tx - x;
+					// Create the unit
 					p::uspool->createUnit(type, linenum, 5, p::ppool->getPlayerNum(owner), health, facing, UnitActionToNr(action), trigger);
 
 					//printf ("%s line %i: createUnit UNIT %s, trigger = %s\n", __FILE__, __LINE__, key->first.c_str(), trigger);
@@ -2175,7 +2233,8 @@ void CnCMap::advancedSections(INIFile *inifile)
 					
 					// Test if trigger creation is good
 					if (res==false){
-						logger->error("Error in create TRIGGER in the map\n");
+						// TODO CHECK THAT BECAUSE ERROR IN CREATION
+						//logger->error("Error in create TRIGGER in the map\n");
 					}
 				}
 			}
@@ -2207,9 +2266,9 @@ void CnCMap::advancedSections(INIFile *inifile)
 					RaTriggers.push_back(triggers);
 
 					// Trigger analysed
-					logger->debug("Trigger analysed n(%d)\n", keynum);
+					//logger->debug("Trigger analysed n(%d)\n", keynum);
 					// Print the trigger
-					PrintTrigger(triggers);
+					//PrintTrigger(triggers);
 				} else {
 					logger->warning("error in reading a trigger");
 				}
@@ -2551,8 +2610,8 @@ void CnCMap::parseBin(TileList* bindata)
 				tile = 0;
 			}
 
-			/* Code sugested by Olaf van der Spek to cause all tiles in template
-			 * 0 and 2 to be used */
+			// Code sugested by Olaf van der Spek to cause all tiles 
+			// in template 0 and 2 to be used
 			if (templ == 0)
 				tile = xtile&3 | (ytile&3 << 2);
 			else if (templ == 2)
@@ -2571,8 +2630,7 @@ void CnCMap::parseBin(TileList* bindata)
 			{
 				// a new tile
 				tileimg = loadTile(templini, templ, tile, &tiletype);
-
-				if (tileimg == NULL)
+				if (tileimg == 0)
 				{
 					logger->error("Error loading tiles\n");
 					throw LoadMapError("Error loading tiles\n");
@@ -2592,9 +2650,9 @@ void CnCMap::parseBin(TileList* bindata)
 
 			// Set the tile in the tilematrix
 			tilematrix[width*ytile+xtile] = tileidx;
-			if (terraintypes[width*ytile+xtile] == 0)
+			if (terraintypes[width*ytile+xtile] == 0){
 				terraintypes[width*ytile+xtile] = tiletype;
-
+			}
 		}
 	}
 }
@@ -2865,8 +2923,8 @@ void CnCMap::loadPal(const string& paln, SDL_Color *palette)
  * @param the tilenumber.
  * @returns a SDL_Surface containing the tile.
  */
-SDL_Surface *CnCMap::loadTile(INIFile *templini, Uint16 templ, Uint8 tile,
-		Uint32* tiletype)
+SDL_Surface* CnCMap::loadTile(INIFile* templini, Uint16 templ, 
+		Uint8 tile, Uint32* tiletype)
 {
 	TemplateCache::iterator ti;
 	TemplateImage *theaterfile;
@@ -2940,7 +2998,7 @@ SDL_Surface *CnCMap::loadTile(INIFile *templini, Uint16 templ, Uint8 tile,
 		theaterfile = ti->second;
 	}
 
-	//Now return this SDL_Surface
+	// Now return this SDL_Surface
 	retimage = theaterfile->getImage(tile);
 	if (retimage == NULL)
 	{
