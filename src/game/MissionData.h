@@ -24,6 +24,8 @@ public:
 	char* brief;
 	/** the theater of the map (eg. winter) */
 	char* theater;
+	/** True if it's the last mission */
+	bool endOfGame; 
 };
 
 #endif //MISSIONDATA_H
