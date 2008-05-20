@@ -92,7 +92,10 @@ int main(int argc, char** argv)
 	// Init with the path of the binaries
 	VFSUtils::VFS_Init(binpath.c_str());
 	VFSUtils::VFS_LoadGame(pc::Config.gamenum);
+	// Log success of loading RA gmae
+	logger->note(".MIX archives loading ok\n");
 
+	// Load the start
 	logger->note("Please wait, FreeRA %s is starting\n", VERSION.c_str());
 
 	try
