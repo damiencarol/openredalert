@@ -230,6 +230,9 @@ public:
     
     /** Return the number with string of a COMMAND */
     Uint8 UnitActionToNr(const string action);
+    
+    /** Return true if it's the last mission of the game */
+    bool isEndOfGame();
 private:
     enum {
     	HAS_OVERLAY=0x100, 

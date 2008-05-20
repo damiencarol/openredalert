@@ -1536,6 +1536,13 @@ void CnCMap::simpleSections(INIFile *inifile)
 
 		// Try to read the theme
 		missionData->theater = inifile->readString("Map", "Theater");
+		
+		// Save if it's the last mission
+		if (inifile->readYesNo("Basic", "EndOfGame", "no") == 1) {
+			missionData->endOfGame = true;
+		} else {
+			missionData->endOfGame = false;		
+		} 
 	}
 	catch (KeyNotFound& ex)
 	{
@@ -3048,3 +3055,12 @@ void CnCMap::reloadTiles()
 		tileimages.push_back(image);
 	}
 }
+
+/** 
+ * Return true if it's the last mission of the game 
+ */
+bool CnCMap::isEndOfGame()
+{
+	return missionData->endOfGame;
+}
+
