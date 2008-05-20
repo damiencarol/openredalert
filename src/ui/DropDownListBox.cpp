@@ -23,14 +23,15 @@ namespace pc {
 	extern GraphicsEngine * gfxeng;
 }
 
-DropDownListBox::DropDownListBox ()
+
+DropDownListBox::DropDownListBox()
 {
 	List.empty();
 	
-	ListBoxSurface	= NULL;
-	DisplaySurface	= NULL;
-	WindowToDrawOn	= NULL;
-	ArrowDownImage	= NULL;
+	ListBoxSurface	= 0;
+	DisplaySurface	= 0;
+	WindowToDrawOn	= 0;
+	ArrowDownImage	= 0;
 
 	SizeAndPosition.x = 0;
 	SizeAndPosition.y = 0;
@@ -59,8 +60,6 @@ DropDownListBox::DropDownListBox ()
 	}catch (ImageNotFound&){
 		printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
 	}
-
-	printf (" Cache entry = %i\n", ArrowDwn);
 }
 
 DropDownListBox::~DropDownListBox()
