@@ -644,12 +644,10 @@ bool UnitAndStructurePool::createUnit(const char *typen, Uint16 cellpos, Uint8 s
         return false;
     }
 
-    // 
+    // Create the unit
     bool res = createUnit(type, cellpos, subpos, owner, health, facing, action, trigger_name);
     
-    if (res==true) logger->debug("res = ok\n");
-    else logger->error("res = FAILURE !!!\n");
-    //
+    // Return results
     return res; 
 }
 
