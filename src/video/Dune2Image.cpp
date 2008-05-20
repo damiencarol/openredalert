@@ -1,8 +1,10 @@
 #include "Dune2Image.h"
+
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
 #include <string>
+
 #include "misc/Compression.h"
 #include "include/fcnc_endian.h"
 #include "include/imageproc.h"
@@ -11,9 +13,12 @@
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "video/ImageNotFound.h"
+
 using std::string;
 using std::runtime_error;
+
 extern Logger * logger;
+
 /**
  * Constructor loads a dune2 shpfile.
  *
@@ -26,10 +31,10 @@ Dune2Image::Dune2Image(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
     
     // Open the file in .mix archivefile
     imgfile = VFSUtils::VFS_Open(fname);
-    if( imgfile == NULL ) {
-        logger->error("(Dune2Image) File \"%s\" not found.\n", fname);
-        shpdata = NULL;
-        throw ImageNotFound("(Dune2Image) File \"" + string(fname) + "\" not found.");
+    if( imgfile == 0 ) {
+        logger->error(" File \"%s\" not found.\n", fname);
+        shpdata = 0;
+        throw ImageNotFound("File \"" + string(fname) + "\" not found.");
     }
     
     // Create the buffer with correct size
@@ -37,10 +42,7 @@ Dune2Image::Dune2Image(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
     
     // Fill the buffer
     imgfile->readByte(shpdata, imgfile->fileSize());
-    
-    // TODO DEBUG
-    logger->debug("(Dune2Image) File %s loaded.\n", fname);
-    
+        
     // Close the archive
     VFSUtils::VFS_Close(imgfile);
 }
@@ -111,6 +113,7 @@ SDL_Surface *Dune2Image::getImage(Uint16 imgnum)
 
     return optimage;
 }
+
 /** Read the header of a specified dune2 shp.
  * @param the number of the image to read the header from.
  * @returns the offset of the image.
@@ -152,5 +155,4 @@ Uint32 Dune2Image::getD2Header(Uint16 imgnum)
     }
 
     return curpos;
-
 }
