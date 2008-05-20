@@ -1825,8 +1825,6 @@ vector<const char*> UnitAndStructurePool::getBuildableUnits(Player* pl)
                     }
                 }                
             }
-            if (ovalid)
-            	retval.push_back(utype->getTName());                                    
         }
     }
     return retval;
