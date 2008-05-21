@@ -1,5 +1,5 @@
 // Player.h
-// 1.3
+// 1.4
 
 //    This file is part of OpenRedAlert.
 //
@@ -198,16 +198,24 @@ private:
 	/** List of location that is buildable by player */
 	vector<bool> mapBuildable;
 	
-	// cheat/debug flags: allmap (reveal all map), buildany (remove
-	// proximity check), buildall (disable prerequisites) infmoney (doesn't
-	// care if money goes negative).
-	bool allmap; bool buildany; bool buildall; bool infmoney;
+	/** cheat/debug flags: allmap (reveal all map) */
+	bool allmap; 
+	/** cheat/debug flags: buildany (remove proximity check) */
+	bool buildany;
+	/** cheat/debug flags: buildall (disable prerequisites) */
+	bool buildall; 
+	/** cheat/debug flags: infmoney (doesn't care if money goes negative).*/
+	bool infmoney;
 
+	/** Event that manage Money variations */ 
 	MoneyCounter* counter;
 
+	/** Number of radars structures */
 	Uint16 NumbRadarStructures;
 
+	/** buildable_radius */
 	Uint8 brad;
+	/** TODO : REMOVE THAT  Map Width */
 	Uint16 mwid;
 };
 
