@@ -498,6 +498,8 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
 			TipString << stringFile->getString(126);
 		} else if (nameOfType=="BRIK"){
 			TipString << stringFile->getString(134);				
+		} else if (nameOfType=="FENC"){
+			TipString << stringFile->getString(135);				
 		} else if (nameOfType=="SBAG"){
 			TipString << stringFile->getString(132);				
 		} else if (nameOfType=="TENT"){
@@ -506,6 +508,18 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
 			TipString << stringFile->getString(129);				
 		} else if (nameOfType=="FACF"){
 			TipString << stringFile->getString(430);				
+		} else if (nameOfType=="PROC"){
+			TipString << stringFile->getString(85);				
+		} else if (nameOfType=="SPEN"){
+			TipString << stringFile->getString(412);				
+		} else if (nameOfType=="APWR"){
+			TipString << stringFile->getString(127);	
+		} else if (nameOfType=="SYRD"){
+			TipString << stringFile->getString(411);				
+		} else if (nameOfType=="GUN"){
+			TipString << stringFile->getString(434);				
+		} else if (nameOfType=="IRON"){
+			TipString << stringFile->getString(424);				
 		} else {
 			TipString << type->getName();
 		}		
