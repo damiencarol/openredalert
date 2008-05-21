@@ -1,3 +1,21 @@
+// Triggers.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "include/triggers.h"
 
 #include <cstdlib>
@@ -7,12 +25,12 @@
 #include "include/ccmap.h"
 #include "include/config.h"
 #include "UnitAndStructurePool.h"
-#include "game/Unit.h"
+#include "Unit.h"
 #include "audio/SoundEngine.h"
 #include "include/PlayerPool.h"
 #include "include/Logger.h"
-#include "game/RA_Tigger.h"
-#include "game/Player.h"
+#include "RA_Tigger.h"
+#include "Player.h"
 
 namespace p {
 	extern CnCMap* ccmap;
@@ -197,23 +215,26 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
 
     // Get the trigger name from the unit or structure
     AssociatedTriggerName = UnitOrStructure->getTriggerName();
-
-    if (AssociatedTriggerName == "None")
+    // If they are no trigger then escape
+    if (AssociatedTriggerName == "None"){
         return;
-
+    }
+    
     //
     // Find the associated trigger in the map
     //
-    AssociatedTrigger = p::ccmap->getTriggerByName (AssociatedTriggerName);
-    if (AssociatedTrigger == NULL){
+    AssociatedTrigger = p::ccmap->getTriggerByName(AssociatedTriggerName);
+    if (AssociatedTrigger == 0){
         printf ("Trigger not found %s\n", AssociatedTrigger->name.c_str());
         return;
     }
 
 
 	if (AssociatedTrigger->trigger1.event != Event && AssociatedTrigger->trigger2.event != Event)
+	{
 		return;
-
+	}
+	
 #if 0
     int countrynr = p::ppool->getHouseNumByPlayerNum(UnitOrStructure->getOwner());
 
@@ -291,19 +312,21 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
     PrintTrigger ( *AssociatedTrigger );
 #endif
 
-    // Tirgger the any tirgger event
+    // Trigger the any tirgger event
     if (Event != TRIGGER_EVENT_ANY_EVENT ){
         //printf ("%s line %i: Trigger any event trigger\n", __FILE__, __LINE__);
-        HandleTriggers ( UnitOrStructure, TRIGGER_EVENT_ANY_EVENT );
+        HandleTriggers(UnitOrStructure, TRIGGER_EVENT_ANY_EVENT);
     }
 }
 
-/** @Handle global triggers
-    * @param Event the event that was caused for this unit or structure
-    * @param param the parameter that goes with the event (example time eleapsed)
-    * @returns void
-**/
-void HandleGlobalTrigger ( int Event, int value )
+/** 
+ * @Handle global triggers
+ * 
+ * @param Event the event that was caused for this unit or structure
+ * @param param the parameter that goes with the event (example time eleapsed)
+ * @returns void
+ */
+void HandleGlobalTrigger(int Event, int value)
 {
 	RA_Tiggers  *Trigger;
 	int         TriggNumb = 0;
@@ -314,8 +337,8 @@ void HandleGlobalTrigger ( int Event, int value )
 	if (Event == TRIGGER_EVENT_ZONE_ENTRY)
 		printf ("%s line %i:  ***TRIGGER_ZONE_ENTRY***, cellpos = %i\n", __FILE__, __LINE__, value);
 
-	while ((Trigger = p::ccmap->getTriggerByNumb ( TriggNumb )) != NULL){
-
+	while ((Trigger = p::ccmap->getTriggerByNumb(TriggNumb)) != 0)
+	{
 		TriggNumb++;
 
 		if (Trigger == NULL)
@@ -413,7 +436,7 @@ void HandleGlobalTrigger ( int Event, int value )
 	}
 	// Trigger the any trigger event
 	if (Event != TRIGGER_EVENT_ANY_EVENT ){
-		HandleGlobalTrigger ( TRIGGER_EVENT_ANY_EVENT, 0 );
+		HandleGlobalTrigger(TRIGGER_EVENT_ANY_EVENT, 0);
 	}
 
 }
@@ -488,7 +511,7 @@ void CheckCellTriggers ( Uint32 pos )
 }
 
 
-void ExecuteTriggerAction (unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigger )
+void ExecuteTriggerAction(unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigger )
 {
     unsigned int    Action;
     int             parameter;
@@ -499,15 +522,16 @@ void ExecuteTriggerAction (unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigg
     RA_Teamtype     *Team;
     Uint32 Waypoint = 0; // For reveal around waypoint/zone
 
-	// Check if the trigger should be executed (if it is not repeatable and 
-	// has already exectued once it should not exectute again)
+	// Check if the trigger should be executed (if it is not 
+    // repeatable and has already exectued once it should not 
+    // exectute again)
 	if (!Trigger->repeatable && Trigger->hasexecuted){
 		return;
 	}
 
 	// Set the has executed var now (to prevent inf loops)
 	Trigger->hasexecuted = true;
-	p::ccmap->setTriggerByName (Trigger->name.c_str(), Trigger);
+	p::ccmap->setTriggerByName(Trigger->name.c_str(), Trigger);
 
 
 	if (ActionNr == 1){
@@ -595,7 +619,7 @@ void ExecuteTriggerAction (unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigg
 		if (ActionNr == 1){
 			Waypoint = Trigger->action1.param3;
 		}else if (ActionNr == 2){
-			Waypoint = Trigger->action1.param3;
+			Waypoint = Trigger->action2.param3;
 		}
 		p::ppool->getLPlayer()->revealAroundWaypoint(Waypoint);
 		logger->error ("%s line %i: ***TRIGGER_ACTION_REVEAL_ZONE_OF_WAYPOINT***\n", __FILE__, __LINE__);
