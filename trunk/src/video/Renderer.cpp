@@ -1,5 +1,5 @@
 // Renderer.cpp
-// 1.3
+// 1.4
 
 //    This file is part of OpenRedAlert.
 //
@@ -33,8 +33,8 @@ extern Logger * logger;
  */
 Renderer::Renderer()
 {
-	screen = NULL;
-	icon = NULL;
+	screen = 0;
+	icon = 0;
 }
 
 /**
@@ -42,11 +42,11 @@ Renderer::Renderer()
  */
 Renderer::~Renderer()
 {
-	if (icon != NULL)
+	if (icon != 0)
 	{
 		SDL_FreeSurface(icon);
 	}
-	icon = NULL;
+	icon = 0;
 }
 
 void Renderer::DrawRectangle(Uint32 color, Uint16 x, Uint16 y, Uint16 width,
@@ -77,12 +77,12 @@ void Renderer::InitializeScreen()
 	icon = SDL_LoadBMP("data/gfx/icon.bmp");
 	if (icon != 0)
 	{
-		SDL_WM_SetIcon(icon, NULL);
+		SDL_WM_SetIcon(icon, 0);
 	}
 
 	// Setup the screen
 	screen = SDL_SetVideoMode(width, height, config.bpp, config.videoflags);
-	if (screen == NULL)
+	if (screen == 0)
 	{
 		logger->error("Unable to set %dx%d video: %s\n", width, height,	SDL_GetError());
 		throw VideoError("Unable to set video mode");
