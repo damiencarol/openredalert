@@ -1,4 +1,3 @@
-#include "MoneyCounter.h"
 // MoneyCounter.cpp
 // 1.4
 
@@ -17,6 +16,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "MoneyCounter.h"
+
 #include <cassert>
 
 #include "SDL/SDL_types.h"
@@ -30,6 +31,7 @@
 #include "ActionEventQueue.h"
 
 namespace pc {
+	extern SoundEngine * sfxeng;
 	extern ConfigType Config;
 }
 namespace p {
@@ -77,7 +79,7 @@ void MoneyCounter::addCredit(Uint16 amount, Uint8 PlayerNumb)
 {
     creditleft += amount;
     if ((sound && -1 == creditsound) && PlayerNumb == p::ppool->getLPlayerNum()) {
-       	creditsound = pc::sfxeng->PlayLoopedSound(pc::Config.MoneyCountUp,0);
+        creditsound = pc::sfxeng->PlayLoopedSound(pc::Config.MoneyCountUp,0);
     }
     reshedule();
 }
@@ -86,15 +88,16 @@ void MoneyCounter::addDebt(Uint16 amount, Uint8 PlayerNumb)
 {
     debtleft += amount;
     if ((sound && -1 == debitsound) && PlayerNumb == p::ppool->getLPlayerNum()) {
-	debitsound = pc::sfxeng->PlayLoopedSound(pc::Config.MoneyCountDown,0);
+        debitsound = pc::sfxeng->PlayLoopedSound(pc::Config.MoneyCountDown,0);
     }
     reshedule();
 }
 
 Uint8 MoneyCounter::step(Uint16& value)
 {
-    if (value == 0)
+    if (value == 0){
         return 0;
+    }
 
     if (value < delta) {
         Uint8 oldvalue = static_cast<Uint8>(value);
