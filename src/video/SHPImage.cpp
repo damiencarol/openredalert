@@ -1,3 +1,21 @@
+// SHPImage.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "SHPImage.h"
 
 #include <cstdlib>
@@ -38,6 +56,9 @@ SHPImage::SHPImage(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
     int i; // variable use for loop
     int j; // variable use for loop
     VFile *imgfile; // link to the file in mix archives
+
+    // Set to 0 before reading of the header
+    lnkHeader.NumImages = 0;
 
 	// Open the file in archive
     imgfile = VFSUtils::VFS_Open(fname);    
@@ -202,7 +223,6 @@ void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
 
     DecodeSprite(imgdata, imgnum);
 
-
     for (Uint16 i = 0; i < lnkHeader.Width * lnkHeader.Height; ++i)  {
         // The shadows.shp only uses 0, 12-16
         // So we map them to 0-5
@@ -210,7 +230,6 @@ void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
             imgdata[i] = 17 - imgdata[i];
         }
     }
-
 
     SDL_Surface* imageimg = SDL_CreateRGBSurfaceFrom(imgdata, lnkHeader.Width,
         lnkHeader.Height, 8, lnkHeader.Width, 0, 0, 0, 0);
