@@ -16,7 +16,7 @@ public:
 	char* winmov;
 	/** Specific music to play for this mission.*/
 	char* theme;
-	/** the players side (goodguy, badguy etc.) */
+	/** The house of the player (Greece, USSR, England, etc.) */
 	char* player;
 	/** the actionmovie */
 	char* action;
