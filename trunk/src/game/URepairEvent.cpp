@@ -4,8 +4,6 @@
 
 #include "UnitOrStructure.h"
 #include "unittypes.h"
-//#include "game/TurnAnimEvent.h"
-//#include "game/UAttackAnimEvent.h"
 #include "MoveAnimEvent.h"
 #include "Structure.h"
 #include "UnitAndStructurePool.h"
