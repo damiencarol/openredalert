@@ -20,8 +20,8 @@ using std::runtime_error;
 
 extern Logger * logger;
 
-ExternalFiles * VFSUtils::externals= NULL;
-MIXFiles * VFSUtils::mixfiles= NULL;
+ExternalFiles * VFSUtils::externals = 0;
+MIXFiles * VFSUtils::mixfiles = 0;
 
 /** 
  * Sets up externals so that the logger can work
@@ -37,7 +37,7 @@ void VFSUtils::VFS_PreInit(const char* binpath)
  */
 void VFSUtils::VFS_Init(const char* binpath)
 {
-	INIFile *filesini= NULL;
+	INIFile *filesini = 0;
 	string tempstr;
 	Uint32 keynum;
 
@@ -73,11 +73,11 @@ void VFSUtils::VFS_Init(const char* binpath)
 		INIKey key;
 		try
 		{
-			key = filesini->readIndexedKeyValue("GENERAL",pathnum,"PATH");
+			key = filesini->readIndexedKeyValue("GENERAL", pathnum, "PATH");
 		}
 		catch(...)
 		{
-			logger->error("Unenable to read [GENERAL]-PATH\n");
+			//logger->error("Unenable to read [GENERAL]-PATH\n");
 			break;
 		}
 		string defpath = key->second;
@@ -88,6 +88,7 @@ void VFSUtils::VFS_Init(const char* binpath)
 		externals->loadArchive(defpath.c_str());
 	}
 
+	// Create Mix file loader
 	mixfiles = new MIXFiles();
 
 	for (Uint32 gamenum = 1;; ++gamenum)
@@ -95,7 +96,7 @@ void VFSUtils::VFS_Init(const char* binpath)
 		INIKey key;
 		try
 		{
-			key = filesini->readIndexedKeyValue("GENERAL",gamenum,"GAME");
+			key = filesini->readIndexedKeyValue("GENERAL", gamenum, "GAME");
 		}
 		catch(...)
 		{
@@ -111,12 +112,12 @@ void VFSUtils::VFS_Init(const char* binpath)
 				INIKey key2;
 				try
 				{
-					key2 = filesini->readIndexedKeyValue(key->second.c_str(),keynum,
+					key2 = filesini->readIndexedKeyValue(key->second.c_str(), keynum,
 							"REQUIRED");
 				}
 				catch(...)
 				{
-					logger->error("Unenable to read [???]-REQUIRED\n");
+					//logger->error("Unenable to read [%s]-REQUIRED%d\n", key->second.c_str(), keynum);
 					break;
 				}
 				if( !mixfiles->loadArchive(key2->second.c_str()) )
@@ -144,7 +145,7 @@ void VFSUtils::VFS_Init(const char* binpath)
 			}
 			catch(...)
 			{
-				logger->error("Unenable to read [???]-OPTIONAL\n");
+				//logger->error("Unenable to read [%s]-OPTIONAL%d\n", key->second.c_str(), keynum);
 				break;
 			}
 			mixfiles->loadArchive(key2->second.c_str());
