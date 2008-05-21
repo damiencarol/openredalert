@@ -25,11 +25,11 @@ extern UnitAndStructurePool* uspool;
 
 namespace Dispatcher {
 
-/** NOTE: I've stripped out the sections related to logging and playback as that
+/** 
+ * NOTE: I've stripped out the sections related to logging and playback as that
  * part isn't as stable as the rest (basically need to fix a horrible synch
  * issue with the playback)
  */
-
 Dispatcher::Dispatcher() :
     logstate(NORMAL),
     localPlayer(p::ppool->getLPlayerNum())
@@ -117,7 +117,8 @@ void Dispatcher::structureAttack(Structure* st, UnitOrStructure* target, bool ti
     }
 }
 
-bool Dispatcher::structurePlace(const StructureType* type, Uint32 pos, Uint8 owner) {
+bool Dispatcher::structurePlace(const StructureType* type, Uint32 pos, Uint8 owner) 
+{
     switch (logstate) {
         case RECORDING:
             // deliberate fallthrough
@@ -133,7 +134,8 @@ bool Dispatcher::structurePlace(const StructureType* type, Uint32 pos, Uint8 own
     return true;
 }
 
-bool Dispatcher::structurePlace(const char* tname, Uint32 pos, Uint8 owner) {
+bool Dispatcher::structurePlace(const char* tname, Uint32 pos, Uint8 owner)
+{
     switch (logstate) {
         case RECORDING:
             // deliberate fallthrough
