@@ -1,3 +1,21 @@
+// Unit.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "Unit.h"
 
 #include <cstdlib>
@@ -5,6 +23,7 @@
 #include <string>
 #include <math.h>
 
+#include "SDL/SDL_types.h"
 #include "SDL/SDL_timer.h"
 
 #include "Ai.h"
@@ -72,9 +91,10 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
     this->owner = owner;
     this->cellpos = cellpos;
     this->subpos = subpos;
-    l2o = NULL;
+    l2o = 0;
     xoffset = 0;
     yoffset = 0;
+    
     ratio = (double)rhealth/256.0f;
     health = (Uint16)(ratio * type->getMaxHealth());
     infgrp = group;
@@ -268,7 +288,7 @@ Uint16 Unit::getHealth() const {
         return health;
     }
 
-void Unit::ChangeHealth (Sint16 amount)
+void Unit::ChangeHealth(Sint16 amount)
 {
 //	printf ("%s line %i: original health = %i\n", __FILE__, __LINE__, health);
 	if (health + amount > type->getMaxHealth()){
@@ -327,7 +347,8 @@ bool Unit::canAttack(bool primary) {
 	return type->getWeapon(primary)!=NULL;
 }
 
-bool Unit::UnderAttack (void){
+bool Unit::UnderAttack()
+{
 	// We have never been attacked if we still have all health
 	if (health == getType()->getMaxHealth())
 		return false;
@@ -522,7 +543,7 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
         	p::ppool->getPlayer(attacker->getOwner())->addUnitKill();
         }
         
-        // todo: add infantry death animation
+        // todo: add infantry death animation here
                 
         // remove the unit
         p::uspool->removeUnit(this);
