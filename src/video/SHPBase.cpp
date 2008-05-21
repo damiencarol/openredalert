@@ -1,3 +1,21 @@
+// SHPBase.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "SHPBase.h"
 
 #include <cstdlib>
@@ -30,11 +48,11 @@ namespace pc {
 const Uint8 SHPBase::numpals = 9;
 SDL_Color SHPBase::palette[32][256];
 
-SHPBase::SHPBase(const string& fname, Sint8 scaleq)
+SHPBase::SHPBase(const string& fname, Sint8 scaleq) :
+	name(fname), 
+    scaleq(scaleq), 
+    scaler(new ImageProc()) 
 {
-	this->name = fname;
-	this->scaleq = scaleq;
-	this->scaler = new ImageProc();
 }
 
 SHPBase::~SHPBase() 
