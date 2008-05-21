@@ -1,5 +1,5 @@
 // Player.cpp
-// 1.7
+// 1.8
 
 //    This file is part of OpenRedAlert.
 //
@@ -91,13 +91,19 @@ Player::Player(const char *pname, INIFile *mapini)
     	unitpalnum = 3;
     	structpalnum = 3;
     } 
+    else if( !strcmp((playername), ("Turkey"))) 
+    {
+    	playerside = PS_BAD;
+    	unitpalnum = 8;
+    	structpalnum = 8;
+    }
     else if( !strcmp((playername), ("GoodGuy")) ) 
     {
     	playerside = PS_GOOD;
         unitpalnum = 0;
         structpalnum = 0;
     } 
-    else if( !strcmp((playername), ("Badguy")) ) 
+    else if( !strcmp((playername), ("BadGuy")) ) 
     {
         playerside = PS_BAD;
         unitpalnum = 2;
@@ -171,8 +177,8 @@ Player::Player(const char *pname, INIFile *mapini)
     brad = getConfig().buildable_radius;
     mwid = mapini->readInt("Map", "Width", 255); // 255 -> max ???
     
+    // Read the TechLevel
     this->techLevel = mapini->readInt(pname, "TechLevel", 30);
-    printf("DEBUG: the player %s as Techlevel at %d\n", pname, techLevel);
 }
 
 Player::~Player()
