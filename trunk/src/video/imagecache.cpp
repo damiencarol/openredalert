@@ -1,13 +1,31 @@
+// ImageCache.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "ImageCache.h"
 
-//#include <cctype>
-//#include "include/common.h"
-//#include "include/Logger.h"
 #include "include/PlayerPool.h"
 #include "ImageNotFound.h"
 #include "SHPImage.h"
 #include "ImageCacheEntry.h"
 
+using std::string;
+using std::map;
+using std::transform;
 
 /** 
  * Return the numb of images contained in the shp (find the image by
@@ -15,6 +33,7 @@
  */
 Uint32 ImageCache::getNumbImages(Uint32 imgnum)
 {
+	// Returns number of image
 	return getImage(imgnum, 0).NumbImages;
 }
 
@@ -127,7 +146,7 @@ ImageCacheEntry& ImageCache::getImage(Uint32 imgnum, Uint32 frame)
     return getImage(imgnum | (frame &0x7FF));
 }
 
-void ImageCache::setImage(SDL_Surface*Image, SDL_Surface* Shadow, Uint32 imgnum)
+void ImageCache::setImage(SDL_Surface* Image, SDL_Surface* Shadow, Uint32 imgnum)
 {
     map<Uint32, ImageCacheEntry>::iterator cachepos;
 
@@ -232,7 +251,7 @@ void ImageCache::flush()
 /** 
  * Removes all images from the image pool and clears both caches
  */
-void ImageCache::Cleanup(void)
+void ImageCache::Cleanup()
 {
 	// Delete all objects in the pool
 	for (unsigned int i = 0; i < imagepool->size(); i++){
