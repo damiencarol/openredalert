@@ -1,3 +1,21 @@
+// GraphicsEngine.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef GRAPHICSENGINE_H
 #define GRAPHICSENGINE_H
 
@@ -73,14 +91,18 @@ private:
     SDL_Surface* icon;
     Uint16 width;
     Uint16 height;
-    Uint16 tilewidth; Uint16 tileheight;
+    /** Width of a tile at the screen */
+    Uint16 tilewidth;
+    /* Height of a tile a the screen */
+    Uint16 tileheight;
     SDL_Rect maparea;
     bool drawFogOfWar;
 
-	// Some labels
+	/** FrameRate label */
 	RA_Label* FrameRateLabel;
-				RA_Label* OptionsLabel;
-				RA_Label* MoneyLabel;
+	RA_Label* OptionsLabel;
+	/** Money label */
+	RA_Label* MoneyLabel;
 
     Uint32 repair_icon;
     Uint32 repairing_icon;
