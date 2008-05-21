@@ -1,3 +1,21 @@
+// INIFile.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef INIFILE_H
 #define INIFILE_H
 
@@ -19,22 +37,12 @@ using std::list;
 /**
  * Parses inifiles.
  * 
- * @TODO port the whole inifile class to the use of the new Inidata..
- * 
- * @TODO zx64 has a parser written using a few bits from boost.  
- * It's much faster and uses templates to simplify a lot of the code.
- * The only problem is integrating the bits of boost it uses into
- * the tree. For the interested: http://freecnc.sf.net/parse.tar.bz2
- * 
- * @TODO It's probably worth pooling INIFile instances so we only need 
- * to parse them once.
  */
 class INIFile
 {
 public:
     explicit INIFile(const char* filename);
-    ~INIFile();
- 
+    ~INIFile(); 
     
     /// @TODO Would be nice if there was a version that returned a non-copy.
     char* readString(const char* section, const char* value);
@@ -48,7 +56,7 @@ public:
 
     INIKey readKeyValue(const char* section, Uint32 keynum);
     INIKey readIndexedKeyValue(const char* section, Uint32 keynum, const char* prefix=0);
-    std::string readSection(Uint32 secnum);
+    string readSection(Uint32 secnum);
 
     int readYesNo(const char* section, const char* value, const char* defaut);
         
@@ -57,7 +65,7 @@ public:
     
 private:
     /** Internal data */
-    std::map<std::string, INISection> Inidata;
+    map<string, INISection> Inidata;
 };
 
 #endif //INIFILE_H
