@@ -1,3 +1,21 @@
+// MPmapsClass.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "MPmapsClass.h"
 
 #include <string>
@@ -43,19 +61,17 @@ bool MPmapsClass::getMapName(unsigned int Index, string & Name)
  */
 void MPmapsClass::readMapData (void)
 {
-	VFile		*MapFile;
-	char		Line[255];
-	std::string	tmpString;
-	Uint32		pos, pos1;
-
-	// I am not sure how the maps from td work so...
- 	if (getConfig().gamenum != GAME_RA){
-		return;
- 	}
+	VFile*	MapFile;
+	char	Line[255];
+	string	tmpString;
+	Uint32	pos;
+	Uint32	pos1;
 
  	// Open the MP map description file "missions.pkt"
 	MapFile = VFSUtils::VFS_Open("missions.pkt");
-	if(MapFile == NULL) {
+	// Return with error
+	if (MapFile == 0) {
+		// Logg it
 		logger->error("Unable to locate mission.pkt file!\n");
 		return;
 	}
@@ -65,9 +81,6 @@ void MPmapsClass::readMapData (void)
 	{
 		// Copy the line
 		tmpString = Line; 
-		
-		// TODO DEBUG
-		//logger->debug("[missions.pkt] : %s", tmpString.c_str());
 
 		int i = 0;
 		while (tmpString[i] != '\0'){
