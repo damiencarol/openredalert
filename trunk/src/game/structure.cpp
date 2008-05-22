@@ -1,3 +1,21 @@
+// Structure.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "Structure.h"
 
 #include <cstdlib>
@@ -22,7 +40,6 @@
 #include "include/weaponspool.h"
 #include "StructureType.h"
 #include "GameMode.h"
-//#include "UnitType.h"
 #include "UnitOrStructure.h"
 #include "game/RefineAnimEvent.h"
 #include "LoopAnimEvent.h"
@@ -304,15 +321,18 @@ Uint16 Structure::getFreePos(Uint8* subpos, bool findsubpos) {
     }
     return curpos;
 }
-void Structure::remove() {
+
+void Structure::remove() 
+{
     if (!type->isWall()) {
         p::ppool->getPlayer(owner)->lostStruct(this);
     }
     UnitOrStructure::remove();
 }
+
 void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 {
-bool odam;	// Old damaged
+	bool odam;	// Old damaged
 
 	if (exploding)
 		return;
@@ -531,35 +551,43 @@ void Structure::runSecAnim(Uint32 param, bool extraParam)
         }
     }
 }
+
 void Structure::stopAnim()
 {
     buildAnim->stop();
 }
+
 void Structure::stop()
 {
     if (attackAnim != NULL) {
 		attackAnim->stop();
     }
 }
-bool Structure::IsAttacking (void)
+
+bool Structure::IsAttacking ()
 {
-    if (attackAnim == NULL)
+    if (attackAnim == 0){
         return false;
+    }
     return true;
 }
+
 void Structure::attack(UnitOrStructure* target)
 {
-Weapon *Weap;
+	Weapon *Weap;
 
     // Don't attack while the structure is being created
-	if (usemakeimgs)
+	if (usemakeimgs){
 		return;
-
+	}
+	
 	// Only attack if we have a weapon
-	if (!this->canAttack())
+	if (!this->canAttack()){
 		return;
-
-	if (!target->getType()->isStructure()){
+	}
+	
+	if (!target->getType()->isStructure())
+	{
 		switch (((Unit*)target)->getType()->getType()){
 			case UN_INFANTRY:
 			case UN_VEHICLE:
@@ -722,17 +750,20 @@ Uint16 Structure::getTargetCell() const
     return targetcell;
 }
 
-bool Structure::is(string Name) {
-		if (strcmp (getType()->getTName(), Name.c_str()) == 0)
-			return true;
-		return false;
+bool Structure::is(string Name) 
+{
+	if (string(getType()->getTName()) == Name){
+		return true;
 	}
+	return false;
+}
 
 void Structure::sell()
 {
 	printf ("%s line %i: Start sell animation\n", __FILE__, __LINE__);
 	runAnim(9);
 }
+
 void Structure::repair()
 {
 	printf ("%s line %i: Start repair animation\n", __FILE__, __LINE__);
@@ -740,16 +771,22 @@ void Structure::repair()
 	repairing = true;
 //	runSecAnim (8);
 }
+
 bool Structure::isRepairing ()
 {
 	return repairing;
 }
+
 void Structure::repairDone (void)
 {
 	repairing = false;
 }
-/** Helper function for getFreePos
- * @BUG Doesn't check that the terrain is passable (only buildable).*/
+
+/** 
+ * Helper function for getFreePos
+ * 
+ * @BUG Doesn't check that the terrain is passable (only buildable).
+ */
 bool Structure::valid_pos(StructureType *type, Uint8 PlayerNr, Uint16 pos, Uint8*) {
     return p::ccmap->isBuildableAt( PlayerNr, pos, type->isWaterBound());
 }
@@ -771,19 +808,28 @@ bool Structure::valid_possubpos(StructureType *type, Uint8 PlayerNr, Uint16 pos,
 	}
     return false;
 }
-Uint32 Structure::getImageNum(Uint8 layer) const {
-        return type->getSHPNums()[layer]+imagenumbers[layer];
-    }
-Uint32 Structure::getRealImageNum ( Uint8 layer ){
-		return (imagenumbers[layer]&0x7FF /*0x1f*/);
-	}
+
+Uint32 Structure::getImageNum(Uint8 layer) const
+{
+	return type->getSHPNums()[layer] + imagenumbers[layer];
+}
+
+Uint32 Structure::getRealImageNum(Uint8 layer)
+{
+	return (imagenumbers[layer]&0x7FF /*0x1f*/);
+}
+
 void Structure::changeImage(Uint8 layer, Sint16 imagechange) {
         imagenumbers[layer]+=imagechange;
-    }
-void Structure::setStructnum(Uint32 stn) {
-        structnum = stn;
-    }
-Uint32 Structure::getNum() const {
+}
+
+void Structure::setStructnum(Uint32 stn) 
+{
+    structnum = stn;
+}
+
+Uint32 Structure::getNum() const 
+{
         return structnum;
 }
 
@@ -792,64 +838,89 @@ Uint16 Structure::getPos() const
 	return cellpos;
 }
 
-Uint16 Structure::getSubpos() const {
-        return 0;
-    }
-Uint8 Structure::getOwner() const {
-        return owner;
-    }
-void Structure::setOwner(Uint8 newowner) {
-        owner = newowner;
-    }
-bool Structure::canAttack() const {
-        return type->getWeapon()!=NULL;
-    }
-bool Structure::IsBuilding (void)  {if (usemakeimgs) return true; return false;  }
-Uint16 Structure::getHealth() const {
-        return health;
-    }
-Sint8 Structure::getXoffset() const {
-        return type->getXoffset();
-    }
-Sint8 Structure::getYoffset() const {
-        return type->getYoffset();
-    }
-/*
-Weapon *Structure::getWeapon(void){
-	return type->getWeapon();
-    }
-*/
-/*
-Uint8 Structure::getWeaponRange(void){
-	if (!this->canAttack())
-		return 0;
-	return type->getWeapon()->getRange();
-    }
-*/
-bool Structure::isPowered (){
+Uint16 Structure::getSubpos() const 
+{
+	return 0;
+}
+
+Uint8 Structure::getOwner() const 
+{
+	return owner;
+}
+
+void Structure::setOwner(Uint8 newowner) 
+{
+	owner = newowner;
+}
+
+bool Structure::canAttack() const 
+{
+	return (type->getWeapon() != 0);
+}
+
+bool Structure::IsBuilding()
+{
+	if (usemakeimgs) 
+		return true;
+	return false;  
+}
+
+Uint16 Structure::getHealth() const 
+{
+	return health;
+}
+
+Sint8 Structure::getXoffset() const 
+{
+	return type->getXoffset();
+}
+
+Sint8 Structure::getYoffset() const 
+{
+	return type->getYoffset();
+}
+
+bool Structure::isPowered()
+{
 	if (type->isPowered ())
 		return true;
 	return false;
-    }
-bool Structure::isRefinery (void)
-    {
+}
+
+bool Structure::isRefinery()
+{
+	// TODO Hack !!!
 	if (strcmp ((char*)type->getTName(), "PROC") == 0)
 		return true;
 	return false;
-    }
-bool Structure::isWall() const {
-        return type->isWall();
-    }
-double Structure::getRatio() const {
-        return ratio;
-    }
-std::string Structure::getTriggerName(void) {return TriggerName;}
-void Structure::setPrimary(bool pri) {
-        primary = pri;
-    }
-bool Structure::isPrimary() const {
-        return primary;
-    }
-StructureType* Structure::getType() {
-        return type;
-    }
+}
+
+bool Structure::isWall() const 
+{
+	return type->isWall();       
+}
+
+double Structure::getRatio() const 
+{
+	return ratio;
+}
+
+string Structure::getTriggerName() 
+{
+	return TriggerName;
+}
+
+void Structure::setPrimary(bool pri) 
+{
+	primary = pri;
+}
+
+bool Structure::isPrimary() const
+{
+	return primary;
+}
+
+StructureType* Structure::getType()
+{
+	return type;
+}
