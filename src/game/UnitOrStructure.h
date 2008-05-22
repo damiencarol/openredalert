@@ -4,6 +4,7 @@
 #include <string>
 
 #include "SDL/SDL_types.h"
+
 #include "UnitOrStructureType.h"
 
 //
