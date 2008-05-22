@@ -1475,7 +1475,6 @@ const SidebarGeometry& Sidebar::getGeom()
 	return geom;
 }
 
-
 Sidebar::Sidebar()
 {
 }
@@ -1493,8 +1492,6 @@ bool Sidebar::getVisible()
 {
 	return visible;
 }
-
-
 
 #if 0
 SDL_Surface* Sidebar::FixGrey(SDL_Surface* gr, Uint8 imgnum)
