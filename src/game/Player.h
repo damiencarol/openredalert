@@ -139,6 +139,7 @@ public:
 	void enableInfMoney();
 	
 	Sint32 getTechLevel();
+	Uint32 getNumberRadars();
 private:
 	/** Do not want player being constructed using default constructor*/
 	Player() ;
@@ -153,7 +154,6 @@ private:
 	Uint8 playerside;
 	Uint8 multiside;
 	Uint8 playernum;
-	Uint8 radarstat;
 	Uint8 unitpalnum;
 	Uint8 structpalnum;
 	
@@ -211,7 +211,7 @@ private:
 	MoneyCounter* counter;
 
 	/** Number of radars structures */
-	Uint16 NumbRadarStructures;
+	Uint32 numberRadars;
 
 	/** buildable_radius */
 	Uint8 brad;
