@@ -55,8 +55,6 @@ public:
     /** Called by input to see if radar status has changed.*/
     Uint8 statRadar();
 
-    /** Called by the local player to update the radar status*/
-    void updateRadar(Uint8 status);
 private:
     PlayerPool();
     PlayerPool(const PlayerPool&);
@@ -66,7 +64,8 @@ private:
     vector< Player *> playerpool;
     vector< Uint16 > player_starts;
     
-    Uint8 localPlayer, gamemode, radarstatus;
+    Uint8 localPlayer;
+    Uint8 gamemode;
     bool won, lost, updatesidebar;
     INIFile * mapini;
 };
