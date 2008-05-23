@@ -96,7 +96,10 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
     yoffset = 0;
     
     ratio = (double)rhealth/256.0f;
-    health = (Uint16)(ratio * type->getMaxHealth());
+    Uint16 newHealth = (Uint16)(ratio * type->getMaxHealth());
+    // Set the Health
+    setHealth((Uint16)newHealth);
+    
     infgrp = group;
 
     if (infgrp) {
@@ -280,24 +283,23 @@ Uint32 Unit::getNum() const {
         return unitnum;
     }
 
-void Unit::setUnitnum(Uint32 unum) {
-        unitnum = unum;
-    }
-
-Uint16 Unit::getHealth() const {
-        return health;
-    }
+void Unit::setUnitnum(Uint32 unum)
+{
+	unitnum = unum;
+}
 
 void Unit::ChangeHealth(Sint16 amount)
 {
+	Uint16 oldHealth = getHealth();
+	
 //	printf ("%s line %i: original health = %i\n", __FILE__, __LINE__, health);
-	if (health + amount > type->getMaxHealth()){
-		health = type->getMaxHealth();
-	} else if (health + amount < 0){
-		health = 0;
-	} else
-		health += amount;
-
+	if (oldHealth + amount > type->getMaxHealth()){
+		setHealth(type->getMaxHealth());
+	} else if (oldHealth + amount < 0){
+		setHealth((Uint16)0);
+	} else {
+		setHealth(oldHealth + amount);
+	}
 //	printf ("%s line %i: health = %i\n", __FILE__, __LINE__, health);
 }
 
@@ -350,7 +352,7 @@ bool Unit::canAttack(bool primary) {
 bool Unit::UnderAttack()
 {
 	// We have never been attacked if we still have all health
-	if (health == getType()->getMaxHealth())
+	if (getHealth() == getType()->getMaxHealth())
 		return false;
 
 	// If the last damage is longer than 10 sec ago we are no longer under attack
@@ -534,7 +536,7 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 		amount = (Sint16)((double)amount * weap->getVersus(type->getArmour()));
 	}
 	
-    if ((health-amount) <= 0) {
+    if ((getHealth()-amount) <= 0) {
 		HandleTriggers((UnitOrStructure*)this, 7 );
         doRandTalk(TB_die);
 
@@ -548,17 +550,17 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
         // remove the unit
         p::uspool->removeUnit(this);
         return;
-    } else if ((health-amount) > type->getMaxHealth()) {
-        health = type->getMaxHealth();
+    } else if ((getHealth()-amount) > type->getMaxHealth()) {
+        setHealth(type->getMaxHealth());
     } else {
-        health -= amount;
+        setHealth((Uint16)(getHealth() - amount));
     }
-    ratio = (double)health / (double)type->getMaxHealth();
+    ratio = (double)getHealth() / (double)type->getMaxHealth();
 }
 
 void Unit::updateDamaged()
 {
-	ratio = (double)health / (double)type->getMaxHealth();
+	ratio = (double)getHealth() / (double)type->getMaxHealth();
 }
 
 char* Unit::getTName() const 
