@@ -1,3 +1,21 @@
+// GraphicsEngine.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "GraphicsEngine.h"
 
 #include <string>
@@ -180,6 +198,7 @@ GraphicsEngine::~GraphicsEngine()
 		delete MoneyLabel;
 	}
 }
+
 /** 
  * Setup the vars for the current mission.
  * 
@@ -232,6 +251,7 @@ void GraphicsEngine::setupCurrentGame()
 	}
     }
 }
+
 /** 
  * Render a scene complete with map, sidebar and cursor.
  */
@@ -241,11 +261,6 @@ void GraphicsEngine::renderScene(bool flipscreen)
 	SDL_Rect dest;
 	SDL_Rect src;
 	SDL_Rect udest;
-
-	// first thing we want to do is scroll the map
-	if (p::ccmap->toScroll()){
-		p::ccmap->doscroll();
-	}
 
 	// remove the old mousecursor
 	SDL_FillRect(screen, &oldmouse, blackpix);
@@ -459,7 +474,7 @@ void GraphicsEngine::DrawSelectionBox ()
 /** 
  * Render the cursor.
  */
-void GraphicsEngine::DrawMouse (void)
+void GraphicsEngine::DrawMouse()
 {
 	SDL_Surface	*curimg = 0;
 	SDL_Rect	dest;
@@ -490,7 +505,7 @@ void GraphicsEngine::DrawMouse (void)
 /** 
  * Render the tooltip.
  */
-void GraphicsEngine::DrawTooltip (void)
+void GraphicsEngine::DrawTooltip()
 {
 	SDL_Surface*	curimg = 0;
 	SDL_Rect		dest;
@@ -517,7 +532,7 @@ void GraphicsEngine::DrawTooltip (void)
 /** 
  * Render the radar mini map
  */
-void GraphicsEngine::DrawMinimap(void)
+void GraphicsEngine::DrawMinimap()
 {
 	Sint16		xpos;
 	Sint16		ypos;
@@ -529,10 +544,12 @@ void GraphicsEngine::DrawMinimap(void)
 	// Get the Local player
 	lplayer = p::ppool->getLPlayer();
 
-	std::vector<bool>& mapvis = lplayer->getMapVis();
+	// Get the visibility of the local player
+	vector<bool>& mapvis = lplayer->getMapVis();
 
     // draw minimap
-    if (Input::isMinimapEnabled()) {
+    if (Input::isMinimapEnabled()) 
+    {
         const Uint8 minizoom = *mz;
         const Uint32 mapwidth = p::ccmap->getWidth();
         const Uint32 mapheight = p::ccmap->getHeight();
@@ -618,7 +635,7 @@ void GraphicsEngine::DrawMinimap(void)
 /** 
  * Handle drawing the repair icon for structures that are being repaired
  */
-void GraphicsEngine::DrawRepairing(void)
+void GraphicsEngine::DrawRepairing()
 {
 	static Uint32	last_repair_tick;
 	static bool		DrawSmallRepair;
@@ -764,9 +781,9 @@ void GraphicsEngine::DrawVehicleSmoke(void)
  */
 void GraphicsEngine::DrawStructureHealthBars(SDL_Rect dest, SDL_Rect udest, Uint32 curdpos)
 {
-	double			ratio;
-	Structure*		Str = 0;
-	Uint16			selection;
+	double		ratio;
+	Structure*	str = 0;
+	Uint16		selection;
 
 	// Check for a position outside the map
 	if (curdpos >= p::ccmap->getSize())
@@ -774,18 +791,19 @@ void GraphicsEngine::DrawStructureHealthBars(SDL_Rect dest, SDL_Rect udest, Uint
 
 	selection = p::uspool->getSelected(curdpos);
 
-	if ((selection&0xff) != 0){
+	if ((selection&0xff) != 0)
+    {
+        // Get the structure at the position
+		str = p::uspool->getStructureAt(curdpos);
 
-		Str = p::uspool->getStructureAt(curdpos);
-
-		if (Str == 0)
+		if (str == 0)
 			return;
 
 		udest.h = 5;
 
-		if (Str->isSelected() && udest.w >= 2 ) {
-			//printf ("Draw health\n");
-			ratio = Str->getRatio();
+		if (str->isSelected() && udest.w >= 2 )
+		{
+			ratio = str->getRatio();
 			SDL_FillRect(screen, &udest, blackpix);
 			udest.h -= 2;
 			++udest.x;
@@ -966,20 +984,19 @@ void GraphicsEngine::DrawL2Overlays()
 		numshps = p::uspool->getL2overlays(curpos, &unitorstructshps, &uxoffsets, &uyoffsets);
 		
 		
-		for( curdpos = 0; curdpos < numshps; curdpos++) {
+		for ( curdpos = 0; curdpos < numshps; curdpos++) 
+		{
 						
 #ifdef DEBUG_SHP_IMAGES
 			Uint16 imagenumb	= unitorstructshps[curdpos]&0x7FF;
-			Uint16 NumbImages	= imgcache->getNumbImages (unitorstructshps[curdpos]);
-			std::string Name	= imgcache->getImageName (unitorstructshps[curdpos]);
+			Uint16 NumbImages	= imgcache->getNumbImages(unitorstructshps[curdpos]);
+			std::string Name	= imgcache->getImageName(unitorstructshps[curdpos]);
 
 			if (imagenumb > NumbImages)
 				printf ("%s line %i: ERROR: Imagenumb > numbimages for image %s, numb images = %i\n", __FILE__, __LINE__, Name.c_str(), NumbImages);
 #endif
 			/*
 			ImageCacheEntry& images = imgcache->getImage(unitorstructshps[curdpos]);
-
-			
 			if (images.image != 0){
 				udest.x = dest.x + uxoffsets[curdpos];
 				udest.y = dest.y + uyoffsets[curdpos];
@@ -1219,14 +1236,16 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 
 	curpos = p::ccmap->getScrollPos();
 
-    dest.y = maparea.y-p::ccmap->getYTileScroll();
+    dest.y = maparea.y - p::ccmap->getYTileScroll();
 
 //	printf ("%s line %i: width = %i, height = %i\n", __FILE__, __LINE__, (tilewidth * (mapWidth+xmax)), (tileheight * (mapHeight+ymax+2)));
 //	printf ("%s line %i: startx = %i, starty = %i, xmax = %i, ymax = %i\n", __FILE__, __LINE__, p::ccmap->getXScroll(), p::ccmap->getYScroll(), (mapWidth+xmax), (mapHeight+ymax+2));
 
-	for( ypos = 0; ypos < mapHeight+ymax+2; ypos++) {
+	for (ypos = 0; ypos < mapHeight+ymax+2; ypos++) 
+	{
 		dest.x = maparea.x - p::ccmap->getXTileScroll();
-		for( xpos = 0; xpos < mapWidth+xmax; xpos++) {
+		for( xpos = 0; xpos < mapWidth+xmax; xpos++) 
+		{
 			dest.w = tilewidth;
 			dest.h = tilewidth;
 			if (xpos < mapWidth && ypos < mapHeight) {
@@ -1291,7 +1310,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 
 			if (ypos > 1) {
 				dest.y -= (tilewidth<<1);
-				curdpos = curpos-(p::ccmap->getWidth()<<1);
+				curdpos = curpos - (p::ccmap->getWidth()<<1);
 				terrain = p::ccmap->getTerrain(curdpos, &txoff, &tyoff);
 				if (terrain != 0) {
 					ImageCacheEntry& images = imgcache->getImage(terrain);
@@ -1316,7 +1335,9 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 
 				// Handle drawing the structures
 				numshps = p::uspool->getStructureNum(curdpos, &unitorstructshps, &uxoffsets, &uyoffsets);
-				if (numshps > 0) {
+				if (numshps > 0) 
+				{
+					//printf("shpnum structur is <> 0\n");
 					for( i  = 0; i < numshps; i++) {
 						ImageCacheEntry& images = imgcache->getImage(unitorstructshps[i]);
 						if (images.image != 0){
@@ -1499,7 +1520,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 			dest.x += tilewidth;
 			curpos++;
 		}
-		curpos += p::ccmap->getWidth()-mapWidth-xmax;
+		curpos += p::ccmap->getWidth() - mapWidth - xmax;
 		dest.y += tilewidth;
     }
 
@@ -1756,4 +1777,24 @@ void GraphicsEngine::drawLine(Sint16 startx, Sint16 starty,
         xpos += xmod;
         ypos += ymod;
     }
+}
+
+SDL_Surface *GraphicsEngine::get_SDL_ScreenSurface()
+{
+	return screen;
+}
+
+Uint16 GraphicsEngine::getWidth()
+{
+	return width;
+}
+
+SDL_Rect* GraphicsEngine::getMapArea()
+{
+	return &maparea;
+}
+
+Uint16 GraphicsEngine::getHeight()
+{
+	return height;
 }
