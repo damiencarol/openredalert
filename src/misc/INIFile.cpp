@@ -396,8 +396,7 @@ INIKey INIFile::readKeyValue(const char* section, Uint32 keynum)
 
 	if (keynum >= sec_new->second.size())
 	{
-		logger->error("throw 0 in INIFile::readKeyValue()\n");		
-		throw KeyNotFound("Key number [????] in Section [" + string(section) + "] not found in .ini file.");
+		throw KeyNotFound("Key number [???] in Section [" + string(section) + "] not found in .ini file.");
 	}
 
 	Key = sec_new->second.begin();
