@@ -237,7 +237,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 	// primary weapon
 	char* miscnames;
 	// Read primary weapon
-	miscnames = unitini->readString(tname, "primary_weapon");
+	miscnames = unitini->readString(tname, "Primary");
 	if (miscnames == 0)
 	{
 		primary_weapon = 0;
@@ -247,7 +247,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 		primary_weapon = p::weappool->getWeapon(miscnames);
 		delete[] miscnames;
 	}
-	miscnames = unitini->readString(tname, "secondary_weapon");
+	miscnames = unitini->readString(tname, "Secondary");
 	if (miscnames == 0)
 	{
 		secondary_weapon = NULL;
