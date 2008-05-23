@@ -73,7 +73,12 @@ Player::Player(const char *pname, INIFile *mapini)
     playerstart = 0;
     defeated = false;
     
-    if( !strcmp((playername), ("Greece"))) 
+    if( !strcmp((playername), ("Spain"))) 
+    {
+        playerside = PS_GOOD;
+        unitpalnum = 0;
+        structpalnum = 0;
+    } else if( !strcmp((playername), ("Greece"))) 
     {
     	playerside = PS_GOOD;
     	unitpalnum = 1;
@@ -90,6 +95,18 @@ Player::Player(const char *pname, INIFile *mapini)
     	playerside = PS_GOOD;
     	unitpalnum = 3;
     	structpalnum = 3;
+    } 
+    else if( !strcmp((playername), ("Germany"))) 
+    {
+    	playerside = PS_GOOD;
+    	unitpalnum = 6;
+    	structpalnum = 6;
+    } 
+    else if( !strcmp((playername), ("France"))) 
+    {
+    	playerside = PS_GOOD;
+    	unitpalnum = 7;
+    	structpalnum = 7;
     } 
     else if( !strcmp((playername), ("Turkey"))) 
     {
@@ -154,7 +171,8 @@ Player::Player(const char *pname, INIFile *mapini)
         structpalnum = 0;
     }
     money = mapini->readInt(playername, "Credits", 0) * 100;
-    powerGenerated = powerUsed = radarstat = 0;
+    powerGenerated = 0;
+    powerUsed = 0;
     unitkills = unitlosses = structurekills = structurelosses = 0;
 
     // this size is just to size matrixs
@@ -172,7 +190,8 @@ Player::Player(const char *pname, INIFile *mapini)
 
     counter = new MoneyCounter(&money, this, &counter);
 
-    NumbRadarStructures = 0;
+    // Set number of radars to zero
+    numberRadars = 0;
 
     brad = getConfig().buildable_radius;
     mwid = mapini->readInt("Map", "Width", 255); // 255 -> max ???
@@ -563,6 +582,7 @@ void Player::builtStruct(Structure* str)
     // Add this structure to Player owned structures
     structures_owned[st].push_back(str);
     
+    // ?????
     if (st->primarySettable()) {
 		printf ("%s line %i: Set primary, ptype = %i\n", __FILE__, __LINE__, st->getPType() );
         production_groups[st->getPType()].push_back(str);
@@ -574,42 +594,27 @@ void Player::builtStruct(Structure* str)
     }//else if (st->primarySettable()){
 	//	setPrimary(str);
 	//}
+    
+    // REMOVE the defeat
     if (defeated) {
         defeated = false;
         p::ppool->playerUndefeated(this);
     }
+        
+    // Update the number of radar
+    if (string(st->getTName()) == "DOME") 
+    {
+    	numberRadars++;
+    };
+    
+    // if it's local player update the sidebar
+    // TODO CHANGE THAT
     if (playernum == p::ppool->getLPlayerNum()) {
     	p::ppool->updateSidebar();
-        if ((strcmp((st->getTName()), ("eye")) == 0) ||
-            (strcmp((st->getTName()), ("hq")) == 0)  ||
-            (strcmp((st->getTName()), ("DOME")) == 0)) 
-        {
-        	NumbRadarStructures++;
-        };
-        
-        // If their are some radars ...
-        if (NumbRadarStructures > 0) 
-        {
-        	// If their are more power than used
-        	if (getPower() > getPowerUsed()){
-                p::ppool->updateRadar(1);
-                radarstat = 1;	
-            } else {
-        		p::ppool->updateRadar(3);
-        		radarstat = 0;
-            }
-        }
-        else
-        {
-        	// TODO implements more good that
-        	//p::ppool->updateRadar(3);
-        	radarstat = 0;
-        }
-        
-        // Logg it for debug
-        //logger->debug("$structure built = [%s] and numradar = [%d]\n", st->getTName(), NumbRadarStructures);
-        //logger->debug("$power = [%d] and used = [%d]\n", getPower(), getPowerUsed());
     }
+        
+    // Check TRIGGER "Low Power"
+    HandleGlobalTrigger(TRIGGER_EVENT_LOW_POWER, this->getPlayerNum());
 }
 
 void Player::lostStruct(Structure* str)
@@ -651,21 +656,13 @@ void Player::lostStruct(Structure* str)
     }//else if (st->primarySettable()){
 
 	//}
-    if (playernum == p::ppool->getLPlayerNum()) {
-        p::ppool->updateSidebar();
-        if (radarstat == 1) {
-            if ((structures_owned[p::uspool->getStructureTypeByName("eye")].empty()) &&
-                (structures_owned[p::uspool->getStructureTypeByName("hq")].empty())  &&
-                (structures_owned[p::uspool->getStructureTypeByName("dome")].empty())) {
-		if (NumbRadarStructures > 0)
-			NumbRadarStructures--;
-		if (NumbRadarStructures == 0){
-                	p::ppool->updateRadar(2);
-                	radarstat = 0;
-		}
-            }
-        }
+    
+    // Update number of radars
+    if (string(st->getTName()) == "DOME") {
+    	numberRadars--;
     }
+    
+    // Add it for stats
     ++structurelosses;
 
     if( unitpool.empty() && structurepool.size() <= 1 ) {
@@ -683,6 +680,15 @@ void Player::lostStruct(Structure* str)
         }
         structurepool.resize(structurepool.size()-1);
     }
+    
+    // If it's the local player
+    // TODO MOVE THAT
+    if (playernum == p::ppool->getLPlayerNum()) {
+            p::ppool->updateSidebar();
+    }
+    
+    // Check TRIGGER "Low Power"
+    HandleGlobalTrigger(TRIGGER_EVENT_LOW_POWER, this->getPlayerNum());
 }
 
 size_t Player::getNumUnits() 
@@ -713,10 +719,12 @@ void Player::placeMultiUnits()
 void Player::updateOwner(Uint8 newnum)
 {
     Uint32 i;
-    for (i=0;i<unitpool.size();++i)
+    for (i=0;i<unitpool.size();++i){
         unitpool[i]->setOwner(newnum);
-    for (i=0;i<structurepool.size();++i)
+    }
+    for (i=0;i<structurepool.size();++i){
         structurepool[i]->setOwner(newnum);
+    }
 }
 
 bool Player::isDefeated() const
@@ -1128,4 +1136,9 @@ Player::Player()
 
 Player::Player(const Player&) 
 {
+}
+
+Uint32 Player::getNumberRadars()
+{
+	return numberRadars;
 }
