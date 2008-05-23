@@ -25,7 +25,6 @@ PlayerPool::PlayerPool(INIFile *inifile, Uint8 gamemode)
 	won = false;
 	mapini = inifile;
 	updatesidebar = false;
-	radarstatus = 0;
 	this->gamemode = gamemode;
 }
 
@@ -362,16 +361,54 @@ void PlayerPool::updateSidebar()
 	updatesidebar = true;
 }
 
+/**
+ * Get the current status of the radar
+ * 
+ * case 0: // do nothing
+ * case 1: // got radar
+ * case 2: // lost radar
+ * case 3: // radar powered down
+ */ 
 Uint8 PlayerPool::statRadar()
 {
-	Uint8 tmp = radarstatus;
-	radarstatus = 0;
-	return tmp;
-}
+	static Uint32 old_numRadarLocalPlayer = 0;
+	static bool old_powerOk = false;
+	Player* localPlayer = 0;
+	Uint8 res;
+	bool powerOk;
+	
+	// Get the localPlayer
+	localPlayer = getLPlayer();
+	if (localPlayer == 0) // check
+		return 0;
 
-void PlayerPool::updateRadar(Uint8 status)
-{
-	radarstatus = status;
+	// Check if power is Ok
+	powerOk = (localPlayer->getPower()>localPlayer->getPowerUsed());
+
+	// If no change
+	if (old_numRadarLocalPlayer == localPlayer->getNumberRadars() &&
+		old_powerOk == powerOk) 
+	{
+		res = 0;
+	}
+	else if (localPlayer->getNumberRadars()>0)
+	{
+		if (powerOk == true)
+		{
+			res = 1;
+		}
+		else
+			res = 3;
+	}
+	else
+		res = 2;
+	
+	// Save olds
+	old_numRadarLocalPlayer = localPlayer->getNumberRadars();
+	old_powerOk = powerOk;
+		
+	// Return result
+	return res;
 }
 
 Uint8 PlayerPool::getNumPlayers() const
@@ -384,14 +421,16 @@ Uint8 PlayerPool::getLPlayerNum() const
 	return localPlayer;
 }
 
-Player *PlayerPool::getLPlayer()
+Player* PlayerPool::getLPlayer()
 {
 	if (localPlayer < playerpool.size())
+	{
 		return playerpool[localPlayer];
-	return NULL;
+	}
+	return 0;
 }
 
-Player *PlayerPool::getPlayer(Uint8 player)
+Player* PlayerPool::getPlayer(Uint8 player)
 {
 	if (player < playerpool.size()){
 		return playerpool[player];
