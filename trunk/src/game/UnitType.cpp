@@ -39,7 +39,12 @@ namespace p {
 }
 extern Logger * logger;
 
-UnitType::UnitType(const char *typeName, INIFile* unitini) : UnitOrStructureType(), shpnums(0), name(0), deploytarget(0)
+UnitType::UnitType(const char *typeName, INIFile* unitini) : 
+	UnitOrStructureType(), 
+	shpnums(0), 
+	name(0), 
+	deploytarget(0),
+	c4(false)
 {
     SHPImage* shpimage = 0;
     Uint32 i;
@@ -125,7 +130,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) : UnitOrStructureType
 	is_infantry = false;
 
 	//buildlevel = unitini->readInt(tname, "buildlevel", 99);
-	techLevel = unitini->readInt(tname, "TechLevel", -1);
+	techLevel = (Sint32)(unitini->readInt(tname, "TechLevel", (Uint32)-1));
 
 	tmp = unitini->readString(tname, "owners");
 	if (tmp != NULL)
@@ -293,6 +298,14 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) : UnitOrStructureType
 
 	animinfo.dmgoff = unitini->readInt(tname, "dmgoff", ((shptnum[0]-1)>>1));
 #endif	
+	
+	// Read the C4 caract
+	if (string(unitini->readString(tname, "C4", "no")) == "yes")
+	{
+		c4 = true;
+	} else {
+		c4 = false;
+	}
 }
 
 /**
@@ -469,4 +482,9 @@ vector<UnitType*> UnitType::getSpecificTypeAllow() const
 Uint8 UnitType::getPQueue() const
 {
 	return ptype;
+}
+
+bool UnitType::isC4() const
+{
+	return c4;
 }

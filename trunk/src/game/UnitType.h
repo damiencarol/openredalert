@@ -73,7 +73,7 @@ public:
     Uint8 getPQueue() const;
     bool isStructure() const;
 	bool isDoubleOwned();
-
+	bool isC4() const;
 private:
     Uint32 *shpnums;
 	Uint16 *shptnum;
@@ -110,6 +110,11 @@ private:
     
     /** matches the unit's type name.*/
     vector<UnitType*> specificTypeAllow;
+    
+    /** C4 = Equipped with building sabotage explosives 
+     * [presumes Infiltrate is true] (def=no)? 
+     */
+    bool c4;    
 };
 
 #endif //UNITTYPE_H
