@@ -26,12 +26,11 @@
 #include "Cursor.h"
 #include "TCheckBox.h"
 
-#include "game/GameMode.h"
 #include "include/config.h"
-#include "video/GraphicsEngine.h"
 #include "include/Logger.h"
 #include "game/MissionMapsClass.h"
-#include "game/MPmapsClass.h"
+#include "game/MultiPlayerMaps.h"
+#include "game/GameMode.h"
 #include "misc/StringTableFile.h"
 #include "vfs/VFile.h"
 #include "vfs/vfs.h"
@@ -40,6 +39,7 @@
 #include "video/PCXImage.h"
 #include "video/CPSImage.h"
 #include "video/VQAMovie.h"
+#include "video/GraphicsEngine.h"
 
 using VQA::VQAMovie;
 
@@ -358,7 +358,7 @@ Menu::Menu() :
 	missionList = new MissionMapsClass();
 	
 	// Load multiPlayer maps
-	MultiPlayerMaps = new MPmapsClass();
+	multiPlayerMaps = new MultiPlayerMaps();
 	
 	// Build Lisbox with mission multi
 	listBox = new ListboxClass();
@@ -441,17 +441,17 @@ void Menu::DrawMousePointer()
 void Menu::DrawMainMenuButtons (void)
 {
 //	if (StartNewGameButton.NeedRedraw())
-		StartNewGameButton.drawbutton ();
+		StartNewGameButton.drawbutton();
 //	if (InternetGameButton.NeedRedraw())
-		InternetGameButton.drawbutton ();
+		InternetGameButton.drawbutton();
 //	if (LoadMissionButton.NeedRedraw())
-		LoadMissionButton.drawbutton ();
+		LoadMissionButton.drawbutton();
 //	if (MultiplayerGameButton.NeedRedraw())
-		MultiplayerGameButton.drawbutton ();
+		MultiplayerGameButton.drawbutton();
 //	if (IntroAndSneakPeekButton.NeedRedraw())
-		IntroAndSneakPeekButton.drawbutton ();
+		IntroAndSneakPeekButton.drawbutton();
 //	if (ExitGameButton.NeedRedraw())
-		ExitGameButton.drawbutton ();
+		ExitGameButton.drawbutton();
 
 }
 
@@ -459,7 +459,7 @@ void Menu::DrawMainMenuButtons (void)
  * Called every frame !!!!!!!!!!!!!!
  * DON'T METTRE DES TRUCS LOURDS !!!
  */
-void Menu::HandleInput (void)
+void Menu::HandleInput()
 {
 	SDL_Event	event;
 	string		SelectedMap;
@@ -498,20 +498,20 @@ void Menu::HandleInput (void)
 				break;
 		}
 		// Handle the different mouse and keyboard events
-		switch (event.type){
-
+		switch (event.type)
+		{
 			case SDL_MOUSEBUTTONDOWN:
 				switch (MenuState){
 					case 3:
 						if (ButtonColGreece.MouseOver()){
-							this->ResetSideColorButtonStates ();
-							ButtonColGreece.setButtonState (2);
+							this->ResetSideColorButtonStates();
+							ButtonColGreece.setButtonState(2);
 						}else if (ButtonColUssr.MouseOver()){
-							this->ResetSideColorButtonStates ();
+							this->ResetSideColorButtonStates();
 							ButtonColUssr.setButtonState (2);
 						}else if (ButtonColUk.MouseOver()){
 							this->ResetSideColorButtonStates ();
-							ButtonColUk.setButtonState (2);
+							ButtonColUk.setButtonState(2);
 						}else if (ButtonColSpain.MouseOver()){
 							this->ResetSideColorButtonStates ();
 							ButtonColSpain.setButtonState (2);
@@ -528,7 +528,8 @@ void Menu::HandleInput (void)
 							this->ResetSideColorButtonStates ();
 							ButtonColTurkey.setButtonState (2);
 						}
-						if (NumbAiProgressbar.HandleMouseClick()){
+						if (NumbAiProgressbar.HandleMouseClick())
+						{
 							int Numb = NumbAiProgressbar.getCurStep ();
 							Numb++;
 							std::stringstream NumbStr;
@@ -576,7 +577,6 @@ void Menu::HandleInput (void)
 								printf ("RussianMission selected\n");
 								pc::Config.UseFogOfWar	= true;
 								SelectedMap = missionList->getNodMissionMap(0);
-								printf ("First nod mission = %s\n", SelectedMap.c_str());
 								pc::Config.mapname	= SelectedMap;//"SCG01EA";	// First nod mission
 								pc::Config.gamemode	= GAME_MODE_SINGLE_PLAYER;	// single player (missions)
 								pc::Config.mside	= "nod"; 	//"badguy";
@@ -589,8 +589,6 @@ void Menu::HandleInput (void)
 								printf ("AlliesMission selected\n");
 								pc::Config.UseFogOfWar	= true;
 								SelectedMap = missionList->getGdiMissionMap(0);
-								printf ("First gdi mission = %s\n", SelectedMap.c_str());
-								isDone = true;
 								pc::Config.mapname	= SelectedMap;	//"SCU01EA";	// First allied mission??
 								pc::Config.gamemode	= GAME_MODE_SINGLE_PLAYER;		// single player (missions)
 								pc::Config.mside	= "gdi"; //"goodguy";
@@ -598,7 +596,7 @@ void Menu::HandleInput (void)
 								pc::Config.side_colour = "yellow";
 								pc::Config.pause = false;
 								pc::Config.quit_mission = false;
-
+								isDone = true;	
 							}
 							break;
 						case 3:
@@ -619,7 +617,7 @@ void Menu::HandleInput (void)
 							//"turquoise"
 							if (Oke.MouseOver()){
 								printf ("Selected map nr = %i\n", this->listBox->GetSelectionIndex ());
-								MultiPlayerMaps->getMapName(this->listBox->GetSelectionIndex(), pc::Config.mapname);
+								multiPlayerMaps->getMapName(this->listBox->GetSelectionIndex(), pc::Config.mapname);
 								// Printf ("For some reason the game crashes when skirmisch is selected??
 								pc::Config.UseFogOfWar	= true;
 								pc::Config.playernum	= 1;	// Local player player number
@@ -700,7 +698,7 @@ int Menu::HandleMenu()
 
 	// Setup the multi player listbox with all the multiplayer maps
 	i = 0;
-	while (MultiPlayerMaps->getMapDescription(i, TmpString)){
+	while (multiPlayerMaps->getMapDescription(i, TmpString)){
 		this->listBox->AddString(TmpString);
 		i++;
 	}
@@ -729,10 +727,12 @@ int Menu::HandleMenu()
 		if (MenuState == 2){
 			// first draw the buttons on the window,
 			// than draw the window to the screen
-			RussianMissionButton.drawbutton ();
-			AlliesMissionButton.drawbutton ();
+			RussianMissionButton.drawbutton();
+			AlliesMissionButton.drawbutton();
 			MissionMenu1.DrawWindow();
-		}else if (MenuState == 3){
+		}
+		else if (MenuState == 3)
+		{
 			// first draw the buttons on the window,
 			// than draw the window to the screen
 			Oke.drawbutton ();
@@ -758,7 +758,7 @@ int Menu::HandleMenu()
 		old_mx = mx;
 		old_my = my;
 
-		this->HandleInput ();
+		this->HandleInput();
 		//SDL_Delay(15);
     }
 
