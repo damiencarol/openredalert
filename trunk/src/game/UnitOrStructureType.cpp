@@ -8,6 +8,17 @@
 using std::vector;
 using std::string;
 
+UnitOrStructureType::UnitOrStructureType() :
+	ptype(0), 
+	valid(false),
+	techLevel(-1)
+{
+}
+
+UnitOrStructureType::~UnitOrStructureType()
+{
+}
+
 Uint8 UnitOrStructureType::getPType() const
 {
 	return ptype;
@@ -21,17 +32,6 @@ void UnitOrStructureType::setPType(Uint8 p)
 bool UnitOrStructureType::isValid() const
 {
 	return valid;
-}
-
-UnitOrStructureType::~UnitOrStructureType()
-{
-}
-
-UnitOrStructureType::UnitOrStructureType() :
-	ptype(0), 
-	valid(false),
-	techLevel(-1)
-{
 }
 
 vector < char *> UnitOrStructureType::getPrereqs() const
