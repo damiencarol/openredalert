@@ -60,7 +60,9 @@ private:
 
     Uint16 width;
     Uint16 height;
-    Uint8 done, donecount, finaldelay, gamemode;
+    Uint8 done;
+    Uint8 donecount;
+    Uint8 finaldelay, gamemode;
     SDL_Rect *maparea;
     Uint16 tabwidth;
     Uint8 tilewidth;
