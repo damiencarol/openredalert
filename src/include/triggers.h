@@ -272,5 +272,6 @@ void HandleTriggers ( UnitOrStructure *UnitOrStructure, int Event, int param = 0
 void HandleGlobalTrigger ( int Event, int param );
 void CheckCellTriggers ( Uint32 pos );
 void ExecuteTriggerAction ( unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigger );
+string getTriggerEventNameByNumber(Uint8 number);
 
 #endif //TRIGGERS_H_
