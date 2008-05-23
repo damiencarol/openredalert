@@ -79,6 +79,10 @@ SHPImage::SHPImage(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
     lnkHeader.NumImages = shpdata[0] + (shpdata[0+1] << 8);
     lnkHeader.Width = shpdata[6] + (shpdata[6+1] << 8);
 
+    // Read unknow variables
+    lnkHeader.A = shpdata[2] + (shpdata[2+1] << 8);
+    lnkHeader.B = shpdata[4] + (shpdata[4+1] << 8);
+
     lnkHeader.Height = shpdata[8] + (shpdata[8+1] << 8);
     lnkHeader.Offset = new Uint32[lnkHeader.NumImages + 2];
     lnkHeader.Format = new Uint8[lnkHeader.NumImages + 2];
