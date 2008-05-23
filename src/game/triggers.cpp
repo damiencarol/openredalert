@@ -52,9 +52,10 @@ bool GlobalVar[100];
  * @param value the value that the event has now
  * @returns void
  */
-bool CheckParameters (unsigned int Event, int param1, int param2, int value)
+bool CheckParameters(unsigned int Event, int param1, int param2, int value)
 {
-    switch (Event){
+    switch (Event)
+    {
         // Events without parameters
         case TRIGGER_EVENT_NO_EVENT:
         case TRIGGER_EVENT_SPIED_BY:
@@ -95,7 +96,27 @@ bool CheckParameters (unsigned int Event, int param1, int param2, int value)
         case TRIGGER_EVENT_GLOBAL_IS_SET:
         case TRIGGER_EVENT_GLOBAL_IS_CLEAR:
         case TRIGGER_EVENT_DESTROYED_FAKES_ALL:
+        	printf ("%s line %i: CheckParameters, Event %i not handled jet -> skip ckeck\n", __FILE__, __LINE__, Event);
+        	return true;
+        	break;
         case TRIGGER_EVENT_LOW_POWER:
+        	// Check if a player have low power (<=> PowerUsed > Power)
+        	// param2 = player to check
+        	printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER try to analysis\n", __FILE__, __LINE__);
+        	// The player to check
+        	Player* pl = p::ppool->getPlayer((Uint8)param2);
+        	printf ("%s line %i: CheckParameters, TRIGGER_EVENT_LOW_POWER analysis player %s\n", __FILE__, __LINE__, pl->getName());
+        	if (pl->getPowerUsed() > pl->getPower())
+        	{
+        		printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER decide TRUE\n", __FILE__, __LINE__);        		        	
+        		return true;
+        	}
+        	else
+        	{
+        		printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER decide FALSE\n", __FILE__, __LINE__);        		
+        		return false;
+        	}
+        	break;
         case TRIGGER_EVENT_ALL_BRIDGES_DESTROYED:
         case TRIGGER_EVENT_BUILDING_EXISTS:
             printf ("%s line %i: CheckParameters, Event %i not handled jet -> skip ckeck\n", __FILE__, __LINE__, Event);
@@ -143,7 +164,25 @@ bool CheckOtherEvent (unsigned int Event, int param1, int param2, int value)
         case TRIGGER_EVENT_GLOBAL_IS_SET:
         case TRIGGER_EVENT_GLOBAL_IS_CLEAR:
         case TRIGGER_EVENT_DESTROYED_FAKES_ALL:
+        	printf ("%s line %i: CheckOtherEvent, Event %i not handled jet -> skip ckeck\n", __FILE__, __LINE__, Event);
+        	return false;
+        	break;
         case TRIGGER_EVENT_LOW_POWER:
+        	// Check if a player have low power (<=> PowerUsed > Power)
+        	// param2 = player to check
+        	printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER try to analysis\n", __FILE__, __LINE__);
+        	// The player to check
+        	Player* pl = p::ppool->getPlayer((Uint8)param2);
+        	printf ("%s line %i: CheckParameters, TRIGGER_EVENT_LOW_POWER analysis player %s\n", __FILE__, __LINE__, pl->getName());
+        	if (pl->getPowerUsed() > pl->getPower())
+        	{
+        		printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER decide TRUE\n", __FILE__, __LINE__);
+        		return true;
+        	} else {
+        		printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER decide FALSE\n", __FILE__, __LINE__);
+        		return false;
+        	}
+        	break;        	        
         case TRIGGER_EVENT_ALL_BRIDGES_DESTROYED:
         case TRIGGER_EVENT_BUILDING_EXISTS:
             printf ("%s line %i: CheckOtherEvent, Event %i not handled jet -> skip ckeck\n", __FILE__, __LINE__, Event);
@@ -334,8 +373,8 @@ void HandleGlobalTrigger(int Event, int value)
 //	if (Event == TRIGGER_EVENT_TIME_ELAPSED)
 //		printf ("%s line %i: event = %i, param = %i\n", __FILE__, __LINE__, Event, value);
 
-	if (Event == TRIGGER_EVENT_ZONE_ENTRY)
-		printf ("%s line %i:  ***TRIGGER_ZONE_ENTRY***, cellpos = %i\n", __FILE__, __LINE__, value);
+//	if (Event == TRIGGER_EVENT_ZONE_ENTRY)
+//		printf ("%s line %i:  ***TRIGGER_ZONE_ENTRY***, cellpos = %i\n", __FILE__, __LINE__, value);
 
 	while ((Trigger = p::ccmap->getTriggerByNumb(TriggNumb)) != 0)
 	{
@@ -442,7 +481,7 @@ void HandleGlobalTrigger(int Event, int value)
 }
 
 
-void CheckCellTriggers ( Uint32 pos )
+void CheckCellTriggers(Uint32 pos)
 {
 	//UnitOrStructure *unitOrStructure;
 	Unit            *unit;
@@ -538,9 +577,11 @@ void ExecuteTriggerAction(unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigge
 		Action = Trigger->action1.Action;
 	}else if (ActionNr == 2){
 		Action = Trigger->action2.Action;
-	}else
+	}else {
+		printf("error ActionNr != 1 or 2 ERRROR !!! \n");
 		return;
-
+	}
+	
     switch (Action){
         case TRIGGER_ACTION_NO_ACTION:
             break;
@@ -548,8 +589,19 @@ void ExecuteTriggerAction(unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigge
             logger->error ("%s line %i: ***TRIGGER_ACTION_WINNER_IS***\n", __FILE__, __LINE__);
             break;
         case TRIGGER_ACTION_LOSER_IS:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_LOSER_IS***\n", __FILE__, __LINE__);
-            break;
+        	if (Action==1)
+        	{
+        		logger->error ("%s line %i: ACT1 ***TRIGGER_ACTION_LOSER_IS = %d ***\n", __FILE__, __LINE__, Trigger->action1.param3);
+        	   /* p::ppool->playerDefeated(        	    
+        		p::ppool->getPlayer(Trigger->action1.param3)
+        		);*/
+        	} else {
+        		logger->error ("%s line %i: ACT2 ***TRIGGER_ACTION_LOSER_IS = %d ***\n", __FILE__, __LINE__, Trigger->action2.param3);
+        		/*p::ppool->playerDefeated(  
+        			p::ppool->getPlayer(Trigger->action2.param3)
+        		  );   */     	
+        		}
+        	break;
         case TRIGGER_ACTION_PRODUCTION_BEGINS:
             logger->error ("%s line %i: ***TRIGGER_ACTION_PRODUCTION_BEGINS***\n", __FILE__, __LINE__);
             break;
@@ -740,16 +792,21 @@ void PrintTrigger(RA_Tiggers Trigger)
     printf ("country = \t\t%i\n", Trigger.country);
     printf ("activate = \t\t%i\n", Trigger.activate);
     printf ("actions = \t\t%i\n", Trigger.actions);
-    printf ("trigger1.event = \t%i\n", Trigger.trigger1.event);
+   
+    printf ("trigger1.event = \t%s\n", getTriggerEventNameByNumber(Trigger.trigger1.event).c_str());
+    //printf ("trigger1.event = \t%i\n", Trigger.trigger1.event);
     printf ("trigger1.param1 = \t%i\n", Trigger.trigger1.param1);
     printf ("trigger1.param2 = \t%i\n", Trigger.trigger1.param2);
+    
     printf ("trigger2.event = \t%i\n", Trigger.trigger2.event);
     printf ("trigger2.param1 = \t%i\n", Trigger.trigger2.param1);
     printf ("trigger2.param2 = \t%i\n", Trigger.trigger2.param2);
+    
     printf ("action1.Action = \t%i\n", Trigger.action1.Action);
     printf ("action1.param1 = \t%i\n", Trigger.action1.param1);
     printf ("action1.param2 = \t%i\n", Trigger.action1.param2);
     printf ("action1.param3 = \t%i\n", Trigger.action1.param3);
+    
     printf ("action2.Action = \t%i\n", Trigger.action2.Action);
     printf ("action2.param1 = \t%i\n", Trigger.action2.param1);
     printf ("action2.param2 = \t%i\n", Trigger.action2.param2);
@@ -770,3 +827,47 @@ void InitializeTriggers()
     }
 }
 
+/**
+ * Return the name of a trigger with this number
+ */
+string getTriggerEventNameByNumber(Uint8 number)
+{
+	string str;
+	switch(number){
+	case 0:	str = "TRIGGER_EVENT_NO_EVENT";	break;
+	case 1:	str = "TRIGGER_EVENT_ENTERED_BY"; break;
+	case 2:	str = "TRIGGER_EVENT_SPIED_BY"; break;
+	case 3: str = "TRIGGER_EVENT_THIEVED_BY"; break;
+	case 4: str = "TRIGGER_EVENT_DISCOVERED_BY"; break;
+	case 5: str = "TRIGGER_EVENT_HOUSE_DISCOVERED"; break;
+	case 6: str = "TRIGGER_EVENT_ATTACKED"; break;
+	case 7: str = "TRIGGER_EVENT_DESTROYED"; break;
+	case 8: str = "TRIGGER_EVENT_ANY_EVENT"; break;
+	case 9: str = "TRIGGER_EVENT_ALL_UNITS_DESTROYED"; break;
+	case 10: str = "TRIGGER_EVENT_ALL_BUILDINGS_DESTROYED"; break;
+	case 11: str = "TRIGGER_EVENT_ALL_DESTROYED"; break;
+	case 12: str = "TRIGGER_EVENT_CREDITS_EXCEED"; break;
+	case 13: str = "TRIGGER_EVENT_TIME_ELAPSED"; break;
+	case 14: str = "TRIGGER_EVENT_MISSION_TIMER_EXPIRED"; break;
+	case 15: str = "TRIGGER_EVENT_DESTROYED_NR_BUILDINGS"; break;
+	case 16: str = "TRIGGER_EVENT_DESTROYED_NR_UNITS"; break;
+	case 17: str = "TRIGGER_EVENT_NO_FACTORIES_LEFT"; break;
+	case 18: str = "TRIGGER_EVENT_CIVILIANS_EVACUATED"; break;
+	case 19: str = "TRIGGER_EVENT_BUILD_BUILDING_TYPE"; break;
+	case 20: str = "TRIGGER_EVENT_BUILD_UNIT_TYPE"; break;
+	case 21: str = "TRIGGER_EVENT_BUILD_INFANTRY_TYPE"; break;
+	case 22: str = "TRIGGER_EVENT_BUILD_AIRCRAFT_TYPE"; break;
+	case 23: str = "TRIGGER_EVENT_LEAVES_MAP"; break;
+	case 24: str = "TRIGGER_EVENT_ZONE_ENTRY"; break;
+	case 25: str = "TRIGGER_EVENT_CROSSED_HORIZONTAL_LINE"; break;
+	case 26: str = "TRIGGER_EVENT_CROSSED_VERTICAL_LINE"; break;
+	case 27: str = "TRIGGER_EVENT_GLOBAL_IS_SET"; break;
+	case 28: str = "TRIGGER_EVENT_GLOBAL_IS_CLEAR"; break;
+	case 29: str = "TRIGGER_EVENT_DESTROYED_FAKES_ALL"; break;
+	case 30: str = "TRIGGER_EVENT_LOW_POWER"; break;
+	case 31: str = "TRIGGER_EVENT_ALL_BRIDGES_DESTROYED"; break;
+	case 32: str = "TRIGGER_EVENT_BUILDING_EXISTS"; break;
+	default : str = "TRIGGER_EVENT_????"; break;
+	}
+	return str;
+}
