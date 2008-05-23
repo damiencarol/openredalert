@@ -73,34 +73,13 @@ UnitAndStructurePool::UnitAndStructurePool(const char* theTheater) :
 	// Create Weapons Pool
     p::weappool	= new WeaponsPool();
     
-    // Create bibs only if the teater is Snow or Temperate
-    if (!strcasecmp(this->theaterext, ".SNO") ||
-    	!strcasecmp(this->theaterext, ".TEM"))
-    {
-    	// Create the file name 
-    	string bibString;
-    	
-    	// FOR BIB1
-    	bibString = "bib1";
-    	// After that the str = "bib1.XXX" 
-    	// which XXX = SNO for snow theater or TEM for temperate
-    	bibString += this->theaterext;
-    	bib1 = pc::imgcache->loadImage(bibString.c_str(), -1);
-    	
-    	// FOR BIB2
-    	bibString = "bib2";
-    	// After that the str = "bib2.XXX" 
-    	// which XXX = SNO for snow theater or TEM for temperate
-    	bibString += this->theaterext;
-    	bib2 = pc::imgcache->loadImage(bibString.c_str(), -1);
-    	
-    	// FOR BIB3
-    	bibString = "bib3";
-    	// After that the str = "bib1.XXX" 
-    	// which XXX = SNO for snow theater or TEM for temperate
-    	bibString += this->theaterext;
-    	bib3 = pc::imgcache->loadImage(bibString.c_str(), -1);
-   }
+//	bib1 = pc::imgcache->loadImage("bib1.tem", -1);
+//	bib2 = pc::imgcache->loadImage("bib2.tem", -1);
+//	bib3 = pc::imgcache->loadImage("bib3.tem", -1);
+
+	bib1 = 0;
+	bib2 = 0;
+	bib3 = 0;
 }
 
 /** 
@@ -591,36 +570,57 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
                         setlr = true;
                     }
                 }
+#if 1
+		// Don't place worn down ground under a naval yard!!
+		if (!type->isWaterBound())
+		{
+			// Start of new worn down ground code
+			if (bib1 == 0)
+			{
+				if (p::ccmap->SnowTheme ())
+					bib1 = pc::imgcache->loadImage("bib1.sno", -1);
+				else
+					bib1 = pc::imgcache->loadImage("bib1.tem", -1);
+			}
+			if (bib2 == 0){
+				if (p::ccmap->SnowTheme ())
+					bib2 = pc::imgcache->loadImage("bib2.sno", -1);
+						else
+							bib2 = pc::imgcache->loadImage("bib2.tem", -1);
+					}
 
-                
-                // PLACE THE BIB
-                // Don't place worn down ground under a naval yard!!
-                if (!type->isWaterBound())
-                {			
-                	if (y < 2){
-                		switch (type->getXsize())
-                		{
-                		case 4:
-                			frame = x+y*4;
-                			pos = curpos+x+(type->getYsize()-1)*p::ccmap->getWidth();
-                			//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
-                			p::ccmap->setTerrainOverlay(pos, bib1, frame);
-                			break;
-                		case 3:
-                			frame = x+y*3;
-                			pos = curpos+x+(type->getYsize()-1)*p::ccmap->getWidth();
-                			//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
-                			p::ccmap->setTerrainOverlay(pos, bib2, frame);
-                			break;
-                		case 2:
-                			frame = x+y*2;
-                			pos = curpos+x+(type->getYsize()-1)*p::ccmap->getWidth();
-                			//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
-                			p::ccmap->setTerrainOverlay(pos, bib3, frame);
-                			break;
-                		}
-                	}
-                }
+			if (bib3 == 0){
+						if (p::ccmap->SnowTheme ())
+							bib3 = pc::imgcache->loadImage("bib3.sno", -1);
+						else
+							bib3 = pc::imgcache->loadImage("bib3.tem", -1);
+			}
+			
+			if (y < 2){
+				switch (type->getXsize()){
+					case 4:
+						frame = x+y*4;
+						pos = curpos+x+(type->getYsize()-1)*p::ccmap->getWidth();
+						//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
+						p::ccmap->setTerrainOverlay( pos, bib1, frame );
+						break;
+					case 3:
+						frame = x+y*3;
+						pos = curpos+x+(type->getYsize()-1)*p::ccmap->getWidth();
+						//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
+						p::ccmap->setTerrainOverlay( pos, bib2, frame );
+						break;
+					case 2:
+						frame = x+y*2;
+						pos = curpos+x+(type->getYsize()-1)*p::ccmap->getWidth();
+						//printf ("%s line %i: Case %i, frame = %i\n", __FILE__, __LINE__, type->getYsize(), frame);
+						p::ccmap->setTerrainOverlay( pos, bib3, frame );
+						break;
+				}
+			}
+				
+			}
+#endif
             }
         }
     } // end if (wall)
