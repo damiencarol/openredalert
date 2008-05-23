@@ -31,8 +31,6 @@
 #include "TTextBox.h"
 #include "RA_WindowClass.h"
 #include "DropDownListBox.h"
-#include "game/MPmapsClass.h"
-class Dune2Image;
 
 #define MENUSTATE_MAIN_MENU	1
 #define MENUSTATE_MISSION_1	2
@@ -44,6 +42,7 @@ class RA_Label;
 class RA_ProgressBar;
 class DropDownListBox;
 class MissionMapsClass;
+class MultiPlayerMaps;
 class ListboxClass;
 class Dune2Image;
 class MPmapsClass;
@@ -69,7 +68,7 @@ private:
 	MissionMapsClass* missionList;
 	
 	/** MultiPlayer maps list */
-	MPmapsClass* MultiPlayerMaps;
+	MultiPlayerMaps* multiPlayerMaps;
 
 	/** Button "new game" for the main menu */
 	Button StartNewGameButton;
