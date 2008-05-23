@@ -72,12 +72,23 @@ extern Logger * logger;
  * @param the height of the screen.
  */
 Input::Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea) :
-    width(screenwidth), height(screenheight), done(0), donecount(0),
-    finaldelay(getConfig().finaldelay), gamemode(p::ccmap->getGameMode()),
-    maparea(maparea), tabwidth(pc::sidebar->getTabLocation()->w),
-    tilewidth(p::ccmap->getMapTile(0)->w), lplayer(p::ppool->getLPlayer()),
-    kbdmod(k_none), lmousedown(m_none), rmousedown(m_none),
-    currentaction(a_none), rcd_scrolling(false), sx(0), sy(0)
+    width(screenwidth), 
+    height(screenheight), 
+    done(0), 
+    donecount(0),
+    finaldelay(400), 
+    gamemode(p::ccmap->getGameMode()),
+    maparea(maparea), 
+    tabwidth(pc::sidebar->getTabLocation()->w),
+    tilewidth(p::ccmap->getMapTile(0)->w), 
+    lplayer(p::ppool->getLPlayer()),
+    kbdmod(k_none), 
+    lmousedown(m_none), 
+    rmousedown(m_none),
+    currentaction(a_none), 
+    rcd_scrolling(false), 
+    sx(0), 
+    sy(0)
 {
     if (lplayer->isDefeated()) {
         logger->gameMsg("%s line %i: TEMPORARY FEATURE: Free MCV because of no initial", __FILE__, __LINE__);
@@ -122,7 +133,8 @@ void Input::handle()
     Uint8* keystate;
     static ConfigType config = getConfig();
 
-    while ( SDL_PollEvent(&event) ) {
+    while (SDL_PollEvent(&event)) 
+    {
         switch (event.type) {
         case SDL_MOUSEBUTTONDOWN:
             // Mousewheel scroll up
@@ -421,6 +433,7 @@ void Input::handle()
             break;
         }
     }
+    
     sdir = CnCMap::s_none;
     keystate = SDL_GetKeyState(NULL);
     if (keystate[SDLK_LEFT])
@@ -446,33 +459,37 @@ void Input::handle()
     if (p::ppool->pollSidebar()) {
         pc::sidebar->UpdateSidebar();
     }
-    radarstat = p::ppool->statRadar();
+
+    // Update the mouse position at screen
+    updateMousePos();
+    
+    // Get the stat of the radar
+    radarstat = p::ppool->statRadar();    
     switch (radarstat) {
     case 0: // do nothing
         break;
     case 1: // got radar
-	printf ("%s line %i: got radar\n", __FILE__, __LINE__);
-	if (pc::Config.gamenum == GAME_RA) {
-		pc::sfxeng->PlaySound(pc::Config.RadarUp);
-	}
+    	printf ("%s line %i: got radar\n", __FILE__, __LINE__);
+    	pc::sfxeng->PlaySound(pc::Config.RadarUp);
+    	// Start the Radar up anim
         pc::sidebar->StartRadarAnim(0,&minimapEnabled);
+        pc::sidebar->UpdateSidebar();
         break;
     case 2: // lost radar
+    	printf ("%s line %i: lost radar\n", __FILE__, __LINE__);
+    	minimapEnabled = false; // Only in this case minimap is suppress   
     case 3: // radar powered down
-	printf ("%s line %i: powerdown/lost radar\n", __FILE__, __LINE__);
-        minimapEnabled = false;
+    	printf ("%s line %i: powerdown/lost radar\n", __FILE__, __LINE__);
         pc::sidebar->StartRadarAnim(1,&minimapEnabled);
-	if (pc::Config.gamenum == GAME_RA) {
 		pc::sfxeng->PlaySound(pc::Config.RadarDown);
-	}
-        break;
+		pc::sidebar->UpdateSidebar();
+		break;
     default:
-        logger->error("BUG: unexpected value returned from PlayerPool::statRadar: %i\n",
-                      radarstat);
+        logger->error("BUG: unexpected value returned from PlayerPool::statRadar: %i\n", radarstat);
         break;
     }
 
-    updateMousePos();
+    
 
     if( p::ppool->hasWon() || p::ppool->hasLost() ) {
         ++donecount;
@@ -491,11 +508,13 @@ void Input::handle()
     }
 }
 
+/** 
+ * Check the position of the mousepointer and scroll if we are
+ *  less than 10 pixels from an edge.
+ */
 void Input::updateMousePos()
 {
-    /* Check the position of the mousepointer and scroll if we are
-     * less than 10 pixels from an edge. */
-    int mx, my;
+     int mx, my;
 	static int old_mx, old_my;
 	static Uint32 LastTick;
 
@@ -637,16 +656,31 @@ void Input::clickMap(int mx, int my)
 	//
 	// Check if we need to heal anybody
 	//
-	if (selected->numbUnits() == 1){
-		if (strcmp ((char*)selected->getUnit(0)->getType()->getTName(), "MEDI") == 0 && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum() && p::uspool->getUnitAt(pos) != NULL){
-			if ( p::uspool->getUnitAt(pos)->getType()->isInfantry() && p::uspool->getUnitAt(pos)->getHealth() < p::uspool->getUnitAt(pos)->getType()->getMaxHealth()){
+	if (selected->numbUnits() == 1)
+	{		
+		// Draw debug
+		pc::msg->clear();
+		pc::msg->postMessage(string(p::ppool->getPlayer(selected->getUnit(0)->getOwner())->getName()));
+		pc::msg->postMessage(string(selected->getUnit(0)->getType()->getTName()));
+		
+		
+		if (strcmp ((char*)selected->getUnit(0)->getType()->getTName(), "MEDI") == 0 && 
+				selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum() && 
+				p::uspool->getUnitAt(pos) != NULL)
+		{
+			if (p::uspool->getUnitAt(pos)->getType()->isInfantry() && 
+				p::uspool->getUnitAt(pos)->getHealth() < p::uspool->getUnitAt(pos)->getType()->getMaxHealth())
+			{
 				//printf ("%s line %i: I am here\n", __FILE__, __LINE__);
 				selected->getUnit(0)->attack( p::uspool->getUnitAt(pos) );
 				return;
 			}
 		}
 
-		if (selected->getUnit(0)->getHealth() <  selected->getUnit(0)->getType()->getMaxHealth() && p::uspool->getStructureAt(pos)!=NULL && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()){
+		if (selected->getUnit(0)->getHealth() <  selected->getUnit(0)->getType()->getMaxHealth() && 
+			p::uspool->getStructureAt(pos)!=NULL && 
+			selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum())
+		{
 			if (strcmp ((char*)p::uspool->getStructureAt(pos)->getType()->getTName(), "FIX") == 0 ){
 				//printf ("%s line %i: I am here\n", __FILE__, __LINE__);
 				selected->getUnit(0)->Repair (p::uspool->getStructureAt(pos));
@@ -655,11 +689,15 @@ void Input::clickMap(int mx, int my)
 		}
 
 		// Check  if we need to harvest!!
-		if (selected->getUnit(0)->IsHarvester() && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()){
-			selected->getUnit(0)->Harvest (pos, NULL);
+		if (selected->getUnit(0)->IsHarvester() && 
+			selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum())
+		{
+			selected->getUnit(0)->Harvest(pos, 0);
 			selected->getUnit(0)->doRandTalk(TB_ack);
-			if ( p::uspool->getStructureAt(pos) != NULL){
- 				if (p::uspool->getStructureAt(pos)->isRefinery ()){
+			if (p::uspool->getStructureAt(pos) != 0)
+			{
+ 				if (p::uspool->getStructureAt(pos)->isRefinery ())
+ 				{
 					//printf ("Now try to set the base ref...\n");
 					selected->getUnit(0)->SetBaseRefinery (p::uspool->getStructureAt(pos));
 				}
@@ -754,7 +792,8 @@ void Input::clickMap(int mx, int my)
 	}
 
 
-    if( curunit != NULL ) {
+    if (curunit != 0) 
+    {
         enemy = curunit->getOwner() != p::ppool->getLPlayerNum();
         if (enemy) {
             if (selected->canAttack() && (
@@ -900,6 +939,9 @@ void Input::clickMap(int mx, int my)
     }
 }
 
+/**
+ * Get the pos and subpos with a X and Y.
+ */
 void Input::clickedTile(int mx, int my, Uint16* pos, Uint8* subpos)
 {
     Uint16 xrest, yrest, tx, ty;
@@ -907,9 +949,10 @@ void Input::clickedTile(int mx, int my, Uint16* pos, Uint8* subpos)
     my -= maparea->y-p::ccmap->getYTileScroll();
     tx = mx/tilewidth;
     ty = my/tilewidth;
-    if( tx >= p::ccmap->getWidth() || ty >= p::ccmap->getHeight() )
-        *pos = 0xffff;
-    else {
+    if (tx >= p::ccmap->getWidth() || ty >= p::ccmap->getHeight())
+    {  
+    	*pos = 0xffff;
+    } else {
         *pos = (my/tilewidth)*p::ccmap->getWidth()+mx/tilewidth;
         *pos += p::ccmap->getScrollPos();
     }
@@ -925,11 +968,10 @@ void Input::clickedTile(int mx, int my, Uint16* pos, Uint8* subpos)
         (*subpos)+=2;
     if( xrest >= 12 )
         (*subpos)++;
-    /* assumes the subpositions are:
-     * 1 2
-     *  0
-     * 3 4
-     */
+    // assumes the subpositions are:
+    // 1 2
+    //  0
+    // 3 4
 }
 
 void Input::setCursorByPos(int mx, int my)
@@ -940,44 +982,77 @@ void Input::setCursorByPos(int mx, int my)
     Structure *curstruct;
     bool enemy;
 
-    /* clicked the map */
+    // Check if the position is in the map area
     if( my >= maparea->y && my < maparea->y+maparea->h &&
-            mx >= maparea->x && mx < maparea->x+maparea->w ) {
+            mx >= maparea->x && mx < maparea->x+maparea->w ) 
+    {
+    	// Get the pos with coords of the mouse
         clickedTile(mx, my, &pos, &subpos);
-        if( pos != 0xffff ) {
-
-		// Handle the harvesters..
-		if (selected->numbUnits() == 1){
-			if (selected->getUnit(0)->getHealth() <  selected->getUnit(0)->getType()->getMaxHealth() && p::uspool->getStructureAt(pos)!=NULL && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()){
- 				if (strcmp ((char*)p::uspool->getStructureAt(pos)->getType()->getTName(), "FIX") == 0 ){
-					pc::cursor->setCursor("enter");
-//					printf ("%s line %i: We have one unit selected and it is a harvester ;0\n", __FILE__, __LINE__);
-					return;
-				}
-			}
-			if (selected->getUnit(0)->IsHarvester() && p::ccmap->getResourceFrame(pos) != 0 && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()){
-				pc::cursor->setCursor("attack");
-//				printf ("%s line %i: We have one unit selected and it is a harvester ;0\n", __FILE__, __LINE__);
-				return;
-			}
-			if (selected->getUnit(0)->IsHarvester() && p::uspool->getStructureAt(pos) != NULL && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()){
-				if (p::uspool->getStructureAt(pos)->isRefinery ())
-					pc::cursor->setCursor("enter");
-					return;
-			}
-		}
-
-		//
-		// Handle setting the heal mouse when using the medic
-		//
-		if (selected->numbUnits() == 1){
-			if (strcmp ((char*)selected->getUnit(0)->getType()->getTName(), "MEDI") == 0 && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum() && p::uspool->getUnitAt(pos) != NULL){
-				if ( p::uspool->getUnitAt(pos)->getType()->isInfantry() && p::uspool->getUnitAt(pos)->getHealth() < p::uspool->getUnitAt(pos)->getType()->getMaxHealth()){
-					pc::cursor->setCursor("heal");
-					return;
-				}
-			}
-		}
+        
+        // If the position is ok
+        if( pos != 0xffff ) 
+        {
+        	// If their are just one unit selected
+        	if (selected->numbUnits() == 1)
+        	{
+        		//
+        		// Handle C4
+        		//
+        		// If the unit has C4 
+        		// AND there are a structure
+        		// AND the local player is owner of the unit
+        		// AND the structure exist AND is not owned by local player
+        		if ((selected->getUnit(0)->getType()->isC4()) &&
+        			(p::uspool->getStructureAt(pos) != 0) &&
+        			(selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()))
+        		{
+        			printf("ok1\n");
+        			if (p::uspool->getStructureAt(pos)->getOwner() != p::ppool->getLPlayerNum())
+        			{        				
+        				printf("ok2\n");
+        				pc::cursor->setCursor("bom");
+        				return;
+        			}
+        		}
+        
+        		// Handle FIX for all units
+        		if (selected->getUnit(0)->getHealth() <  selected->getUnit(0)->getType()->getMaxHealth() && p::uspool->getStructureAt(pos)!=NULL && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum())
+        		{
+        			if (strcmp ((char*)p::uspool->getStructureAt(pos)->getType()->getTName(), "FIX") == 0 ){
+        				pc::cursor->setCursor("enter");
+        				return;
+        			}
+        		}
+			
+ 				// We have one unit selected and it is a harvester
+        		// ATTACK GOLD
+ 				if (selected->getUnit(0)->IsHarvester() && p::ccmap->getResourceFrame(pos) != 0 && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()){
+ 					pc::cursor->setCursor("attack");
+ 					return;
+ 				}
+ 				// RETURN
+ 				if (selected->getUnit(0)->IsHarvester() && p::uspool->getStructureAt(pos) != NULL && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()){
+ 					if (p::uspool->getStructureAt(pos)->isRefinery ())
+ 						pc::cursor->setCursor("enter");
+ 					return;
+ 				}
+        	}
+		
+        	
+        	//
+        	// Handle setting the heal mouse when using the medic
+        	//
+        	if (selected->numbUnits() == 1)
+        	{
+        		if (strcmp ((char*)selected->getUnit(0)->getType()->getTName(), "MEDI") == 0 && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum() && p::uspool->getUnitAt(pos) != NULL)
+        		{
+        			if ( p::uspool->getUnitAt(pos)->getType()->isInfantry() && p::uspool->getUnitAt(pos)->getHealth() < p::uspool->getUnitAt(pos)->getType()->getMaxHealth())
+        			{
+        				pc::cursor->setCursor("heal");
+        				return;
+        			}
+        		}
+        	}
 
             if( lplayer->getMapVis()[pos] ) {
                 curunit = p::uspool->getUnitAt(pos, subpos);
@@ -1130,6 +1205,7 @@ void Input::setCursorByPos(int mx, int my)
         }
     }
 
+    // Set cursor to default
     pc::cursor->setCursor(CUR_STANDARD, CUR_NOANIM);
 }
 
