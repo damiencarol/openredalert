@@ -216,8 +216,7 @@ CnCMap::~CnCMap()
 void CnCMap::loadMap(const char* mapname, LoadingScreen* lscreen)
 {	
 	// Copy the map name
-	missionData->mapname = new char[strlen(mapname)+1];
-	strcpy(missionData->mapname, mapname);
+	missionData->mapname = strdup(mapname);
 
 	string message = "Reading ";
 	message += mapname;
@@ -2357,7 +2356,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 	// Digest
 	//
 	// If their are a section called "Digest"
-	if (inifile->isSection("DIGEST") == true)
+	/*if (inifile->isSection("DIGEST") == true)
 	{
 		try
 		{
@@ -2379,7 +2378,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 			Compression::dec_base64(mapdata, temp, strlen(((char*)mapdata)));
 			
 			logger->debug("temp read = %s\n", temp);
-				/*
+				
 				// decode the format80 coded data (2 chunks)
 				curpos = 0;
 				for (int tmpval = 0; tmpval < 2; tmpval++)
@@ -2407,15 +2406,12 @@ void CnCMap::advancedSections(INIFile *inifile)
 						parseOverlay(tilepos, RAOverlayNames[mapdata[curpos]]);
 					}
 				}
-				*/
+				
 				logger->debug("digest() ok\n");		
 		}
 		catch (...)
 		{}
-	}
-	
-	// Log it
-	logger->note("Map loaded.\n");
+	}*/
 }
 
 struct tiledata
@@ -2517,9 +2513,10 @@ void CnCMap::unMapPack(INIFile *inifile)
 	catch(...)
 	{}
 
+	// Decompress base 64 data
 	Compression::dec_base64(mapdata1, mapdata2, strlen(((char*)mapdata1)));
 
-	/* decode the format80 coded data (6 chunks) */
+	// decode the format80 coded data (6 chunks)
 	curpos = 0;
 	for (tmpval = 0; tmpval < 6; tmpval++)
 	{
@@ -2537,7 +2534,9 @@ void CnCMap::unMapPack(INIFile *inifile)
 		delete[] mapdata2;
 	mapdata2 = NULL;
 
-	/* 128*128 16-bit template number followed by 128*128 8-bit tile numbers */
+	// 128*128 16-bit template number 
+	// followed by 
+	// 128*128 8-bit tile numbers
 	bindata = new TileList[width*height];
 	tmpval = y*128+x;
 	curpos = 0;
@@ -2545,17 +2544,15 @@ void CnCMap::unMapPack(INIFile *inifile)
 	{
 		for (xtile = 0; xtile < width; xtile++)
 		{
-			/* Read template and tile */
+			// Read template and tile
 			bindata[curpos].templateNum = ((Uint16 *)mapdata1)[tmpval];
 			bindata[curpos].tileNum = mapdata1[tmpval+128*128*2];
 			curpos++;
 			tmpval++;
-			/*  printf("tile %d, %d\n", bindata[curpos-1].templateNum,
-			 bindata[curpos-1].tileNum); */
+			// printf("tile %d, %d\n", bindata[curpos-1].templateNum, bindata[curpos-1].tileNum);
 		}
-		/* Skip until the end of the line and the onwards to the
-		 * beginning of usefull data on the next line
-		 */
+		// Skip until the end of the line and the onwards to the
+		// beginning of usefull data on the next line
 		tmpval += (128-width);
 	}
 	if (mapdata1 != NULL)
