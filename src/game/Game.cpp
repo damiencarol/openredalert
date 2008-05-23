@@ -20,6 +20,8 @@
 
 #include <stdexcept>
 
+#include "SDL/SDL.h"
+
 #include "ActionEventQueue.h"
 #include "include/Logger.h"
 #include "include/ccmap.h"
@@ -64,8 +66,8 @@ namespace p
 }
 namespace pc
 {
-	extern GraphicsEngine * gfxeng;
-	extern Ai * ai;
+	extern GraphicsEngine* gfxeng;
+	extern Ai* ai;
 	extern ConfigType Config;
 	extern vector<SHPImage *> *imagepool;	
 }
@@ -135,13 +137,10 @@ void Game::InitializeMap(string MapName)
 		p::ccmap = new CnCMap();
 		p::ccmap->Init(GAME_RA, this->gamemode);
 		p::ccmap->loadMap(MapName.c_str(), 0);
-		// TODO TRY THIS TO DEBUG INTERIOR MAPS
-		//char* toto = strdup("scg10eb");
-		//p::ccmap->loadMap(toto, 0);
 	}
 	catch (LoadMapError& ex)
 	{
-		logger->error("LoadMapError\n", ex.what());
+		logger->error("LoadMapError:%s\n", ex.what());
 		// loadmap will have printed the error
 		throw GameError("Error during load of the Map in Game::InitializeMap\n");
 	}
@@ -168,10 +167,10 @@ void Game::InitializeMap(string MapName)
 	case GAME_MODE_SINGLE_PLAYER:
 		try
 		{
-			// Try to Play the "Briefing" Movie
+			// Try to Play the "Brief" Movie
 			string briefMovieName;
 			briefMovieName = string(p::ccmap->getMissionData()->brief);
-			// Check that movie is not <none>
+			// Check that "Brief" movie is different of "<none>"
 			if (briefMovieName != "<none>")
 			{
 				VQAMovie* movBrief = new VQAMovie(briefMovieName.c_str());
@@ -179,17 +178,18 @@ void Game::InitializeMap(string MapName)
 			}
 
 			// Try to Play the "Action" Movie
-			char * tmpAction;
-			tmpAction = new char[strlen(p::ccmap->getMissionData()->action)+1];
-			strcpy(tmpAction, p::ccmap->getMissionData()->action);
-			logger->note ("%s line %i: Action = %s\n", __FILE__, __LINE__, tmpAction);
-			VQAMovie actionMovie(tmpAction);
-			actionMovie.play();
-
+			string actionMovieName;
+			actionMovieName = p::ccmap->getMissionData()->action;
+			//logger->note("%s line %i: Action = %s\n", __FILE__, __LINE__, actionMovieName.c_str());
+			// Check that "Action" movie is different of "<none>
+			if (actionMovieName != "<none>")
+			{
+				VQAMovie* actionMovie = new VQAMovie(actionMovieName.c_str());
+				actionMovie->play();
+			}
 		}
 		catch (std::runtime_error&)
-		{
-		}
+		{}
 		break;
 	case GAME_MODE_SKIRMISH:
 	case GAME_MODE_MULTI_PLAYER:
@@ -513,10 +513,8 @@ void Game::play()
 			{
 				logger->note("%s line %i: Unknown mission type\n",__FILE__ , __LINE__);
 			}
-		}
-
-		logger->debug("Mission name = %s\n", pc::Config.mapname.c_str());
-
+		}		
+		
 		// Initialize (load) the map
 		InitializeMap(pc::Config.mapname);
 
@@ -594,7 +592,11 @@ void Game::play()
 
 		while (!pc::input->shouldQuit() && !pc::quit)
 		{
-
+			// first thing we want to do is scroll the map
+			if (p::ccmap->toScroll()){
+				p::ccmap->doscroll();
+			}
+			
 			// Draw the pause menu (when needed)
 			while (pc::Config.pause)
 			{
@@ -642,9 +644,8 @@ void Game::play()
 					VQAMovie *mov = new VQAMovie(p::ccmap->getMissionData()->winmov);
 					mov->play();
 				}
-				catch (std::runtime_error&)
-				{
-				}
+				catch (runtime_error&)
+				{}
 			}
 			else if (p::ppool->hasLost() )
 			{
@@ -654,9 +655,8 @@ void Game::play()
 					VQAMovie *mov = new VQAMovie(p::ccmap->getMissionData()->losemov);
 					mov->play();
 				}
-				catch (std::runtime_error&)
-				{
-				}
+				catch (runtime_error&)
+				{}
 			}
 			else
 			{
