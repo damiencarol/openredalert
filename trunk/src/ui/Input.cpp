@@ -1006,10 +1006,8 @@ void Input::setCursorByPos(int mx, int my)
         			(p::uspool->getStructureAt(pos) != 0) &&
         			(selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()))
         		{
-        			printf("ok1\n");
         			if (p::uspool->getStructureAt(pos)->getOwner() != p::ppool->getLPlayerNum())
         			{        				
-        				printf("ok2\n");
         				pc::cursor->setCursor("bom");
         				return;
         			}
