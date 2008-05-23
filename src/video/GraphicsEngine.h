@@ -19,6 +19,7 @@
 #ifndef GRAPHICSENGINE_H
 #define GRAPHICSENGINE_H
 
+#include <string>
 #include <vector>
 
 #include "SDL/SDL_types.h"
@@ -30,9 +31,11 @@ class Unit;
 class ImageCache;
 class CnCMap;
 
+using std::string;
 using std::vector;
 
-
+/**
+ */
 class GraphicsEngine
 {
 public:
@@ -40,30 +43,16 @@ public:
     ~GraphicsEngine();
     void setupCurrentGame();
     void renderScene(bool flipscreen = true);
-    Uint16 getWidth()
-    {
-        return width;
-    }
-    Uint16 getHeight()
-    {
-        return height;
-    }
-    SDL_Rect *getMapArea()
-    {
-        return &maparea;
-    }
+    Uint16 getWidth();
+    Uint16 getHeight();
+    SDL_Rect* getMapArea();
     void drawVQAFrame(SDL_Surface *frame);
     void clearBuffer();
     void clearScreen();
-    /*void postMessage(char *msg) {
-        messages->postMessage(msg);
-    }*/
 
-    void renderLoading(const std::string& buff, SDL_Surface* logo);
+    void renderLoading(const string& buff, SDL_Surface* logo);
 
-	SDL_Surface *get_SDL_ScreenSurface (void){
-		return screen;
-	}
+	SDL_Surface* get_SDL_ScreenSurface();
 
 private:
 	bool MapPosToScreenXY (Uint32 MapPos, Sint16 *ScreenX, Sint16 *ScreenY, CnCMap* map);
@@ -113,10 +102,10 @@ private:
 	SDL_Rect	oldmouse;
 
 	Uint32 whitepix;
-			Uint32 greenpix;
-			Uint32 yellowpix;
-			Uint32 redpix;
-			Uint32 blackpix;
+	Uint32 greenpix;
+	Uint32 yellowpix;
+	Uint32 redpix;
+	Uint32 blackpix;
 
 	vector<Uint16> l2overlays;
 
@@ -127,8 +116,8 @@ private:
 
 	// Surfaces needed to draw text
 	SDL_Surface* FrameRateSurface;
-				SDL_Surface* MoneySurface;
-				SDL_Surface* OptionsSurface;
+	SDL_Surface* MoneySurface;
+	SDL_Surface* OptionsSurface;
 
     /** Minimap zoom factor*/
     struct minizoom {
