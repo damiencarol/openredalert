@@ -70,7 +70,7 @@ public:
 	Uint16 getSubpos() const;
 	Uint32 getNum() const;
 	void setUnitnum(Uint32 unum);
-	Uint16 getHealth() const;
+
 	void ChangeHealth(Sint16 amount);
 
 	void move(Uint16 dest);
@@ -144,7 +144,9 @@ private:
 	Uint32 fix_str_num; // Then structure number of fix (for repairing this unit)
 	Uint16 fix_str_pos;
 	Uint16 *imagenumbers;
-	Uint16 cellpos; Uint16 health; Uint16 palettenum;
+	Uint16 cellpos;
+    Uint16 palettenum;
+
 	Uint8 owner;
 	Uint8 subpos;
 	Sint8 xoffset;

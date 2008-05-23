@@ -78,7 +78,12 @@ public:
 
     virtual void setYoffset(Sint8 yo) ;
 
-    virtual Uint16 getHealth() const = 0;
+private:
+    Uint16 health;
+public:
+    Uint16 getHealth() const;
+
+    void setHealth(Uint16 health);
 
     virtual Uint8 getOwner() const = 0;
 
