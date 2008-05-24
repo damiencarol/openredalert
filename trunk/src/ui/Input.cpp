@@ -26,6 +26,7 @@
 #include "Cursor.h"
 #include "Selection.h"
 #include "Sidebar.h"
+#include "RA_Label.h"
 
 #include "include/ccmap.h"
 #include "include/dispatcher.h"
@@ -76,7 +77,7 @@ Input::Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea) :
     height(screenheight), 
     done(0), 
     donecount(0),
-    finaldelay(400), 
+    finaldelay(1000), 
     gamemode(p::ccmap->getGameMode()),
     maparea(maparea), 
     tabwidth(pc::sidebar->getTabLocation()->w),
@@ -117,7 +118,8 @@ Input::Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea) :
  * 
  * - free selection
  */
-Input::~Input() {
+Input::~Input()
+{
 	// Free selected object
 	delete this->selected;
 }
@@ -326,6 +328,12 @@ void Input::handle()
                 case SDLK_F8:
                     p::uspool->showMoves();
                     break;
+                case SDLK_F9:
+                    p::ppool->playerUndefeated(p::ppool->getLPlayer());
+                    break;
+                case SDLK_F10:
+                    p::ppool->playerDefeated(p::ppool->getLPlayer());
+                    break;
                 case SDLK_v:
                     if (!lplayer->canSeeAll()) {
                         lplayer->setVisBuild(Player::SOB_SIGHT, true);
@@ -497,10 +505,10 @@ void Input::handle()
     if (donecount == 1) {
         if (p::ppool->hasWon()) {
 		pc::sfxeng->PlaySound(pc::Config.MissionWon);
-		logger->gameMsg("MISSION ACCOMPLISHED");
+		//logger->gameMsg("MISSION ACCOMPLISHED");
         } else {
 		pc::sfxeng->PlaySound(pc::Config.MissionLost);
-		logger->gameMsg("MISSION FAILED");
+		//logger->gameMsg("MISSION FAILED");
         }
     }
     if (donecount > finaldelay) {
