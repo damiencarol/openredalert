@@ -100,11 +100,13 @@ bool CheckParameters(unsigned int Event, int param1, int param2, int value)
         	return true;
         	break;
         case TRIGGER_EVENT_LOW_POWER:
+        {
         	// Check if a player have low power (<=> PowerUsed > Power)
         	// param2 = player to check
         	printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER try to analysis\n", __FILE__, __LINE__);
         	// The player to check
-        	Player* pl = p::ppool->getPlayer((Uint8)param2);
+        	Player* pl = 0;
+        	pl = p::ppool->getPlayer((Uint8)param2);
         	printf ("%s line %i: CheckParameters, TRIGGER_EVENT_LOW_POWER analysis player %s\n", __FILE__, __LINE__, pl->getName());
         	if (pl->getPowerUsed() > pl->getPower())
         	{
@@ -115,8 +117,9 @@ bool CheckParameters(unsigned int Event, int param1, int param2, int value)
         	{
         		printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER decide FALSE\n", __FILE__, __LINE__);        		
         		return false;
-        	}
+        	}        	
         	break;
+        }
         case TRIGGER_EVENT_ALL_BRIDGES_DESTROYED:
         case TRIGGER_EVENT_BUILDING_EXISTS:
             printf ("%s line %i: CheckParameters, Event %i not handled jet -> skip ckeck\n", __FILE__, __LINE__, Event);
@@ -168,6 +171,7 @@ bool CheckOtherEvent (unsigned int Event, int param1, int param2, int value)
         	return false;
         	break;
         case TRIGGER_EVENT_LOW_POWER:
+        {
         	// Check if a player have low power (<=> PowerUsed > Power)
         	// param2 = player to check
         	printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER try to analysis\n", __FILE__, __LINE__);
@@ -182,7 +186,8 @@ bool CheckOtherEvent (unsigned int Event, int param1, int param2, int value)
         		printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER decide FALSE\n", __FILE__, __LINE__);
         		return false;
         	}
-        	break;        	        
+        	break;   
+        }     	        
         case TRIGGER_EVENT_ALL_BRIDGES_DESTROYED:
         case TRIGGER_EVENT_BUILDING_EXISTS:
             printf ("%s line %i: CheckOtherEvent, Event %i not handled jet -> skip ckeck\n", __FILE__, __LINE__, Event);
