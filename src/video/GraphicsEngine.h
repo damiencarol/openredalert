@@ -74,7 +74,7 @@ private:
     void drawSidebar();
     void drawLine(Sint16 startx, Sint16 starty,
                   Sint16 stopx, Sint16 stopy, Uint16 width, Uint32 colour);
-    
+    void drawMissionLabel();
     
     SDL_Surface* screen;
     SDL_Surface* icon;
@@ -92,6 +92,13 @@ private:
 	RA_Label* OptionsLabel;
 	/** Money label */
 	RA_Label* MoneyLabel;
+
+	    
+    /** Label for victory message */
+    RA_Label* victoryLabel;
+    /** Label for defeat message */
+    RA_Label* defeatLabel;  
+
 
     Uint32 repair_icon;
     Uint32 repairing_icon;

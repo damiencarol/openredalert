@@ -36,6 +36,7 @@
 #include "game/UnitAndStructurePool.h"
 #include "audio/SoundEngine.h"
 #include "include/sdllayer.h"
+#include "misc/StringTableFile.h"
 #include "ui/Cursor.h"
 #include "ui/RA_Label.h"
 #include "ui/Input.h"
@@ -69,6 +70,7 @@ GraphicsEngine::GraphicsEngine()
     height = config.height;
 	drawFogOfWar = true;//false;
 //	char VideoDriverName[20];
+	StringTableFile* stringFile = new StringTableFile("conquer.eng");
 
 	FrameRateSurface = 0;
 	MoneySurface = 0;
@@ -148,7 +150,6 @@ GraphicsEngine::GraphicsEngine()
 	}
 	logger->renderGameMsg(true);
 
-//	printf ("%s line %i: Video driver = %s\n", __FILE__, __LINE__, SDL_VideoDriverName (VideoDriverName, 20));
 
 	firstframe = SDL_GetTicks();
 	frames = 0;
@@ -159,8 +160,27 @@ GraphicsEngine::GraphicsEngine()
 	MoneyLabel = 0;
 
 	//oldmouse.x = oldmouse.y = oldmouse.w = oldmouse.h = 0;
-	memset (&oldmouse, 0, sizeof (SDL_Rect));
+	memset(&oldmouse, 0, sizeof (SDL_Rect));
+	
+	
+	// Create the label for victory msg
+	victoryLabel = new RA_Label();
+	victoryLabel->setColor(0xAA, 0x00, 0x00);
+	victoryLabel->SetFont("vcr.fnt");
+	victoryLabel->UseAntiAliasing(false);
+	victoryLabel->setText(stringFile->getString(15));
+	
+	// Create the label for defeat msg
+	defeatLabel = new RA_Label();
+	defeatLabel->setColor(0xAA, 0x00, 0x00);
+	defeatLabel->SetFont("vcr.fnt");
+	defeatLabel->UseAntiAliasing(false);
+	defeatLabel->setText(stringFile->getString(16));
+	
+	// Free the string file
+	delete stringFile;
 }
+
 /** 
  * Destructor, free the memory used by the graphicsengine.
  */
@@ -197,6 +217,15 @@ GraphicsEngine::~GraphicsEngine()
 	if (MoneyLabel != 0){
 		delete MoneyLabel;
 	}
+    
+    // Delete Label for victory message
+    if (victoryLabel != 0){
+    	delete victoryLabel;
+    }    
+    // Delete Label for defeat message
+    if (defeatLabel != 0){
+    	delete defeatLabel;
+    }  	
 }
 
 /** 
@@ -283,6 +312,8 @@ void GraphicsEngine::renderScene(bool flipscreen)
 	// draw the selectionbox, 0.000 sec
 	DrawSelectionBox();
 
+	// Draw the message "Victory" or "defeat"
+	drawMissionLabel();
 
 	// Draw messages
 	curimg = pc::msg->getMessages();
@@ -1561,6 +1592,58 @@ void GraphicsEngine::clipToMaparea(SDL_Rect *src, SDL_Rect *dest)
         dest->y = maparea.y;
         dest->h = src->h;
     }
+}
+
+/** 
+ * Draw the victory or the defeat label.
+ */
+void GraphicsEngine::drawMissionLabel()
+{
+	// Get the local player
+	//Player* lplayer = p::ppool->getLPlayer();
+	//printf("x=%d y=%d w=%d h=%d\n", maparea.x, maparea.y, maparea.w, maparea.h);
+	//printf("resX=%d W=%d resY=%d  H=%d\n", 
+	//maparea.x + (maparea.w + defeatLabel->getWidth())/2, defeatLabel->getWidth(),
+	//maparea.y + (maparea.h + defeatLabel->getHeight())/2, defeatLabel->getHeight());
+	
+	
+	// If the local player is winning
+	if (p::ppool->hasWon() == true) 
+	{
+		Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
+		
+		// If the sidebar is visible
+		if (pc::sidebar->getVisible()) 
+		{
+			// TODO get the real width of the sidebar
+			// resX -= pc::sidebar->getSidebarImage()->w;
+			resX -=30;
+		}
+		
+		victoryLabel->Draw(screen, // Draw at screen
+							resX,
+							maparea.y + (maparea.h + victoryLabel->getHeight())/2
+							);
+	}
+	
+	// If the local player is lossing
+	if (p::ppool->hasLost() == true) 
+	{
+		Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
+		
+		// If the sidebar is visible
+		if (pc::sidebar->getVisible()) 
+		{
+			// TODO get the real width of the sidebar
+			// resX -= pc::sidebar->getSidebarImage()->w;
+			resX -=30;
+		}
+		
+		defeatLabel->Draw(screen, // Draw at screen
+							resX,
+							maparea.y + (maparea.h - defeatLabel->getHeight())/2
+							);
+	}  
 }
 
 /** 
