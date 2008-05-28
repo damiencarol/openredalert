@@ -321,6 +321,27 @@ void Input::handle()
                         p::ccmap->restoreLocation(locnum);
                     } }
                     break;
+                case SDLK_F6:
+                {
+                	if (selected->getStructure(0) != 0)
+                	{
+                		if (selected->getStructure(0)->isBombing() == true)
+                		{
+                			logger->debug("Structure stop bombing\n");
+                			selected->getStructure(0)->bombingDone();                		                			
+                		} else {
+                			logger->debug("Structure bombing !!!\n");                		                	
+                			selected->getStructure(0)->bomb();
+                			/*Uint32 num = pc::imgcache->loadImage("fire1.shp");
+                			new ExplosionAnim(1, selected->getStructure(0)->getPos(),
+                					num, pc::imgcache->getNumbImages(num), 23, 23);*/
+                			//static_cast<Uint8>(p::ccmap->getMoveFlash()->getNumImg()), 0, 0);
+                		}
+                	} else {
+                		logger->debug("Structure 0 = NULL\n");
+                	}
+                	break;
+                }
                 case SDLK_F7:
                     logger->gameMsg("MARK @ %i",SDL_GetTicks());
                     logger->debug("Mark placed at %i\n",SDL_GetTicks());
