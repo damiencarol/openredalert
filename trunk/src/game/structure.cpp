@@ -1,5 +1,5 @@
 // Structure.cpp
-// 1.0
+// 1.1
 
 //    This file is part of OpenRedAlert.
 //
@@ -134,6 +134,9 @@ Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
 	TriggerName = trigger_name;
 
 	repairunitAnim = NULL;
+	
+	// When created a structure is not bombed :)
+	bombing = false;
 }
 
 Structure::~Structure()
@@ -334,9 +337,10 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 {
 	bool odam;	// Old damaged
 
-	if (exploding)
+	if (exploding){
 		return;
-
+	}
+	
 	if (this->getOwner() != p::ppool->getLPlayerNum()){
 		// This structure is from a computer player
 		if (p::ccmap->getGameMode() != GAME_MODE_SINGLE_PLAYER){
@@ -442,11 +446,18 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 	}
 }
 
+/**
+ * If mode = 0 => BUILD ANIM
+ * 
+ * If mode = 9 => RETRY SELL
+ * 
+ * If mode = 8 => RETRY REPAIR
+ */
 void Structure::runAnim(Uint32 mode)
 {
 	Uint32 speed;
 
-	// If we want to sell stop current animations
+	// If we want to sell, stop current animations
 	if (mode == 9 && animating ){
 		this->stopAnim();
 		retry_sell = true;
@@ -777,9 +788,28 @@ bool Structure::isRepairing ()
 	return repairing;
 }
 
-void Structure::repairDone (void)
+void Structure::repairDone()
 {
 	repairing = false;
+}
+
+void Structure::bomb()
+{
+	printf ("%s line %i: Start bomb animation\n", __FILE__, __LINE__);
+	// TODO THE BOMBING ANIM
+	//runAnim(8);
+	bombing = true;
+//	runSecAnim (8);
+}
+
+bool Structure::isBombing()
+{
+	return bombing;
+}
+
+void Structure::bombingDone()
+{
+	bombing = false;
 }
 
 /** 

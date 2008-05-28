@@ -1,5 +1,5 @@
 // Structure.h
-// 1.0
+// 1.1
 
 //    This file is part of OpenRedAlert.
 //
@@ -108,10 +108,21 @@ public:
 	bool is(string Name) ;
 
 	void sell();
+	
 	void repair();
 	bool isRepairing();
 	void repairDone(void);
 
+	
+	/** Use to bomb a structure */
+	void bomb();
+	/** Get if the C4 is here :( */
+	bool isBombing();
+	/** */
+	void bombingDone();
+	
+	
+	
 	bool underAttack(void);
 	Uint16 getAttackerPosition(void);
 
@@ -147,6 +158,8 @@ private:
 	bool retry_sell;
     bool retry_repair;
     bool repairing;
+
+    bool bombing;
 
 	UnitType*	CreateUnitType;
 	Uint8		CreateUnitOwner;
