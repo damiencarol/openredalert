@@ -30,6 +30,7 @@ class RA_Label;
 class Unit;
 class ImageCache;
 class CnCMap;
+class Dune2Image;
 
 using std::string;
 using std::vector;
@@ -60,7 +61,11 @@ private:
 	void DrawMouse (void);
 	void DrawTooltip (void);
     void DrawMinimap(void);
-	void DrawRepairing(void);
+	void DrawRepairing();
+	/** 
+	 * Handle drawing the BOMB (C4) icon for structures that are being bombing
+	 */
+	void DrawBombing();
 //	void DrawUnits(void);
 	void DrawVehicleSmoke(void);
 	void DrawStructureHealthBars(SDL_Rect dest, SDL_Rect udest, Uint32 curdpos);
@@ -136,6 +141,9 @@ private:
     Uint8* mz;
     /** Used to avoid SDL_MapRGB in the radar render step. */
     vector<Uint32> playercolours;
+    
+    /** Image for bombing icon */
+    Dune2Image* bombing_icon;
 };
 
 #endif //GRAPHICSENGINE_H
