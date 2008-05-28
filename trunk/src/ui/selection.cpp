@@ -1,3 +1,21 @@
+// Selection.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "Selection.h"
 
 #include <cassert>
@@ -279,8 +297,8 @@ void Selection::purge(Structure* sel)
 
 void Selection::clearSelection()
 {
-list<Unit*>::iterator iter_un;
-list<Structure*>::iterator iter_st;
+	list<Unit*>::iterator iter_un;
+	list<Structure*>::iterator iter_st;
 
     numattacking = 0;
 
@@ -484,15 +502,33 @@ bool Selection::areWaterBound()
 	}
 	return true;
 }
-Uint32 Selection::numbUnits() const {return sel_units.size();}
-Unit* Selection::getUnit(Uint32 UnitNumb) {
-	if (UnitNumb < sel_units.size()){
-        	std::list<Unit*>::const_iterator i = sel_units.begin();
-        	advance(i, UnitNumb);
-        	return *i;
+
+Uint32 Selection::numbUnits() const 
+{
+	return sel_units.size();
+}
+
+Unit* Selection::getUnit(Uint32 UnitNumb)
+{
+	if (UnitNumb < sel_units.size())
+	{
+		list<Unit*>::const_iterator i = sel_units.begin();
+		advance(i, UnitNumb);
+		return *i;
 	}
-	return NULL;
-    }
+	return 0;
+}
+
+Structure* Selection::getStructure(Uint32 structureNumber)
+{
+	if (structureNumber < this->sel_structs.size())
+	{
+		list<Structure*>::const_iterator i = sel_structs.begin();
+		advance(i, structureNumber);
+		return *i;
+	}
+	return 0;
+}
 
 bool Selection::canAttack() const 
 {
