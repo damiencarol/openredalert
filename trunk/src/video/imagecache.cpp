@@ -18,7 +18,6 @@
 
 #include "ImageCache.h"
 
-#include "include/PlayerPool.h"
 #include "ImageNotFound.h"
 #include "SHPImage.h"
 #include "ImageCacheEntry.h"
