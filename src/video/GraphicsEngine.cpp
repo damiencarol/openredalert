@@ -45,6 +45,7 @@
 #include "MessagePool.h"
 #include "ImageCache.h"
 #include "ImageCacheEntry.h"
+#include "Dune2Image.h"
 
 using pc::imgcache;
 using std::string;
@@ -179,6 +180,9 @@ GraphicsEngine::GraphicsEngine()
 	
 	// Free the string file
 	delete stringFile;
+	
+	// Set bombing_icon to zero
+	bombing_icon = 0;
 }
 
 /** 
@@ -273,11 +277,11 @@ void GraphicsEngine::setupCurrentGame()
     for (Uint8 i = 0; i < playercolours.size() ; ++i) {
         // Magic Number 179: See comment at start of
         // shpimage.cpp
-	if (pc::Config.gamenum == GAME_TD) {
+    	if (pc::Config.gamenum == GAME_TD) {
         	playercolours[i] = SHPBase::getColour(screen->format, i, 179);
-	}else if (pc::Config.gamenum == GAME_RA) {
+        }else if (pc::Config.gamenum == GAME_RA) {
         	playercolours[i] = SHPBase::getColour(screen->format, i, 85);
-	}
+        }
     }
 }
 
@@ -734,6 +738,81 @@ void GraphicsEngine::DrawRepairing()
 		udest.w = RepairImg->w;
 		udest.h = RepairImg->h;
 		SDL_UpperBlit(RepairImg, 0, screen, &udest);
+	}
+}
+
+/** 
+ * Handle drawing the BOMB (C4) icon for structures that are being bombing
+ */
+void GraphicsEngine::DrawBombing()
+{
+	static Uint32	last_repair_tick;
+	static Uint8	numImage;
+	static Uint32	tempNum; 
+	
+	Structure		*str = 0;
+
+	Sint16			xpos;
+	Sint16			ypos;
+	SDL_Surface*	bombImage = 0;
+	SDL_Rect		udest;
+	int				scaleq = -1;
+
+	// For all structures
+	for (unsigned int i = 0; i < p::uspool->getNumbStructures(); i++)
+	{
+		// For now we only do this for red alert
+		if (pc::Config.gamenum != GAME_RA){
+			continue;
+		}
+
+		// Get a structure
+		str = p::uspool->getStructure(i);
+
+		// Check that we actually found a structure
+		if (str == 0){
+			continue;
+		}
+		
+		// Check if the structure is being bombing
+		if (str->isBombing()==false){
+			continue;
+		}
+		
+		// Load the bombing icon image (displayed while bombing a structure)
+		if (bombing_icon == 0){
+			bombing_icon = new Dune2Image("mouse.shp", scaleq);
+		}
+		
+		// Update the animation icon (from the first (116) to the last (118))
+		if ( (SDL_GetTicks() - last_repair_tick) > 1000){//300
+			if (numImage>117 || numImage<116){
+				numImage = 116;
+			}else{
+				numImage++;
+			}
+			last_repair_tick = SDL_GetTicks();
+		}
+
+		// Get the icon (116, 117 or 118)
+		bombImage = bombing_icon->getImage(numImage);
+		
+		if (bombImage == 0){
+			logger->error("bombimage = 0 \n");		                	
+			continue;
+		}
+		
+		if (!MapPosToScreenXY(str->getPos(), &xpos, &ypos, p::ccmap)){
+			continue;
+		}
+		
+		// Draw the repair icon (animation)
+		udest.x = xpos + (str->getType()->getXsize() * tilewidth - bombImage->w)/2; //+ (str->getType()->getXsize() * tilewidth)
+		udest.y = ypos + (str->getType()->getYsize() * tileheight - bombImage->h)/2; /* + (str->getType()->getYsize() * tileheight) */
+		udest.w = bombImage->w;
+		udest.h = bombImage->h;
+		// Draw the icon
+		SDL_BlitSurface(bombImage, 0, screen, &udest);
 	}
 }
 
@@ -1559,7 +1638,10 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 	DrawRepairing();
 
 	// Draw smoke on vehicules
-	DrawVehicleSmoke();
+	DrawVehicleSmoke();		
+	
+	// Handle drawing the BOMB (C4) icon
+	DrawBombing();
 }
 
 /**
