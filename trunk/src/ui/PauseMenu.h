@@ -41,14 +41,18 @@ private:
 	void HandleInput();
 	void DrawMousePointer();
 	
+	/** Label for the Pause menu */
 	RA_Label* MenuLabel;
+	/** Label for version */
 	RA_Label* VersionLabel;
 
 	SDL_Color Font_color;
 	
-	/** Buttons for the main menu */
+	/** Buttons "Option" for the main menu */
 	Button* OptionsButton;
+	/** Buttons "Exit" for the main menu */
 	Button* ExitButton;
+	/** Buttons "Resume" for the main menu */
 	Button* ContinueButton;
 
 	RA_WindowClass* PauseWindow;
@@ -56,6 +60,7 @@ private:
 	SDL_Surface* display;
 	SDL_Surface* my_cursor;
 
+	/** Image for the cursor */
 	Dune2Image *cursorimg;
 	
 	/** Exit the menu if this var is true */
