@@ -158,7 +158,8 @@ Menu::Menu() :
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
-	LoadMissionButton.CreateSurface("Btitaque arienn", ButtonXpos, ButtonYpos, button_width, button_height);
+	// (the string 35 is "Load game" but located)
+	LoadMissionButton.CreateSurface(strFile->getString(35), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;;
 
@@ -166,7 +167,8 @@ Menu::Menu() :
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
-	IntroAndSneakPeekButton.CreateSurface("Intro & Sneak Peek", ButtonXpos, ButtonYpos, button_width, button_height);
+	// (the string 18 is "Intro & Sneak Peek" but located)
+	IntroAndSneakPeekButton.CreateSurface(strFile->getString(18), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
@@ -362,20 +364,20 @@ Menu::Menu() :
 	
 	// Build Lisbox with mission multi
 	listBox = new ListboxClass();
-	
-	printf("end constructor menu\n");
 }
 
+/**
+ * 
+ */
 Menu::~Menu()
 {
-//    int stat;
 
-	if (win95_logo != NULL)
+	if (win95_logo != NULL){
 		delete win95_logo;
-
-	if (dos_logo != NULL)
+	}
+	if (dos_logo != NULL){
 		delete dos_logo;
-
+	}
 	if (my_cursor != NULL){
 		SDL_FreeSurface(my_cursor);
 	}
@@ -438,7 +440,10 @@ void Menu::DrawMousePointer()
 	SDL_BlitSurface(my_cursor, 0, display, &dest);
 }
 
-void Menu::DrawMainMenuButtons (void)
+/**
+ * 
+ */
+void Menu::DrawMainMenuButtons()
 {
 //	if (StartNewGameButton.NeedRedraw())
 		StartNewGameButton.drawbutton();
@@ -719,9 +724,9 @@ int Menu::HandleMenu()
 		SDL_GetMouseState(&mx, &my);
 
 		// Draw the background pixture
-		this->DrawMenuBackground ();
+		this->DrawMenuBackground();
 		// Draw buttons
-		this->DrawMainMenuButtons ();
+		this->DrawMainMenuButtons();
 
 
 		if (MenuState == 2){
