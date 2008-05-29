@@ -26,13 +26,14 @@
 #include "RA_WindowClass.h"
 #include "TCheckBox.h"
 #include "game/Player.h"
-#include "include/PlayerPool.h"
+#include "game/PlayerPool.h"
 #include "include/config.h"
 #include "video/GraphicsEngine.h"
 #include "include/Logger.h"
 #include "audio/SoundEngine.h"
 #include "include/sdllayer.h"
 #include "video/Dune2Image.h"
+#include "misc/StringTableFile.h"
 
 namespace p {
 	extern PlayerPool* ppool;
@@ -43,13 +44,22 @@ namespace pc {
 }
 extern Logger * logger;
 
+/**
+ * 
+ */
 PauseMenu::PauseMenu()
 {
-    //:MenuFont("type.fnt"), VersionFont ("grad6fnt.fnt")
-    
-    // Create the windows
-    PauseWindow = new RA_WindowClass();
-    
+	StringTableFile* stringFile = 0; // File to load located string
+	
+	// Load strings
+	stringFile = new StringTableFile("conquer.eng");
+	
+	// Create the window
+	PauseWindow = new RA_WindowClass();
+	// Setup the first popup window
+	PauseWindow->SetupWindow(130, 90, 430, 250);
+
+	
     // Create "Option" button
     OptionsButton = new Button();
 	// Create "Exit" button
@@ -59,11 +69,14 @@ PauseMenu::PauseMenu()
 	
 	// Draw the buttons on the new window..
     OptionsButton->SetDrawingWindow(PauseWindow);
-	OptionsButton->CreateSurface("game options", 120, 110, 180, 22);	
+    // String 47 = "game options"
+    OptionsButton->CreateSurface(stringFile->getString(47), 120, 110, 180, 22);	
 	ExitButton->SetDrawingWindow(PauseWindow);
-	ExitButton->CreateSurface("abort Mission", 120, 145, 180, 22);	
+	// String 45 = "abort Mission"
+	ExitButton->CreateSurface(stringFile->getString(45), 120, 145, 180, 22);	
 	ContinueButton->SetDrawingWindow(PauseWindow);
-	ContinueButton->CreateSurface("Resume Mission", 35, 200, 180, 22);
+	// String 43 = "Resume Mission"
+	ContinueButton->CreateSurface(stringFile->getString(43), 35, 200, 180, 22);
 			
 	// Setup the font color
 	Font_color.r = 255;
@@ -80,11 +93,7 @@ PauseMenu::PauseMenu()
     }
 	my_cursor = cursorimg->getImage(0);
 
-	// Create the window
-	PauseWindow = new RA_WindowClass();
-	// Setup the first popup window
-    PauseWindow->SetupWindow(130, 90, 430, 250);
-
+	
 
 	// Create the menu Label
 	MenuLabel = new RA_Label();
@@ -100,6 +109,9 @@ PauseMenu::PauseMenu()
 	for (int x = 177; x < 243; x++){
 		SDLLayer::set_pixel(PauseWindow->GetWindowSurface(), 0xffffff, x, 45);
     }
+	
+	// Free string file
+	delete stringFile;
 }
 
 /**
@@ -176,11 +188,14 @@ int PauseMenu::HandleMenu()
     return 0;
 }
 
+
 void PauseMenu::HandleInput()
 {
 	SDL_Event event;
 
-	if (SDL_WaitEvent(&event)){
+	// Wait an event from SDL Layer
+	if (SDL_WaitEvent(&event))
+	{
 
 		// Pass events on to menu items
 		if (ExitButton->handleMouseEvent(event)){
@@ -215,19 +230,24 @@ void PauseMenu::HandleInput()
 						// Continue the game
 						pc::Config.pause = false;
 						pc::sfxeng->ResumeLoopedSound(-1);
-						for (int i = 0; i < p::ppool->getNumPlayers(); i++)
+						for (int i = 0; i < p::ppool->getNumPlayers(); i++){
 							p::ppool->getPlayer(i)->resumeBuilding();
+						}
 					}
 				}
 				break;
 			case SDL_KEYDOWN:
-				if (event.key.keysym.sym == SDLK_ESCAPE){
+				if (event.key.keysym.sym == SDLK_ESCAPE)
+				{
+					// Continue the game
 					pc::Config.pause = false;
+					pc::sfxeng->ResumeLoopedSound(-1);
+					for (int i = 0; i < p::ppool->getNumPlayers(); i++){
+						p::ppool->getPlayer(i)->resumeBuilding();
+					}
 				}
 				break;
 		}
-	} else {
-		printf ("Error");
 	}
 }
 
