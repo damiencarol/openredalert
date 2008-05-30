@@ -4,10 +4,13 @@
 #include "SDL/SDL_types.h"
 
 #include "UnitAnimEvent.h"
-#include "Unit.h"
 
+class Unit;
 class UnitOrStructure;
 
+/**
+ * 
+ */
 class UAttackAnimEvent : public UnitAnimEvent
 {
 public:
@@ -17,11 +20,11 @@ public:
 	virtual void update();
 	virtual void run();
 private:
-	Unit *un;
+	Unit* un;
 	bool stopping;
 	Uint8 waiting;
 	UnitOrStructure* target;
 	bool UsePrimaryWeapon;
 };
 
-#endif
+#endif //UATTACKANIMEVENT_H
