@@ -1,4 +1,22 @@
-#include "game/Ai.h"
+// Ai.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
+#include "Ai.h"
 
 #include <stdexcept>
 #include <math.h>
@@ -6,14 +24,13 @@
 #include "SDL/SDL_timer.h"
 
 #include "ActionEventQueue.h"
-#include "include/ccmap.h"
-#include "include/Logger.h"
-#include "include/PlayerPool.h"
+#include "CnCMap.h"
+#include "PlayerPool.h"
 #include "game/Unit.h"
 #include "UnitAndStructurePool.h"
-#include "include/weaponspool.h"
+//#include "Weaponspool.h"
 #include "audio/SoundEngine.h"
-#include "include/dispatcher.h"
+#include "Dispatcher.h"
 #include "video/Renderer.h"
 #include "misc/INIFile.h"
 #include "GameMode.h"
@@ -21,15 +38,18 @@
 #include "Structure.h"
 #include "pside.h"
 #include "Player.h"
-#include "Ai.h"
 #include "AiRules.h"
 #include "Unit.h"
+#include "include/Logger.h"
+#include "include/config.h"
 
 #define DEBUG_AI
 
-using p::ccmap;
 namespace p {
+	extern CnCMap* ccmap;
 	extern UnitAndStructurePool* uspool;
+	extern PlayerPool* ppool;
+	extern Dispatcher* dispatcher;
 }
 extern Logger * logger;
 
@@ -144,15 +164,17 @@ Ai::~Ai()
 
 void Ai::SetDifficulty(int Diff)
 {
-	if (Diff <= 4)
+	if (Diff > 0 && Diff <= 4)
+	{
 		this->Difficulty = Diff;
+	}
 }
 
 void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 {
 	UnitOrStructure     *lEnemy = NULL;
 	int                 lNumbUnits;
-	std::vector<Unit*>	lUnitpool;
+	vector<Unit*>	lUnitpool;
 	Unit                *lUnit;
 	Unit				*lEnemyUnit;
 	Structure           *lEnemyStructure;
@@ -164,7 +186,8 @@ void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 	lUnitpool = pPlayer->getUnits();
 
 	// For each unit from this player
-	for (int lUnitNumb = 0; lUnitNumb < lNumbUnits; lUnitNumb++){
+	for (int lUnitNumb = 0; lUnitNumb < lNumbUnits; lUnitNumb++)
+	{
 
 		lUnit = lUnitpool[lUnitNumb];
 
@@ -218,17 +241,19 @@ void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 
 void Ai::DefendComputerPlayerBaseUnderAttack (Player *Player, int PlayerNumb, UnitOrStructure *Enemy, Structure *StructureUnderAttack)
 {
-int			NumbUnits = 0;
-std::vector<Unit*>	unitpool;
-Unit			*Unit = NULL;
-int			Distance, SightRange, StructureUnderAttackPos;
+	int			NumbUnits = 0;
+	vector<Unit*>	unitpool;
+	Unit* Unit = 0;
+	int	Distance;
+	int SightRange;
+	int StructureUnderAttackPos;
 
-	if (Enemy == NULL || StructureUnderAttack == NULL)
+	if (Enemy == 0 || StructureUnderAttack == 0){
 		return;
-
-	if (Enemy->getOwner() == StructureUnderAttack->getOwner())
+	}
+	if (Enemy->getOwner() == StructureUnderAttack->getOwner()){
 		return;
-
+	}
 	//
 	// don't try to build for the human player
 	// We should actually check if building is allowed and only build when allowed (by triggers)
@@ -247,7 +272,8 @@ int			Distance, SightRange, StructureUnderAttackPos;
 			StructureUnderAttack->repair();
 	}
 
-	for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++){
+	for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++)
+	{
 		Unit = unitpool[UnitNumb];
 
 		if (/*Unit->IsAttacking () ||*/ !Unit->canAttack())
@@ -261,12 +287,15 @@ int			Distance, SightRange, StructureUnderAttackPos;
 		}
 	}
 }
+
 void Ai::DefendComputerPlayerUnitUnderAttack (Player *Player, int PlayerNumb, UnitOrStructure *Enemy, Unit *UnitUnderAttack)
 {
-int			NumbUnits = 0;
-std::vector<Unit*>	unitpool;
-Unit			*Unit = NULL;
-int			Distance, SightRange, UnitUnderAttackPos;
+	int			NumbUnits = 0;
+	vector<Unit*>	unitpool;
+	Unit* lUnit = 0;
+	int	Distance, SightRange, UnitUnderAttackPos;
+	
+	
 
 	if ( Enemy == NULL || UnitUnderAttack == NULL)
 		return;
@@ -290,17 +319,17 @@ int			Distance, SightRange, UnitUnderAttackPos;
 	UnitUnderAttackPos = UnitUnderAttack->getPos();
 
 	for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++){
-		Unit = unitpool[UnitNumb];
+		lUnit = unitpool[UnitNumb];
 
-		if (/*Unit->IsAttacking () ||*/ !Unit->canAttack())
+		if (/*lUnit->IsAttacking () ||*/ !lUnit->canAttack())
 			continue;
 
-		Distance	= Unit->getDist(UnitUnderAttackPos);
-		SightRange	= Unit->getType()->getSight();
+		Distance	= lUnit->getDist(UnitUnderAttackPos);
+		SightRange	= lUnit->getType()->getSight();
 
 		// If I can see my comrade under attack
 		if ( Distance < SightRange){
-			Unit->attack ((UnitOrStructure*)Enemy);
+			lUnit->attack ((UnitOrStructure*)Enemy);
 		}
 	}
 }
@@ -309,7 +338,7 @@ int			Distance, SightRange, UnitUnderAttackPos;
 /**
  *	This is a beginning, for now this function only deploy's the starting MCV
  */
-void Ai::handle (void)
+void Ai::handle()
 {
 	Player * CurPlayer;
 	static bool DelayAttack = true;
@@ -317,7 +346,7 @@ void Ai::handle (void)
 	//char			*Name;
 
 	// Don't burn our fingers on multi player mode...
-	if (ccmap->getGameMode() == GAME_MODE_MULTI_PLAYER){
+	if (p::ccmap->getGameMode() == GAME_MODE_MULTI_PLAYER){
 		return;
 	}
 
@@ -402,16 +431,20 @@ void Ai::handle (void)
 		}
 	}
 }
-void Ai::guideAttack (Player *Player, int PlayerNumb) {
-    int NumbUnits, NumbStructures,
-    	lPlayerNumbStructures,
-    	lPlayerNumbUnits;
-std::vector<Structure*>		structurepool, lPlayerStructurePool;
-std::vector<Structure*>		EnemyTeslaCoils, EnemyPowerPlants, EnemyOreRefs;
-std::vector<Unit*>		unitpool, lPlayerUnitPool;
-Unit				*Unit = NULL, *FirstUnit = NULL, *ClosestUnit = NULL;
-Uint32				MaxDist = 0, TargetDist = 0, NextTargetDist = 0;
-bool				StillMoving = false;
+
+void Ai::guideAttack (Player *Player, int PlayerNumb) 
+{
+    int NumbUnits;
+    int NumbStructures;
+    int lPlayerNumbStructures;
+    int lPlayerNumbUnits;
+    vector<Structure*>		structurepool, lPlayerStructurePool;
+    vector<Structure*>		EnemyTeslaCoils, EnemyPowerPlants, EnemyOreRefs;
+    vector<Unit*> unitpool;
+    vector<Unit*> lPlayerUnitPool;
+    Unit* Unit = NULL, *FirstUnit = NULL, *ClosestUnit = NULL;
+    Uint32	MaxDist = 0, TargetDist = 0, NextTargetDist = 0;
+    bool StillMoving = false;
 
 	// don't try to control for the human player
 	if (PlayerNumb == this->HumanPlayerNumb){
@@ -455,7 +488,8 @@ bool				StillMoving = false;
 		if (!player_targets[PlayerNumb]->isAlive()){
 			player_targets[PlayerNumb] = NULL;
 
-			if (lPlayerStructurePool.size() > 0){
+			if (lPlayerStructurePool.size() > 0)
+			{
 				if (lPlayerStructurePool[0]->isAlive()){
 					NextTargetDist = FirstUnit->getDist(lPlayerStructurePool[0]->getPos());
 					player_targets[PlayerNumb] = lPlayerStructurePool[0];
@@ -463,7 +497,8 @@ bool				StillMoving = false;
 					NextTargetDist = 10000;
 
 				// Find the closest target
-				for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++){
+				for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++)
+				{
 					if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < NextTargetDist && lPlayerStructurePool[i]->isAlive()){
 						NextTargetDist = FirstUnit->getDist(lPlayerStructurePool[i]->getPos());
 						player_targets[PlayerNumb] = lPlayerStructurePool[i];
@@ -471,7 +506,8 @@ bool				StillMoving = false;
 				}
 
 				// Find the preferred targets
-				for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++){
+				for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++)
+				{
 					// Make a list of all nearby tesla's
 					if ( lPlayerStructurePool[i]->is("TSLA") && lPlayerStructurePool[i]->isAlive()){
 						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
@@ -599,7 +635,9 @@ bool				StillMoving = false;
 	}
 }
 
-
+/**
+ * 
+ */
 Uint32 Ai::getDist(Uint32 pos1, Uint32 pos2)
 {
     Uint16 x, y, nx, ny, xdiff, ydiff;
@@ -628,11 +666,11 @@ bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
 
 	StructureType* Type	= p::uspool->getStructureTypeByName(structname);
 
-	std::vector<bool>& buildable = p::ppool->getPlayer(PlayerNumb)->getMapBuildable();
+	vector<bool>& buildable = p::ppool->getPlayer(PlayerNumb)->getMapBuildable();
 
 	// Check that we don't try to build outside the map (copied check from unitandstructurepool.cpp!!
-	br = pos + ccmap->getWidth()*(Type->getYsize()-1);
-	if (pos > ccmap->getSize() || (br > ccmap->getSize() && 0))
+	br = pos + p::ccmap->getWidth()*(Type->getYsize()-1);
+	if (pos > p::ccmap->getSize() || (br > p::ccmap->getSize() && 0))
 		return false;
 
 	// Prevent wrapping around
@@ -657,10 +695,15 @@ bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
 	}
 	return true;
 }
+
+/**
+ * 
+ */
 bool Ai::BuildStructure (Player *Player, int PlayerNumb, const char *structname, Uint32 ConstYardPos)
 {
-Uint32 pos = 0;
-Uint16 ConstYard_x, ConstYard_y;
+	Uint32 pos = 0;
+	Uint16 ConstYard_x;
+	Uint16 ConstYard_y;
 
 	p::ccmap->translateFromPos(ConstYardPos, &ConstYard_x, &ConstYard_y);
 
@@ -708,7 +751,11 @@ Uint16 ConstYard_x, ConstYard_y;
 	logger->error("%s line %i: Failed to find free pos\n", __FILE__, __LINE__);
 	return false;
 }
-unsigned int Ai::FindClosesedTiberium (Unit *Unit)
+
+/**
+ * 
+ */
+unsigned int Ai::FindClosesedTiberium(Unit *Unit)
 {
     Uint32 tiberium = 0;
     Uint32 ClosesedPos = 0;
@@ -781,14 +828,14 @@ Unit                    *EnemyUnit;
 
 void Ai::Build (Player *Player, int PlayerNumb)
 {
-std::vector<Structure*>	structurepool;
-int					NumbUnits,
-					NumbStructures;
-std::vector<Unit*>	unitpool;
-Unit				*Unit;
-Structure			*OreRefinery;
-Uint32				NumbOfInfantry = 0, NumbWarfactorys = 0, NumbOreRefs = 0, NumbConstYards = 0, NumbBarracks = 0, NumbOfOreTrucks = 0, NumbTanks = 0, NumbTeslaCoils = 0 , NumbOfPowerPlants = 0;
-Structure			*Structure;
+	vector<Structure*>	structurepool;
+	int					NumbUnits;
+	int					NumbStructures;
+	vector<Unit*>	unitpool;
+	Unit			*Unit;
+	Structure		*OreRefinery;
+	Uint32			NumbOfInfantry = 0, NumbWarfactorys = 0, NumbOreRefs = 0, NumbConstYards = 0, NumbBarracks = 0, NumbOfOreTrucks = 0, NumbTanks = 0, NumbTeslaCoils = 0 , NumbOfPowerPlants = 0;
+	Structure*		Structure;
 Uint32				ConstYardPos = 0;
 //UnitType			*BuildUnitType;
 int					cost;
@@ -800,7 +847,7 @@ Uint16				xpos,
 				ypos;
 
 	// Don't build in single player mode (jet).
-	if (ccmap->getGameMode() == GAME_MODE_SINGLE_PLAYER){
+	if (p::ccmap->getGameMode() == GAME_MODE_SINGLE_PLAYER){
 		return;
 	}
 
