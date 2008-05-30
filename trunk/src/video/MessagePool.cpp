@@ -1,3 +1,21 @@
+// MessagePool.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "MessagePool.h"
 
 #include <list>
@@ -67,9 +85,10 @@ SDL_Surface *MessagePool::getMessages()
     return textimg;
 }
 
-void MessagePool::postMessage(const std::string& msg)
+void MessagePool::postMessage(string msg)
 {
-    msglist.push_back(Message(msg, SDL_GetTicks() + 10000));
+	string mess = msg;	
+    msglist.push_back(Message(mess, SDL_GetTicks() + 10000));
     updated = true;
 }
 
