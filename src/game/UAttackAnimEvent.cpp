@@ -1,3 +1,21 @@
+// UAttackAnimEvent.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "UAttackAnimEvent.h"
 
 #include <cmath>
@@ -11,13 +29,14 @@
 #include "MoveAnimEvent.h"
 #include "Projectile.h"
 #include "Weapon.h"
-
+#include "PlayerPool.h"
 #include "game/Unit.h"
-#include "include/ccmap.h"
+#include "CnCMap.h"
 #include "include/Logger.h"
 #include "Unit.h"
 
 namespace p {
+	extern PlayerPool* ppool;
 	extern ActionEventQueue * aequeue;
 	extern CnCMap * ccmap;
 }
@@ -151,10 +170,13 @@ void UAttackAnimEvent::run()
 
     atkpos = un->getTargetCell();
 
-    xtiles = un->cellpos % p::ccmap->getWidth() - atkpos % p::ccmap->getWidth();
-    ytiles = un->cellpos / p::ccmap->getWidth() - atkpos / p::ccmap->getWidth();
-    distance = abs(xtiles)>abs(ytiles)?abs(xtiles):abs(ytiles);
-
+    xtiles = un->getPos() % p::ccmap->getWidth() - atkpos % p::ccmap->getWidth();
+    ytiles = un->getPos() / p::ccmap->getWidth() - atkpos / p::ccmap->getWidth();
+    
+    // TODO modify calculs
+    //distance = abs()>abs(ytiles)?abs(xtiles):abs(ytiles);
+    distance = sqrt(xtiles*xtiles + ytiles*ytiles);
+    
     if( distance > un->type->getWeapon(UsePrimaryWeapon)->getRange() /* weapons range */ ) {
         setDelay(0);
         waiting = 3;
@@ -221,6 +243,11 @@ void UAttackAnimEvent::run()
 		}
 	}
 
+	// Throw an event
+	HandleTriggers(target, TRIGGER_EVENT_ATTACKED,
+	    		p::ppool->getHouseNumByPlayerNum(un->getOwner()));
+
+		
     // We can shoot
     un->type->getWeapon(UsePrimaryWeapon)->fire(un, target->getBPos(un->getPos()), target->getSubpos());
     // set delay to reloadtime
