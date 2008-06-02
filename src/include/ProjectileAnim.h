@@ -10,7 +10,7 @@
 #include "game/UnitOrStructure.h"
 
 class UnitAndStructurePool;
-struct L2Overlay;
+class L2Overlay;
 
 class ProjectileAnim : public ActionEvent
 {
@@ -31,7 +31,7 @@ private:
     Sint8 xoffset;
     Sint8 yoffset;
     //Sint32 xmod, ymod;
-    L2Overlay *l2o;
+    L2Overlay* l2o;
     std::multimap<Uint16, L2Overlay*>::iterator l2entry;
     double xdiff, ydiff;
     double xmod, ymod, rxoffs, ryoffs;
