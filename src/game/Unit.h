@@ -22,7 +22,7 @@
 #include "Structure.h"
 #include "TalkbackType.h"
 
-struct L2Overlay;
+class L2Overlay;
 class WalkAnimEvent;
 class MoveAnimEvent;
 class URepairEvent;
