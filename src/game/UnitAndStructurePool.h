@@ -49,7 +49,7 @@
 #include "UnitOrStructure.h"
 
 struct RA_Teamtype;
-struct UnitAndStructureMat;
+class UnitAndStructureMat;
 class UnitOrStructure;
 class UnitOrStructureType;
 class INIFile;
