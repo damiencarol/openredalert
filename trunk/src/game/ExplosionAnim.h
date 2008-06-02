@@ -7,7 +7,7 @@
 
 #include "ActionEvent.h"
 
-struct L2Overlay;
+class L2Overlay;
 
 using std::multimap;
 
@@ -25,7 +25,7 @@ public:
 private:
     ExplosionAnim() ; // Declare private constructor to force parameter in constructor
 
-    L2Overlay *l2o;
+    L2Overlay* l2o;
     Uint16 pos;
     Uint8 animsteps;
     std::multimap<Uint16, L2Overlay*>::iterator l2entry;
