@@ -15,7 +15,7 @@ class Talkback;
 class StructureType;
 class WeaponsPool;
 class INIFile;
-struct L2Overlay;
+class L2Overlay;
 
 using std::vector;
 
