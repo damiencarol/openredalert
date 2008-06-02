@@ -25,7 +25,7 @@ class INIFile;
 class Weapon;
 class WeaponsPool;
 class StructureType;
-struct L2Overlay;
+class L2Overlay;
 
 /**
  * This should be a member of unit for infantry. When an infantry unit walks
