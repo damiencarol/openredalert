@@ -1074,7 +1074,7 @@ void GraphicsEngine::DrawFlyingUnitHealthBars(SDL_Rect dest, SDL_Rect	udest, Uin
 void GraphicsEngine::DrawL2Overlays()
 {
 	Uint32		i;
-	//SDL_Rect	udest;
+	SDL_Rect	udest;
 	SDL_Rect	dest;
 	Uint32		curpos, curdpos;
 	Uint8		numshps;
@@ -1105,7 +1105,7 @@ void GraphicsEngine::DrawL2Overlays()
 			if (imagenumb > NumbImages)
 				printf ("%s line %i: ERROR: Imagenumb > numbimages for image %s, numb images = %i\n", __FILE__, __LINE__, Name.c_str(), NumbImages);
 #endif
-			/*
+			
 			ImageCacheEntry& images = imgcache->getImage(unitorstructshps[curdpos]);
 			if (images.image != 0){
 				udest.x = dest.x + uxoffsets[curdpos];
@@ -1114,7 +1114,7 @@ void GraphicsEngine::DrawL2Overlays()
 				udest.h = images.image->h;
 				SDL_UpperBlit(images.image, 0, screen, &udest);
 			}
-			*/
+			
         }
    
 		if (unitorstructshps != 0){
