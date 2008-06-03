@@ -1,3 +1,21 @@
+// RA_ProgressBar.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "RA_ProgressBar.h"
 
 #include <math.h>
@@ -7,8 +25,7 @@
 #include "SDL/SDL_video.h"
 
 #include "video/GraphicsEngine.h"
-//#include "include/widgets.h"
-#include "RA_WindowClass.h"
+#include "RaWindow.h"
 
 using std::string;
 
@@ -56,10 +73,12 @@ void RA_ProgressBar::SetDrawingSurface(SDL_Surface *DwgSurface)
 	}
 }
 
-void RA_ProgressBar::SetDrawingWindow(RA_WindowClass *Window)
+void RA_ProgressBar::SetDrawingWindow(RaWindow* window)
 {
-	if (Window != NULL){
-		_windowToDrawOn = Window;
+	// Check if it's not NULL
+	if (window != 0)
+	{
+		_windowToDrawOn = window;
 	}
 }
 
@@ -71,7 +90,7 @@ bool RA_ProgressBar::MouseOver()
 	SDL_GetMouseState(&mx, &my);
 
 	if (_windowToDrawOn != NULL){
-		_windowToDrawOn->GetWindowPosition (&WinXpos, &WinYpos);
+		_windowToDrawOn->GetWindowPosition(&WinXpos, &WinYpos);
 		mx -= WinXpos;
 		my -= WinYpos;
 	}
