@@ -1,3 +1,21 @@
+// LoadingScreen.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "LoadingScreen.h"
 
 #include "SDL/SDL_timer.h"
@@ -19,7 +37,7 @@ namespace pc {
 extern Logger * logger;
 
 
-/** @TODO Abstract away the dependencies on video stuff so we can use
+/** @todo Abstract away the dependencies on video stuff so we can use
  * LoadingScreen as part of the server's console output.
  */
 LoadingScreen::LoadingScreen()
@@ -36,6 +54,7 @@ LoadingScreen::LoadingScreen()
     }
 //    renderThread = SDL_CreateThread(LoadingScreen::runRenderThread, this);
 }
+
 LoadingScreen::~LoadingScreen()
 {
 //    int stat;
@@ -53,7 +72,8 @@ LoadingScreen::~LoadingScreen()
     delete logo;
     pc::msg->setWidth(oldwidth);
 }
-void LoadingScreen::setCurrentTask(const std::string& task)
+
+void LoadingScreen::setCurrentTask(const string& task)
 {
     while(SDL_mutexP(lsmutex)==-1) {
         logger->warning("Couldn't lock mutex\n");
@@ -92,8 +112,17 @@ int LoadingScreen::runRenderThread(void* inst)
     }
     return 0;
 }
-const std::string& LoadingScreen::getCurrentTask() const {
-        return task_;
-    }
-LoadingScreen::LoadingScreen(const LoadingScreen&) {}
-LoadingScreen& LoadingScreen::operator=(const LoadingScreen&) {return *this;}
+
+const string& LoadingScreen::getCurrentTask() const
+{
+	return task_;
+}
+
+LoadingScreen::LoadingScreen(const LoadingScreen&)
+{
+}
+
+LoadingScreen& LoadingScreen::operator=(const LoadingScreen&)
+{
+	return *this;
+}

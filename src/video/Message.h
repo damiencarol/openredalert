@@ -26,14 +26,16 @@
 using std::string;
 
 /** 
- * @TODO Replace this class with a std::pair<string, Uint32>
+ * @todo Replace this class with a std::pair<string, Uint32>
  */
 class Message
 {
 public:
-    Message(string msg, Uint32 deltime) ;
-    const char *getMessage() const ;
-    bool expired(Uint32 time) const ;
+    Message(string msg, Uint32 deltime);
+    
+    const char* getMessage() const;
+    bool expired(Uint32 time) const;
+    
 private:
     string message;
     Uint32 deltime;
