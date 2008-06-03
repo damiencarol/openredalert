@@ -1,3 +1,21 @@
+// INIFile.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "INIFile.h"
 
 #include <iosfwd>
@@ -165,23 +183,22 @@ INIFile::~INIFile()
  */
 char* INIFile::readString(const char* section, const char* value)
 {
-	char* retval;
-	map<string, INISection>::iterator sec;
-	INIKey key;
+	char* retval = 0; // Return value	
 
 	string s = section;
 	transform(s.begin(), s.end(), s.begin(), toupper);
 	string v = value;
 	transform(v.begin(), v.end(), v.begin(), toupper);
 
-	sec = Inidata.find(s);
+	// Try to find the key
+	map<string, INISection>::iterator sec = Inidata.find(s);
 	if (sec == Inidata.end())
 	{
 		return 0;
 	}
 
-	//    key = sec->second.find(v);
-	key = sec->second.begin();
+	// get a const iterator
+	INIKey key = sec->second.begin();
 
 	for (unsigned int i = 0; i < sec->second.size(); i++)
 	{
