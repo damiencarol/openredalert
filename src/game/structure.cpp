@@ -1,5 +1,5 @@
 // Structure.cpp
-// 1.1
+// 1.0
 
 //    This file is part of OpenRedAlert.
 //
@@ -23,8 +23,8 @@
 
 #include "SDL/SDL_timer.h"
 
-#include "include/ccmap.h"
-#include "include/PlayerPool.h"
+#include "cncmap.h"
+#include "PlayerPool.h"
 #include "Player.h"
 #include "BTurnAnimEvent.h"
 #include "BExplodeAnimEvent.h"
@@ -34,24 +34,26 @@
 #include "audio/SoundEngine.h"
 #include "BAttackAnimEvent.h"
 #include "UnitAndStructurePool.h"
-#include "include/weaponspool.h"
-#include "include/dispatcher.h"
+#include "weaponspool.h"
+#include "dispatcher.h"
 #include "BRepairUnitAnimEvent.h"
-#include "include/weaponspool.h"
+#include "weaponspool.h"
 #include "StructureType.h"
 #include "GameMode.h"
 #include "UnitOrStructure.h"
-#include "game/RefineAnimEvent.h"
+#include "RefineAnimEvent.h"
 #include "LoopAnimEvent.h"
 #include "RepairAnimEvent.h"
 #include "ProcAnimEvent.h"
-#include "game/Ai.h"
+#include "Ai.h"
 #include "include/Logger.h"
-#include "game/unittypes.h"
-#include "game/Projectile.h"
+#include "unittypes.h"
+#include "Projectile.h"
 #include "Weapon.h"
 #include "Unit.h"
 #include "InfantryGroup.h"
+#include "include/config.h"
+#include "ActionEventQueue.h"
 
 namespace p {
 	extern ActionEventQueue* aequeue;
@@ -111,7 +113,8 @@ Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
 
 		if (p::ccmap->isBuildableAt(this->getOwner(), temppos)){
 			// Health = 256 --> max
-			p::uspool->createUnit(this->type->getDeployWith()[j]/*"HARV"*/, temppos, 0, owner, 256, 0);
+			p::uspool->createUnit(this->type->getDeployWith()[j]/*"HARV"*/, 
+					temppos, 0, owner, 256, 0, 0, "None");
 		}
 
 		// If the current structure is a PROC and we are placing a extra harvester
@@ -189,7 +192,7 @@ Uint8 Structure::getImageNums(Uint32 **inums, Sint8 **xoffsets, Sint8 **yoffsets
 Uint16 Structure::getNumbImages(Uint8 layer)
 {
 	if (!usemakeimgs){
-		if (type->getSHPTNum() != NULL){
+		if (type->getSHPTNum() != 0){
 			return type->getSHPTNum()[layer];
 		}
 	} else {
@@ -364,8 +367,8 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 
 		exploding = true;
 
-		HandleTriggers((UnitOrStructure*)this, 7);
-		HandleTriggers((UnitOrStructure*)this, 6);
+		// Throw the event (-1 means nothing)
+		HandleTriggers((UnitOrStructure*)this, TRIGGER_EVENT_DESTROYED, -1);
 
 		if (type->isWall()) {
 			p::uspool->removeStructure(this);
@@ -389,7 +392,6 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 	} else {
 		health -= amount;
 	}
-	HandleTriggers ( (UnitOrStructure*)this, 6 );
 
 	damaged = checkdamage();
 
@@ -796,7 +798,7 @@ void Structure::repairDone()
 void Structure::bomb()
 {
 	printf ("%s line %i: Start bomb animation\n", __FILE__, __LINE__);
-	// TODO THE BOMBING ANIM
+	// @todo THE BOMBING ANIM
 	//runAnim(8);
 	bombing = true;
 //	runSecAnim (8);
@@ -815,7 +817,7 @@ void Structure::bombingDone()
 /** 
  * Helper function for getFreePos
  * 
- * @BUG Doesn't check that the terrain is passable (only buildable).
+ * @bug Doesn't check that the terrain is passable (only buildable).
  */
 bool Structure::valid_pos(StructureType *type, Uint8 PlayerNr, Uint16 pos, Uint8*) {
     return p::ccmap->isBuildableAt( PlayerNr, pos, type->isWaterBound());
@@ -824,13 +826,14 @@ bool Structure::valid_pos(StructureType *type, Uint8 PlayerNr, Uint16 pos, Uint8
 /**
  * Helper function for getFreePos
  *
- * @BUG Doesn't check that the terrain is passable (only buildable).
+ * @bug Doesn't check that the terrain is passable (only buildable).
  */
-bool Structure::valid_possubpos(StructureType *type, Uint8 PlayerNr, Uint16 pos, Uint8* subpos) {
+bool Structure::valid_possubpos(StructureType *type, Uint8 PlayerNr, Uint16 pos, Uint8* subpos)
+{
     InfantryGroup *ig = p::uspool->getInfantryGroupAt(pos);
-    if (ig == NULL) {
+    if (ig == 0) {
         return p::ccmap->isBuildableAt( PlayerNr, pos, type->isWaterBound());
-    }else{
+    } else {
 	    if (ig->IsAvailable()) {
     	    *subpos = ig->GetFreePos();
         	return true;
@@ -890,8 +893,9 @@ bool Structure::canAttack() const
 
 bool Structure::IsBuilding()
 {
-	if (usemakeimgs) 
+	if (usemakeimgs){
 		return true;
+	}
 	return false;  
 }
 
@@ -912,22 +916,19 @@ Sint8 Structure::getYoffset() const
 
 bool Structure::isPowered()
 {
-	if (type->isPowered ())
+	if (type->isPowered()){
 		return true;
+	}
 	return false;
 }
 
 bool Structure::isRefinery()
 {
-	// TODO Hack !!!
-	if (strcmp ((char*)type->getTName(), "PROC") == 0)
+	// @todo Hack !!!
+	if (strcmp ((char*)type->getTName(), "PROC") == 0){
 		return true;
+	}
 	return false;
-}
-
-bool Structure::isWall() const 
-{
-	return type->isWall();       
 }
 
 double Structure::getRatio() const 
