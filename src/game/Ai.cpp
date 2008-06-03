@@ -116,8 +116,8 @@ Ai::Ai()
 		Rules->AirstripLimit	= rules_ini->readInt	("AI", "AirstripLimit", 5);
 //		Rules->CompEasyBonus	= rules_ini->readInt("AI", "CompEasyBonus", true);
 //		Rules->Paranoid		= rules_ini->readInt("AI", "Paranoid", true);
-		Rules->CompEasyBonus	= true; /// @TODO read this value from the config file
-		Rules->Paranoid		= true; /// @TODO read this value from the config file
+		Rules->CompEasyBonus	= true; // @todo read this value from the config file
+		Rules->Paranoid		= true; // @todo read this value from the config file
 		Rules->PowerEmergency	= rules_ini->readInt	("AI", "PowerEmergency", 75);
 	}else{
 		Rules->AttackInterval	= 3;
@@ -951,7 +951,7 @@ Uint16				xpos,
 					Player->changeMoney(-1 * cost);
 				StructureWasBuild = true;
 			}
-			/// TODO sell some stuff if we can't afford a new refinery and we dont't have any refinery's anymore
+			// @todo sell some stuff if we can't afford a new refinery and we dont't have any refinery's anymore
 		}
 
 		// Build the weapen factory
