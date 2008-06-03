@@ -1,3 +1,21 @@
+// UnitOrStructureType.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef UNITORSTRUCTURETYPE_H
 #define UNITORSTRUCTURETYPE_H
 
@@ -57,7 +75,7 @@ public :
     virtual const char * getName() const = 0;
 
     /** @returns the names of the sides that can build this */
-    virtual std::vector < char * > getOwners() const = 0;
+    virtual vector < char * > getOwners() const = 0;
 
     /** @returns whether the type is valid or not (loaded fully) */
     virtual bool isValid() const;
@@ -95,10 +113,14 @@ public :
     Uint8 getSight() const;
     
 protected :
+	/** Sight of the Unit (in Cell) */
     Uint8 sight;
     animinfo_t animinfo;
+    /** Armour of the Unit */
     armour_t armour;
+    /** Secondary weapon of the Unit */
     Weapon* secondary_weapon;
+    /** Primary weapon of the Unit */
     Weapon* primary_weapon;
     Uint16 maxhealth;
     Uint8 speed;
