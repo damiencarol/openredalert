@@ -1,11 +1,11 @@
+#include "include/fibheap.h"
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
 #include "SDL/SDL_types.h"
-#include "include/fibheap.h"
-#include "game/TileRef.h"
+
 
 FibHeapEntry::FibHeapEntry(void *value, Uint32 key)
 {
