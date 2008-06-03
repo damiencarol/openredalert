@@ -16,7 +16,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "include/ProjectileAnim.h"
+#include "ProjectileAnim.h"
 
 #include <cmath>
 
@@ -32,8 +32,8 @@
 #include "Unit.h"
 #include "UnitAndStructurePool.h"
 #include "ActionEventQueue.h"
+#include "CnCMap.h"
 
-#include "include/ccmap.h"
 #include "include/Logger.h"
 #include "audio/SoundEngine.h"
 #include "video/ImageNotFound.h"
@@ -82,7 +82,10 @@ ProjectileAnim::ProjectileAnim(Uint32 p, Weapon *weap, UnitOrStructure* owner,
         heatseek = false;
     }
 
-    if (heatseek) {
+    if (heatseek) 
+    {
+// @todo _check that
+    	target = 0;
 //        target = p::uspool->getUnitOrStructureAt(dest,subdest);
 		target = p::uspool->getGroundUnitAt(dest,subdest);
 		if (target == 0){
@@ -91,7 +94,7 @@ ProjectileAnim::ProjectileAnim(Uint32 p, Weapon *weap, UnitOrStructure* owner,
 				target = p::uspool->getStructureAt ( dest,subdest,false );
 			}
 		}
-        if (target == NULL) {
+        if (target == 0) {
             seekfuel = 0;
             heatseek = false;
         } else {
@@ -168,13 +171,14 @@ ProjectileAnim::~ProjectileAnim() {
 void ProjectileAnim::run()
 {
     Uint32 oldpos;
-    Unit *utarget;
-    Structure *starget;
+    Unit* utarget;
+    Structure* starget;
     
     if (fuelled) {
         --fuel;
     }
-    if (heatseek) {
+    if (heatseek) 
+    {
         double pixelspertick;
         double totlen;
         float alpha;
@@ -217,15 +221,25 @@ void ProjectileAnim::run()
         }
     }
     //check if we are close enough to target to stop modifying
-    if( fabs(xdiff) < fabs(xmod) ) {
+    if( fabs(xdiff) < fabs(xmod) )
+    {
         xmod = 0;
     }
-    if( fabs(ydiff) < fabs(ymod) ) {
+    if( fabs(ydiff) < fabs(ymod) )
+    {
         ymod = 0;
     }
+    
     // if we are so close both
-    if( xmod == 0 && ymod == 0 ) {
-    	// TODO _PLAY ANIMATION ONLY IF IN PROJECTILE THEIR ARE "Animates" = 'yes'
+    if (xmod == 0 && ymod == 0) 
+    {
+    	// Play report of th weapon
+    	//pc::sfxeng->PlaySound(weap->getWarhead()->getExplosionsound());  	        
+    	
+    	
+    	
+    	
+    	// @todo _PLAY ANIMATION ONLY IF IN PROJECTILE THEIR ARE "Animates" = 'yes'
         // projectile hit..
         /*if( weap->getWarhead()->getExplosionsound() != NULL ) {
             pc::sfxeng->PlaySound(weap->getWarhead()->getExplosionsound());
@@ -233,7 +247,7 @@ void ProjectileAnim::run()
         */
     	//printf("0\n");
     	//
-    	// TODO test image death
+    	// @todo test image death
     	//
     	/*
     	Uint32 imageExplosionNum;
@@ -271,14 +285,14 @@ void ProjectileAnim::run()
     	*/ 	
     	
         starget = p::uspool->getStructureAt(dest,weap->getWall());
-        if( starget != NULL ) {
+        if( starget != 0 ) {
             starget->applyDamage((Sint16)weap->getDamage(),weap,owner);
             delete this;
             return;
         }
 
         utarget = p::uspool->getUnitAt(dest, subdest);
-        if( (utarget != NULL) || inaccurate ) {
+        if( (utarget != 0) || inaccurate ) {
             if (inaccurate) {
                 for (int sud=0;sud<5;++sud) {
                     utarget = p::uspool->getUnitAt(dest, sud);
@@ -341,7 +355,7 @@ void ProjectileAnim::run()
     
     // The weapon is fuelled
     if (fuelled && fuel == 0) {   	
-    	// TODO _PLAY ANIMATION ONLY IF IN PROJECTILE THEIR ARE "Animates" = 'yes'
+    	// @todo _PLAY ANIMATION ONLY IF IN PROJECTILE THEIR ARE "Animates" = 'yes'
     	// projectile hit..
     	/*       if( weap->getWarhead()->getExplosionsound() != NULL ) {
             pc::sfxeng->PlaySound(weap->getWarhead()->getExplosionsound());
