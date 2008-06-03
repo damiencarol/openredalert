@@ -1,3 +1,21 @@
+// ExplosionAnim.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef EXPLOSIONANIM_H
 #define EXPLOSIONANIM_H
 
@@ -22,13 +40,16 @@ public:
     ~ExplosionAnim();
 
     void run();
+    
 private:
     ExplosionAnim() ; // Declare private constructor to force parameter in constructor
 
     L2Overlay* l2o;
+    /** The position of the animation */
     Uint16 pos;
     Uint8 animsteps;
-    std::multimap<Uint16, L2Overlay*>::iterator l2entry;
+    /** iterator to the overlay in the multimap */
+    multimap<Uint16, L2Overlay*>::iterator l2entry;
 };
 
 #endif //EXPLOSIONANIM_H
