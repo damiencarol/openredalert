@@ -33,7 +33,7 @@ void VFSUtils::VFS_PreInit(const char* binpath)
 }
 
 /** 
- * TODO install prefix
+ * @todo install prefix
  */
 void VFSUtils::VFS_Init(const char* binpath)
 {
@@ -51,7 +51,7 @@ void VFSUtils::VFS_Init(const char* binpath)
 	tempstr += "/";
 	externals->loadArchive(tempstr.c_str());
 
-	// TODO prevoir pour linux
+	// @todo prevoir pour linux
 	/*
 	 #if defined _WIN32
 	 #else
