@@ -20,7 +20,7 @@
 
 #include <cmath>
 
-#include "include/ccmap.h"
+#include "cncmap.h"
 #include "include/config.h"
 #include "audio/SoundEngine.h"
 #include "UnitAndStructurePool.h"
@@ -29,14 +29,17 @@
 
 namespace pc
 {
-extern ConfigType Config;
-extern SoundEngine* sfxeng;
+	extern ConfigType Config;
+	extern SoundEngine* sfxeng;
 }
 namespace p
 {
-extern UnitAndStructurePool* uspool;
+	extern UnitAndStructurePool* uspool;
 }
 
+/**
+ * 
+ */
 BExplodeAnimEvent::BExplodeAnimEvent(Uint32 p, Structure* str) :
 	BuildingAnimEvent(p, str, 9)
 {
@@ -55,14 +58,14 @@ BExplodeAnimEvent::BExplodeAnimEvent(Uint32 p, Structure* str) :
 
 BExplodeAnimEvent::~BExplodeAnimEvent()
 {
-	// TODO : spawn survivors and other goodies
+	// @todo : spawn survivors and other goodies
 	//printf ("%s line %i: Remove exploded structure: %i\n", __FILE__, __LINE__, (int) strct);
 	p::uspool->removeStructure(strct);
 }
 
 void BExplodeAnimEvent::run()
 {
-	if ((counter == 0) && !(getType()->isWall()) && (pc::sfxeng != NULL) && !p::ccmap->isLoading())
+	if ((counter == 0) && !(getType()->isWall()) && (pc::sfxeng != 0) && !p::ccmap->isLoading())
 	{
 		pc::sfxeng->PlaySound(pc::Config.StructureDestroyed);
 		// add code to draw flames
