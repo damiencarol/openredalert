@@ -38,112 +38,117 @@ using std::vector;
 /**
  * Base class for structure in game
  */
-class StructureType : public UnitOrStructureType 
-{
+class StructureType : public UnitOrStructureType {
 public:
-    StructureType(const char * typeName, INIFile* structini, INIFile * artini, const char * thext);
-    ~StructureType();
+	StructureType(const char * typeName, INIFile* structini, INIFile * artini,
+			const char * thext);
+	~StructureType();
 
-    Uint16 * getSHPNums();
+	Uint16 * getSHPNums();
 
-    Uint16 * getSHPTNum();
+	Uint16 * getSHPTNum();
 
-    const char * getTName() const;
+	const char * getTName() const;
 
-    const char * getName() const;
+	const char * getName() const;
 
-    vector < char * > getDeployWith() const;
+	vector < char *> getDeployWith() const;
 
-    vector < char * > getOwners() const;
+	vector < char *> getOwners() const;
 
-    Uint8 getNumLayers() const;
+	Uint8 getNumLayers() const;
 
-    Uint16 getMakeImg() const;
+	Uint16 getMakeImg() const;
 
-    bool isWall() const;
+	bool isWall() const;
 
-    bool isWaterBound() const;
+	bool isWaterBound() const;
 
-    bool hasAirBoundUnits() const;
+	bool hasAirBoundUnits() const;
 
-    Uint8 getXsize() const;
+	Uint8 getXsize() const;
 
-    Uint8 getYsize() const;
+	Uint8 getYsize() const;
 
-    Uint8 isBlocked(Uint16 tile) const;
+	Uint8 isBlocked(Uint16 tile) const;
 
-    Sint8 getXoffset() const;
+	Sint8 getXoffset() const;
 
-    Sint8 getYoffset() const;
+	Sint8 getYoffset() const;
 
-    Uint8 getOffset() const;
+	Uint8 getOffset() const;
 
-    Uint8 getTurnspeed() const;
+	Uint8 getTurnspeed() const;
 
-    /**
-     * Surcharge speed with 0 (because it's a building). 
-     */
-    Uint8 getSpeed() const;
+	/**
+	 * Surcharge speed with 0 (because it's a building). 
+	 */
+	Uint8 getSpeed() const;
 
-    armour_t getArmour() const;
+	armour_t getArmour() const;
 
-    animinfo_t getAnimInfo() const;
+	animinfo_t getAnimInfo() const;
 
-    PowerInfo getPowerInfo() const;
+	PowerInfo getPowerInfo() const;
 
-    bool isPowered();
+	bool isPowered();
 
-    Weapon* getWeapon(bool primary = true) const;
+	Weapon* getWeapon(bool primary = true) const;
 
-    bool hasTurret() const;
+	bool hasTurret() const;
 
-    Uint16 getBlckOff() const;
+	Uint16 getBlckOff() const;
 
-    bool isInfantry() const;
+	bool isInfantry() const;
 
-    Uint8 getNumWallLevels() const;
+	Uint8 getNumWallLevels() const;
 
-    Uint8 getDefaultFace() const;
+	Uint8 getDefaultFace() const;
 
-    Uint8 getBuildlevel() const;
+	Uint8 getBuildlevel() const;
 
-    bool primarySettable() const;
+	bool primarySettable() const;
 
-    bool Charges();
+	bool Charges();
 
-    Uint8 getPQueue() const;
+	Uint8 getPQueue() const;
 
-    bool isStructure() const;
+	bool isStructure() const;
+
+	Uint32 getAdjacent() const;
 
 private:
 	/** Index in the ImagePool of the first MAKE image */
-    Uint16 makeimg;
-    Uint16 blckoff;
-    Sint8 xoffset;
-    Sint8 yoffset;
-    Uint8 turnspeed;
-    Uint8 sight;
-    Uint8 xsize;
-    Uint8 ysize;
-    Uint8 numshps;
-    Uint8 numwalllevels;
-    Uint8 defaultface;
-    Uint8 buildlevel;
-    Uint8 * blocked;
-    char tname[12];
-    char* name;
-    vector<char*> owners;
-    vector<char*> deploywith;
-    PowerInfo powerinfo;
+	Uint16 makeimg;
+	Uint16 blckoff;
+	Sint8 xoffset;
+	Sint8 yoffset;
+	Uint8 turnspeed;
+	Uint8 sight;
+	Uint8 xsize;
+	Uint8 ysize;
+	Uint8 numshps;
+	Uint8 numwalllevels;
+	Uint8 defaultface;
+	Uint8 buildlevel;
+	Uint8 * blocked;
+	char tname[12];
+	char* name;
+	vector<char*> owners;
+	vector<char*> deploywith;
+	PowerInfo powerinfo;
 
-    bool is_wall;
-    bool turret;
-    bool primarysettable;
-    bool charges;
-    bool WaterBound;
-    bool AirBoundUnits;
+	bool is_wall;
+	bool turret;
+	bool primarysettable;
+	bool charges;
+	bool WaterBound;
+	bool AirBoundUnits;
 	Uint16* shptnum;
-    Uint16* shpnums;
+	Uint16* shpnums;
+
+	/** Adjacent = distance allowed to place from other buildings (def=1) */
+	Uint32 adjacent;
 };
 
 #endif //STRUCTURETYPE_H

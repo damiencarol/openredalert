@@ -20,9 +20,11 @@
 
 #include <cstring>
 
+#include "SDL/SDL_types.h"
+
 #include "include/common.h"
 #include "include/Logger.h"
-#include "include/weaponspool.h"
+#include "weaponspool.h"
 #include "video/ImageNotFound.h"
 #include "video/SHPImage.h"
 #include "Weapon.h"
@@ -55,7 +57,10 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	char blocktest[128];
 	Uint32 size;
 	char* miscnames;
+	INIFile* rulesIni = 0;
 
+	// Load the rules.ini file
+	rulesIni = new INIFile("rules.ini");
 
 	// Check if the section exist
 	if (structini->isSection(string(typeName)) == false){
@@ -68,7 +73,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 		structini->readKeyValue(typeName,0);
 	} catch (...) {
 		// Log that section doesn't exist
-		logger->debug("Try to read a non existant ini section %s in StructureType constructor.\n", typeName);
+		logger->debug("The section [%s] of the building no exists in  inifile (StructureType constructor).\n", typeName);
 		
 		shpnums = NULL;
 		blocked = NULL;
@@ -144,7 +149,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	blocked = new Uint8[xsize*ysize];
 	for( i = 0; i < (Uint32)xsize*ysize; i++ ) {
 		sprintf(blocktest, "notblocked%d", i);
-		// TODO BUG : try catch
+		// @todo BUG : try catch
 		try 
 		{
 			size = artini->readInt(tname, blocktest);
@@ -192,7 +197,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	shptnum = new Uint16[numshps];
 
 	// Read the Tech level
-	// TODO : refactor this !!!!!!!
+	// @todo : refactor this !!!!!!!
 	//techLevel = structini->readInt(tname,"TechLevel", -1);
 	techLevel = (Sint32)structini->readInt(tname,"techlevel", (Sint32)-1);
 
@@ -215,17 +220,17 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	// Read if it's a "waterbound" structure
 	tmpWaterBound = (structini->readString(tname, "WaterBound"));
 	WaterBound = false;
-	if (tmpWaterBound != NULL) {
+	if (tmpWaterBound != 0) {
 		if (strcmp (tmpWaterBound, "yes") == 0) {
 			WaterBound = true;
 		}
 		delete[] tmpWaterBound;
-		tmpWaterBound = NULL;
+		tmpWaterBound = 0;
 	}
 
-	// TODO Read SHP ???????
+	// @todo Read SHP ???????
 	for( i = 0; i < numshps; i++ ) {
-		// TODO TRY THIS (TEST !!!!!!!!!!!)
+		// @todo TRY THIS (TEST !!!!!!!!!!!)
 		sprintf(imagename, "image%d", i+1);
 		tmp = structini->readString(tname, imagename);
 		if( tmp == NULL ) {
@@ -343,7 +348,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	if (miscnames == NULL) {
 		armour = AC_none;
 	} else {
-		// TODO DEBUG _stricmp(
+		// @todo DEBUG _stricmp(
 		/*
 		if (_strnicmp((miscnames), ("none"), (4)) == 0)
 		armour = AC_none;
@@ -386,6 +391,15 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	if (strcmp ((char*)tname, "AFLD") == 0 || strcmp ((char*)tname, "HPAD") == 0) {
 		AirBoundUnits = true;
 	}
+	
+	// Read the Adjacent
+	this->adjacent = rulesIni->readInt(tname, "Adjacent", 1);
+	
+	// Read the Sight	
+	this->sight = rulesIni->readInt(tname, "Sight", 1);	
+
+	// Free rules.ini
+	delete rulesIni;
 }
 
 StructureType::~StructureType()
@@ -415,12 +429,16 @@ StructureType::~StructureType()
 	name = NULL;
 }
 
-Uint16 * StructureType::getSHPNums() {
+Uint16 * StructureType::getSHPNums()
+{
 	return shpnums;
 }
-Uint16 * StructureType::getSHPTNum() {
+
+Uint16 * StructureType::getSHPTNum() 
+{
 	return shptnum;
 }
+
 const char * StructureType::getTName() const {
 	return tname;
 }
@@ -475,6 +493,11 @@ Uint8 StructureType::getTurnspeed() const {
 
 armour_t StructureType::getArmour() const {
 	return armour;
+}
+
+Uint32 StructureType::getAdjacent() const
+{
+	return adjacent;
 }
 
 animinfo_t StructureType::getAnimInfo() const {
