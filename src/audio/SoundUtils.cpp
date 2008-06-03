@@ -91,7 +91,7 @@ void SoundUtils::IMADecode(Uint8 *output, Uint8 *input, Uint16 compressed_size, 
 	    if (sample < -32768)
 	        sample = -32768;
 
-        // TODO I'm not happy with this, if we do sample = 0 or sample -= 0x7FFF we get
+        // @todo I'm not happy with this, if we do sample = 0 or sample -= 0x7FFF we get
         // popping noises. sample = Delta seems to have the smallest pop
         // If we do nothing, then audio after X seconds gets stuck
 
@@ -139,7 +139,7 @@ void SoundUtils::WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_s
             } else {
                 // copy (count+1) bytes from input to output
 
-                /// @TODO This version doesn't produce the same result as the loop below
+                /// @todo This version doesn't produce the same result as the loop below
                 //std::copy(input+i, input+i+count+1, output);
                 //bytes_left -= (count + 1);
                 //i += (count + 1);
@@ -178,7 +178,7 @@ void SoundUtils::WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_s
             }
             break;
         default: // just copy (CurSample) (count+1) times to output
-            /// @TODO This version doesn't produce the same result as the loop below
+            /// @todo This version doesn't produce the same result as the loop below
             //std::fill(output, output+count+2, Clip<Uint8>(CurSample));
             //bytes_left -= count+1;
 
