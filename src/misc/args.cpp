@@ -1,3 +1,20 @@
+// args.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 #include <string>
@@ -290,11 +307,11 @@ extern bool parse(int argc, char **argv)
         logger->error("Unknown argument: %s, exiting\n",argv[i]);
         return false;
     }
-    // TODO FULLSCREEN
+    // @todo FULLSCREEN
     config.videoflags |= (fullscreen?SDL_FULLSCREEN:0);
 #ifndef _WIN32
 	if (config.use_opengl){
-		// TODO DEBUG
+		// @todo DEBUG
 	    //config.videoflags |= SDL_GLSDL;
 	}
 #endif
