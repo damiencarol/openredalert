@@ -47,7 +47,7 @@ public:
 
 	void setImage(SDL_Surface* Image, SDL_Surface* Shadow, Uint32 imgnum);
 
-    /** @TODO Arbitrary post-processing filter, e.g. colour fiddling.
+    /** @todo Arbitrary post-processing filter, e.g. colour fiddling.
      * ImageCacheEntry& getText(const char*); // Caches text
      * 1) typedef void (FilterFunc*)(Uint32, ImageCacheEntry&);  OR
      * 2) Policy class that provides this API:
