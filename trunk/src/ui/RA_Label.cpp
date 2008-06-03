@@ -1,15 +1,28 @@
+// RA_Label.cpp
+// 1.5
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "RA_Label.h"
 
-//#include <math.h>
 #include <string>
 
-//#include "include/config.h"
-//#include "video/CPSImage.h"
 #include "video/GraphicsEngine.h"
 #include "Font.h"
-//#include "video/ImageCache.h"
-//#include "include/sdllayer.h"
-#include "RA_WindowClass.h"
+#include "RaWindow.h"
 
 using std::string;
 
@@ -17,17 +30,18 @@ namespace pc {
 	extern GraphicsEngine * gfxeng;
 }
 
-RA_Label::RA_Label():LabelFont("type.fnt")
+RA_Label::RA_Label() :
+	LabelFont("type.fnt")
 {
 	// Setup some vars
 	Checked			= false;
 	Width			= 20,
 	Heigth			= 20;
-	LabelSurface	= NULL;
+	LabelSurface	= 0;
 	LabelText 		= "Uninitialize";
-	DrawingSurface		= NULL;
-	DrawingWindow		= NULL;
-	BackgroundBackup	= NULL;
+	DrawingSurface		= 0;
+	DrawingWindow		= 0;
+	BackgroundBackup	= 0;
 
 	// Initialize the display surface pointer
 //	SetDrawingSurface (pc::gfxeng->get_SDL_ScreenSurface());
@@ -38,24 +52,29 @@ RA_Label::RA_Label():LabelFont("type.fnt")
 	LabelFontColor.b = 0xff;
 	ColorKeyColor.r = ColorKeyColor.g = ColorKeyColor.b = 0;
 
-	LabelDest.x = LabelDest.y = 0;
-
+	LabelDest.x = 0;
+	LabelDest.y = 0;
 }
 
+/**
+ * 
+ */
 RA_Label::~RA_Label()
 {
-	if (LabelSurface != NULL){
+	if (LabelSurface != 0)
+	{
 		SDL_FreeSurface(LabelSurface);
 	}
 	
-	if (BackgroundBackup != NULL){
+	if (BackgroundBackup != 0)
+	{
 		SDL_FreeSurface(BackgroundBackup);
 	}
 
-	LabelSurface = NULL;
+	LabelSurface = 0;
 }
 
-Uint32 RA_Label::getHeight(void)
+Uint32 RA_Label::getHeight()
 {
 	return LabelFont.getHeight();
 }
@@ -75,7 +94,8 @@ string RA_Label::getText(){
 
 void RA_Label::setColor(SDL_Color RGBcolor)
 {
-	if (BackgroundBackup != NULL && DrawingWindow != NULL){
+	if (BackgroundBackup != 0 && DrawingWindow != 0)
+	{
 		SDL_BlitSurface(BackgroundBackup, NULL, DrawingWindow->GetWindowSurface (), &LabelDest);
 		SDL_FreeSurface(BackgroundBackup);
 		BackgroundBackup = NULL;
@@ -117,11 +137,12 @@ void RA_Label::SetDrawingSurface (SDL_Surface *DwgSurface)
 	}
 }
 
-void RA_Label::SetDrawingWindow(RA_WindowClass *Window)
+void RA_Label::SetDrawingWindow(RaWindow* window)
 {
-	if (DrawingWindow != Window){
-		DrawingWindow = Window;
-		DrawingSurface = NULL;
+	if (DrawingWindow != window)
+	{
+		DrawingWindow = window;
+		DrawingSurface = 0;
 		recreate = true;
 	}
 }
