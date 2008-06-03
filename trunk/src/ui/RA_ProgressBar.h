@@ -1,33 +1,57 @@
-#ifndef RA_PROGRESS_BAR_H_
-#define RA_PROGRESS_BAR_H_
+// RA_ProgressBar.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef RA_PROGRESSBAR_H
+#define RA_PROGRESSBAR_H
 
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_video.h"
 
-class RA_WindowClass;
+class RaWindow;
 
-class RA_ProgressBar {
+/**
+ * 
+ */
+class RA_ProgressBar
+{
 public:
 	RA_ProgressBar();
 	~RA_ProgressBar();
 
 	void SetDrawingSurface(SDL_Surface *DwgSurface);
-	void SetDrawingWindow(RA_WindowClass *Window);
+	void SetDrawingWindow(RaWindow* Window);
 
-	bool MouseOver(void);
-	bool HandleMouseClick(void);
+	bool MouseOver();
+	bool HandleMouseClick();
 
 	void setProgressPosition(Uint8 Pos);
-	Uint8 getProgressPosition(void);
+	Uint8 getProgressPosition();
 	void setNumbSteps(int Steps);
 	void setCurStep(Uint8 Step);
-	int getCurStep(void);
+	int getCurStep();
 
 	void Draw(int X, int Y);
-	void Redraw(void);
+	void Redraw();
 
 private:
-	RA_WindowClass *_windowToDrawOn;
+	void Create();
+	
+	RaWindow* _windowToDrawOn;
 	SDL_Surface* _progressSurface;
 	SDL_Surface* _displaySurface;
 	SDL_Rect _sizeAndPosition;
@@ -41,8 +65,6 @@ private:
 
 	int _maxSteps;
 	int _curStep;
-
-	void Create(void);
 };
 
-#endif
+#endif //RA_PROGRESSBAR_H
