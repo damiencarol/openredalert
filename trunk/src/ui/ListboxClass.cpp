@@ -1,3 +1,21 @@
+// ListBoxClass.cpp
+// 1.5
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "ListboxClass.h"
 
 #include <string>
@@ -13,7 +31,7 @@
 #include "video/ImageCache.h"
 #include "include/sdllayer.h"
 #include "RA_ProgressBar.h"
-#include "RA_WindowClass.h"
+#include "RaWindow.h"
 #include "TTextBox.h"
 #include "video/ImageNotFound.h"
 #include "video/CPSImage.h"
@@ -28,7 +46,7 @@ namespace pc {
 
 ListboxClass::ListboxClass()
 {
-	ListBoxSurface	= NULL;
+	ListBoxSurface = 0;
 
 	ScrollPos	= 0;
 	SelectPos	= 0;
@@ -48,10 +66,13 @@ ListboxClass::ListboxClass()
 
 	//printf ("ListBox class initialized\n");
 }
+
+/**
+ * 
+ */
 ListboxClass::~ListboxClass()
 {
-	//printf ("Destructor\n");
-
+	//
 	if (ListBoxSurface != NULL){
 		SDL_FreeSurface(ListBoxSurface);
 	}
@@ -72,6 +93,9 @@ ListboxClass::~ListboxClass()
 
 }
 
+/**
+ * 
+ */
 SDL_Surface *ListboxClass::ReadShpImage (char *Name, int ImageNumb, Uint8 palnum)
 {
 	SDL_Surface	*image;
@@ -95,6 +119,7 @@ SDL_Surface *ListboxClass::ReadShpImage (char *Name, int ImageNumb, Uint8 palnum
 
 	return image;
 }
+
 void ListboxClass::SetType (unsigned int type)
 {
 	if (type < 1 || type > 2)
@@ -102,6 +127,7 @@ void ListboxClass::SetType (unsigned int type)
 
 	ListBoxType	= type;
 }
+
 bool ListboxClass::IsChecked (unsigned int line)
 {
 	if (ListBoxType != 2)
@@ -115,15 +141,18 @@ bool ListboxClass::IsChecked (unsigned int line)
 
 	return false;
 }
+
 int ListboxClass::GetSelectionIndex (void)
 {
 	return (/*ScrollPos + */SelectPos);
 }
-SDL_Surface* ListboxClass::geDrawingSurface(void)
+
+SDL_Surface* ListboxClass::geDrawingSurface()
 {
 	return ListBoxSurface;
 }
-void ListboxClass::ScrollUp (void)
+
+void ListboxClass::ScrollUp()
 {
 //	if (SelectPos > 0){
 //		SelectPos--;
@@ -134,7 +163,8 @@ void ListboxClass::ScrollUp (void)
 		Recreate = true;
 	}
 }
-void ListboxClass::ScrollDown (void)
+
+void ListboxClass::ScrollDown()
 {
 //	if (SelectPos < NumbLines - 1){
 //		SelectPos++;
@@ -145,9 +175,11 @@ void ListboxClass::ScrollDown (void)
 		Recreate = true;
 	}
 }
+
 void ListboxClass::HandleInput(SDL_Event event)
 {
-int MouseXpos, MouseYpos;
+	int MouseXpos;
+	int MouseYpos;
 
 
 	switch (event.type) {
@@ -221,9 +253,10 @@ int MouseXpos, MouseYpos;
 
 	}
 }
-bool ListboxClass::MouseOverArrowUp (void)
+
+bool ListboxClass::MouseOverArrowUp()
 {
-int MouseXpos, MouseYpos;
+	int MouseXpos, MouseYpos;
 
 	if (ListBoxSurface == NULL)
 		return false;
@@ -236,7 +269,8 @@ int MouseXpos, MouseYpos;
 
 	return false;
 }
-bool ListboxClass::MouseOverArrowDown (void)
+
+bool ListboxClass::MouseOverArrowDown()
 {
 int MouseXpos, MouseYpos;
 
@@ -248,16 +282,18 @@ int MouseXpos, MouseYpos;
 
 	return false;
 }
-void ListboxClass::AddString (const std::string String)
+
+void ListboxClass::AddString(const string String)
 {
 	// Add the text to the list
 	MessageList.push_back (String);
 	CheckedList.push_back (false);
 	Recreate = true;
 }
-void ListboxClass::DrawListBox (int X, int Y)
+
+void ListboxClass::DrawListBox(int X, int Y)
 {
-SDL_Rect dest;
+	SDL_Rect dest;
 
 	Xpos = X;
 	Ypos = Y;
@@ -276,9 +312,10 @@ SDL_Rect dest;
 	if (DisplaySurface != NULL)
 		SDL_BlitSurface(ListBoxSurface, NULL, DisplaySurface, &dest);
 }
+
 unsigned int ListboxClass::CalcSliderHeight()
 {
-unsigned int AvailableHeight;
+	unsigned int AvailableHeight;
 
 	AvailableHeight = ListBoxSurface->h - 2*16;
 
@@ -287,9 +324,10 @@ unsigned int AvailableHeight;
 	else
 		return AvailableHeight;
 }
+
 unsigned int ListboxClass::CalcSliderYoffset()
 {
-unsigned int AvailableHeight;
+	unsigned int AvailableHeight;
 
 	AvailableHeight = ListBoxSurface->h - 2*16;
 
@@ -299,10 +337,11 @@ unsigned int AvailableHeight;
 	}
 	return 0;
 }
+
 void ListboxClass::DrawSlider()
 {
-SDL_Surface	*Slider, *tmp;
-SDL_Rect	dest;
+	SDL_Surface	*Slider, *tmp;
+	SDL_Rect	dest;
 
 	if (ListBoxSurface == NULL)
 		return;
@@ -364,7 +403,7 @@ SDL_Rect	dest;
 	SDL_FreeSurface(Slider);
 }
 
-void ListboxClass::CreateListBox (void)
+void ListboxClass::CreateListBox()
 {
 	SDL_Rect	dest;
 	SDL_Surface	*TempImage;
@@ -504,7 +543,7 @@ void ListboxClass::CreateListBox (void)
 
 
 #if 0
-	/// TODO cache all line surface in selected and not selected mode, this will speed up considerably !!
+	/// @todo cache all line surface in selected and not selected mode, this will speed up considerably !!
 	/// Use ListboxLines to do this ;)
 	TempImage = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, ListBoxSurface->w - LISTBOX_SCROLLBAR_WITH  - 2 * BorderWidth/*Font.calcTextWidth(MessageList[i+ScrollPos])*/, this->FontHeigth, 16, 0, 0, 0, 0);
 
@@ -556,7 +595,9 @@ void ListboxClass::CreateListBox (void)
 	}
 	SDL_FreeSurface(TempImage);
 #else
-ListBoxLine Line;
+	
+	ListBoxLine Line;
+	
 	// Create the line surfaces (if needed)
 	if (ListboxLines.size() < (unsigned) MessageList.size()){
 
