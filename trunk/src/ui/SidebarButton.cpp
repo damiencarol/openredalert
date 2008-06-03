@@ -1,5 +1,5 @@
 // SidebarButton.cpp
-// 1.4
+// 1.5
 
 //    This file is part of OpenRedAlert.
 //
@@ -18,35 +18,29 @@
 
 #include "SidebarButton.h"
 
-#include <cstdio>
-#include <cstdlib>
-#include <stdexcept>
-#include <string>
-
 #include "SDL/SDL_types.h"
 
 #include "Sidebar.h"
-#include "include/config.h"
 #include "video/ImageCache.h"
 #include "video/ImageCacheEntry.h"
 #include "video/ImageNotFound.h"
 
-using std::string;
-using std::runtime_error;
-using std::vector;
-using std::replace;
-
-namespace pc
-{
-	extern ConfigType Config;
+namespace pc {
+	extern ImageCache* imgcache;
+	extern Sidebar* sidebar;
 }
 
+/**
+ * Create a SidebarButton
+ */
 SidebarButton::SidebarButton(Sint16 x, Sint16 y, const char* picname, Uint8 func,
 		const char* theatre, Uint8 pal) :
 	pic(0), function(func), palnum(pal), theatre(theatre), using_fallback(false)
 {
+	
 	picloc.x = x;
 	picloc.y = y;
+	
 	ChangeImage(picname);
 
 	FallbackLabel.setColor(0xff, 0xff, 0xff);
@@ -75,10 +69,6 @@ void SidebarButton::ChangeImage(const char* fname, Uint8 number)
 
 void SidebarButton::ChangeImage(const char* fname, Uint8 number, Uint8 side)
 {
-	const char* name;
-	char goldname[32];
-	Uint32 slen = strlen(fname);
-
 	// Error checking
 	if (side != 1 && side != 2){
 		return;
@@ -90,46 +80,17 @@ void SidebarButton::ChangeImage(const char* fname, Uint8 number, Uint8 side)
 		using_fallback = false;
 	}
 
-	if (pc::sidebar->isOriginalType() || pc::Config.gamenum == GAME_RA)
-	{
-		name = fname;
-	}
-	else
-	{
-
-		if (slen>8 && strcasecmp(("icon.shp"), (fname+slen-8))==0)
-		{
-			strcpy(goldname, fname);
-			goldname[slen-6] = 'N';
-			goldname[slen-5] = 'H';
-			goldname[slen-3] = theatre[0];
-			goldname[slen-2] = theatre[1];
-			goldname[slen-1] = theatre[2];
-		}
-		else
-		{
-			sprintf(goldname, "H%s", fname);
-		}
-		name = goldname;
-	}
-
 	try
 	{
-		picnum = pc::imgcache->loadImage(name);
+		picnum = pc::imgcache->loadImage(fname);
 		picnum += number;
 		picnum |= palnum<<11;
-		if (pc::Config.gamenum == GAME_TD)
-		{
-			pic = pc::imgcache->getImage(picnum).image;
-		}
-		else if (pc::Config.gamenum == GAME_RA)
-		{
-			if (side == 1){
-				pic = pc::imgcache->getImage(picnum, 0).image;
-			} else {
-				pic = pc::imgcache->getImage(picnum, 1).image;
-			}
-		}
+		
+		if (side == 1){
+			pic = pc::imgcache->getImage(picnum, 0).image;
+		} else {
+			pic = pc::imgcache->getImage(picnum, 1).image;
+		}		
 	}
 	catch(ImageNotFound&)
 	{
