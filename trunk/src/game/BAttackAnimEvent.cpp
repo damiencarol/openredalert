@@ -4,14 +4,14 @@
 #include <cmath>
 
 #include "BTurnAnimEvent.h"
-#include "include/ccmap.h"
+#include "cncmap.h"
 #include "include/common.h"
-#include "include/PlayerPool.h"
-#include "include/ProjectileAnim.h"
+#include "PlayerPool.h"
+#include "ProjectileAnim.h"
 #include "audio/SoundEngine.h"
 #include "Unit.h"
 #include "UnitAndStructurePool.h"
-#include "include/weaponspool.h"
+#include "weaponspool.h"
 #include "anim_nfo.h"
 #include "UnitOrStructure.h"
 #include "ActionEventQueue.h"
@@ -88,9 +88,11 @@ void BAttackAnimEvent::run()
 	xtiles = strct->getPos() % mwid - atkpos % mwid;
 	ytiles = strct->getPos() / mwid - atkpos / mwid;
 	
-	distance = abs(xtiles)>abs(ytiles)?abs(xtiles):abs(ytiles);
+	// @todo modify calculs
+	//distance = abs()>abs(ytiles)?abs(xtiles):abs(ytiles);
+	distance = sqrt(xtiles*xtiles + ytiles*ytiles);
 
-	if( distance > strct->getType()->getWeapon()->getRange() )
+	if (distance > strct->getType()->getWeapon()->getRange())
 	{
 		// Since buildings can not move, give up for now.
 		// Alternatively, we could just wait to see if the target ever
@@ -130,9 +132,12 @@ void BAttackAnimEvent::run()
 		}
 	}
 	facing = (40-(Sint8)(alpha*16/M_PI))&0x1f;
-
-	if ((strct->getType()->hasTurret())&&((strct->getImageNums()[0]&0x1f)!=facing))
-	{ // turn to face target first
+	
+	//
+	// turn to face target first if this building have turret
+	//
+	if ((strct->getType()->hasTurret()) && ((strct->getImageNums()[0]&0x1f)!=facing) )
+	{
 		setDelay(0);
 		strct->buildAnim = new BTurnAnimEvent(strct->type->getTurnspeed(), strct, facing);
 		strct->buildAnim->setSchedule(this, true);
@@ -180,6 +185,10 @@ void BAttackAnimEvent::run()
 		}
 		NeedToCharge = true;
 	}
+
+	// Throw an event
+	HandleTriggers(target, TRIGGER_EVENT_ATTACKED,
+		    		p::ppool->getHouseNumByPlayerNum(strct->getOwner()));
 
 	// We can shoot
 	strct->getType()->getWeapon()->fire(strct, target->getBPos(strct->getPos()), target->getSubpos());
