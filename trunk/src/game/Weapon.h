@@ -35,22 +35,27 @@ class Projectile;
 class Warhead;
 class UnitOrStructure;
 
-class Weapon {
+/**
+ * Weapon in the game
+ */
+class Weapon 
+{
 public:
     Weapon(const char * wname);
     ~Weapon();
+    
     Uint8 getReloadTime() const;
     Uint8 getRange() const;
     Uint8 getSpeed() const;
     Sint16 getDamage() const;
     bool getWall() const;
-    Projectile * getProjectile();
+    Projectile* getProjectile();
 
-    Warhead * getWarhead();
+    Warhead* getWarhead();
 
-    char * getChargingSound();
+    char* getChargingSound();
 
-    void fire(UnitOrStructure * owner, Uint16 target, Uint8 subtarget);
+    void fire(UnitOrStructure* owner, Uint16 target, Uint8 subtarget);
 
     //Uint32 tmppif;
     
@@ -64,14 +69,13 @@ public:
 
     Uint8 getSeekFuel() const;
 
-    const char * getName() const;
+    const char* getName() const;
 
-    void Reload(void);
+    void Reload();
 
 private:
-
-    Projectile * projectile;
-    Warhead * whead;
+    Projectile* projectile;
+    Warhead* whead;
     Uint8 speed;
     Uint8 range;
     Uint8 reloadtime;
@@ -88,13 +92,16 @@ private:
     Uint8 seekfuel;
     bool heatseek; 
     bool charges;
-    Uint32 fireimage;
-    Uint32 * fireimages;
-    Uint8 numfireimages; 
-    Uint8 numfiredirections;
-    char * firesound;
-    char * reloadsound;
-    char * chargingsound;
+    
+    // @todo Implemente Anim in [Weapon]
+    //Uint32 fireimage;
+    //Uint32* fireimages;
+    //Uint8 numfireimages; 
+    //Uint8 numfiredirections;
+    
+    char* report;
+    char* reloadsound;
+    char* chargingsound;
     string name;
 };
 
