@@ -18,7 +18,6 @@
 
 #include "mixvfs.h"
 
-//#include <cctype>
 #include <cmath>
 
 #include "blowfish.h"
@@ -103,7 +102,8 @@ Uint32 MIXFiles::getFile(const char *fname)
     newfile.pos = 0;
 
     openfiles_t::const_iterator ofe = openfiles.end();
-    do { /// @TODO Rewrite this loop.
+    do { 
+    	// @todo Rewrite this loop.
         of = openfiles.find(id++);
     } while (ofe != of);
     id--;
@@ -431,19 +431,19 @@ void MIXFiles::seekCur(Uint32 file, Sint32 pos)
 
 Uint32 MIXFiles::getPos(Uint32 file) const
 {
-    /// @TODO Abstract this const version of operator[]
-    std::map<Uint32, MIXPriv::OpenFile>::const_iterator i = openfiles.find(file);
+    // @todo Abstract this const version of operator[]
+    map<Uint32, MIXPriv::OpenFile>::const_iterator i = openfiles.find(file);
     if (openfiles.end() != i) {
         return i->second.pos;
     } else {
-        /// @TODO Throw an exception in a later iteration of code cleanup.
+        // @todo Throw an exception in a later iteration of code cleanup.
         return 0;
     }
 }
 
 Uint32 MIXFiles::getSize(Uint32 file) const
 {
-    /// @TODO Abstract this const version of operator[]
+    // @todo Abstract this const version of operator[]
     openfiles_t::const_iterator i = openfiles.find(file);
     if (openfiles.end() != i) {
         mixheaders_t::const_iterator i2 = mixheaders.find(i->second.id);
@@ -451,7 +451,7 @@ Uint32 MIXFiles::getSize(Uint32 file) const
             return i2->second.size;
         }
     }
-    /// @TODO Throw an exception in a later iterator of code cleanup.
+    // @todo Throw an exception in a later iterator of code cleanup.
     return 0;
 }
 
