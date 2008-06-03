@@ -52,7 +52,7 @@ SDL_Surface *MessagePool::getMessages()
     SDL_Rect dest;
 
     if (!updated) {
-        /// @TODO Replace this with STL magic
+        /// @todo Replace this with STL magic
         for (list<Message>::iterator i = msglist.begin(); i != msglist.end();) {
             if (i->expired(curtick)) {
                 updated = true;
