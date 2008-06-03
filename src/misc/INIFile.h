@@ -44,7 +44,7 @@ public:
     explicit INIFile(const char* filename);
     ~INIFile(); 
     
-    /// @TODO Would be nice if there was a version that returned a non-copy.
+    /// @todo Would be nice if there was a version that returned a non-copy.
     char* readString(const char* section, const char* value);
     char* readString(const char* section, const char* value, const char* deflt);
 
