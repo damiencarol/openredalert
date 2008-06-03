@@ -1,3 +1,21 @@
+// ExternalFiles.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include <algorithm>
 #include <cstdio>
 #include <cstdarg>
@@ -302,33 +320,34 @@ void ExternalFiles::seekCur(Uint32 file, Sint32 pos)
     fseek(openfiles[file].file, pos, SEEK_CUR);
 }
 
-Uint32 ExternalFiles::getPos(Uint32 file) const {
-    /// @TODO Abstract this const implementation of operator[].
+Uint32 ExternalFiles::getPos(Uint32 file) const
+{
+    // @todo Abstract this const implementation of operator[].
     openfiles_t::const_iterator i = openfiles.find(file);
     if (openfiles.end() != i) {
         return ftell(i->second.file);
     }
-    /// @TODO Throw an exception in a later iteration of code cleanup.
+    // @todo Throw an exception in a later iteration of code cleanup.
     return 0;
 }
 
 Uint32 ExternalFiles::getSize(Uint32 file) const {
-    /// @TODO Abstract this const implementation of operator[].
+    // @todo Abstract this const implementation of operator[].
     openfiles_t::const_iterator i = openfiles.find(file);
     if (openfiles.end() != i) {
         return i->second.size;
     }
-    /// @TODO Throw an exception in a later iteration of code cleanup.
+    // @todo Throw an exception in a later iteration of code cleanup.
     return 0;
 }
 
 const char* ExternalFiles::getPath(Uint32 file) const {
-    /// @TODO Abstract this const implementation of operator[].
+    // @todo Abstract this const implementation of operator[].
     openfiles_t::const_iterator i = openfiles.find(file);
     if (openfiles.end() != i) {
         return i->second.path.c_str();
     }
-    /// @TODO Throw an exception in a later iteration of code cleanup.
+    // @todo Throw an exception in a later iteration of code cleanup.
     return 0;
 }
 
@@ -360,7 +379,7 @@ FILE* ret;
     // Try all other case.  Assuming uniform casing.
     Uint32 i;
     // Skip over non-alpha chars.
-    // @TODO These are the old style text munging routines that are a) consise
+    // @todo These are the old style text munging routines that are a) consise
     // and b) doesn't work with UTF8 filenames.
     for (i=caseoffset;i<fname.length()&&!isalpha(fname[i]);++i);
     if (islower(fname[i])) {
@@ -372,7 +391,7 @@ FILE* ret;
     if (NULL != ret) {
         return ret;
     }
-    /// @TODO Try other tricks like "lower.EXT" or "UPPER.ext"
+    // @todo Try other tricks like "lower.EXT" or "UPPER.ext"
     return NULL;
 #endif
 }
