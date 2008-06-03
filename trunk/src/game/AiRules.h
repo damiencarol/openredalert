@@ -5,7 +5,11 @@
 
 #include "SDL/SDL_types.h"
 
-class AiRules {
+/**
+ * Params of the Ai
+ */
+class AiRules 
+{
 public:
     /** Average delay between computer attacks. (defaut = 3) */
 	Uint8 AttackInterval;
