@@ -1,13 +1,31 @@
+// BRepairUnitAnimEvent.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "BRepairUnitAnimEvent.h"
 
 #include <cmath>
 
 #include "Player.h"
-#include "include/PlayerPool.h"
+#include "PlayerPool.h"
 #include "audio/SoundEngine.h"
 #include "Unit.h"
 #include "UnitAndStructurePool.h"
-#include "include/weaponspool.h"
+#include "weaponspool.h"
 #include "anim_nfo.h"
 #include "Structure.h"
 #include "include/Logger.h"
@@ -97,7 +115,7 @@ void BRepairUnitAnimEvent::run()
 		}
 	}else{
 		//printf ("%s line %i: Unit repaired\n", __FILE__, __LINE__);
-		// TODO ADD "Unit repaired" sound
+		// @todo ADD "Unit repaired" sound
 		//pc::sfxeng->PlaySound(pc::Config.UnitRepaired);
 		stop();
 	}
