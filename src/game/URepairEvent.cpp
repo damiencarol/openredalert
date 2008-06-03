@@ -1,3 +1,21 @@
+// URepairEvent.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "URepairEvent.h"
 
 #include <cmath>
@@ -37,26 +55,39 @@ URepairEvent::URepairEvent(Uint32 p, Unit *un) : UnitAnimEvent(p,un)
 
 	moveCounter = 0;
 }
+
+/**
+ * 
+ */
 URepairEvent::~URepairEvent()
 {
     if (un->repairanim == this)
-        un->repairanim = NULL;
+    {
+        un->repairanim = 0;
+        }
 }
+
+/**
+ * 
+ */
 void URepairEvent::stop()
 {
-    if (un == NULL) {
+    if (un == 0)
+    {
         printf("Repair unit::stop: un is NULL!?\n");
         abort();
     }
     stopping = true;
 }
+
 void URepairEvent::update()
 {
     stopping = false;
 }
+
 void URepairEvent::run()
 {
-Structure *FixStr;
+	Structure* FixStr = 0;
 
 	if( !un->isAlive() || stopping ) {
 		delete this;
@@ -76,7 +107,8 @@ Structure *FixStr;
 		return;
 	}
 
-	if (un->getPos() != fix_str_pos){
+	if (un->getPos() != fix_str_pos)
+	{
 		if (moveCounter > 4){
 			// Can't reach target, give up
 			printf ("%s line %i: Can't reach target --> give up\n", __FILE__, __LINE__);
@@ -93,7 +125,7 @@ Structure *FixStr;
 		return;
 	}
 
-	if (!FixStr->RepairUnint (un)){
+	if (!FixStr->RepairUnint(un)){
 		delete this;
 		return;
 	}
