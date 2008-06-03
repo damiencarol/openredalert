@@ -54,7 +54,7 @@ private:
     Queue queue;
 
     /**
-     * TODO These values should be moved to a configuration file. I don't think buildspeed needs to be changed once this code is stable. 
+     * @todo These values should be moved to a configuration file. I don't think buildspeed needs to be changed once this code is stable. 
      */
     static const Uint8 buildspeed;
     static const Uint8 maxbuild;
