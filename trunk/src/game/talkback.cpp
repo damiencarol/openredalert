@@ -75,7 +75,7 @@ void Talkback::load(string talkback, INIFile *tbini)
 
     try {
         for (keynum=0;;++keynum) {
-            // Still TODO: stringify rest of code
+            // Still @todo: stringify rest of code
             char* first;
             key=tbini->readKeyValue(talkback.c_str(), keynum);
             first = stripNumbers(key->first.c_str());
@@ -137,7 +137,7 @@ vector<string>& Talkback::getTypeVector(TalkbackType type)
 
 	t_talkstore::iterator ret = talkstore.find(type);
 	if (ret == talkstore.end()) {
-		// TODO : change it assert(0 && "Unknown talkback type");
+		// @todo : change it assert(0 && "Unknown talkback type");
 	}
 	return ret->second;
 }
