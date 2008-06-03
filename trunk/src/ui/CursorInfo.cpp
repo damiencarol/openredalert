@@ -1,4 +1,4 @@
-// CursorInfo.h
+// CursorInfo.cpp
 // 1.0
 
 //    This file is part of OpenRedAlert.
@@ -16,25 +16,24 @@
 //    You should have received a copy of the GNU General Public License
 //    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CURSORINFO_H
-#define CURSORINFO_H
+#include "CursorInfo.h"
 
-#include "SDL/SDL_types.h"
-
-/**
- * All Data of a cursor 
- */
-class CursorInfo
+Uint16 CursorInfo::getAnStart()
 {
-public:
-    Uint16 getAnStart();
-    void setAnStart(Uint16 anStart);
-    Uint16 getAnEnd();
-    void setAnEnd(Uint16 anEnd);
+	return anStart; 
+}
 
-private:
-    Uint16 anStart;
-    Uint16 anEnd;
-};
+void CursorInfo::setAnStart(Uint16 anStart)
+{
+	this->anStart = anStart; 
+}
 
-#endif //CURSORINFO_H
+Uint16 CursorInfo::getAnEnd()
+{
+	return anEnd; 
+}
+
+void CursorInfo::setAnEnd(Uint16 anEnd)
+{
+	this->anEnd = anEnd; 
+}
