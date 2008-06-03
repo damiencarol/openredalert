@@ -22,11 +22,11 @@
 #include <stdexcept>
 #include <string>
 
-#include "include/dispatcher.h"
-#include "include/Logger.h"
-#include "include/PlayerPool.h"
-#include "UnitAndStructurePool.h"
 #include "audio/SoundEngine.h"
+#include "Dispatcher.h"
+#include "include/Logger.h"
+#include "PlayerPool.h"
+#include "UnitAndStructurePool.h"
 #include "ActionEvent.h"
 #include "UnitOrStructureType.h"
 #include "ActionEventQueue.h"
@@ -34,15 +34,24 @@
 #include "Player.h"
 #include "BQTimer.h"
 #include "RQstate.h"
+#include "include/config.h"
 
 namespace pc {
+	extern SoundEngine* sfxeng;
 	extern ConfigType Config;
 }
 namespace p {
+	extern Dispatcher* dispatcher;
 	extern ActionEventQueue* aequeue;
+	extern PlayerPool* ppool;
 }
 extern Logger * logger;
 
+using std::min;
+
+/**
+ * 
+ */
 BQueue::BQueue(Player* pPlayer) : 
 	player(pPlayer), 
 	status(BQ_EMPTY) 
@@ -295,9 +304,9 @@ bool BQueue::tick()
         return false;
     }
     last += delta * buildspeed;
-    /// @TODO Play "tink" sound
+    /// @todo Play "tink" sound
     if (!player->changeMoney(-delta)) {
-        /// @TODO Play "insufficient funds" sound
+        /// @todo Play "insufficient funds" sound
         // Note: C&C didn't put build on hold when you initially run out, so you
         // could leave something partially built whilst waiting for the
         // harvester to return
@@ -318,7 +327,7 @@ bool BQueue::tick()
     if (!type->isStructure()) {
         UnitType * utype = (UnitType *) type;
         if (p::dispatcher->unitSpawn(utype, player->getPlayerNum())) {
-            /// @TODO Play "unit ready" sound
+            /// @todo Play "unit ready" sound
             // If we were able to spawn the unit, move onto the next
             // item
             pc::sfxeng->PlaySound(pc::Config.UnitReady);
