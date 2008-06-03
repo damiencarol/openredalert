@@ -1,3 +1,21 @@
+// UnitType.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "UnitType.h"
 
 #include <string>
@@ -7,10 +25,10 @@
 #include "SDL/SDL_timer.h"
 
 #include "include/common.h"
-#include "include/ccmap.h"
+#include "cncmap.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
-#include "include/PlayerPool.h"
+#include "PlayerPool.h"
 #include "audio/SoundEngine.h"
 #include "Unit.h"
 #include "UnitAndStructurePool.h"
@@ -19,7 +37,7 @@
 #include "Talkback.h"
 #include "video/ImageCache.h"
 #include "video/ImageCacheEntry.h"
-#include "include/weaponspool.h"
+#include "weaponspool.h"
 #include "InfantryGroup.h"
 #include "StructureType.h"
 #include "GameMode.h"
@@ -96,26 +114,28 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 	// get string with this name
 	shpname = string(typeName);	    
 	shpname += ".shp";
-	// TODO TRY THIS !!!	
-	 try {
-	 shpimage = new SHPImage(shpname.c_str(), -1);
-	 } catch (ImageNotFound&) {
-	 logger->error("Image not found: \"%s\"\n", shpname.c_str());
-	 numlayers = 0;
-	 return;
-	 }
-	 shpnum = static_cast<Uint32>(pc::imagepool->size());
-	 pc::imagepool->push_back(shpimage);        
-	 shpnum <<= 16;
+	// @todo TRY THIS !!!
+	try 
+	{
+		shpimage = new SHPImage(shpname.c_str(), -1);
+	} catch (ImageNotFound&) {
+		logger->error("Image not found: \"%s\"\n", shpname.c_str());
+		numlayers = 0;
+		return;
+	}
+	shpnum = static_cast<Uint32>(pc::imagepool->size());
+	pc::imagepool->push_back(shpimage);        
+	shpnum <<= 16;
 	 
-	 for( i = 0; i < numlayers; i++ ) {
-	 // get layer offsets from inifile
-	 //shpnums[i] = pc::imagepool->size();
-	 shpnums[i] = shpnum;
-	 shptnum[i] = shpimage->getNumImg();
-	 shpnum += 32;	 
-	 }
-	 // TODO REFACTOR TO IT !!!
+	for( i = 0; i < numlayers; i++ )
+	{
+		// get layer offsets from inifile
+		//shpnums[i] = pc::imagepool->size();
+		shpnums[i] = shpnum;
+		shptnum[i] = shpimage->getNumImg();
+		shpnum += 32;
+	}
+	// @todo REFACTOR TO IT !!!
 	 /*
 	// Load the SHPimage
 	Uint32 numSHP = pc::imgcache->loadImage(shpname.c_str());
@@ -306,6 +326,15 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 	} else {
 		c4 = false;
 	}
+	
+	// Read the Infiltrate caracteristic
+	if (string(unitini->readString(tname, "Infiltrate", "no")) == "yes" ||
+		string(unitini->readString(tname, "Infiltrate", "no")) == "Yes")
+	{
+		infiltrate = true;
+	} else {
+		infiltrate = false;
+	}		
 }
 
 /**
@@ -380,13 +409,15 @@ bool UnitType::isDoubleOwned()
 
 Uint32 *UnitType::getSHPNums() 
 {
-        return shpnums;
-    }
+	return shpnums;
+}
+
 Uint8 UnitType::getNumLayers() const 
 {
-        return numlayers;
-    }
-Uint16 *UnitType::getSHPTNum() 
+	return numlayers;
+}
+
+Uint16* UnitType::getSHPTNum() 
 {
         return shptnum;
 }
@@ -487,4 +518,14 @@ Uint8 UnitType::getPQueue() const
 bool UnitType::isC4() const
 {
 	return c4;
+}
+
+bool UnitType::isInfiltrate()
+{
+	return infiltrate;
+}
+
+void UnitType::setInfiltrate(bool infiltrate)
+{
+	this->infiltrate = infiltrate;
 }

@@ -74,6 +74,11 @@ public:
     bool isStructure() const;
 	bool isDoubleOwned();
 	bool isC4() const;
+	/** */
+    bool isInfiltrate();
+    /** */
+    void setInfiltrate(bool infiltrate);
+
 private:
     Uint32 *shpnums;
 	Uint16 *shptnum;
@@ -111,10 +116,16 @@ private:
     /** matches the unit's type name.*/
     vector<UnitType*> specificTypeAllow;
     
-    /** C4 = Equipped with building sabotage explosives 
+    /** 
+     * C4 = Equipped with building sabotage explosives 
      * [presumes Infiltrate is true] (def=no)? 
      */
     bool c4;    
+    
+    /** 
+     * Infiltrate = Can it enter a building like a spy or thief (def=no)?
+     */
+    bool infiltrate;
 };
 
 #endif //UNITTYPE_H
