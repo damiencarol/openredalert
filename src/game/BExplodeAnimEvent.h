@@ -1,3 +1,21 @@
+// BExploreAnimEvent.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef BEXPLODEANIMEVENT_H
 #define BEXPLODEANIMEVENT_H
 
@@ -12,7 +30,8 @@
  * the destroyed structure upon finishing.  This class also
  * overrides the run function (but calls the BuildingAnimEvent::run
  * function)
- * \see BuildingAnimEvent
+ * 
+ * @see BuildingAnimEvent
  */
 class BExplodeAnimEvent : public BuildingAnimEvent {
 public:
@@ -21,16 +40,19 @@ public:
      * @param str the structure that has just been destroyed
      */
     BExplodeAnimEvent(Uint32 p, Structure* str);
-
-    /// Updates the UnitAndStructurePool
-    /// @todo spawn survivors
-    /// @todo spawn flame objects
     ~BExplodeAnimEvent();
+    
+    /**
+     * Updates the UnitAndStructurePool
+     * @todo spawn survivors
+     * @todo spawn flame objects
+     */
     virtual void run();
+    
 private:
     Structure* strct;
     Uint16 lastframe; Uint16 counter;
     virtual void anim_func(anim_nfo* data);
 };
 
-#endif /*  */
+#endif //BEXPLODEANIMEVENT_H
