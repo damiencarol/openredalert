@@ -48,6 +48,9 @@ namespace pc {
 const Uint8 SHPBase::numpals = 9;
 SDL_Color SHPBase::palette[32][256];
 
+/**
+ * Base class for all image based on shp file in archives
+ */
 SHPBase::SHPBase(const string& fname, Sint8 scaleq) :
 	name(fname), 
     scaleq(scaleq), 
@@ -55,6 +58,9 @@ SHPBase::SHPBase(const string& fname, Sint8 scaleq) :
 {
 }
 
+/**
+ * Base class for all image based on shp file in archives
+ */
 SHPBase::~SHPBase() 
 {
 	delete scaler;
@@ -87,7 +93,7 @@ void SHPBase::setPalette(SDL_Color *pal)
 }
 
 /**
- * TODO DO NOTHING IN RA
+ * @todo DO NOTHING IN RA
  */
 void SHPBase::calculatePalettes() 
 {
