@@ -35,6 +35,7 @@ using std::runtime_error;
 extern Logger * logger;
 
 /**
+ * @param filename File name to load
  */
 StringTableFile::StringTableFile(string filename)
 {
@@ -43,6 +44,7 @@ StringTableFile::StringTableFile(string filename)
 }
 
 /**
+ * @param filename File name to load
  */
 StringTableFile::StringTableFile(const char* filename)
 {
@@ -52,6 +54,8 @@ StringTableFile::StringTableFile(const char* filename)
 
 /**
  * Load all strings in the file specified and stroe it in a std::vector
+ * 
+ * @param filename File name to load
  */
 void StringTableFile::loadStringFile(const char* filename)
 {
@@ -112,8 +116,6 @@ void StringTableFile::loadStringFile(const char* filename)
 }
 
 /**
- * Destructor
- * 
  * Free only data by calling vector::clear() function.
  */
 StringTableFile::~StringTableFile()
@@ -124,12 +126,17 @@ StringTableFile::~StringTableFile()
 
 /**
  * Return string by id
+ * 
+ * @param id Number (id) of the string
+ * @return The string with the id specified
  */
 string StringTableFile::getString(Uint32 id)
 {
-	string ret;
+	string ret; // String to return
 	
+	// Copy the string from the internal data
 	ret = this->data[id];
 	
+	// Return the string
 	return ret;
 }
