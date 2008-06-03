@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 
 /**
- * @TODO These palettes only differ between 179 and 190.
+ * @todo These palettes only differ between 179 and 190.
  * In this range are two gradients from bright to dark of that colour.
  * Should calculate the gradients and SDL_MapRGB them to the palette.
  */
