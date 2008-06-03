@@ -23,7 +23,7 @@
 
 #include "Button.h"
 #include "RA_Label.h"
-#include "RA_WindowClass.h"
+#include "RaWindow.h"
 #include "TCheckBox.h"
 #include "game/Player.h"
 #include "game/PlayerPool.h"
@@ -55,7 +55,7 @@ PauseMenu::PauseMenu()
 	stringFile = new StringTableFile("conquer.eng");
 	
 	// Create the window
-	PauseWindow = new RA_WindowClass();
+	PauseWindow = new RaWindow();
 	// Setup the first popup window
 	PauseWindow->SetupWindow(130, 90, 430, 250);
 
@@ -93,7 +93,6 @@ PauseMenu::PauseMenu()
     }
 	my_cursor = cursorimg->getImage(0);
 
-	
 
 	// Create the menu Label
 	MenuLabel = new RA_Label();
