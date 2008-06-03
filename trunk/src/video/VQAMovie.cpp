@@ -159,7 +159,7 @@ void VQA::VQAMovie::play()
         return;
     }
     
-    // TODO : DEBUG
+    // @todo : DEBUG
 #ifndef RA_SOUND_ENGINE
     logger->debug("SWAP VQA MOVIE FOR DEBUG\n");
     return;
@@ -454,7 +454,7 @@ Uint32 VQA::VQAMovie::DecodeSNDChunk(Uint8 *outbuf)
         memcpy(outbuf, inbuf, chunklen);
         break;
     case '1': // Westwoods own algorithm
-        // TODO: Add support for this algorithm
+        // @todo: Add support for this algorithm
         logger->error("VQA: Decoding SND chunk - sound compressed using unsupported westwood algorithm\n");
         //Sound::WSADPCM_Decode(outbuf, inbuf, chunklen, uncompressed_size)
         chunklen = 0;
