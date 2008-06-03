@@ -1,5 +1,5 @@
 // Structure.h
-// 1.1
+// 1.2
 
 //    This file is part of OpenRedAlert.
 //
@@ -94,7 +94,6 @@ public:
 
 	bool CreateUnitAnimation (UnitType* UnType, Uint8 owner);
 
-    bool isWall() const ;
     double getRatio() const ;
     bool isPrimary() const ;
     void setPrimary(bool pri) ;
@@ -157,8 +156,8 @@ private:
 
 	bool retry_sell;
     bool retry_repair;
+    bool retry_bombing;
     bool repairing;
-
     bool bombing;
 
 	UnitType*	CreateUnitType;
