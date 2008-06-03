@@ -1,15 +1,36 @@
+// Path.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "Path.h"
+
 #include <cstdlib>
 #include <queue>
 #include <vector>
-#include "include/ccmap.h"
+
+#include "CnCMap.h"
 #include "KeyComp.h"
 #include "FibHeapEntry.h"
 #include "TileRef.h"
 #include "Unit.h"
 using std::min;
 
-namespace p {
+namespace p 
+{
 	extern CnCMap * ccmap;
 }
 
@@ -101,7 +122,7 @@ Path::Path(Unit *Unit, Uint32 crBeg, Uint32 crEnd, Uint8 max_dist) : std::stack<
             /* desired min dist to target, 0 to go all the way. Currently the length of the path is limited to 100 */
             break;
 
-		/* Walk in all directions */
+		// Walk in all directions
 		for( edp = 0; edp < 8; edp++ ) {
 
 			switch( edp ) {
@@ -347,9 +368,14 @@ Path::Path(Unit *Unit, Uint32 crBeg, Uint32 crEnd, Uint8 max_dist) : std::stack<
         return;
     }
 }
+
+/**
+ * Empty the path 
+ */
 Path::~Path()
 {
-    while(!empty()){
+    while(!empty())
+    {
         pop();
     }
 }
