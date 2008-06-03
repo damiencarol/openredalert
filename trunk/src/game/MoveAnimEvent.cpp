@@ -1,3 +1,21 @@
+// MoveAnimEvent.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "MoveAnimEvent.h"
 
 #include <cmath>
@@ -159,7 +177,7 @@ void MoveAnimEvent::startMoveOne(bool wasblocked)
     Unit *BlockingUnit = NULL;
     Uint8 face;
 #ifdef LOOPEND_TURN
-    //TODO: transport boat is jerky (?)
+    //@todo: transport boat is jerky (?)
     Uint8 loopend=((UnitType*)un->type)->getAnimInfo().loopend;
 #endif
     newpos = p::uspool->preMove(un, path->top(), &xmod, &ymod, &BlockingUnit);
@@ -196,7 +214,7 @@ void MoveAnimEvent::startMoveOne(bool wasblocked)
                 p::aequeue->scheduleEvent(this);
                 return;
             } else {
-                /* TODO: tell the blocking unit to move here */
+                // @todo: tell the blocking unit to move here
                 // logger->note ("%s line %i: We are blocked\n", __FILE__, __LINE__);
 
                 blocked = true;
