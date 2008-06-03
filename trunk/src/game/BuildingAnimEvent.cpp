@@ -1,9 +1,27 @@
+// BuildingAnimEvent.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "BuildingAnimEvent.h"
 
 #include <cmath>
 
 #include "ActionEventQueue.h"
-#include "include/ccmap.h"
+#include "cncmap.h"
 #include "audio/SoundEngine.h"
 #include "BAttackAnimEvent.h"
 #include "include/Logger.h"
@@ -53,9 +71,15 @@ BuildingAnimEvent::BuildingAnimEvent(Uint32 p, Structure* str, Uint8 mode) :
 	}
 }
 
-BuildingAnimEvent::~BuildingAnimEvent() {
-	if ((e != NULL)||(ea!=NULL)) {
-		if (toAttack) {
+/**
+ * 
+ */
+BuildingAnimEvent::~BuildingAnimEvent() 
+{
+	if ((e != 0)||(ea != 0)) 
+	{
+		if (toAttack) 
+		{
 			strct->attackAnim = ea;
 			p::aequeue->scheduleEvent(ea);
 		} else {
@@ -66,7 +90,11 @@ BuildingAnimEvent::~BuildingAnimEvent() {
 	strct->unrefer();
 }
 
-void BuildingAnimEvent::run() {
+/**
+ * 
+ */
+void BuildingAnimEvent::run()
+{
 	//	BuildingAnimEvent* tmp_ev;
 
 	if ( !strct->isAlive() ) {
@@ -75,79 +103,86 @@ void BuildingAnimEvent::run() {
 	}
 	anim_func(&anim_data);
 
-	if (strct->getNumbImages(0) > anim_data.frame0)
+	if (strct->getNumbImages(0) > anim_data.frame0){
 		strct->setImageNum(anim_data.frame0, 0);
-	else
+	}else{
 		logger->error("%s line %i: Failed to set frame %i, numb frames = %i\n",__FILE__ , __LINE__, anim_data.frame0, strct->getNumbImages (0));
-		if (layer2)
-		{
-			if (strct->getNumbImages (1)> anim_data.frame1)
-			strct->setImageNum(anim_data.frame1,1);
-			else
-			logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.frame1);
-		}
-		if (anim_data.done)
-		{
-			/// Handle ending the animation
-			if (anim_data.mode != 6 && anim_data.mode != 5)
-			{
-				if (strct->getNumbImages (0)> anim_data.damagedelta)
-				strct->setImageNum(anim_data.damagedelta,0);
-				else
-				logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta);
-				if (layer2)
-				{
-					if (strct->getNumbImages (1)> anim_data.damagedelta2)
-					strct->setImageNum(anim_data.damagedelta2,1);
-					else
-					logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta2);
-				}
-			}
-			if (anim_data.mode == 0)
-			{
-				if (strct->getNumbImages (0)> anim_data.damagedelta + anim_data.frame0)
-				strct->setImageNum(anim_data.damagedelta + anim_data.frame0,0);
-				else
-				logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta + anim_data.frame0);
-			}
-			strct->usemakeimgs = false;
-			if ((anim_data.mode == 0) || (anim_data.mode == 7) || (anim_data.mode == 8) )
-			{
-				switch (getaniminfo().animtype)
-				{
-					case 1:
-					strct->animating = false;
-					strct->runAnim (1);
-					//tmp_ev = new LoopAnimEvent(getaniminfo().animspeed,strct);
-					//setSchedule(tmp_ev);
-					break;
-					case 4:
-					//tmp_ev = new ProcAnimEvent(getaniminfo().animspeed,strct);
-					//setSchedule(tmp_ev);
-					strct->animating = false;
-					strct->runAnim (4);
-					break;
-					case 8:
-					strct->animating = false;
-					if (strct->backup_anim_mode != 0)
-					strct->runAnim (strct->backup_anim_mode);
-					strct->backup_anim_mode = 0;
-					break;
-					default:
-					strct->animating = false;
-					break;
-				}
-			}
-			else if (e == NULL)
-			{
-				strct->animating = false;
-			}
-			delete this;
-			return;
-		}
-		p::aequeue->scheduleEvent(this);
 	}
 	
+	if (layer2)
+	{
+		if (strct->getNumbImages(1)> anim_data.frame1)
+			strct->setImageNum(anim_data.frame1,1);
+		else
+			logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.frame1);
+	}
+	
+	if (anim_data.done)
+	{
+		/// Handle ending the animation
+		if (anim_data.mode != 6 && anim_data.mode != 5)
+		{
+			if (strct->getNumbImages (0)> anim_data.damagedelta)
+				strct->setImageNum(anim_data.damagedelta,0);
+			else
+				logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta);
+			if (layer2)
+			{
+				if (strct->getNumbImages (1)> anim_data.damagedelta2)
+					strct->setImageNum(anim_data.damagedelta2,1);
+				else
+					logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta2);
+			}
+		}
+		if (anim_data.mode == 0)
+		{
+			if (strct->getNumbImages (0)> anim_data.damagedelta + anim_data.frame0)
+				strct->setImageNum(anim_data.damagedelta + anim_data.frame0,0);
+			else
+				logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta + anim_data.frame0);
+		}
+		strct->usemakeimgs = false;
+		if ((anim_data.mode == 0) || (anim_data.mode == 7) || (anim_data.mode == 8) )
+		{
+			switch (getaniminfo().animtype)
+			{
+			case 1:
+				strct->animating = false;
+				strct->runAnim (1);
+				//tmp_ev = new LoopAnimEvent(getaniminfo().animspeed,strct);
+				//setSchedule(tmp_ev);
+				break;
+			case 4:
+				//tmp_ev = new ProcAnimEvent(getaniminfo().animspeed,strct);
+				//setSchedule(tmp_ev);
+				strct->animating = false;
+				strct->runAnim (4);
+				break;
+			case 8:
+				strct->animating = false;
+				if (strct->backup_anim_mode != 0){
+					strct->runAnim (strct->backup_anim_mode);
+				}
+				strct->backup_anim_mode = 0;
+				break;
+			default:
+				strct->animating = false;
+				break;
+			}
+		}
+		else if (e == NULL)
+		{
+			strct->animating = false;
+		}
+		delete this;
+		return;
+	}
+	p::aequeue->scheduleEvent(this);
+}
+
+/**
+ * 
+ */
 void BuildingAnimEvent::updateDamaged() 
 {
 	bool odam = anim_data.damaged;
@@ -171,21 +206,27 @@ void BuildingAnimEvent::updateDamaged()
 	}
 }
 
-animinfo_t BuildingAnimEvent::getaniminfo() {
+animinfo_t BuildingAnimEvent::getaniminfo()
+{
 	return ((StructureType *)strct->getType())->getAnimInfo();
 }
-StructureType* BuildingAnimEvent::getType() {
+
+StructureType* BuildingAnimEvent::getType()
+{
 	return strct->type;
 }
 
-void BuildingAnimEvent::update() {
+void BuildingAnimEvent::update()
+{
 }
 
-void BuildingAnimEvent::setSchedule(BuildingAnimEvent* e) {
+void BuildingAnimEvent::setSchedule(BuildingAnimEvent* e)
+{
 	this->e = e;
 }
 
-void BuildingAnimEvent::setSchedule(BAttackAnimEvent* ea, bool attack) {
+void BuildingAnimEvent::setSchedule(BAttackAnimEvent* ea, bool attack)
+{
 	if (attack) {
 		this->ea = ea;
 	} else {
@@ -194,6 +235,10 @@ void BuildingAnimEvent::setSchedule(BAttackAnimEvent* ea, bool attack) {
 	toAttack = attack;
 }
 
-void BuildingAnimEvent::stop() {
+/**
+ * 
+ */
+void BuildingAnimEvent::stop()
+{
 	anim_data.done = true;
 }
