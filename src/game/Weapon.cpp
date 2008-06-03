@@ -29,13 +29,13 @@
 #include "ActionEventQueue.h"
 #include "UnitOrStructure.h"
 #include "include/Logger.h"
-#include "include/weaponspool.h"
+#include "weaponspool.h"
 #include "video/ImageNotFound.h"
 #include "video/SHPImage.h"
 #include "audio/SoundEngine.h"
 #include "UnitOrStructureType.h"
 #include "InfantryGroup.h"
-#include "include/ProjectileAnim.h"
+#include "ProjectileAnim.h"
 #include "RedAlertDataLoader.h"
 
 using std::vector;
@@ -68,9 +68,11 @@ Weapon::Weapon(const char* wname)
 	string weapname;
 	string::iterator p;
 	
+	INIFile* rules = 0;
 		
 	name = string(wname);
 	
+	rules = new INIFile("rules.ini");
 
 	weapini = p::weappool->getWeaponsINI();
 	weapname = (string)wname;
@@ -163,12 +165,19 @@ Weapon::Weapon(const char* wname)
 	burst = weapini->readInt(wname, "burst", 1);
 	heatseek = (weapini->readInt(wname, "heatseek", 0) != 0);
 
-	fireimage = pc::imagepool->size()<<16;
-	// pc::imagepool->push_back(new SHPImage("minigun.shp", mapscaleq));
-	firesound = weapini->readString(wname, "firesound");
-	if (firesound != 0)
-		pc::sfxeng->LoadSound(firesound);
 
+	// pc::imagepool->push_back(new SHPImage("minigun.shp", mapscaleq));
+	//firesound = weapini->readString(wname, "firesound");
+	//printf("wname = %s\n", wname);
+	report = rules->readString(wname, "Report");
+	if (report != 0){
+		string soundWeap = report;
+		soundWeap += string(".aud");
+		transform(soundWeap.begin(), soundWeap.begin(), soundWeap.end(), tolower);
+		//logger->debug("Report = %s\n", soundWeap.c_str());
+		report = strdup(soundWeap.c_str());	
+		pc::sfxeng->LoadSound(report);
+	}
 	reloadsound = weapini->readString(wname, "reloadsound");
 	if (reloadsound != 0)
 		pc::sfxeng->LoadSound(reloadsound);
@@ -180,6 +189,9 @@ Weapon::Weapon(const char* wname)
 	fuel = weapini->readInt(wname, "fuel", 0);
 	seekfuel = weapini->readInt(wname, "seekfuel", 0);
 
+	// @todo Implemente Anim in [Weapon]
+	/*
+	fireimage = pc::imagepool->size()<<16;	
 	faname = weapini->readString(wname, "fireimage", "none");
 	//printf ("%s line %i: Weapon = %s, fireimage = %s\n", __FILE__, __LINE__, wname, faname);
 	if (strcmp((faname), ("none")) == 0)
@@ -251,23 +263,31 @@ Weapon::Weapon(const char* wname)
 			}
 		}
 		delete[] faname;
-	}
+	}*/
+	
+	// Free rules.ini
+	delete rules;
 }
 
 Weapon::~Weapon()
 {
-	if (firesound != NULL)
+	// If Report sound exist
+	if (report != 0)
 	{
-		delete[] firesound;
+		// delete it
+		delete[] report;
 	}
+	
 	if (reloadsound != NULL)
 	{
 		delete[] reloadsound;
 	}
-	if (fireimage != 0)
-	{
-		delete[] fireimages;
-	}
+	
+	// @todo Implemente Anim in [Weapon]		
+	//if (fireimage != 0)
+	//{
+	//	delete[] fireimages;
+	//}
 }
 
 Uint8 Weapon::getReloadTime() const
@@ -310,13 +330,17 @@ char * Weapon::getChargingSound()
 	return chargingsound;
 }
 
-void Weapon::fire(UnitOrStructure *owner, Uint16 target, Uint8 subtarget)
+void Weapon::fire(UnitOrStructure* owner, Uint16 target, Uint8 subtarget)
 {
-	if (firesound != NULL)
+	// If sound report is defined
+	if (report != 0)
 	{
-		pc::sfxeng->PlaySound(firesound);
+		// Play the sound
+		pc::sfxeng->PlaySound(report);
 	}
-	if (fireimage != 0)
+	
+	// @todo implemente Anim in [Weapon]
+	/*if (fireimage != 0)
 	{
 		Uint32 length = numfireimages;
 		Uint8 facing;
@@ -336,15 +360,18 @@ void Weapon::fire(UnitOrStructure *owner, Uint16 target, Uint8 subtarget)
 		if (numfiredirections == 1)
 		{
 			facing = 0;
-		}
-		new ExplosionAnim(1, owner->getPos(),fireimages[facing],
-				(Uint8)length,/*owner->getXoffset()+*/InfantryGroup::GetUnitOffsets()[owner->getSubpos()],
-				/*owner->getYoffset()+*/InfantryGroup::GetUnitOffsets()[owner->getSubpos()]);
-	}
-	p::aequeue->scheduleEvent(new ProjectileAnim(0, this, owner, target, subtarget));
+		}*/
+//		new ExplosionAnim(1, owner->getPos(),fireimages[facing],
+//				(Uint8)length,/*owner->getXoffset()+*/InfantryGroup::GetUnitOffsets()[owner->getSubpos()],
+//				/*owner->getYoffset()+*/InfantryGroup::GetUnitOffsets()[owner->getSubpos()]);
+	
+		
+	//}
+	
+	ProjectileAnim* proj = new ProjectileAnim(0, this, owner, target, subtarget);
+	p::aequeue->scheduleEvent(proj);
 
 	this->Reload();
-
 }
 
 bool Weapon::isHeatseek() const
