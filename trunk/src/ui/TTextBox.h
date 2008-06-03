@@ -1,3 +1,21 @@
+// TTextBox.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef TTEXTBOX_H
 #define TTEXTBOX_H
 
@@ -6,29 +24,35 @@
 
 #include "RA_Label.h"
 
-class RA_WindowClass;
+class RaWindow;
 
-class TTextBox {
+/**
+ * 
+ */
+class TTextBox 
+{
 public:
 	TTextBox();
-	// TTextBox(const int w);
 	~TTextBox();
-	bool need_redraw(void);
+	
+	bool need_redraw();
 	bool Draw(int X, int Y);
-	void SetDrawingWindow(RA_WindowClass *Window);
+	void SetDrawingWindow(RaWindow* Window);
 	bool setText(const std::string& text);
 	char* getText();
 
 	bool DeleteChar(unsigned int pos);
-	bool MouseOver(void);
+	bool MouseOver();
 	void HandleInput(SDL_Event event);
-	void Create(void);
+	void Create();
 	void setColor(Uint32 Color);
-	Uint32 getWidth(void);
+	Uint32 getWidth();
 
 private:
-	std::string TextBoxString;
-	RA_WindowClass *WindowToDrawOn;
+	bool AddChar(char AddChar);
+	
+	string TextBoxString;
+	RaWindow* WindowToDrawOn;
 	RA_Label TextBoxLabel;
 	volatile bool Selected;
 	volatile bool Recreate;
@@ -41,8 +65,6 @@ private:
 	SDL_Surface* TextBoxSurface;
 	SDL_Surface* DisplaySurface;
 	SDL_Rect SizeAndPosition;
-	
-	bool AddChar(char AddChar);
 };
 
 #endif //TTEXTBOX_H
