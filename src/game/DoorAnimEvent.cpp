@@ -71,7 +71,7 @@ void DoorAnimEvent::anim_func(anim_nfo* data)
 				if (pos != 0xffff) {
 					strct->runAnim(1);
 					// (256 = FULLHEALTH)
-					p::uspool->createUnit(strct->CreateUnitType, pos, subpos, strct->CreateUnitOwner, 255, 16);
+					p::uspool->createUnit(strct->CreateUnitType, pos, subpos, strct->CreateUnitOwner, 255, 16, 0, "None");
 				} else {
 					logger->error("%s line %i: No free position for %s\n", __FILE__, __LINE__, strct->CreateUnitType->getTName());
 				}
