@@ -1,5 +1,5 @@
 // Button.h
-// 1.2
+// 1.3
 
 //    This file is part of OpenRedAlert.
 //
@@ -37,7 +37,7 @@
 #include "RA_Label.h"
 
 class RA_Label;
-class RA_WindowClass;
+class RaWindow;
 
 using std::string;
 
@@ -52,7 +52,7 @@ public:
 	
 	bool handleMouseEvent(SDL_Event event);
 	void SetDrawingSurface(SDL_Surface *Surface);
-	void SetDrawingWindow(RA_WindowClass* Window);
+	void SetDrawingWindow(RaWindow* Window);
 	/** Set the font color in the button up state.*/
 	void setFontColor_up(Uint8 red, Uint8 green, Uint8 blue);
 	/**  Set the font color in the button down state.*/
@@ -63,7 +63,7 @@ public:
 	Uint32 GetColor();
 	void setposition(int x, int y);
 	void setsize(int w, int h);
-	void setText(const std::string buff);
+	void setText(const string buff);
 	void setButtonState(int state);
 	int getButtonState();
 	void drawbutton();
@@ -73,7 +73,7 @@ public:
 	void CreateSurface(const string& ButtonText, int Xpos, int Ypos, int Width, int Heigth);
 
 private:
-	RA_WindowClass *WindowToDrawOn;
+	RaWindow* WindowToDrawOn;
 	SDL_Color FontColor_up;
 	SDL_Color FontColor_down;
 	SDL_Color ButtonColor;

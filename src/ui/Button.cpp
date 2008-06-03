@@ -1,5 +1,5 @@
 // Button.cpp
-// 1.3
+// 1.4
 
 //    This file is part of OpenRedAlert.
 //
@@ -21,7 +21,7 @@
 #include <string>
 #include <math.h>
 
-#include "RA_WindowClass.h"
+#include "RaWindow.h"
 #include "video/GraphicsEngine.h"
 
 using std::string;
@@ -122,7 +122,7 @@ void Button::SetDrawingSurface(SDL_Surface *Surface)
 	}	
 }
 
-void Button::SetDrawingWindow(RA_WindowClass *Window)
+void Button::SetDrawingWindow(RaWindow *Window)
 {
 	if (Window != 0){
 		WindowToDrawOn = Window;
