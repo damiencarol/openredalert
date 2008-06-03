@@ -24,7 +24,7 @@
 class Button;
 class Dune2Image;
 class RA_Label;
-class RA_WindowClass;
+class RaWindow;
 
 /**
  * Pause menu in the game
@@ -55,7 +55,7 @@ private:
 	/** Buttons "Resume" for the main menu */
 	Button* ContinueButton;
 
-	RA_WindowClass* PauseWindow;
+	RaWindow* PauseWindow;
 
 	SDL_Surface* display;
 	SDL_Surface* my_cursor;
