@@ -179,6 +179,8 @@ void ImageCache::setImage(SDL_Surface* Image, SDL_Surface* Shadow, Uint32 imgnum
 
 /**
  * Load an image with this name
+ * 
+ * @param fname Name of the file.
  */
 Uint32 ImageCache::loadImage(const char* fname)
 {
@@ -186,6 +188,12 @@ Uint32 ImageCache::loadImage(const char* fname)
     return loadImage(fname, -1);
 }
 
+/**
+ * Load an image with this name
+ * 
+ * @param fname Name of the file.
+ * @param scaleq scale factor (-1 = no factor)
+ */
 Uint32 ImageCache::loadImage(const char* fname, int scaleq) 
 {
     string name; // Name of the file wanted
@@ -202,7 +210,8 @@ Uint32 ImageCache::loadImage(const char* fname, int scaleq)
     
     // if the iterator is at end (image NOT FOUND) load the image and 
     // push it on the vector
-    if (cachentry == namecache.end()) {
+    if (cachentry == namecache.end()) 
+    {
     	// Get the initial index
         Uint32 size = static_cast<Uint32>(imagepool->size());
         try {
