@@ -52,10 +52,11 @@ Cursor::Cursor() :
 	//	nsoff = 129;
 	//}
 
-	cursorpool = new CursorPool("cursors.ini");
+	// Build a CursorPool with all cursor of RedAlert
+	cursorpool = new CursorPool();
 
 	// Load the first simple cursor
-	setCursor("STANDARD");
+	setCursor("standard");
 	x = 0;
 	y = 0;
 
@@ -132,7 +133,7 @@ void Cursor::setCursor(const char* curname)
 
 	//	printf ("%s line %i: Ci start = %i, Ci end = %i\n", __FILE__, __LINE__, ci->anstart,  ci->anend);
 
-	setCursor(ci->anstart, ci->anend - ci->anstart + 1);
+	setCursor(ci->getAnStart(), (Uint8)(ci->getAnEnd() - ci->getAnStart() + 1));
 }
 
 void Cursor::setPlaceCursor(Uint8 stw, Uint8 sth, Uint8 *icn) 
@@ -298,8 +299,8 @@ void Cursor::setTooltip(string TipText)
 	// If splitpos !=0 We have two lines to draw in the tooltip
 	if (splitpos != 0) 
 	{
-		ToolTipLabel[0].setText(TipText.substr( 0, splitpos));
-		ToolTipLabel[1].setText(TipText.substr(splitpos+1));
+		ToolTipLabel[0].setText(TipText.substr(0, splitpos));
+		ToolTipLabel[1].setText(TipText.substr(splitpos + 1));
 
 		h = 2*ToolTipLabel[0].getHeight() + 6;
 		if (ToolTipLabel[0].getWidth() > ToolTipLabel[1].getWidth()){

@@ -26,7 +26,7 @@
 
 #include "RA_Label.h"
 
-/// @TODO Move these hardcoded values
+/// @todo Move these hardcoded values
 #define MAX_CURS_IN_ANIM 24
 
 #define CUR_NOANIM 1
@@ -45,9 +45,7 @@
 
 #define CUR_PLACE 250
 
-#define MAXCURNAME 12
-
-struct CursorInfo;
+class CursorInfo;
 class CursorPool;
 class Dune2Image;
 class TemplateImage;
@@ -96,6 +94,7 @@ private:
 	SDL_Surface *image[24];
 
 	Dune2Image *cursorimg;
+	/** Image for building placement in game */
 	TemplateImage *transicn;
 	Sint16 cursor_offset;
 
