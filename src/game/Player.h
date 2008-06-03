@@ -1,5 +1,5 @@
 // Player.h
-// 1.4
+// 1.5
 
 //    This file is part of OpenRedAlert.
 //
@@ -28,11 +28,7 @@
 #include "ConStatus.h"
 #include "UnitOrStructureType.h"
 #include "Unit.h"
-//#include "BQueue.h"
 
-namespace AI {
-    struct AIPluginData;
-}
 class MoneyCounter;
 class Structure;
 class StructureType;
@@ -43,6 +39,9 @@ using std::map;
 using std::list;
 using std::vector;
 
+/**
+ * Player in game
+ */
 class Player
 {
 public:
@@ -215,7 +214,7 @@ private:
 
 	/** buildable_radius */
 	Uint8 brad;
-	/** TODO : REMOVE THAT  Map Width */
+	/** @todo : REMOVE THAT  Map Width */
 	Uint16 mwid;
 };
 

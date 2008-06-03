@@ -23,11 +23,11 @@
 #include <cstring>
 #include <map>
 
-#include "include/ccmap.h"
+#include "CnCMap.h"
 #include "include/config.h"
-#include "include/dispatcher.h"
+#include "dispatcher.h"
 #include "misc/INIFile.h"
-#include "include/PlayerPool.h"
+#include "PlayerPool.h"
 #include "include/Logger.h"
 #include "MoneyCounter.h"
 #include "UnitAndStructurePool.h"
@@ -53,12 +53,12 @@ namespace p {
 extern Logger * logger;
 
 /**
- * @TODO Make hardcoded side names customisable (Needed to make RA support
+ * @todo Make hardcoded side names customisable (Needed to make RA support
  * cleaner)
  *
- * @TODO The colour lookup code needs to ensure duplicates don't happen.
+ * @todo The colour lookup code needs to ensure duplicates don't happen.
  *
- * @TODO Do something about the player start points in multiplayer: server
+ * @todo Do something about the player start points in multiplayer: server
  * should take points from map, shuffle them, and then hand out only the start
  * point for each player (possibly include start points for allies if we have
  * map sharing between allies).  This requires some work on the USPool too (see
@@ -144,7 +144,7 @@ Player::Player(const char *pname, INIFile *mapini)
 
         if (playername[5] < 49 || playername[5] > 57) {
             logger->error("Invalid builtin multi name: %s\n",playername);
-            /// @TODO Nicer error handling here
+            /// @todo Nicer error handling here
             multiside = 9;
         } else {
             multiside = playername[5] - 48;
@@ -560,7 +560,7 @@ void Player::movedUnit(Uint32 oldpos, Uint32 newpos, Uint8 sight)
  */
 void Player::builtStruct(Structure* str)
 {
-    StructureType* st;
+    StructureType* st = 0; // Ref to the new Structure
     
     // Get the type of the structure
     st = dynamic_cast<StructureType*> (str->getType());
@@ -568,10 +568,11 @@ void Player::builtStruct(Structure* str)
     // Add this structure to the pool
     structurepool.push_back(str);
     
-    // Add some sight
-    // TODO modify to use StructureType sight
-    //str->getType()->getSight());
+	// Add some sight (sight of the building)
+    // @todo change this feature to test during the placement
     addSoB(str->getPos(), st->getXsize(), st->getYsize(), 3, SOB_SIGHT);
+    // If building 
+    // @todo change this feature to test during the placement
     addSoB(str->getPos(), st->getXsize(), st->getYsize(), 1, SOB_BUILD);
     
     // get the power info and update constants
@@ -583,7 +584,8 @@ void Player::builtStruct(Structure* str)
     structures_owned[st].push_back(str);
     
     // ?????
-    if (st->primarySettable()) {
+    if (st->primarySettable()) 
+    {
 		printf ("%s line %i: Set primary, ptype = %i\n", __FILE__, __LINE__, st->getPType() );
         production_groups[st->getPType()].push_back(str);
         if ((production_groups[st->getPType()].size() == 1) ||
@@ -608,7 +610,7 @@ void Player::builtStruct(Structure* str)
     };
     
     // if it's local player update the sidebar
-    // TODO CHANGE THAT
+    // @todo CHANGE THAT
     if (playernum == p::ppool->getLPlayerNum()) {
     	p::ppool->updateSidebar();
     }
@@ -682,7 +684,7 @@ void Player::lostStruct(Structure* str)
     }
     
     // If it's the local player
-    // TODO MOVE THAT
+    // @todo MOVE THAT
     if (playernum == p::ppool->getLPlayerNum()) {
             p::ppool->updateSidebar();
     }
@@ -706,14 +708,22 @@ const std::vector<Structure*>& Player::getStructures() const {return structurepo
 Uint8 Player::getStructpalNum() const {return structpalnum;}
 Uint8 Player::getUnitpalNum() const {return unitpalnum;}
 Uint32 Player::getPower() const {return powerGenerated;}
-Uint32 Player::getPowerUsed() const {return powerUsed;}
-Uint16 Player::getPlayerStart() const {return playerstart;}
+
+Uint32 Player::getPowerUsed() const 
+{
+	return powerUsed;
+}
+
+Uint16 Player::getPlayerStart() const 
+{
+	return playerstart;
+}
 
 void Player::placeMultiUnits()
 {
 	printf ("%s line %i: Place multi units (MCV)\n", __FILE__, __LINE__);
 	// Create the unit in the pool
-    p::uspool->createUnit("MCV", playerstart, 0, playernum, 256, 0);
+    p::uspool->createUnit("MCV", playerstart, 0, playernum, 256, 0, 0, "None");
 }
 
 void Player::updateOwner(Uint8 newnum)
@@ -933,11 +943,11 @@ void Player::revealAroundWaypoint(Uint32 waypointNumber)
 	wp_cellpos = p::ccmap->getWaypoint(waypointNumber);
 	//	printf ("Waypoint = %u\n", wp_cellpos);
 
-	p::ccmap->translateFromPos(wp_cellpos, &xpos, &ypos);
+	//p::ccmap->translateFromPos(wp_cellpos, &xpos, &ypos);
 
 //	printf ("xpos = %u, ypos = %u\n", xpos, ypos);
 
-	for (int x = xpos - 2; x < xpos + 2; x++){
+	/*for (int x = xpos - 2; x < xpos + 2; x++){
 		for (int y = ypos -2; y < ypos +2; y++){
 			if (x > 0 && y > 0){
 				Uint32 cellpos = p::ccmap->translateToPos(x, y);
@@ -948,7 +958,9 @@ void Player::revealAroundWaypoint(Uint32 waypointNumber)
 				}
 			}
 		}
-	}
+	}*/
+	
+	addSoB(wp_cellpos, 1, 1, 4, SOB_SIGHT);
 }
 
 /**
