@@ -270,21 +270,37 @@ void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
     delete[] imgdata;
 }
 
+/**
+ * Get the Width of the image
+ * @return Width of the image
+ */
 Uint32 SHPImage::getWidth() const 
 { 
 	return lnkHeader.Width; 
 }
 
+/**
+ * Get the Height of the image
+ * @return Height of the image
+ */
 Uint32 SHPImage::getHeight() const 
 { 
 	return lnkHeader.Height; 
 }
 
+/**
+ * Get number of image in the SHPImage file
+ * @return Number of image in the SHPImage file
+ */
 Uint16 SHPImage::getNumImg() const 
 {
 	return lnkHeader.NumImages;
 }
 
+/**
+ * Get the name of the file
+ * @return Name of the file
+ */
 string SHPImage::getFileName() const 
 {
 	return name; 
