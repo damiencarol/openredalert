@@ -1,3 +1,21 @@
+// RA_Label.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef RA_LABEL_H
 #define RA_LABEL_H
 
@@ -8,14 +26,17 @@
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_video.h"
 
-#include "ui/Font.h"
-//#include "RA_WindowClass.h"
+#include "Font.h"
 
-class RA_WindowClass;
+class RaWindow;
+
 using std::string;
 
-
-class RA_Label {
+/**
+ * 
+ */
+class RA_Label
+{
 public:
     RA_Label();
     ~RA_Label();
@@ -32,7 +53,7 @@ public:
     void setColor(Uint8 r, Uint8 g, Uint8 b);
 
     void SetDrawingSurface(SDL_Surface * DwgSurface);
-    void SetDrawingWindow(RA_WindowClass * Window);
+    void SetDrawingWindow(RaWindow* Window);
 
     void SetFont(const string FontName);
     void UseAntiAliasing(bool status);
@@ -42,24 +63,24 @@ public:
     void Draw(SDL_Surface * DrawingSurface, int X, int Y);
     void Draw(const string & text, SDL_Surface * DrawingSurface, int X, int Y);
     void Draw(const string & text, SDL_Surface * DrawingSurface, SDL_Color Fcolor, int X, int Y);
-    void Redraw(void);
+    void Redraw();
 
 private:
-    string LabelText;
+	void Create();
+	
+	string LabelText;
     bool Checked;
     bool recreate;
     int Width;
     int Heigth;
     SDL_Color LabelFontColor;
     SDL_Color ColorKeyColor;
-    SDL_Surface * LabelSurface;
-    SDL_Surface * DrawingSurface;
-    SDL_Surface * BackgroundBackup;
-    RA_WindowClass * DrawingWindow;
+    SDL_Surface* LabelSurface;
+    SDL_Surface* DrawingSurface;
+    SDL_Surface* BackgroundBackup;
+    RaWindow* DrawingWindow;
     Font LabelFont;
     SDL_Rect LabelDest;
-
-    void Create(void);
 };
 
 #endif //RA_LABEL_H
