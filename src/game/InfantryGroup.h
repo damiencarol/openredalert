@@ -1,44 +1,41 @@
+// InfantryGroup.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef INFANTRYGROUP_H
 #define INFANTRYGROUP_H
 
-#include <cassert>
-#include <map>
-#include <vector>
-#include <stack>
-#include <time.h>
-
 #include "SDL/SDL_types.h"
 
-#include "game/ActionEventQueue.h"
-#include "Unit.h"
-
-#define LOOPEND_TURN
-
-class ActionEventQueue;
-
-namespace p {
-    extern ActionEventQueue * aequeue;
-}
-
-
-class INIFile;
-class Weapon;
-class WeaponsPool;
-class StructureType;
-class L2Overlay;
+class Unit;
 
 /**
  * This should be a member of unit for infantry. When an infantry unit walks
  * into a previously empty cell a new group is created, otherwise the existing group is used.
  * We need one more bit in the unit/structure matrix to tell if infantry is in that cell.
- * TODO: Implement group reuse, or just scrap this in favour of something that
+ * @todo: Implement group reuse, or just scrap this in favour of something that
  * won't cause lots of allocations and deallocations whilst moving infantry.
  */
-class InfantryGroup {
+class InfantryGroup 
+{
 public:
     InfantryGroup();
     ~InfantryGroup();
-    bool AddInfantry(Unit * inf, Uint8 subpos);
+    bool AddInfantry(Unit* inf, Uint8 subpos);
     bool RemoveInfantry(Uint8 subpos);
     bool IsClear(Uint8 subpos);
     Uint8 GetNumInfantry() const;
@@ -51,10 +48,9 @@ public:
     static const Sint8 * GetUnitOffsets();
     Unit * GetNearest(Uint8 subpos);
 private:
-    Unit * positions[5];
+    Unit* positions[5];
     Uint8 numinfantry;
     static const Sint8 unitoffsets[];
 };
 
-
-#endif
+#endif //INFANTRYGROUP_H

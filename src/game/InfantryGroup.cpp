@@ -25,11 +25,11 @@
 
 #include "SDL/SDL_timer.h"
 
-#include "include/ccmap.h"
-#include "include/weaponspool.h"
+#include "cncmap.h"
+#include "weaponspool.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
-#include "include/PlayerPool.h"
+#include "PlayerPool.h"
 #include "audio/SoundEngine.h"
 #include "UnitAndStructurePool.h"
 #include "Unit.h"
