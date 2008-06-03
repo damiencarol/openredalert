@@ -1,3 +1,21 @@
+// Dune2Image.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "Dune2Image.h"
 
 #include <cstdlib>
@@ -114,7 +132,9 @@ SDL_Surface *Dune2Image::getImage(Uint16 imgnum)
     return optimage;
 }
 
-/** Read the header of a specified dune2 shp.
+/** 
+ * Read the header of a specified dune2 shp.
+ * 
  * @param the number of the image to read the header from.
  * @returns the offset of the image.
  */
