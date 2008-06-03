@@ -1,12 +1,28 @@
+// TCheckBox.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "TCheckBox.h"
 
-#include <math.h>
+//#include <math.h>
 
 #include "SDL/SDL_video.h"
+
 #include "video/GraphicsEngine.h"
-#include "RA_ProgressBar.h"
-#include "RA_WindowClass.h"
-#include "TTextBox.h"
 
 using std::string;
 
@@ -14,7 +30,8 @@ namespace pc {
 	extern GraphicsEngine * gfxeng;
 }
 
-TCheckBox::~TCheckBox(){
+TCheckBox::~TCheckBox()
+{
 	SDL_FreeSurface(CheckBoxSurface);
 }
 
@@ -37,7 +54,7 @@ void TCheckBox::Draw(int X, int Y)
 	SDL_BlitSurface(CheckBoxSurface, NULL, DisplaySurface, &dest);
 }
 
-void TCheckBox::Create (void)
+void TCheckBox::Create()
 {
 	SDL_Rect dest;
 
@@ -66,7 +83,8 @@ void TCheckBox::Create (void)
 	SDL_FillRect(CheckBoxSurface, &dest, CheckboxBackgroundColor);
 }
 
-TCheckBox::TCheckBox(){
+TCheckBox::TCheckBox()
+{
 	// Setup some vars
 	Checked		= false;
 	Width		= 20,
@@ -80,5 +98,5 @@ TCheckBox::TCheckBox(){
 	CheckboxColor		= SDL_MapRGB(DisplaySurface->format, 0xff, 0, 0);
 	CheckboxBackgroundColor	= SDL_MapRGB(DisplaySurface->format, 0, 0, 0);
 
-	this->Create ();
+	this->Create();
 }
