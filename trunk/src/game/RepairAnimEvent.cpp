@@ -23,7 +23,7 @@
 #include "anim_nfo.h"
 #include "Structure.h"
 #include "Player.h"
-#include "include/PlayerPool.h"
+#include "PlayerPool.h"
 
 namespace p {
 	extern PlayerPool* ppool;
@@ -71,8 +71,8 @@ void RepairAnimEvent::anim_func(anim_nfo* data)
 
 	if (health < structure->getType()->getMaxHealth()){
 		cost = (Uint16)((double)dmg_cost/((double)structure->getType()->getMaxHealth() - (double)health));
-		Player *Owner;
-		// Get the owner TODO : get Player from structure
+		Player* Owner = 0;
+		// Get the owner
 		Owner = p::ppool->getPlayer(structure->getOwner());
 		if (Owner->getMoney() > cost){
 			Owner->changeMoney(-1 * cost);
