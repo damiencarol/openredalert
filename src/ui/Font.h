@@ -82,7 +82,7 @@ public:
 	void double_underline(bool status);
 
 	void Load(string FontName);
-	void reload(void);
+	void reload();
 	
 private:
 	SDL_Color FontPal[15];

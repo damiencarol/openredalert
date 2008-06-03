@@ -98,7 +98,7 @@ SDL_Color font_pal3[] = {
 		{1, 1, 1, 0x0}		// Not used
 };
 
-void Font::reload (void)
+void Font::reload()
 {
 	this->Load(this->fontname);
 }
@@ -112,7 +112,7 @@ Uint32 Font::getHeight() const
  * At the moment there is a lot of overhead in reloading the font each time,
  * These new functions are a start at preventing that...
  */
-bool Font::GetFontColor (SDL_Color FColor, SDL_Color BColor, SDL_Color OrgFntColor, SDL_Color &FntColor)
+bool Font::GetFontColor(SDL_Color FColor, SDL_Color BColor, SDL_Color OrgFntColor, SDL_Color &FntColor)
 {
 	Uint32 perc;
 
@@ -137,9 +137,9 @@ bool Font::GetFontColor (SDL_Color FColor, SDL_Color BColor, SDL_Color OrgFntCol
  * At the moment there is a lot of overhead in reloading the font each time,
  * These new functions are a start at preventing that...
  */
-bool Font::GetFontColor (SDL_Color FColor, SDL_Color OrgFntColor, SDL_Color &FntColor)
+bool Font::GetFontColor(SDL_Color FColor, SDL_Color OrgFntColor, SDL_Color &FntColor)
 {
-Uint32 perc;
+	Uint32 perc;
 
 	//calc the percentage:
 	perc = ((OrgFntColor.r) * 100) / 255;
@@ -192,12 +192,12 @@ void Font::UseAntiAliasing(bool status)
 	lnkOptions.use_anitaliasing	= status;
 }
 
-void Font::underline (bool status)
+void Font::underline(bool status)
 {
-	lnkOptions.underline			= status;
+	lnkOptions.underline = status;
 }
 
-void Font::double_underline (bool status)
+void Font::double_underline(bool status)
 {
 	lnkOptions.double_underline	= status;
 }
@@ -217,9 +217,11 @@ Uint32 Font::Font(const std::string& text) const {
  * Draw a colored text to a surface
  *
  * This function gets the background color from the dest surface so
- * !!!this function will not work if you draw over the same text each time without clearing the background !!
+ * this function will not work if you draw over the same text each 
+ * time without clearing the background !!!
  *
- * I think this functions works correctly with the following fonts (don't really know about the rest):
+ * I think this functions works correctly with the following fonts 
+ * (don't really know about the rest):
  * type.fnt
  * scorefnt.fnt
  * grad6fnt.fnt
@@ -293,20 +295,20 @@ void Font::drawText(const string& text, SDL_Surface *SrcSurf, Uint32 SrcStartx, 
 
 void Font::Load(string FontName)
 {
-VFile		*fontfile;
-Uint16		wpos,
-		hpos,
-		cdata,
-		nchars;
-Uint8		fnheight,
-		fnmaxw;
-Uint32		fntotalw;
-Uint32		ypos,
-		i,
-		pos,
-		curchar;
-Uint8		data;
-SDL_Surface *OrgFonImg = NULL;
+	VFile* fontfile;
+	Uint16 wpos;
+	Uint16 hpos;
+	Uint16 cdata;
+	Uint16 nchars;
+	Uint8 fnheight;
+	Uint8 fnmaxw;
+	Uint32 fntotalw;
+	Uint32 ypos;
+	Uint32 i;
+	Uint32 pos;
+	Uint32 curchar;
+	Uint8		data;
+	SDL_Surface* OrgFonImg = 0;
 
 
 
@@ -422,13 +424,13 @@ Uint32 Font::calcTextWidth(const string& text) const
     return wdt;
 }
 
-Font::Font(const std::string& fontname) : SHPBase(fontname), fontimg(0)
+Font::Font(const string& fontname) : SHPBase(fontname), fontimg(0)
 {
 	// Set the image pointer to NULL
-	fontimg = NULL;
+	fontimg = 0;
 
 	lnkOptions.use_anitaliasing	= true;
-	lnkOptions.underline			= false;
+	lnkOptions.underline		= false;
 	lnkOptions.double_underline	= false;
 
 	this->Load(fontname);
