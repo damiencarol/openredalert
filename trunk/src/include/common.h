@@ -10,23 +10,10 @@
 
 using std::vector;
 
-//#include "video/MessagePool.h"
-//#include "mapsini.h"
-
-
-/* This file contains data types and constants that are used by multiple
- * classes, in possibly different files
- */
-
 class CnCMap;
 class UnitAndStructurePool;
-
 class WeaponsPool;
-namespace Dispatcher {
-    class Dispatcher;
-}
-
-// Forward dcls for client only things.
+class Dispatcher;
 class SoundEngine;
 class INIFile;
 class MessagePool;
@@ -36,7 +23,6 @@ class Input;
 class ImageCache;
 class Renderer;
 class Cursor;
-class PauseMenu;
 class PlayerPool;
 class MissionMapsClass;
 
@@ -51,7 +37,7 @@ namespace p {
     extern UnitAndStructurePool* uspool;
     extern PlayerPool* ppool;
     extern WeaponsPool* weappool;
-    extern Dispatcher::Dispatcher* dispatcher;
+    extern Dispatcher* dispatcher;
 }
 // Note we pass by value because we would otherwise copy anyway
 //shared_ptr<INIFile> GetConfig(std::string name);
@@ -74,11 +60,6 @@ namespace pc {
 	extern Sidebar * sidebar;
 	extern Cursor* cursor;
 	extern Input* input;
-	//extern ConfigType Config;
-	//extern MissionMapsClass *MissionsMapdata;
-	extern bool quit;
-	//extern ai *Ai;
-	extern PauseMenu *PauseMenu;
 }
 /* #endif FREECNC_CLIENT */
 
@@ -117,7 +98,7 @@ extern int mapscaleq;
 
 
 /// Same as strdup but uses C++ style allocation
-/// @TODO: Obviate this function
+/// @todo: Obviate this function
 inline char* cppstrdup(const char* s) {
 	if (s == NULL){
 		char* r = new char[5];
@@ -138,10 +119,10 @@ inline bool isRelativePath(const char *p) {
 #endif
 }
 
-/// @TODO Stringify this funciton
+/// @todo Stringify this funciton
 std::vector<char*> splitList(char* line, char delim);
 
-/// @TODO Stringify this funciton
+/// @todo Stringify this funciton
 char* stripNumbers(const char* src);
 
 const std::string& determineBinaryLocation(const std::string& launchcmd);
