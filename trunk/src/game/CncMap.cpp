@@ -1,4 +1,22 @@
-#include "include/ccmap.h"
+// CnCMap.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
+#include "CnCMap.h"
 
 #include <cmath>
 #include <iostream>
@@ -13,9 +31,16 @@
 #include "Unit.h"
 #include "LoadMapError.h"
 #include "GameMode.h"
+#include "TriggerAction.h"
+#include "NoActionTriggerAction.h"
+#include "GlobalSetTriggerAction.h"
+#include "GlobalClearTriggerAction.h"
+#include "TextTriggerAction.h"
+#include "RawTriggerAction.h"
 #include "misc/Compression.h"
 #include "misc/KeyNotFound.h"
 #include "misc/INIFile.h"
+#include "misc/StringTableFile.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "video/ImageNotFound.h"
@@ -27,8 +52,9 @@
 #include "include/config.h"
 #include "include/imageproc.h"
 #include "include/Logger.h"
-#include "include/PlayerPool.h"
-#include "include/triggers.h"
+#include "PlayerPool.h"
+#include "Triggers.h"
+#include "AiCommand.h"
 
 using std::vector;
 using std::string;
@@ -211,7 +237,7 @@ CnCMap::~CnCMap()
 }
 
 /** 
- * @TODO Map loading goes here.
+ * @todo Map loading goes here.
  */
 void CnCMap::loadMap(const char* mapname, LoadingScreen* lscreen)
 {	
@@ -773,7 +799,7 @@ Uint16 CnCMap::getCost(Uint16 pos, Unit* excpUn) const
 	}
 #endif
 
-	/** @TODO: Tile cost should worked out as follows
+	/** @todo: Tile cost should worked out as follows
 	 * if tmp == 1 then impassible
 	 * else unitspeed * tmp
 	 * where "tmp" is the terrain movement penalty.  This is a percentage of how much
@@ -823,7 +849,7 @@ Uint16 CnCMap::getCost(Uint16 pos, Unit* excpUn) const
 		}
 		break;
 	}
-	/** @TODO If unit prefers to be near tiberium (harvester) or should avoid
+	/** @todo If unit prefers to be near tiberium (harvester) or should avoid
 	 * it at all costs (infantry except chem.) apply appropriate bonus/penatly
 	 * to cost.
 	 */
@@ -918,11 +944,12 @@ SDL_Surface* CnCMap::getMiniMap(Uint8 pixsize)
 	// x == offset in pixels from the top-left hand corner of the sidebar under
 	// the tab.
 	miniclip.x = abs(miniclip.sidew-miniclip.w)/2;
-	if (pc::Config.gamenum == GAME_RA)
+	if (this->maptype == GAME_RA){
 		miniclip.y = abs(miniclip.sidew - 20 - miniclip.h)/2;
-	else
+	}else{
 		miniclip.y = abs(miniclip.sidew - miniclip.h)/2;
-
+	}
+	
 	// Tilew == number of tiles visible in minimap horizontally
 	miniclip.tilew = miniclip.w/pixsize;
 	miniclip.tileh = miniclip.h/pixsize;
@@ -1142,10 +1169,27 @@ void CnCMap::decreaseResource(Uint32 pos, Uint8 amount)
 	}
 }
 
-RA_Tiggers *CnCMap::getTriggerByNumb(unsigned int TriggerNumb)
+/**
+ * 
+ */
+RA_Tiggers* CnCMap::getTriggerByNumb(int TriggerNumb)
 {
-	if (TriggerNumb >= RaTriggers.size())
-		return NULL;
+	int size = RaTriggers.size();
+	
+	// If number = -1
+	if (TriggerNumb == -1)
+	{
+		// Return a blank trigger
+		RA_Tiggers* toto = new RA_Tiggers();
+		toto->name = "None";
+		return toto;
+	}
+	
+	if (TriggerNumb >= size ||	TriggerNumb < -1) {
+		return 0;
+	}
+	
+	// Return the right trigger
 	return &RaTriggers[TriggerNumb];
 }
 
@@ -1154,28 +1198,54 @@ RA_Tiggers *CnCMap::getTriggerByNumb(unsigned int TriggerNumb)
  */
 RA_Tiggers* CnCMap::getTriggerByName(string TriggerName)
 {
+	vector<RA_Tiggers>::iterator i = RaTriggers.begin();
+	int index = 0;
+	
+	string name = TriggerName;
+	
+	// Upper the string 
+    transform(name.begin(), name.end(), name.begin(), toupper);
+    
+	
+	while (i != RaTriggers.end())
+	{
+		string UpTrig = i->name;
+		// Upper the string 
+		transform(UpTrig.begin(), UpTrig.end(), UpTrig.begin(), toupper);
+		    
+		if (UpTrig == name)
+		{
+			printf("%s = %s \n", UpTrig.c_str(), name.c_str());
+			return &RaTriggers[index];
+		}
+		i++;
+		index++;
+	}
+	
+	return 0;
+	/*
 	unsigned int j;
 	for (unsigned int i = 0; i < RaTriggers.size(); ++i)
 	{
-		//printf ("%s line %i: String1 = %s, String2 = %s, j = %i, size1 = %i, size2 = %i\n",  __FILE__, __LINE__, TriggerName.c_str(), RaTriggers[i].name.c_str(), j, TriggerName.size(), RaTriggers[i].name.size());
+		printf ("%s line %i: String1 = %s, String2 = %s, j = %i, size1 = %i, size2 = %i\n",  __FILE__, __LINE__, TriggerName.c_str(), RaTriggers[i].name.c_str(), j, TriggerName.size(), RaTriggers[i].name.size());
 
 		if (TriggerName.size() != RaTriggers[i].name.size())
 			continue;
 
 		for (j = 0; j < TriggerName.size(); ++j)
 		{
-			//printf ("%s line %i: TriggerName.size() = %i, RaTriggers[i].name.size() = %i, j = %i\n", __FILE__, __LINE__, TriggerName.size(), RaTriggers[i].name.size(), j);
+			printf ("%s line %i: TriggerName.size() = %i, RaTriggers[i].name.size() = %i, j = %i\n", __FILE__, __LINE__, TriggerName.size(), RaTriggers[i].name.size(), j);
 			if (toupper(TriggerName[j]) != toupper(RaTriggers[i].name[j]))
 				break;
 		}
-		//printf ("%s line %i: String1 = %s, String2 = %s, j = %i, size1 = %i, size2 = %i\n",  __FILE__, __LINE__, TriggerName.c_str(), RaTriggers[i].name.c_str(), j, TriggerName.size(), RaTriggers[i].name.size());
+		printf ("%s line %i: String1 = %s, String2 = %s, j = %i, size1 = %i, size2 = %i\n",  __FILE__, __LINE__, TriggerName.c_str(), RaTriggers[i].name.c_str(), j, TriggerName.size(), RaTriggers[i].name.size());
 		if (j == TriggerName.size())
 		{
 			//trigger = &RaTriggers[i];
 			return &RaTriggers[i];
 		}
 	}
-	return 0;
+	return 0;*/
 }
 
 RA_Teamtype *CnCMap::getTeamtypeByNumb(unsigned int TeamNumb)
@@ -1223,17 +1293,32 @@ SDL_Surface* CnCMap::getMapTile(Uint32 pos)
 	return tileimages[tilematrix[pos]];
 }
 
+/**
+ * Get the terrain overlay
+ */
 Uint32 CnCMap::getTerrainOverlay(Uint32 pos)
 {
+	// Check if the pos(ition) is in the map
 	if (pos < terrainoverlay.size())
+	{
+		// return the overlay
 		return terrainoverlay[pos];
+	}
+	// Return the index zero by default
 	return 0;
 }
 
+/**
+ * Set the terrain overlay to an Image/Frame
+ */
 void CnCMap::setTerrainOverlay(Uint32 pos, Uint32 ImgNum, Uint16 Frame)
 {
+	// Check if the pos(ition) is in the map
 	if (pos < terrainoverlay.size())
+	{
+		// Set the overlay
 		terrainoverlay[pos] = ImgNum | (Frame &0x7FF);
+	}
 }
 
 /**
@@ -1244,7 +1329,11 @@ Uint16 CnCMap::getWidth() const
 	return width;
 }
 
-Uint16 CnCMap::getHeight() const {return height;}
+Uint16 CnCMap::getHeight() const
+{
+	return height;
+}
+
 Uint32 CnCMap::getSize() const 
 {
 	return width*height;
@@ -1260,21 +1349,30 @@ Uint8 CnCMap::getGameMode() const
 	return gamemode;
 }
 
-Uint16 CnCMap::getYScroll() const {
-        return scrollpos.cury;
-    }
-Uint16 CnCMap::getXScroll() const {
-        return scrollpos.curx;
-    }
-Uint32 CnCMap::getScrollPos() const {
-        return scrollpos.cury*width+scrollpos.curx;
-    }
-Uint32 CnCMap::getSmudge(Uint32 pos) const {
-        return ((overlaymatrix[pos] & 0xF0) << 12);
-    }
-Uint32 CnCMap::getTiberium(Uint32 pos) const {
-        return (overlaymatrix[pos] & 0xF);
-    }
+Uint16 CnCMap::getYScroll() const 
+{
+	return scrollpos.cury;
+}
+
+Uint16 CnCMap::getXScroll() const 
+{
+	return scrollpos.curx;
+}
+
+Uint32 CnCMap::getScrollPos() const
+{
+	return scrollpos.cury*width+scrollpos.curx;
+}
+
+Uint32 CnCMap::getSmudge(Uint32 pos) const 
+{
+	return ((overlaymatrix[pos] & 0xF0) << 12);
+}
+
+Uint32 CnCMap::getTiberium(Uint32 pos) const 
+{
+	return (overlaymatrix[pos] & 0xF);
+}
 
 Uint32 CnCMap::getResourceFrame(Uint32 pos) const
 {
@@ -1286,40 +1384,61 @@ Uint32 CnCMap::getResourceFrame(Uint32 pos) const
 	return ((resourcebases[resourcematrix[pos] & 0xFF]<<16) + (resourcematrix[pos]>>8));
 }
 
-bool CnCMap::getResource(Uint32 pos, Uint8* type, Uint8* amount) const {
-        if (0 == type || 0 == amount) {
-            return (0 != resourcematrix[pos]);
-        }
-        *type = resourcematrix[pos] & 0xFF;
-        *amount = resourcematrix[pos] >> 8;
-        return (0 != resourcematrix[pos]);
-    }
-Uint16 CnCMap::getYTileScroll() const {
-        return (Uint16)scrollpos.curytileoffs;
-    }
-Uint16 CnCMap::getXTileScroll() const {
-        return (Uint16)scrollpos.curxtileoffs;
-    }
-const MiniMapClipping& CnCMap::getMiniMapClipping() const {return miniclip;}
-SHPImage* CnCMap::getPips() {
-        return pips;
-    }
-Uint32 CnCMap::getPipsNum() const {
-        return pipsnum;
-    }
-SHPImage* CnCMap::getMoveFlash() {
-        return moveflash;
-    }
-Uint32 CnCMap::getMoveFlashNum() const {
-        return flashnum;
-    }
-Uint16 CnCMap::getX() const {
-        return x;
-    }
-Uint16 CnCMap::getY() const {
-        return y;
-    }
+bool CnCMap::getResource(Uint32 pos, Uint8* type, Uint8* amount) const 
+{
+	if (0 == type || 0 == amount) 
+	{
+		return (0 != resourcematrix[pos]);
+	}
+	*type = resourcematrix[pos] & 0xFF;
+	*amount = resourcematrix[pos] >> 8;
+	return (0 != resourcematrix[pos]);
+}
 
+Uint16 CnCMap::getYTileScroll() const 
+{
+	return (Uint16)scrollpos.curytileoffs;
+}
+
+Uint16 CnCMap::getXTileScroll() const 
+{
+	return (Uint16)scrollpos.curxtileoffs;
+}
+
+const MiniMapClipping& CnCMap::getMiniMapClipping() const 
+{
+	return miniclip;
+}
+
+SHPImage* CnCMap::getPips()
+{
+	return pips;
+}
+
+Uint32 CnCMap::getPipsNum() const
+{
+	return pipsnum;
+}
+
+SHPImage* CnCMap::getMoveFlash() 
+{
+	return moveflash;
+}
+
+Uint32 CnCMap::getMoveFlashNum() const 
+{
+	return flashnum;
+}
+
+Uint16 CnCMap::getX() const 
+{
+	return x;
+}
+
+Uint16 CnCMap::getY() const
+{
+	return y;
+}
 
 /** 
  * Loads the maps ini file containing info on dimensions, units, trees
@@ -1383,7 +1502,7 @@ void CnCMap::loadIni()
 		// Set the local player with House name in the BASIC section 
 		// of the .ini of the map
 		p::ppool->setLPlayer(missionData->player);
-		// TODO modify that to set the colour
+		// @todo modify that to set the colour
 		//p::ppool->getLPlayer()->setMultiColour(pc::Config.side_colour.c_str());
 		//			printf ("%s line %i: Set local player\n", __FILE__, __LINE__);
 	}
@@ -1441,61 +1560,25 @@ void CnCMap::loadIni()
 		p::ppool->placeMultiUnits();
 	}
 
-	//try
-	//{
-	//	pips = new SHPImage("hpips.shp", -1);
-	//}
-	//catch(ImageNotFound&)
-	//{
-		try
-		{
-			pips = new SHPImage("pips.shp", -1);
-		}
-		catch(ImageNotFound&)
-		{
-			// Logg it
-			logger->error("Unable to load the pips graphics!\n");
-			// Throw error
-			throw LoadMapError("Unable to load the pips graphics!");
-		}
-	//}
-	pipsnum = pc::imagepool->size()<<16;
-	pc::imagepool->push_back(pips);
-	if (maptype == GAME_RA)
-	{
-		try
-		{
-			char moveflsh[13] = "moveflsh.";
-			strncat( moveflsh, missionData->theater, 3 );
-			moveflash = new SHPImage(moveflsh, -1);
-		}
-		catch (ImageNotFound&)
-		{
-			logger->error("Unable to load the movement acknowledgement pulse graphic\n");
-			throw LoadMapError("Unable to load the movement acknowledgement pulse graphic");
-		}
-	}
-	else
-	{
-		try
-		{
-			moveflash = new SHPImage("moveflsh.shp", -1);
-		}
-		catch (ImageNotFound&)
-		{
-			logger->error("Unable to load the movement acknowledgement pulse graphic\n");
-			throw LoadMapError("Unable to load the movement acknowledgement pulse graphic");
-		}
-	}
-	flashnum = pc::imagepool->size()<<16;
-	pc::imagepool->push_back(moveflash);
-
+	// Load the images of pips and save the number
+	pipsnum = pc::imgcache->loadImage("pips.shp");
+	
+	
+	// Load the animation of mouvement graphics
+	// (the circle when clicking for movement)
+	char moveflsh[13] = "moveflsh.";
+	strncat(moveflsh, missionData->theater, 3);
+	// Load the images and save the number
+	flashnum = pc::imgcache->loadImage(moveflsh);
+	
+	printf("moveflsh = %s   nmu = %d\n", moveflsh, flashnum);
+	printf("pips =    nmu = %d\n", pipsnum);
 }
 
 /** 
  * Function to load all vars in the simple sections of the inifile
  * 
- * TODO add key name in the log (to throw LoadMapError
+ * @todo add key name in the log (to throw LoadMapError
  * 
  * @param pointer to the inifile
  */
@@ -1670,7 +1753,6 @@ void CnCMap::advancedSections(INIFile *inifile)
 	char action[128];
 	char type[128];
 	char owner[128];
-	char teamname[255];
 	int facing, health, subpos;
 	int linenum, smudgenum, tmpval;
 	Uint16 tx = 0;
@@ -1762,7 +1844,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 		logger->warning("Unable to load \"shadow.shp\"\n");
 		numShadowImg = 0;
 	}
-	// Log it (end of waypoint decode
+	// Log it (end of Shadow decode
 	logger->note("Shadow images loaded...\n");
 		
 	// load the smudge marks and the tiberium to the imagepool
@@ -2045,35 +2127,6 @@ void CnCMap::advancedSections(INIFile *inifile)
 	// If their are a section called "STRUCTURES"
 	if (inifile->isSection(string("STRUCTURES")) == true)
 	{
-		// TODO DEBUG THAT !!!!
-		// TODO REFACTOR THAT
-		/*
-		INISection* sec = inifile->getSection("STRUCTURES");
-		INISection::iterator it = sec->begin();
-		while (it != sec->end())
-		{
-			string str = it->second;
-			printf("read=%s\n", str.c_str());
-			char* temp = strdup(str.c_str());
-			vector<string> lst = splitList(temp, ',');
-			
-			
-			translateCoord(linenum, &tx, &ty);
-			facing = min(31,facing>>3);
-			if( tx < x || ty < y || tx> x+width || ty> height+y )
-			{
-				continue;
-			}
-			linenum = (ty-y)*width + tx - x;
-									
-			//printf("cncmap::loadIni(%s)\n", owner);							
-									
-			p::uspool->createStructure(type, linenum, p::ppool->getPlayerNum(owner), health, facing, false, trigger);
-			//                    printf ("%s line %i: createStructure STRUCTURE %s, trigger = %s\n", __FILE__, __LINE__, type, trigger);
-								
-			
-			it++;
-		}*/
 		try
 		{
 			for( keynum = 0;;keynum++ )
@@ -2239,7 +2292,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 					
 					// Test if trigger creation is good
 					if (res==false){
-						// TODO CHECK THAT BECAUSE ERROR IN CREATION
+						// @todo CHECK THAT BECAUSE ERROR IN CREATION
 						//logger->error("Error in create TRIGGER in the map\n");
 					}
 				}
@@ -2251,6 +2304,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 
 	// triggers
 	RA_Tiggers triggers;
+	INIFile* messageTable = new INIFile("tutorial.ini");
 	try
 	{
 		for( keynum = 0;;keynum++ )
@@ -2261,22 +2315,103 @@ void CnCMap::advancedSections(INIFile *inifile)
 				// is the char which separate terraintype from action.
 				triggers.name = key->first;
 				transform(triggers.name.begin(),triggers.name.end(), triggers.name.begin(), toupper);
-				if (sscanf(key->second.c_str(), "%i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i", &triggers.repeatable, &triggers.country, &triggers.activate, &triggers.actions, &triggers.trigger1.event, &triggers.trigger1.param1, &triggers.trigger1.param2, &triggers.trigger2.event, &triggers.trigger2.param1, &triggers.trigger2.param2, &triggers.action1.Action, &triggers.action1.param1, &triggers.action1.param2, &triggers.action1.param3, &triggers.action2.Action, &triggers.action2.param1, &triggers.action2.param2, &triggers.action2.param3) == 18 )
+				// Split the line
+				vector<char*> triggsData = splitList(strdup(key->second.c_str()), ',');
+				// check that the line had 18 param
+				if (triggsData.size()!=18) {
+					logger->warning("error in reading trigger [%s]\n", key->first.c_str());
+				}
+				else
 				{
-#if 0
+					sscanf(triggsData[0], "%d", &triggers.repeatable);
+					sscanf(triggsData[1], "%d", &triggers.country);
+					sscanf(triggsData[2], "%d", &triggers.activate);
+					sscanf(triggsData[3], "%d", &triggers.actions);
+					sscanf(triggsData[4], "%d", &triggers.trigger1.event);
+					sscanf(triggsData[5], "%d", &triggers.trigger1.param1);
+					sscanf(triggsData[6], "%d", &triggers.trigger1.param2);
+					sscanf(triggsData[7], "%d", &triggers.trigger2.event);
+					sscanf(triggsData[8], "%d", &triggers.trigger2.param1);
+					sscanf(triggsData[9], "%d", &triggers.trigger2.param2);
+					// Build Action 1
+					int actionType = 0;					
+					sscanf(triggsData[10], "%d", &actionType); // get the type
+					int param1 = 0;
+					sscanf(triggsData[11], "%d", &param1);
+					int param2 = 0;
+					sscanf(triggsData[12], "%d", &param2);							
+					int param3 = 0;
+					sscanf(triggsData[13], "%d", &param3);						
+					switch (actionType)
+					{
+					case TRIGGER_ACTION_NO_ACTION:
+						triggers.action1 = new NoActionTriggerAction();
+						break;
+					case TRIGGER_ACTION_TEXT:
+					{
+						// Get string with the num in data
+						string messageToDraw = string(messageTable->readString("Tutorial", triggsData[13]));
+						printf("Txt = %s\n", messageToDraw.c_str());
+						// Build the TriggerAction
+						triggers.action1 = new TextTriggerAction(messageToDraw, pc::msg);
+					}
+						break;
+					case TRIGGER_ACTION_GLOBAL_SET:
+						// Create an action (param 3 is the number of the global)
+						triggers.action1 = new GlobalSetTriggerAction(param3);	
+						break;
+					case TRIGGER_ACTION_GLOBAL_CLEAR:
+						// Create an action (param 3 is the number of the global)
+						triggers.action1 = new GlobalClearTriggerAction(param3);	
+						break;
+					default:
+						triggers.action1 = new RawTriggerAction(actionType, param1, param2, param3);
+						break;
+					}
+
+					// Build Action 2
+					int action2Type = 0;
+					sscanf(triggsData[14], "%d", &action2Type); // get the type
+					int param1b = 0;
+					sscanf(triggsData[15], "%d", &param1b);
+					int param2b = 0;
+					sscanf(triggsData[16], "%d", &param2b);
+					int param3b = 0;
+					sscanf(triggsData[17], "%d", &param3b);
+					switch (action2Type)
+					{
+					case TRIGGER_ACTION_NO_ACTION:
+						triggers.action2 = new NoActionTriggerAction();
+						break;
+					case TRIGGER_ACTION_TEXT:
+					{
+						// Get string with the num in data
+						string messageToDraw = string(messageTable->readString("Tutorial", triggsData[17]));
+						printf("Txt = %s\n", messageToDraw.c_str());
+						// Build the TriggerAction
+						triggers.action2 = new TextTriggerAction(messageToDraw, pc::msg);
+						break;
+					}
+					case TRIGGER_ACTION_GLOBAL_SET:
+						// Create an action (param 3 is the number of the global)
+						triggers.action2 = new GlobalSetTriggerAction(param3b);
+						break;
+					case TRIGGER_ACTION_GLOBAL_CLEAR:
+						// Create an action (param 3 is the number of the global)
+						triggers.action2 = new GlobalClearTriggerAction(param3);
+						break;
+					default:
+						triggers.action2 = new RawTriggerAction(action2Type, param1b, param2b, param3b);
+						break;
+					}
+
 					printf ("%s line %i: Read trigger:\n", __FILE__, __LINE__);
-					PrintTrigger ( triggers );
+					PrintTrigger(triggers);
 					printf ("\n\n\n");
-#endif
+
+					// Set to zero (=never executed)
 					triggers.hasexecuted = false;
 					RaTriggers.push_back(triggers);
-
-					// Trigger analysed
-					//logger->debug("Trigger analysed n(%d)\n", keynum);
-					// Print the trigger
-					//PrintTrigger(triggers);
-				} else {
-					logger->warning("error in reading a trigger");
 				}
 			}
 			else if (maptype == GAME_TD)
@@ -2291,40 +2426,10 @@ void CnCMap::advancedSections(INIFile *inifile)
 	catch(...)
 	{}
 
-	// Teamtypes
-	RA_Teamtype team;
-	RA_TeamUnits unit;
-	int pos;
-	try
-	{
-		for( keynum = 0;;keynum++ )
-		{
-			if (maptype == GAME_RA)
-			{
-				team.Units.clear();
-				key = inifile->readKeyValue("Teamtypes", keynum);
-				team.tname = key->first;
-				sscanf(key->second.c_str(), "%i, %i, %i, %i, %i, %i, %i, %i, %[^,]", &team.country, &team.props, &team.unknown1, &team.unknown2, &team.maxteams, &team.waypoint, &team.trigger, &team.numb_teamtypes, teamname );
-				pos = key->second.find (teamname,0);
-				string temp = key->second.substr (pos, key->second.size());
-				for (int j = 0; j < team.numb_teamtypes; j++)
-				{
-					sscanf(temp.c_str(), "%[^:]:%i ,", teamname, &unit.numb);
-					unit.tname = teamname;
-					//                    printf ("%s line %i: Team = %s, push back unit: %s, %i\n", __FILE__, __LINE__, team.tname.c_str(), unit.tname.c_str(), unit.numb);
-					team.Units.push_back (unit);
-					pos = temp.find (",", 0);
-					temp = temp.substr(pos+1, temp.size());
-					//printf ("%s line %i: New string: %s\n", __FILE__, __LINE__, temp.c_str());
-				}
-				//We should start reading the commands from std::string temp here :)
-
-				RaTeamtypes.push_back (team);
-			}
-		}
-	}
-	catch(...)
-	{}
+	
+	// Loads TeamTypes
+	loadTeamTypes(inifile);
+	
 
 	// Load  [BASE] section
 	try
@@ -2360,7 +2465,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 	{
 		try
 		{
-			// TODO implemente digest
+			// @todo implemente digest
 			//char mapdata[1024];
 			Uint8 mapdata[16384]; // 16k
 			Uint8 temp[16384];
@@ -2659,6 +2764,33 @@ void CnCMap::parseBin(TileList* bindata)
 			}
 		}
 	}
+	
+	// @todo DEBUG
+	// @todo REMOVE THAT
+	Uint32 index2 = 0;
+	for (ytile = 0; ytile < height; ytile++)
+	{
+		for (xtile = 0; xtile < width; xtile++)
+		{
+			// Read template and tile
+			Uint16 templ2 = bindata[index2].templateNum;
+			//Uint8 tile2 = bindata[index2].tileNum;
+			index2++;
+			
+			if (templ2==0xff){
+				printf("   .");
+			} else if (templ2<10){
+				printf("  %d|", templ2);	
+			} else if (templ2<100){
+				printf(" %d|", templ2);	
+			} else if (templ2<1000){
+				printf("%d|", templ2);
+			} else {
+				printf("   .");			
+			}
+		}
+		printf("\n");
+	}
 }
 
 /**
@@ -2681,7 +2813,7 @@ void CnCMap::loadOverlay(INIFile *inifile)
 				continue;
 				linenum = normaliseCoord(tx, ty);
 
-				parseOverlay(linenum, key->second);
+				this->parseOverlay(linenum, key->second);
 			}
 		}
 	}
@@ -2804,12 +2936,12 @@ void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 		}
 	}
 
-	/// @TODO Generic resources?
+	/// @todo Generic resources?
 	if (strncasecmp(name.c_str(), "TI", 2) == 0 || strncasecmp(name.c_str(),
 			"GOLD", 4) == 0 || strncasecmp(name.c_str(), "GEM", 3) == 0)
 	{
 		Uint32 i = 0;
-		// TODO CHANGE THAT
+		// @todo CHANGE THAT
 		// This is a hack to seed the map with semi-reasonable amounts of
 		// resource growth.  This will hopefully become less ugly after the code
 		// to manage resource growth has been written.		
@@ -3033,7 +3165,7 @@ void CnCMap::reloadTiles()
 	SDL_Surface *image;
 
 	// Free the old surfaces
-	for (std::vector<SDL_Surface*>::size_type i = 0; i < tileimages.size(); i++)
+	for (vector<SDL_Surface*>::size_type i = 0; i < tileimages.size(); i++)
 	{
 		if (tileimages[i] != NULL)
 		{
@@ -3061,3 +3193,76 @@ bool CnCMap::isEndOfGame()
 	return missionData->endOfGame;
 }
 
+/**
+ * Loading of TeamTypes
+ */
+void CnCMap::loadTeamTypes(INIFile* fileIni)
+{	
+	Uint32 keynum = 0; // Use to parse the key
+	INIKey key; // Key to get the key values
+	
+	try
+	{
+		for(keynum = 0;;keynum++ )
+		{
+			if (maptype == GAME_RA)
+			{
+				RA_Teamtype team;
+				int pos;
+				char teamname[255]; // Use to keep the team name
+				
+				team.Units.clear();
+				key = fileIni->readKeyValue("Teamtypes", keynum);
+				team.tname = key->first;
+				sscanf(key->second.c_str(), "%i, %i, %i, %i, %i, %i, %i, %i, %[^,]", &team.country, &team.props, &team.unknown1, &team.unknown2, &team.maxteams, &team.waypoint, &team.trigger, &team.numb_teamtypes, teamname );
+				pos = key->second.find(teamname,0);
+				string temp = key->second.substr (pos, key->second.size());
+				for (int j = 0; j < team.numb_teamtypes; j++)
+				{
+					RA_TeamUnits unit;
+					sscanf(temp.c_str(), "%[^:]:%i ,", teamname, &unit.numb);
+					unit.tname = teamname;
+					 printf ("%s line %i: Team = %s, push back unit: %s, %i\n", __FILE__, __LINE__, team.tname.c_str(), unit.tname.c_str(), unit.numb);
+					team.Units.push_back(unit);
+					pos = temp.find (",", 0);
+					temp = temp.substr(pos+1, temp.size());
+					//printf("%s line %i: New string: %s\n", __FILE__, __LINE__, temp.c_str());
+				}
+				
+				//We should start reading the commands from std::string temp here :)
+				//printf("temp = %s\n", temp.c_str());
+				string temp3 = string(splitList(strdup(temp.c_str()), ',')[0]);
+				//printf("temp3 = %s\n", temp3.c_str());
+				pos = temp.find (",", 0);
+				string temp2 = temp.substr(pos+1, temp.size());
+				//printf("temp2 = %s\n", temp2.c_str());
+													
+				int numcommand;
+				sscanf(temp3.c_str(), "%i", &numcommand);
+				//team.aiCommandList = new vector<AiCommand*>();
+				//team.aiCommandList->resize(numcommand);
+				for (int j=0; j<numcommand; j++)
+				{
+					int id;
+					int wayp;
+					sscanf(splitList(strdup(temp2.c_str()), ':')[0], "%i", &id);
+					sscanf(splitList(strdup(temp2.c_str()), ':')[1], "%i", &wayp);
+					AiCommand* aiCom = new AiCommand();
+					aiCom->setId(id); 
+					aiCom->setWaypoint(wayp);
+					
+					pos = temp2.find (",", 0);
+					temp2 = temp2.substr(pos+1, temp2.size());
+					//printf("temp2 = %s\n", temp2.c_str());
+					printf("id=%d, wayp=%d\n", aiCom->getId(), aiCom->getWaypoint());	
+					
+					team.aiCommandList.push_back(aiCom);					
+				}
+				
+				RaTeamtypes.push_back(team);
+			}
+		}
+	}
+	catch(...)
+	{}
+}
