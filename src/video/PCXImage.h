@@ -27,23 +27,31 @@
 
 class VFile;
 
-class PCXImage {
+/**
+ * Image in .pcx format
+ */
+class PCXImage
+{
 public:
-    PCXImage(const char * fname, int scaleq);
-    ~PCXImage();
-    SDL_Surface* getImage();
+	PCXImage(const char * fname, int scaleq);
+	~PCXImage();
+
+	SDL_Surface* getImage();
+
 private:
-    void loadImage();
-    void readPalette();
-    Uint32 imgsize;
-    Uint8 * pcxdata;
-    SDL_Color palette[256];
-    PCXHeader header;
-    int scaleq;
-    ImageProc scaler;
-    SDL_Surface * image;
-    bool Use16ColorPalette;
-    bool HeaderError;
+	void loadImage();
+	void readPalette();
+
+	/** Header of the file */
+	PCXHeader header;
+	Uint32 imgsize;
+	Uint8 * pcxdata;
+	SDL_Color palette[256];
+	int scaleq;
+	ImageProc scaler;
+	SDL_Surface * image;
+	bool Use16ColorPalette;
+	bool HeaderError;
 };
 
 #endif //PCXIMAGE_H
