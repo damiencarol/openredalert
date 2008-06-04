@@ -22,7 +22,9 @@
 #include "SDL/SDL_types.h"
 
 /**
+ * Header of SHP Image
  * 
+ * @see SHPImage
  */
 class SHPHeader
 {
