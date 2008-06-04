@@ -25,7 +25,9 @@
 
 class VFile;
 
-
+/**
+ * Abstract interface to manipulate VFile in archives
+ */
 class Archive
 {
 public:
@@ -59,9 +61,6 @@ public:
     virtual Uint32 getPos(Uint32 file) const = 0;
     virtual Uint32 getSize(Uint32 file) const = 0;
     virtual const char* getPath(Uint32 filenum) const = 0;
-//protected:
-//    VFSOPEN vfopen;
-//    VFSCLOSE vfclose;
 };
 
 #endif //ARCHIVE_H
