@@ -27,6 +27,9 @@ class SoundBuffer;
 using std::string;
 using std::map;
 
+/**
+ * Cache for all buffer (sounds)
+ */
 class SoundCache : public map<string, SoundBuffer*>
 {
 };
