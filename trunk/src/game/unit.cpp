@@ -30,7 +30,7 @@
 #include "ActionEventQueue.h"
 #include "GameMode.h"
 #include "unittypes.h"
-#include "include/ccmap.h"
+#include "CnCMap.h"
 #include "InfantryGroup.h"
 #include "L2Overlay.h"
 #include "MoveAnimEvent.h"
@@ -42,10 +42,11 @@
 #include "URepairEvent.h"
 #include "UnitAndStructurePool.h"
 #include "audio/SoundEngine.h"
-#include "include/PlayerPool.h"
+#include "PlayerPool.h"
 #include "include/Logger.h"
 #include "include/config.h"
 #include "TalkbackType.h"
+#include "UInfiltrateAnimEvent.h"
 
 namespace p {
 	extern ActionEventQueue * aequeue;
@@ -136,6 +137,9 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
 	// testing code for medic healing
 	//health -= 20;
 	//updateDamaged();
+	
+	// Initialisation
+	infianim = 0;
 }
 
 Unit::~Unit()
@@ -170,7 +174,7 @@ Unit::~Unit()
     }
     
     if (deployed) {
-        // TODO This is a client thing. Will dispatch a 
+        // @todo This is a client thing. Will dispatch a 
     	// "play these sounds" event when the time comes.
 		if (this->getOwner() == p::ppool->getLPlayerNum()){
 			pc::sfxeng->PlaySound(pc::Config.UnitDeployed);
@@ -208,22 +212,27 @@ Uint8 Unit::getImageNums(Uint32 **inums, Sint8 **xoffsets, Sint8 **yoffsets)
     return type->getNumLayers();
 }
 
-InfantryGroup* Unit::getInfantryGroup() {
-        return infgrp;
-    }
+InfantryGroup* Unit::getInfantryGroup()
+{
+	return infgrp;
+}
 
-void Unit::setInfantryGroup(InfantryGroup *ig) {
-        infgrp = ig;
-    }
+void Unit::setInfantryGroup(InfantryGroup *ig)
+{
+	infgrp = ig;
+}
 
-Uint32 Unit::getImageNum(Uint8 layer) const {
-        return type->getSHPNums()[layer]+imagenumbers[layer];
-    }
+Uint32 Unit::getImageNum(Uint8 layer) const 
+{
+	return type->getSHPNums()[layer]+imagenumbers[layer];
+}
 
 Uint16 Unit::getNumbImages( Uint8 layer )
 {
-	if (type->getSHPTNum() != NULL)
+	if (type->getSHPTNum() != 0)
+	{
 		return type->getSHPTNum()[layer];
+	}
 	return 0;
 }
 
@@ -263,25 +272,30 @@ void Unit::setYoffset(Sint8 yo)
 	this->yoffset = yo; 
 }
 
-UnitType* Unit::getType() {
-        return type;
-    }
+UnitType* Unit::getType()
+{
+	return type;
+}
 
-Uint16 Unit::getPos() const {
-        return cellpos;
-    }
+Uint16 Unit::getPos() const
+{
+	return cellpos;
+}
 
-Uint16 Unit::getBPos(Uint16 pos) const {
-        return cellpos;
-    }
+Uint16 Unit::getBPos(Uint16 pos) const
+{
+	return cellpos;
+}
 
-Uint16 Unit::getSubpos() const {
-        return subpos;
-    }
+Uint16 Unit::getSubpos() const
+{
+	return subpos;
+}
 
-Uint32 Unit::getNum() const {
-        return unitnum;
-    }
+Uint32 Unit::getNum() const
+{
+	return unitnum;
+}
 
 void Unit::setUnitnum(Uint32 unum)
 {
@@ -292,7 +306,6 @@ void Unit::ChangeHealth(Sint16 amount)
 {
 	Uint16 oldHealth = getHealth();
 	
-//	printf ("%s line %i: original health = %i\n", __FILE__, __LINE__, health);
 	if (oldHealth + amount > type->getMaxHealth()){
 		setHealth(type->getMaxHealth());
 	} else if (oldHealth + amount < 0){
@@ -300,17 +313,17 @@ void Unit::ChangeHealth(Sint16 amount)
 	} else {
 		setHealth(oldHealth + amount);
 	}
-//	printf ("%s line %i: health = %i\n", __FILE__, __LINE__, health);
 }
 
 void Unit::move(Uint16 dest)
 {
-    move(dest,true);
+    move(dest, true);
 }
 
 void Unit::move(Uint16 dest, bool stop)
 {
     targetcell = dest;
+
     if (stop && (attackanim != NULL)) {
         attackanim->stop();
         if (target != NULL) {
@@ -322,8 +335,13 @@ void Unit::move(Uint16 dest, bool stop)
 	if (stop && harvestanim != NULL){
 		harvestanim->stop();
 	}
+	
+	if (stop && infianim != 0){
+		infianim->stop();
+	}
 
-    if (moveanim == NULL) {
+    if (moveanim == NULL)
+    {
         moveanim = new MoveAnimEvent(type->getSpeed(), this);
         p::aequeue->scheduleEvent(moveanim);
     } else {
@@ -331,17 +349,19 @@ void Unit::move(Uint16 dest, bool stop)
     }
 }
 
-bool Unit::IsMoving (void)
+bool Unit::IsMoving()
 {
-    if (moveanim != NULL)
+    if (moveanim != 0){
         return true;
+    }
     return false;
 }
 
-bool Unit::IsAttacking (void)
+bool Unit::IsAttacking()
 {
-    if (attackanim == NULL)
+    if (attackanim == 0){
         return false;
+    }
     return true;
 }
 
@@ -364,9 +384,9 @@ bool Unit::UnderAttack()
 
 void Unit::attack(UnitOrStructure* target)
 {
-	if (!this->canAttack())
+	if (!this->canAttack()){
 		return;
-
+	}
     attack(target, true);
 }
 
@@ -377,7 +397,8 @@ void Unit::attack(UnitOrStructure* target, bool stop)
 	if (!this->canAttack())
 		return;
 
-	if (!target->getType()->isStructure()){
+	if (!target->getType()->isStructure())
+	{
 		switch (((Unit*)target)->getType()->getType()){
 			case UN_INFANTRY:
 			case UN_VEHICLE:
@@ -494,16 +515,19 @@ void Unit::stop()
     }
 }
 
-Uint8 Unit::getOwner() const {
-        return owner;
-    }
+Uint8 Unit::getOwner() const 
+{
+	return owner;
+}
 
-void Unit::setOwner(Uint8 newowner) {
-        owner = newowner;
-    }
+void Unit::setOwner(Uint8 newowner)
+{
+	owner = newowner;
+}
 
-void Unit::remove() {
-    p::ppool->getPlayer(owner)->lostUnit(this,deployed);
+void Unit::remove() 
+{
+    p::ppool->getPlayer(owner)->lostUnit(this, deployed);
     UnitOrStructure::remove();
 }
 
@@ -511,8 +535,6 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 {
 
 //	printf ("%s line %i: Apply damage, damage = %i\n", __FILE__, __LINE__, amount);
-
-    HandleTriggers((UnitOrStructure*)this, 6);
 
 	LastDamageTick = SDL_GetTicks();
 
@@ -532,13 +554,19 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 	}
 #endif
 
-	if (weap != NULL){
-		amount = (Sint16)((double)amount * weap->getVersus(type->getArmour()));
+	// If the Weapon exist
+	if (weap != 0){
+		amount = (Sint16)((double)amount * weap->getVersus(type->getArmor()));
 	}
 	
-    if ((getHealth()-amount) <= 0) {
-		HandleTriggers((UnitOrStructure*)this, 7 );
-        doRandTalk(TB_die);
+    if ((getHealth()-amount) <= 0) 
+    {
+    	// Throw the event
+    	logger->debug("TRIGGER_EVENT_DESTROYED unit\n");
+    	// (-1 means nothing)
+    	HandleTriggers((UnitOrStructure*)this, TRIGGER_EVENT_DESTROYED, -1);
+        
+		doRandTalk(TB_die);
 
         // Add a death for stats
         if (attacker != NULL){
@@ -563,11 +591,6 @@ void Unit::updateDamaged()
 	ratio = (double)getHealth() / (double)type->getMaxHealth();
 }
 
-char* Unit::getTName() const 
-{
-	return (char*)type->getTName();
-}
-
 bool Unit::IsHarvester() 
 {
 	if (strcmp ((char*)type->getTName(), "HARV") == 0)
@@ -586,12 +609,13 @@ bool Unit::IsHarvesting()
 /**
  *	This functions returns the position of the tiberium that is closesed to this unit....
  */
-Uint32 Unit::FindTiberium (void)
+Uint32 Unit::FindTiberium()
 {
 	Uint32 tiberium;
 	Uint32 ClosesedPos = 0;
 	Uint32 ClosesedDistance = 0;
-	Uint32 Distance = 0, ClosesedExpensivePos = 0;
+	Uint32 Distance = 0;
+	Uint32 ClosesedExpensivePos = 0;
 	Uint32 ClosesedExpensiveDistance = 0;
 	bool FirstFound = false;
 	bool FirstExpensiveFound = false;
@@ -645,11 +669,12 @@ Uint32 Unit::FindTiberium (void)
 
 void Unit::Harvest (Uint32 pos, Structure *Struct)
 {
-     if (harvestanim == NULL) {
-        harvestanim = new UHarvestEvent(0, this);
-        p::aequeue->scheduleEvent(harvestanim);
-    } else {
-        harvestanim->update();
+	if (harvestanim == NULL) 
+	{
+		harvestanim = new UHarvestEvent(0, this);
+		p::aequeue->scheduleEvent(harvestanim);
+	} else {
+		harvestanim->update();
     }
 
 	if (pos != 0){
@@ -659,19 +684,28 @@ void Unit::Harvest (Uint32 pos, Structure *Struct)
 		harvestanim->setHarvestingPos(pos);
 	}
 
-	if (Struct != NULL)
+	if (Struct != 0){
 		SetBaseRefinery (Struct);
+	}
 }
 
-bool Unit::Repair (Structure *str)
+/**
+ * Command to the Unit to be repaired by a FIX structure
+ */
+bool Unit::Repair(Structure *str)
 {
-	Uint16 xpos, ypos;
+	Uint16 xpos;
+	Uint16 ypos;
 
-	if (strcmp ((char*)str->getType()->getTName(), "FIX") != 0 )
+	// Check if the structure is "FIX"
+	if (strcmp ((char*)str->getType()->getTName(), "FIX") != 0 ){
 		return false;
-
+	}
+	
+	// Get coordinates
 	p::ccmap->translateFromPos(str->getPos(), &xpos, &ypos);
 
+	// Try to get the middle
 	xpos += str->getType()->getXsize()/2 ;
 	ypos += str->getType()->getYsize()/2;
 
@@ -701,7 +735,9 @@ void Unit::doRandTalk(TalkbackType ttype)
 
 bool Unit::deploy()
 {
-    if (canDeploy()) { // error catching
+	// error catching
+    if (canDeploy()) 
+    { 
         if (type->getDeployTarget() != NULL) {
             deployed = true;
             p::uspool->removeUnit(this);
@@ -713,8 +749,10 @@ bool Unit::deploy()
 
 bool Unit::canDeploy()
 {
-    if (type->canDeploy()) {
-        if (type->getDeployTarget() != NULL) {
+    if (type->canDeploy())
+    {
+        if (type->getDeployTarget() != NULL)
+        {
             if (!deployed)
                 return checkDeployTarget(calcDeployPos());
             return false;
@@ -755,6 +793,7 @@ bool Unit::checkDeployTarget(Uint32 pos)
     }
     return true;
 }
+
 Uint32 Unit::calcDeployPos() const
 {
     Uint32 deploypos;
@@ -782,6 +821,7 @@ Uint32 Unit::calcDeployPos() const
     }
     return deploypos;
 }
+
 Uint32 Unit::calcDeployPos(Uint32 pos) const
 {
     Uint32 deploypos;
@@ -809,12 +849,17 @@ Uint32 Unit::calcDeployPos(Uint32 pos) const
     }
     return deploypos;
 }
-Uint32 Unit::getExitCell() const {
-        return calcDeployPos();
-    }
-double Unit::getRatio() const {
-        return ratio;
-    }
+
+Uint32 Unit::getExitCell() const
+{
+	return calcDeployPos();
+}
+
+double Unit::getRatio() const 
+{
+	return ratio;
+}
+
 Uint16 Unit::getDist(Uint16 pos)
 {
     Uint16 x, y, nx, ny, xdiff, ydiff;
@@ -828,6 +873,7 @@ Uint16 Unit::getDist(Uint16 pos)
 //    return min(xdiff,ydiff)+abs(xdiff-ydiff);
     return (Uint32) sqrt (xdiff*xdiff+ydiff*ydiff);
 }
+
 Uint16 Unit::getTargetCell()
 {
     if (attackanim != NULL && target != NULL) {
@@ -835,66 +881,115 @@ Uint16 Unit::getTargetCell()
     }
     return targetcell;
 }
-Structure *Unit::GetBaseRefinery (){
-		return BaseRefinery;
-    }
-void Unit::SetBaseRefinery (Structure *Bref){
-		printf ("Set base refinery\n");
-		BaseRefinery = Bref;
-		if (harvestanim == NULL) {
-			harvestanim = new UHarvestEvent(0, this);
-			p::aequeue->scheduleEvent(harvestanim);
-		} else {
-			harvestanim->update();
-		}
-    }
+
+Structure *Unit::GetBaseRefinery()
+{
+	return BaseRefinery;
+}
+
+void Unit::SetBaseRefinery (Structure *Bref)
+{
+	printf ("Set base refinery\n");
+	BaseRefinery = Bref;
+	if (harvestanim == NULL) 
+	{
+		harvestanim = new UHarvestEvent(0, this);
+		p::aequeue->scheduleEvent(harvestanim);
+	} else {
+		harvestanim->update();
+	}
+}
+
 void Unit::AddResource (Uint8 ResourceType)
-    {
-        ResourceTypes[NumbResources] = ResourceType;  // Resource type in harvester
-        NumbResources++;
-    }
-void Unit::EmptyResources (void)
-    {
-        NumbResources = 0;  // Resource type in harvester
-    }
-Uint8 Unit::GetNumResources (void)
-    {
-        return NumbResources;  // Resource type in harvester
-    }
+{
+	ResourceTypes[NumbResources] = ResourceType;  // Resource type in harvester
+	NumbResources++;
+}
+
+void Unit::EmptyResources()
+{
+	NumbResources = 0;  // Resource type in harvester
+}
+
+Uint8 Unit::GetNumResources()
+{
+	return NumbResources;  // Resource type in harvester
+}
+
 bool Unit::GetResourceType (Uint8 Numb, Uint8 *Type)
-    {
-        if (Numb < NumbResources){
-            *Type = ResourceTypes[Numb];
-            return true;
-        }
-        return false;
-    }
-bool Unit::is(const char *Name) {
-		if (strcmp (getType()->getTName(), Name) == 0)
-			return true;
-		return false;
-	}
-Uint32 Unit::GetFixStr (void)
+{
+	if (Numb < NumbResources)
 	{
-		return fix_str_num;
+		*Type = ResourceTypes[Numb];
+		return true;
 	}
-Uint16 Unit::GetFixPos (void)
+	return false;
+}
+
+bool Unit::is(const char *Name) 
+{
+	if (strcmp (getType()->getTName(), Name) == 0)
+		return true;
+	return false;
+}
+
+Uint32 Unit::GetFixStr()
+{
+	return fix_str_num;
+}
+
+Uint16 Unit::GetFixPos()
+{
+	return fix_str_pos;
+}
+
+bool Unit::IsAirBound()
+{
+	if (type->getType() == UN_PLANE || 
+		type->getType() == UN_HELICOPTER)
 	{
-		return fix_str_pos;
+		return true;
 	}
-bool Unit::IsAirBound (void)
-	{
-		if (type->getType() == UN_PLANE || type->getType() == UN_HELICOPTER)
-			return true;
-		return false;
-	}
-bool Unit::IsWaterBound (void)
-	{
-		if (type->getType() == UN_BOAT)
-			return true;
-		return false;
-	}
-string Unit::getTriggerName (void) {return TriggerName;}
-void Unit::operation1(){}
+	return false;
+}
+
+bool Unit::IsWaterBound()
+{
+	if (type->getType() == UN_BOAT)
+		return true;
+	return false;
+}
+
+string Unit::getTriggerName()
+{
+	return TriggerName;
+}
+
+UInfiltrateAnimEvent* Unit::getInfianim()
+{
+	return infianim;
+}
+
+void Unit::setInfianim(UInfiltrateAnimEvent* anim)
+{
+	this->infianim = infianim;
+}
+
+/** 
+ * Action to infiltrate
+ */
+void Unit::Infiltrate(Structure* target)
+{
+	this->target = target;
+	
+	this->infianim = new UInfiltrateAnimEvent(0, this);
+	p::aequeue->scheduleEvent(infianim);
+}
+
+
+
+
+
+
 
 
