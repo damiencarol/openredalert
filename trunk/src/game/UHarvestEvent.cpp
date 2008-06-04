@@ -1,8 +1,26 @@
+// UHarvestEvent.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "UHarvestEvent.h"
 
 #include <cmath>
 
-#include "include/ccmap.h"
+#include "CnCMap.h"
 #include "UnitOrStructure.h"
 #include "Structure.h"
 #include "unittypes.h"
@@ -11,7 +29,7 @@
 #include "MoveAnimEvent.h"
 #include "ActionEventQueue.h"
 #include "Player.h"
-#include "include/PlayerPool.h"
+#include "PlayerPool.h"
 #include "include/Logger.h"
 #include "Unit.h"
 
@@ -109,14 +127,16 @@ void UHarvestEvent::update()
 void UHarvestEvent::run()
 {
 #ifdef DEBUG_HARVEST_ANIM
-	if ( un->getOwner() == p::ppool->getLPlayerNum() )
+	if ( un->getOwner() == p::ppool->getLPlayerNum() ){
 		printf ("%s line %i: Run harvest animation\n", __FILE__, __LINE__);
+	}
 #endif
 
 	if( !un->isAlive() || stopping ) {
 #ifdef DEBUG_HARVEST_ANIM
-		if ( un->getOwner() == p::ppool->getLPlayerNum() )
+		if ( un->getOwner() == p::ppool->getLPlayerNum() ){
 			printf ("%s line %i: Stopping harvest animation\n", __FILE__, __LINE__);
+		}
 #endif
 		delete this;
 		return;
