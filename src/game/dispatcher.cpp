@@ -1,29 +1,44 @@
-#include "ActionEventQueue.h"
+// Dispatcher.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
+#include "Dispatcher.h"
 
 #include <string>
 
-#include "include/ccmap.h"
+#include "ActionEventQueue.h"
+#include "cncmap.h"
 #include "include/common.h"
 #include "include/config.h"
-#include "include/dispatcher.h"
 #include "include/Logger.h"
-#include "include/PlayerPool.h"
-#include "game/Unit.h"
+#include "PlayerPool.h"
+#include "Unit.h"
 #include "UnitAndStructurePool.h"
 #include "vfs/vfs.h"
 #include "StructureType.h"
 #include "UnitType.h"
 #include "UnitOrStructure.h"
 #include "Structure.h"
-#include "Unit.h"
 
 using std::string;
 
 namespace p {
-extern UnitAndStructurePool* uspool;
+    extern UnitAndStructurePool* uspool;
 }
-
-namespace Dispatcher {
 
 /** 
  * NOTE: I've stripped out the sections related to logging and playback as that
@@ -180,12 +195,14 @@ bool Dispatcher::unitSpawn(const char* tname, Uint8 owner) {
     return true;
 }
 
-bool Dispatcher::unitCreate(const char* tname, Uint32 pos, Uint8 subpos, Uint8 owner) {
-    switch (logstate) {
+bool Dispatcher::unitCreate(const char* tname, Uint32 pos, Uint8 subpos, Uint8 owner) 
+{
+    switch (logstate) 
+    {
         case RECORDING:
             // deliberate fallthrough
         case NORMAL:
-            return p::uspool->createUnit(tname,pos,subpos,owner,FULLHEALTH,0);
+            return p::uspool->createUnit(tname, pos, subpos, owner, FULLHEALTH, 0, 0, "None");
             break;
         case PLAYING:
         default:
@@ -194,5 +211,3 @@ bool Dispatcher::unitCreate(const char* tname, Uint32 pos, Uint8 subpos, Uint8 o
     /// XXX This won't always be true.
     return true;
 }
-
-} /* namespace Dispatcher */
