@@ -29,7 +29,7 @@ class Unit;
 using std::list;
 
 /**
- * Selection of Units and structure in the game
+ * Selectino of Units and structure in the game
  */
 class Selection
 {
