@@ -140,7 +140,7 @@ void RedAlertDataLoader::load()
 		
 	//
 	// Try to load strings from MIX archive file
-	// TODO DEBUG MAKE READING OF KEYS
+	// @todo DEBUG MAKE READING OF KEYS
 	// Loads all strings in the REDALERT/LOCAL/conquer.eng
 	//VFile* raStrings = VFSUtils::VFS_Open("conquer.eng");
 	//logger->debug("File SIZE = %d", raStrings->fileSize());

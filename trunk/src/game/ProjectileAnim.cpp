@@ -171,8 +171,8 @@ ProjectileAnim::~ProjectileAnim() {
 void ProjectileAnim::run()
 {
     Uint32 oldpos;
-    Unit* utarget;
-    Structure* starget;
+    Unit* utarget = 0;
+    Structure* starget = 0;
     
     if (fuelled) {
         --fuel;
@@ -233,8 +233,13 @@ void ProjectileAnim::run()
     // if we are so close both
     if (xmod == 0 && ymod == 0) 
     {
-    	// Play report of th weapon
-    	//pc::sfxeng->PlaySound(weap->getWarhead()->getExplosionsound());  	        
+    	// Play the anim for piff
+    	Uint32 numPiffShp = pc::imgcache->loadImage("piff.shp", -1);
+    	new ExplosionAnim(1, dest, numPiffShp, 4, 0, 0);
+    	
+    	
+    	// Play report of the weapon 
+    	//pc::sfxeng->PlaySound(weap->getProjectile()->lnkProjectileData->Warhead()->getExplosionsound());  	        
     	
     	
     	
@@ -284,6 +289,7 @@ void ProjectileAnim::run()
     	}
     	*/ 	
     	
+    	// Apply damages to a structure if founded
         starget = p::uspool->getStructureAt(dest,weap->getWall());
         if( starget != 0 ) {
             starget->applyDamage((Sint16)weap->getDamage(),weap,owner);
@@ -291,6 +297,8 @@ void ProjectileAnim::run()
             return;
         }
 
+        
+        // Apply damages to a Unit if founded
         utarget = p::uspool->getUnitAt(dest, subdest);
         if( (utarget != 0) || inaccurate ) {
             if (inaccurate) {
@@ -303,7 +311,7 @@ void ProjectileAnim::run()
                     }
                 } // targeted soldier gets full normal damage
                 utarget = p::uspool->getUnitAt(dest, subdest);
-                if (utarget != NULL) { // soldier might have already been killed
+                if (utarget != 0) { // soldier might have already been killed
                     utarget->applyDamage((Sint16)(2.0*(double)weap->getDamage()/3.0),weap,owner);
                 }
                 delete this;

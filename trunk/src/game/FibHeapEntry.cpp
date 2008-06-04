@@ -1,17 +1,26 @@
 #include "FibHeapEntry.h"
+
 #include "SDL/SDL_types.h"
+
 #include "TileRef.h"
 
-FibHeapEntry::FibHeapEntry(TileRef * val, Uint32 k) {
+FibHeapEntry::FibHeapEntry(TileRef* val, Uint32 k) 
+{
 	lnkTileRef = val;
-    key = k;
+	key = k;
 }
 
-TileRef * FibHeapEntry::getValue() {
-    return lnkTileRef;
+TileRef* FibHeapEntry::getValue() 
+{
+	return lnkTileRef;
 }
 
-void FibHeapEntry::setKey(Uint32 k) {
-    key = k;
+void FibHeapEntry::setKey(Uint32 k) 
+{
+	key = k;
 }
-Uint32& FibHeapEntry::getKey(){ return key; }
+
+Uint32& FibHeapEntry::getKey() 
+{
+	return key;
+}

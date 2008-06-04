@@ -37,6 +37,8 @@ using std::string;
 using std::vector;
 
 namespace pc {
+/** SoundEngine of the game */	
+	extern SoundEngine* sfxeng;
     extern ConfigType Config;
 }
 extern Logger * logger;

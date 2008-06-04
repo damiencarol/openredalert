@@ -66,11 +66,13 @@ using INI::KeyNotFound;
 
 namespace pc
 {
+	extern ImageCache* imgcache;
 	extern ConfigType Config;
 	extern vector<SHPImage*>* imagepool;
+	extern MessagePool* msg;
 }
 namespace p {
-extern PlayerPool* ppool;
+	extern PlayerPool* ppool;
 }
 extern Logger * logger;
 

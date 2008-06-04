@@ -22,35 +22,44 @@
 #include <string>
 
 #include "ActionEventQueue.h"
-#include "include/config.h"
 #include "video/ImageCache.h"
 #include "video/ImageCacheEntry.h"
+#include "video/SHPImage.h"
 #include "ui/Sidebar.h"
-
+#include "game/pside.h"
+#include "game/Player.h"
 
 using std::string;
 using std::runtime_error;
 
-namespace pc {
-    extern ConfigType Config;
-}
 namespace p {
 	extern ActionEventQueue* aequeue;
 }
 
-RadarAnimEvent::RadarAnimEvent(Uint8 mode, bool* minienable, Uint32 radar)
-    : ActionEvent(1), minienable(minienable), radar(radar)
+/**
+ * Build an anim 
+ * 
+ * @param mode If mode = 0 => RADAR ON 
+ *             If mode = 1 => RADAR OFF
+ * @param isBad If isBad = true => Player is bad side 
+ *              If isBad = false => Player is good side
+ */
+RadarAnimEvent::RadarAnimEvent(Uint8 mode, Sidebar* sideBar)
+    : ActionEvent(1)
 {
+	// Set the sidebar
+	this->sidebar = sidebar;
+	
 	// Get the mode
 	this->mode = mode;
 	
+	// Set the start and end number in the anim 
     switch (mode) {
     case 0:
         frame = 0;
         framend = 20;
         break;
     case 1:
-        //*minienable = false;
         frame = 20;
         framend = 30;
         break;
@@ -59,68 +68,95 @@ RadarAnimEvent::RadarAnimEvent(Uint8 mode, bool* minienable, Uint32 radar)
     }
 
 
-	if (pc::sidebar->sbar != NULL) {
-		// Draw grey box where radar was
-		// SDL_FillRect(pc::sidebar->sbar, dest, SDL_MapRGB(pc::sidebar->sbar->format, 0x0a, 0x0a, 0x0a));
-
-		//if (pc::Config.gamenum == GAME_TD){
-		//	sdlRadar = pc::imgcache->getImage(pc::sidebar->radarlogo).image;
-		//} else {
-			sdlRadar = pc::imgcache->getImage(pc::sidebar->radarlogo, 1).image;
-		//}
-	}
+    // If the player of the sidebar is GOOD or BAD
+    //if (sideBar->getPlayer()->getSide() &~PS_MULTI) == PS_BAD)
+    //{
+    //	animImages = 
+    //}    
+    
+    // Load the image for anim BAD
+    animImagesBad = new SHPImage("ussrradr.shp" , -1);
+	
+    // Load the image for anim GOOD
+    animImagesGood = new SHPImage("natoradr.shp" , -1);
+    	
+    // Schedule this
     p::aequeue->scheduleEvent(this);
 }
 
+/**
+ * Run the anim
+ */
 void RadarAnimEvent::run()
 {
 	//SDL_Rect *dest = &pc::sidebar->radarlocation;
-	SDL_Surface *radarFrame;
+	SDL_Surface* radarFrame;
 	SDL_Rect dest;
-	dest.x = pc::sidebar->radarlocation.x;
-	dest.y = pc::sidebar->radarlocation.y;
-	dest.h = pc::sidebar->radarlocation.h;
-	dest.w = pc::sidebar->radarlocation.w;
+	dest.x = sidebar->radarlocation.x;
+	dest.y = sidebar->radarlocation.y;
+	dest.h = sidebar->radarlocation.h;
+	dest.w = sidebar->radarlocation.w;
 
-    if (frame <= framend) {
-
+    if (frame <= framend) 
+    {
         //If the sidebar is null don't even bother
-        if (pc::sidebar->sbar != NULL) {
-            // Draw radar loading frame
-            radarFrame = pc::imgcache->getImage(radar, frame).image;
-            dest.h = radarFrame->h;
+        if (sidebar->sbar != 0) 
+        {
+        	// If the player of the sidebar is GOOD or BAD
+        	if ((sidebar->getPlayer()->getSide() &~PS_MULTI) == PS_BAD)
+        	{
+        		animImagesBad->getImageAsAlpha(frame, &radarFrame);
+        	} else {
+        		animImagesGood->getImageAsAlpha(frame, &radarFrame);        	        	
+        	}
+        	
+        	dest.h = radarFrame->h;
             //SDL_FillRect(pc::sidebar->sbar, &dest, SDL_MapRGB(pc::sidebar->sbar->format, 0x0a, 0x0a, 0x0a));
-			SDL_BlitSurface(radarFrame, NULL, pc::sidebar->sbar, &dest);
+			SDL_BlitSurface(radarFrame, 0, sidebar->sbar, &dest);
         }
 
         ++frame;
         p::aequeue->scheduleEvent(this);
-    	pc::sidebar->DrawSpecialIcons();
+    	sidebar->DrawSpecialIcons();
     } else {
-        if (mode == 0) {
-		// We got radar
-		if (pc::sidebar->sbar != NULL) {
-			printf ("%s line %i: Draw last radar image (radar up, mode = %i)\n", __FILE__, __LINE__, mode);
-			radarFrame = pc::imgcache->getImage(pc::sidebar->radarlogo, 1).image;
-			SDL_SetColorKey(radarFrame,SDL_SRCCOLORKEY,  0xffffff);
-			dest.h = radarFrame->h;
-			SDL_BlitSurface( radarFrame, NULL, pc::sidebar->sbar, &dest);
-		}
-		*minienable = true;
-	}else{
-		// We don't have radar anymore
-		if (pc::sidebar->sbar != NULL) {
-			printf ("%s line %i: Draw last radar image (radar down, mode = %i)\n", __FILE__, __LINE__, mode);
-			radarFrame = pc::imgcache->getImage(radar, 0).image;
-			SDL_SetColorKey(radarFrame,SDL_SRCCOLORKEY, 0xffffff);
-			dest.h = radarFrame->h;
-			SDL_BlitSurface( radarFrame, NULL, pc::sidebar->sbar, &dest);
-		}
-		*minienable = false;
-	}
-        pc::sidebar->radaranimating = false;
-        pc::sidebar->radaranim = NULL;
-    	pc::sidebar->DrawSpecialIcons();
+        if (mode == 0) 
+        {
+        	// We got radar
+        	if (sidebar->sbar != 0) 
+        	{
+        		printf ("%s line %i: Draw last radar image (radar up, mode = %i)\n", __FILE__, __LINE__, mode);
+        		// If the player of the sidebar is GOOD or BAD
+        		if ((sidebar->getPlayer()->getSide() &~PS_MULTI) == PS_BAD)
+        		{
+        			logoRadarBad->getImageAsAlpha(1, &radarFrame);
+        		} else {
+        			logoRadarGood->getImageAsAlpha(1, &radarFrame); 
+        		}
+        		//radarFrame = pc::imgcache->getImage(pc::sidebar->radarlogo, 1).image;
+        		SDL_SetColorKey(radarFrame,SDL_SRCCOLORKEY,  0xffffff);
+        		dest.h = radarFrame->h;
+        		SDL_BlitSurface(radarFrame, 0, sidebar->sbar, &dest);
+        	}
+        } else {
+        	// We don't have radar anymore
+        	if (sidebar->sbar != 0) 
+        	{
+        		printf ("%s line %i: Draw last radar image (radar down, mode = %i)\n", __FILE__, __LINE__, mode);
+        		// If the player of the sidebar is GOOD or BAD
+        		if ((sidebar->getPlayer()->getSide() &~PS_MULTI) == PS_BAD)
+        		{
+        			logoRadarBad->getImageAsAlpha(0, &radarFrame);
+        		} else {
+        			logoRadarGood->getImageAsAlpha(0, &radarFrame); 
+        		}
+        		SDL_SetColorKey(radarFrame,SDL_SRCCOLORKEY, 0xffffff);
+        		dest.h = radarFrame->h;
+        		SDL_BlitSurface(radarFrame, 0, sidebar->sbar, &dest);
+        	}
+        }
+        sidebar->radaranimating = false;
+        sidebar->radaranim = 0;
+    	sidebar->DrawSpecialIcons(); // Refresh
         delete this;
         return;
     }

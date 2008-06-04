@@ -60,6 +60,7 @@ public:
 
 	Uint16 getMakeImg() const;
 
+	/** Only applicable to structures.  UnitType always returns false. */	    
 	bool isWall() const;
 
 	bool isWaterBound() const;
@@ -85,7 +86,7 @@ public:
 	 */
 	Uint8 getSpeed() const;
 
-	armour_t getArmour() const;
+	armor_t getArmor() const;
 
 	animinfo_t getAnimInfo() const;
 
@@ -93,7 +94,14 @@ public:
 
 	bool isPowered();
 
-	Weapon* getWeapon(bool primary = true) const;
+	/**
+     * Units and structures can have at most two weapons. Currently any secondary weapons are ignored.
+     * @param primary if true return the first weapon else the second
+     * @todo Write a version that accepts an armour type and returns the weapon that'll cause the most damage.
+     */
+	Weapon* getWeapon(bool primary) const;
+	/** @brief Return by default the primary weapon */
+	Weapon* getWeapon() const;
 
 	bool hasTurret() const;
 
