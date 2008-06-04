@@ -18,15 +18,15 @@
     
 #include "Sidebar.h"
 
-#include <cstdio>
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
+#include <iosfwd>
+#include <sstream>
 
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_video.h"
 
-#include "include/config.h"
 #include "Input.h"
 #include "Cursor.h"
 #include "SidebarButton.h"
@@ -38,17 +38,17 @@
 #include "video/ImageCache.h"
 #include "video/ImageCacheEntry.h"
 #include "audio/SoundEngine.h"
-#include "include/PlayerPool.h"
 #include "include/sdllayer.h"
 #include "sidebarop.h"
 #include "video/ImageNotFound.h"
 #include "game/pside.h"
 #include "game/Player.h"
+#include "game/PlayerPool.h"
 #include "game/UnitAndStructurePool.h"
 #include "misc/StringTableFile.h"
 #include "vfs/vfs.h"
 
-/// @TODO Move this into config file(s)
+/// @todo Move this into config file(s)
 static const char* radarnames[] =
 {
 //   Gold Edition radars: NOD, GDI and Dinosaur
@@ -60,8 +60,6 @@ static const char* radarnames[] =
     "uradrfrm.shp", "nradrfrm.shp", "nradrfrm.shp"
 };
 
-class ImageCache;
-
 using std::string;
 using std::runtime_error;
 using std::vector;
@@ -70,8 +68,13 @@ using std::ostringstream;
 
 extern Logger * logger;
 namespace pc {
-	extern ConfigType Config;
+	//extern ConfigType Config;
 	extern ImageCache* imgcache;
+	extern SoundEngine* sfxeng;
+	extern Cursor* cursor;
+}
+namespace p {
+	extern UnitAndStructurePool* uspool;
 }
 
 #define S_BUTTON_NONE	255
@@ -136,19 +139,11 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
         }
 
         // Load the sell icon image
-        try {
-            sell_icon = pc::imgcache->loadImage("sell.shp", scaleq);
-        } catch (ImageNotFound&) {
-            throw runtime_error("Unable to load the sell icon!");
-        }
+        sellImages = new SHPImage("sell.shp", -1);
 
-        // Load the repair icon image
-        try {
-            repair_icon = pc::imgcache->loadImage("repair.shp", scaleq);
-        } catch (ImageNotFound&) {
-            throw runtime_error("Unable to load the repair icon!");
-        }
-
+        // Load the repair icon image (-1 = disable scale)
+        repairImages = new SHPImage("repair.shp", -1);
+        
         // Load the map icon image
         try {
             map_icon = pc::imgcache->loadImage("map.shp", scaleq);
@@ -182,17 +177,18 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
         side = isoriginaltype?5:2;
     }
 
-    if (pc::Config.gamenum == GAME_RA) {
+    //if (pc::Config.gamenum == GAME_RA) {
         // RA follows (Gold names) * 3 and (DOS names) * 3
         side += 6;
-    }
+    //}
 
     radarname = radarnames[side];
     radaranim = 0;
     try {
-        radaranimnumb = radarlogo = pc::imgcache->loadImage(radarname, scaleq);
+        radarlogo = pc::imgcache->loadImage(radarname, scaleq);
+        //radaranimnumb = radarlogo;
     } catch (ImageNotFound&) {
-        /// @TODO This problem should ripple up to the "game detection" layer
+        /// @todo This problem should ripple up to the "game detection" layer
         // so it can try again from scratch with a different set of data files.
         logger->error("Hmm.. managed to misdetect sidebar type\n");
         try {
@@ -210,19 +206,22 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
             throw SidebarError();
         }
     }
-	if (pc::Config.gamenum == GAME_RA) {
-		if ((player->getSide()&~PS_MULTI) == PS_BAD) {
-			radaranimnumb = pc::imgcache->loadImage("ussrradr.shp", scaleq);
-		}else
-			radaranimnumb = pc::imgcache->loadImage("natoradr.shp", scaleq);
-	}
+    
+	//if (pc::Config.gamenum == GAME_RA) {
+	//	if ((player->getSide()&~PS_MULTI) == PS_BAD) {
+    ussrAnimRadarImage = new SHPImage("ussrradr.shp", scaleq);
+    //		radaranimnumb = pc::imgcache->loadImage("ussrradr.shp", scaleq);
+	//	}else
+	//		radaranimnumb = pc::imgcache->loadImage("natoradr.shp", scaleq);
+	//}
 
+	
     SDL_Surface *radar;
-    if (pc::Config.gamenum == GAME_TD){
-    	radar = pc::imgcache->getImage(radarlogo).image;
-    } else {
+    //if (pc::Config.gamenum == GAME_TD){
+    //	radar = pc::imgcache->getImage(radarlogo).image;
+    //} else {
     	radar = pc::imgcache->getImage(radarlogo,1).image;
-    }
+    //}
     //	radar = ReadShpImage ((char *)radarnames[side], 1);
 
     radarlocation.x = 0;  
@@ -237,7 +236,7 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
 
     std::fill(greyFixed, greyFixed+256, false);
 
-    pc::sidebar = this;
+    // ???
     SetupButtons(height);
 
     // Set the states of the buttons to "UNDOWN" = 0
@@ -245,9 +244,9 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
     sell_but_state = 0;
     map_but_state = 0;
 
-    // Free claock images
+    // Free clock images
 	for (int i = 0; i < 256; i++){
-		Clocks[i] = NULL;
+		Clocks[i] = 0;
 	}
 
 
@@ -338,7 +337,9 @@ void Sidebar::ReloadImages()
 
 SDL_Surface *Sidebar::getSidebarImage(SDL_Rect location)
 {
-    SDL_Rect dest, src, newdest;
+    //SDL_Rect dest;
+    //SDL_Rect src;
+    SDL_Rect newdest;
     SDL_Surface *temp;
 
     if (location.w == sbarlocation.w && location.h == sbarlocation.h){
@@ -353,56 +354,57 @@ SDL_Surface *Sidebar::getSidebarImage(SDL_Rect location)
     location.x = 0;
     location.y = 0;
 
-    /// @TODO HACK
-    if (isoriginaltype || pc::Config.gamenum == GAME_RA) {
+    /// @todo HACK
+   // if (isoriginaltype || pc::Config.gamenum == GAME_RA) {
         SDL_FillRect(sbar, &location, SDL_MapRGB(sbar->format, 1, 1, 1));
-    } else {
-        try {
-            // Get the index of the btexture
-            Uint32 idx = pc::imgcache->loadImage("btexture.shp", scaleq);
-
-            // Get the SDL_Surface for this texture
-            SDL_Surface* texture = pc::imgcache->getImage(idx).image;
-
-            dest.x = 0;
-            dest.y = 0;
-            dest.w = location.w;
-            dest.h = texture->h;
-            src.x = 0;
-            src.y = 0;
-            src.w = location.w;
-            src.h = texture->h;
-            for (dest.y = 0; dest.y < location.h; dest.y += dest.h) {
-                SDL_BlitSurface(texture, &src, sbar, &dest);
-            }
-        } catch (ImageNotFound&) {
-            logger->error("Unable to load the background texture\n");
-            SDL_FillRect(sbar, &location, SDL_MapRGB(sbar->format, 0xa0, 0xa0, 0xa0));
-        }
-    }
+//    } else {
+//        try {
+//            // Get the index of the btexture
+//            Uint32 idx = pc::imgcache->loadImage("btexture.shp", scaleq);
+//
+//            // Get the SDL_Surface for this texture
+//            SDL_Surface* texture = pc::imgcache->getImage(idx).image;
+//
+//            dest.x = 0;
+//            dest.y = 0;
+//            dest.w = location.w;
+//            dest.h = texture->h;
+//            src.x = 0;
+//            src.y = 0;
+//            src.w = location.w;
+//            src.h = texture->h;
+//            for (dest.y = 0; dest.y < location.h; dest.y += dest.h) {
+//                SDL_BlitSurface(texture, &src, sbar, &dest);
+//            }
+//        } catch (ImageNotFound&) {
+//            logger->error("Unable to load the background texture\n");
+//            SDL_FillRect(sbar, &location, SDL_MapRGB(sbar->format, 0xa0, 0xa0, 0xa0));
+//        }
+//    }
     sbarlocation = location;
 
 	SDL_Surface* radar;
-	if (!Input::isMinimapEnabled()) {
-
-		if (pc::Config.gamenum == GAME_TD)
-			radar = pc::imgcache->getImage(radarlogo).image;
-		else
+	if (!Input::isMinimapEnabled())
+	{
+	//	if (pc::Config.gamenum == GAME_TD)
+	//		radar = pc::imgcache->getImage(radarlogo).image;
+	//	else
 			radar = pc::imgcache->getImage(radarlogo, 1).image;
-
+	//
 		SDL_SetColorKey(radar, SDL_SRCCOLORKEY, 0xffffff);
 
 		SDL_BlitSurface(radar, 0, sbar, &radarlocation);
 
 		// overdraw the with the correct upper part
-		radar = pc::imgcache->getImage(radaranimnumb, 0).image;
+		//radar = pc::imgcache->getImage(radaranimnumb, 0).image;
+		ussrAnimRadarImage->getImageAsAlpha(0, &radar);
 		SDL_SetColorKey(radar,SDL_SRCCOLORKEY, 0xffffff);
 		newdest.x = radarlocation.x;
 		newdest.y = radarlocation.y;
 		newdest.h = radar->h;
 		newdest.w = radar->w;
 		// SDL_FillRect(sbar, &newdest, SDL_MapRGB(pc::sidebar->sbar->format, 0x0a, 0x0a, 0x0a));
-		SDL_BlitSurface( radar, NULL, sbar, &newdest);
+		SDL_BlitSurface(radar, 0, sbar, &newdest);
 	}
 	else
 	{
@@ -425,20 +427,20 @@ SDL_Surface *Sidebar::getSidebarImage(SDL_Rect location)
     return sbar;
 }
 
-void Sidebar::GetButtonName(Uint8 index, char *UnitOrStructureName)
+char* Sidebar::getButtonName(Uint8 index)
 {
-	Uint8 function = buttons[index]->getFunction();
+	Uint8 function;
 	Uint8* offptr;
-	std::vector<char*>* vecptr;
+	vector<char*>* vecptr;
 	Uint8 type;
+	char* res = 0;
 
-	strncpy(UnitOrStructureName,"xxxx",4);
-
-	UnitOrStructureName[5] = '\0';
+	// Get the fonction of the button
+	function = buttons[index]->getFunction();
 
 	// Check that this is a build button and not a scroll button
 	if ((function&0x3) != 1){
-		return;
+		return 0;
 	}
 	
 	Uint8 VecPtrIndex = index - 3 - ((function&sbo_unit)?0:buildbut);
@@ -453,21 +455,22 @@ void Sidebar::GetButtonName(Uint8 index, char *UnitOrStructureName)
 		vecptr = &structicons;
 	}
 
-	if ( (unsigned)(*vecptr).size() > ((unsigned)(*offptr)+VecPtrIndex - 1) ) {
-		strncpy(UnitOrStructureName,(*vecptr)[(*offptr+VecPtrIndex-1)],13);
-		UnitOrStructureName[strlen((*vecptr)[(*offptr+VecPtrIndex-1)])-8] = 0x0;
+	if ( (unsigned)(*vecptr).size() > ((unsigned)(*offptr)+VecPtrIndex - 1) ) 
+	{		
+		res = strdup((*vecptr)[(*offptr+VecPtrIndex-1)]);
 	} else {
 		// Out of range
-		return;
+		return 0;
 	}
+	
+	return res;
 }
 
 void Sidebar::DrawButtonTooltip(Uint8 index)
 {
-	char 			UnitOrStructureName[20];	// should be at least 13 :)
+	char* UnitOrStructureName = 0;	// 
 	Uint8 			unit;
 	Uint8 			function;
-	//char			TooltipText[20];
 	ostringstream	TipString;
 
 
@@ -475,11 +478,15 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
 	function = buttons[index]->getFunction();
 
 	// Get the button name with this index
-	GetButtonName(index, UnitOrStructureName);
+	UnitOrStructureName = getButtonName(index);
 
+	// Check that it's ok
+	if (UnitOrStructureName == 0){
+		return;
+	}
 	unit = ( function & sbo_unit );
 
-	UnitOrStructureType* type;
+	UnitOrStructureType* type = 0;
 	if (unit) {
 		type = p::uspool->getUnitTypeByName(UnitOrStructureName);
 	} else {
@@ -536,7 +543,14 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
 	pc::cursor->setTooltip(TipString.str());
 }
 
-Uint8 Sidebar::getButton(Uint16 x,Uint16 y)
+/**
+ * Return the index of the button which is at coordinates x and y
+ * 
+ * @param x coordinate X
+ * @param y coordinate Y
+ * @return Number of the sidebar button or 255 if no button found
+ */
+Uint8 Sidebar::getButton(Uint16 x, Uint16 y)
 {
     SDL_Rect tmp;
 
@@ -611,7 +625,9 @@ void Sidebar::UpdateSidebar()
 {	
 	// update list of available icons
 	UpdateAvailableLists();
+	// Updates all buttons
 	UpdateIcons();
+	// Update the power bar
 	UpdatePowerbar();
 }
 
@@ -622,10 +638,15 @@ void Sidebar::DrawPowerbar()
 	SDL_Surface* Powerbar_down;
 	//SDL_Surface* PowerIndicator;
 
-	if (pc::Config.gamenum != GAME_RA || sbar == 0){
+	// If the surface exist
+	if (sbar == 0){
 		return;
 	}
-	
+	// TD radar is not implemented
+	//if (pc::Config.gamenum != GAME_RA){
+	//	return;
+	//}
+		
 	Powerbar_up = pc::imgcache->getImage(powerbar,0).image;
 	dest.x	= 0;
 	dest.y	= radarlocation.h;
@@ -650,16 +671,22 @@ void Sidebar::UpdatePowerbar()
 	SDL_Surface* PowerIndicator;
 	Uint32		 IndicatorBarColor;
 	Uint32		 IndicatorBarColorDark;
-	static unsigned int 	OldPower, OldPowerused;
+	static unsigned int OldPower;
+	static unsigned int OldPowerused;
 	static bool		LowPowerSoundPlayed = false;
 
-	if (sbar == 0 || pc::Config.gamenum != GAME_RA)
+	// If the surface exist
+	if (sbar == 0){
 		return;
-
-	// Get the power status
-	Player *lplayer = p::ppool->getLPlayer();
-	unsigned int power = lplayer->getPower();
-	unsigned int powerused = lplayer->getPowerUsed();
+	}
+	// TD radar is not implemented
+	//if (pc::Config.gamenum != GAME_RA){
+	//	return;
+	//}
+		
+	// Get the power status of the player
+	unsigned int power = this->player->getPower();
+	unsigned int powerused = this->player->getPowerUsed();
 
 	// Check for change
 	if (OldPower == power && OldPowerused	== powerused)
@@ -689,21 +716,21 @@ void Sidebar::UpdatePowerbar()
 	dest.y	= radarlocation.h;
 	dest.w	= Powerbar_up->w;
 	dest.h	= Powerbar_up->h;
-	SDL_BlitSurface(Powerbar_up, NULL, sbar, &dest);
+	SDL_BlitSurface(Powerbar_up, 0, sbar, &dest);
 
 	// Redraw the powerbar lower part (so it is clean again)
 	dest.x	= 0;
 	dest.y	= radarlocation.h + Powerbar_up->h;
 	dest.w	= Powerbar_down->w;
 	dest.h	= Powerbar_down->h;
-	SDL_BlitSurface(Powerbar_down, NULL, sbar, &dest);
+	SDL_BlitSurface(Powerbar_down, 0, sbar, &dest);
 
-	if (power > MaxPower)
+	if (power > MaxPower){
 		MaxPower = power * 4 + 500;
-
-	if (powerused > MaxPower)
+	}
+	if (powerused > MaxPower){
 		MaxPower = powerused * 4 + 500;
-
+	}
 
 	unsigned char PowerPercentage	= power * 100/ MaxPower;
 	unsigned int MaxPowerHeight	= Powerbar_up->h + Powerbar_down->h - 31 - 46;
@@ -743,7 +770,7 @@ void Sidebar::UpdatePowerbar()
 	dest.y	= radarlocation.h + 31 + MaxPowerHeight - (MaxPowerHeight * powerused / MaxPower) - PowerIndicator->h/2;
 	dest.w	= PowerIndicator->w;
 	dest.h	= PowerIndicator->h;
-	SDL_BlitSurface(PowerIndicator, NULL, sbar, &dest);
+	SDL_BlitSurface(PowerIndicator, 0, sbar, &dest);
 }
 
 Uint8 Sidebar::getSpecialButton(Uint16 x, Uint16 y)
@@ -783,10 +810,16 @@ void Sidebar::setSpecialButtonState(Uint8 Button, Uint8 State)
 	DrawSpecialIcons();
 }
 
-Uint8 Sidebar::getSpecialButtonState(Uint8 Button)
+/**
+ * Get the state of a special button
+ * 
+ * @param button Number of the button
+ * @return state of the button
+ */
+Uint8 Sidebar::getSpecialButtonState(Uint8 button)
 {
 	//RepairLoc, SellLoc, MapLoc;
-	switch (Button){
+	switch (button){
 		case 1:
 			return repair_but_state;
 			break;
@@ -801,67 +834,82 @@ Uint8 Sidebar::getSpecialButtonState(Uint8 Button)
 	return false;
 }
 
+/**
+ * Draw the three specail button below the map location in the sidebar
+ */
 void Sidebar::DrawSpecialIcons()
 {
+	SDL_Surface *shadow;		
 	//SDL_Rect	dest;
-	SDL_Surface	*Repair;
+	SDL_Surface* Repair;
 	SDL_Surface* Sell;
 	SDL_Surface* Map;
 	int	IconSpacing = 45;
 
 	if (sbar == 0) {
-		/// @TODO Ensure we don't actually get called when this is the case
+		/// @todo Ensure we don't actually get called when this is the case
 		return;
 	}
 
 	radarlocation.h = 160;
 
-	if (pc::Config.gamenum == GAME_RA){
-
-		if (repair_but_state < 3)
-			Repair	= pc::imgcache->getImage(repair_icon,repair_but_state).image;
-		else
-			Repair	= pc::imgcache->getImage(repair_icon,0).image;
+	//if (pc::Config.gamenum == GAME_RA)
+	{
+		// Draw the repair icon
+		if (repair_but_state < 3){
+			repairImages->getImage(repair_but_state, &Repair, &shadow, 0);
+		} else {
+			repairImages->getImage(0, &Repair, &shadow, 0);
+		}
+		SDL_FreeSurface(shadow);
 		RepairLoc.x	= 18;
 		RepairLoc.y	= radarlocation.h - Repair->h +2;
 		RepairLoc.w	= Repair->w;
 		RepairLoc.h	= Repair->h;
-		SDL_BlitSurface(Repair, NULL, sbar, &RepairLoc);
+		SDL_BlitSurface(Repair, 0, sbar, &RepairLoc);
 
-		if (sell_but_state < 3)
-			Sell	= pc::imgcache->getImage(sell_icon,sell_but_state).image;
-		else
-			Sell	= pc::imgcache->getImage(sell_icon,0).image;
-
+		// Draw the sell icon
+		if (sell_but_state < 3){
+			sellImages->getImage(sell_but_state, &Sell, &shadow, 0);
+		} else {
+			sellImages->getImage(0, &Sell, &shadow, 0);
+		}
 		SellLoc.x	= 18+IconSpacing;
 		SellLoc.y	= radarlocation.h - Sell->h +2;
 		SellLoc.w	= Sell->w;
 		SellLoc.h	= Sell->h;
-		SDL_BlitSurface(Sell, NULL, sbar, &SellLoc);
+		SDL_BlitSurface(Sell, 0, sbar, &SellLoc);
 
-		if (map_but_state < 3)
+		// Draw the map icon
+		if (map_but_state < 3){
 			Map	= pc::imgcache->getImage(map_icon,map_but_state).image;
-		else
+		} else {
 			Map	= pc::imgcache->getImage(map_icon,3).image;
-
+		}
 		MapLoc.x	= 18+2*IconSpacing;
 		MapLoc.y	= radarlocation.h - Map->h +2;
 		MapLoc.w	= Map->w;
 		MapLoc.h	= Map->h;
-		SDL_BlitSurface(Map, NULL, sbar, &MapLoc);
+		SDL_BlitSurface(Map, 0, sbar, &MapLoc);
 	}
 }
 
-void Sidebar::StartRadarAnim(Uint8 mode, bool* minienable)
+/**
+ * Start the drawing of the animation radar (ON or OFF)
+ * 
+ * @param mode If mode = 0 then RADAR ON anim wil be render
+ *             If mode = 1 then RADAR OFF anim wil be render
+ */
+void Sidebar::StartRadarAnim(Uint8 mode)
 {
     if (radaranimating == false && radaranim == 0 && sbar != 0)
     {
         radaranimating = true;
-        radaranim = new RadarAnimEvent(mode, minienable, radaranimnumb);
+        radaranim = new RadarAnimEvent(mode, this);
     }
 }
 
-SDL_Surface *Sidebar::ReadShpImage(char *Name, int ImageNumb)
+SDL_Surface* Sidebar::ReadShpImage(char *Name, int ImageNumb)
 {
 	SDL_Surface	*image;
 	SDL_Surface *shadow;
@@ -893,13 +941,13 @@ void Sidebar::SetupButtons(Uint16 height)
 	int ButtonXpos;
 	Uint32 startoffs;
 
-	if (pc::Config.gamenum == GAME_TD){
-		ButtonXpos	= 10;
-		startoffs	= tablocation.h + radarlocation.h;
-	}else{
+	//if (pc::Config.gamenum == GAME_TD){
+	//	ButtonXpos	= 10;
+	//	startoffs	= tablocation.h + radarlocation.h;
+	//}else{
 		ButtonXpos	= 25;
 		startoffs	= radarlocation.h + 5;
-	}
+	//}
 	SHPImage *strip;
 
 	tmpname = VFSUtils::VFS_getFirstExisting(3,"stripna.shp","hstrip.shp","strip.shp");
@@ -925,7 +973,7 @@ void Sidebar::SetupButtons(Uint16 height)
 	buildbut = ((height-startoffs)/geom.bh)-2;
 
 	// Add the scroll up/down buttons
-	if (pc::Config.gamenum == GAME_TD){
+	/*if (pc::Config.gamenum == GAME_TD){
 		startoffs += geom.bh;
 		scrollbase = startoffs + geom.bh*buildbut;
 		AddButton(ButtonXpos+geom.bw,scrollbase,"stripup.shp",sbo_scroll|sbo_unit|sbo_up,0); // 0
@@ -933,41 +981,45 @@ void Sidebar::SetupButtons(Uint16 height)
 
 		AddButton(ButtonXpos+geom.bw+(geom.bw>>1),scrollbase,"stripdn.shp",sbo_scroll|sbo_unit|sbo_down,0); // 2
 		AddButton(ButtonXpos+(geom.bw>>1),scrollbase,"stripdn.shp",sbo_scroll|sbo_structure|sbo_down,0); // 3
-	}else if (pc::Config.gamenum == GAME_RA){
-		scrollbase = startoffs + geom.bh*buildbut;
-		AddButton(ButtonXpos+geom.bw,scrollbase,"stripup.shp",sbo_scroll|sbo_unit|sbo_up,0); // 0
-		AddButton(ButtonXpos,scrollbase,"stripup.shp",sbo_scroll|sbo_structure|sbo_up,0); // 1
+	}else if (pc::Config.gamenum == GAME_RA){*/
 
-		AddButton(ButtonXpos+geom.bw+(geom.bw>>1),scrollbase,"stripdn.shp",sbo_scroll|sbo_unit|sbo_down,0); // 2
-		AddButton(ButtonXpos+(geom.bw>>1),scrollbase,"stripdn.shp",sbo_scroll|sbo_structure|sbo_down,0); // 3
-	}
+
+		scrollbase = startoffs + geom.bh*buildbut;
+		AddButton(ButtonXpos+geom.bw, scrollbase, "stripup.shp", sbo_scroll|sbo_unit|sbo_up, 0); // 0
+		AddButton(ButtonXpos, scrollbase, "stripup.shp", sbo_scroll|sbo_structure|sbo_up,0); // 1
+
+		AddButton(ButtonXpos+geom.bw+(geom.bw>>1), scrollbase, "stripdn.shp", sbo_scroll|sbo_unit|sbo_down, 0); // 2
+		AddButton(ButtonXpos+(geom.bw>>1), scrollbase, "stripdn.shp", sbo_scroll|sbo_structure|sbo_down, 0); // 3
+	//}
+
 
     // The order in which the AddButton calls are made MUST be preserved
     // Two loops are made so that all unit buttons and all structure buttons
     // are grouped contiguously (4,5,6,7,...) compared to (4,6,8,10,...)
     for (t=0;t<buildbut;++t) {
-        if (pc::Config.gamenum == GAME_RA){
+        //if (pc::Config.gamenum == GAME_RA){
 		if ((player->getSide()&~PS_MULTI) == PS_BAD)
 			AddButton(ButtonXpos+geom.bw,startoffs+geom.bh*t,"stripus.shp", sbo_build|sbo_unit,0);
 		else
 			AddButton(ButtonXpos+geom.bw,startoffs+geom.bh*t,"stripna.shp",sbo_build|sbo_unit,0);
-        }else
-		AddButton(ButtonXpos+geom.bw,startoffs+geom.bh*t,"strip.shp",sbo_build|sbo_unit,0);
+        //}else
+		//AddButton(ButtonXpos+geom.bw,startoffs+geom.bh*t,"strip.shp",sbo_build|sbo_unit,0);
     }
     for (t=0;t<buildbut;++t) {
-        if (pc::Config.gamenum == GAME_RA){
+        //if (pc::Config.gamenum == GAME_RA){
 		if ((player->getSide()&~PS_MULTI) == PS_BAD)
 			AddButton(ButtonXpos,startoffs+geom.bh*t,"stripus.shp",sbo_build|sbo_structure,spalnum);
 		else
 			AddButton(ButtonXpos,startoffs+geom.bh*t,"stripna.shp",sbo_build|sbo_structure,spalnum);
-          }else
-		AddButton(ButtonXpos,startoffs+geom.bh*t,"strip.shp",sbo_build|sbo_structure,spalnum);
+        //  }else
+		//AddButton(ButtonXpos,startoffs+geom.bh*t,"strip.shp",sbo_build|sbo_structure,spalnum);
     }
 
     startoffs += geom.bh;
 
     // Update Available Lists of option
     UpdateAvailableLists();
+
     // Update icons
     UpdateIcons();
     
@@ -1046,7 +1098,7 @@ void Sidebar::Build(Uint8 index, Uint8 type, char* unitname, createmode_t* creat
 /** 
  * Sets the images of the visible icons, having scrolled.
  * 
- * @TODO Provide a way to only update certain icons
+ * @todo Provide a way to only update certain icons
  */
 void Sidebar::UpdateIcons() 
 {
@@ -1055,13 +1107,13 @@ void Sidebar::UpdateIcons()
 	// Unit buttons
 	for (i=0;i<buildbut;++i) {
 		if ((unsigned)(i+unitoff)>=(unsigned)uniticons.size()) {
-			if (pc::Config.gamenum == GAME_RA){
+			//if (pc::Config.gamenum == GAME_RA){
 				if ((player->getSide()&~PS_MULTI) == PS_BAD)
 					buttons[4+i]->ChangeImage("stripus.shp", 0, 2);
 				else
 					buttons[4+i]->ChangeImage("stripna.shp", 0, 2);
-			}else
-				buttons[4+i]->ChangeImage("strip.shp");
+			//}else
+			//	buttons[4+i]->ChangeImage("strip.shp");
 		} else {
 			buttons[4+i]->ChangeImage(uniticons[i+unitoff]);
 		}
@@ -1070,13 +1122,13 @@ void Sidebar::UpdateIcons()
 	// Structure buttons
 	for (i=0;i<buildbut;++i) {
 		if ((unsigned)(i+structoff)>=(unsigned)structicons.size()) {
-			if (pc::Config.gamenum == GAME_RA){
+			//if (pc::Config.gamenum == GAME_RA){
 				if ((player->getSide()&~PS_MULTI) == PS_BAD)
 					buttons[buildbut+4+i]->ChangeImage("stripus.shp", 0, 1);
 				else
 					buttons[buildbut+4+i]->ChangeImage("stripna.shp", 0, 1);
-			}else
-				buttons[buildbut+4+i]->ChangeImage("strip.shp");
+			//}else
+			//	buttons[buildbut+4+i]->ChangeImage("strip.shp");
 		} else {
 			buttons[buildbut+4+i]->ChangeImage(structicons[i+structoff]);
 		}
@@ -1098,7 +1150,7 @@ void Sidebar::UpdateIcons()
  * 
  * @bug Newer items should be appended, although with some grouping (i.e. keep
  * infantry at top, vehicles, aircraft, boats, then superweapons).
- * TODO implement superweapons
+ * @todo implement superweapons
  */
 void Sidebar::UpdateAvailableLists() 
 {
@@ -1115,8 +1167,8 @@ void Sidebar::UpdateAvailableLists()
     structs_avail = p::uspool->getBuildableStructures(player);
     
     // Get SUPERWEAPONS availlable
-    // TODO get super weapon like that superWeapon_avail = p::uspool->getBuildableStructures(player);
-    //superWeapons_avail.push_back("gpss"); // emulate TODO
+    // @todo get super weapon like that superWeapon_avail = p::uspool->getBuildableStructures(player);
+    //superWeapons_avail.push_back("gpss"); // "gpss" value is to emulate 
     
     //
     // CONTROL AND RESETS OFFSETS
@@ -1229,7 +1281,7 @@ void Sidebar::DownButton(Uint8 index)
 
 void Sidebar::AddButton(Uint16 x, Uint16 y, const char* fname, Uint8 f, Uint8 pal)
 {
-    SidebarButton* t;
+    SidebarButton* t = 0; // Reference to the new button
     
     // Create the button
     t = new SidebarButton(x, y, fname, f, theatre, pal);
@@ -1246,7 +1298,7 @@ void Sidebar::DrawButton(Uint8 index)
 	SDL_Rect src;
 
 	if (sbar == 0) {
-		/// @TODO Ensure we don't actually get called when this is the case
+		/// @todo Ensure we don't actually get called when this is the case
 		return;
 	}
 	SDL_Rect dest = buttons[index]->getRect();
@@ -1322,7 +1374,7 @@ void Sidebar::DrawButton(Uint8 index)
         type = (UnitOrStructureType*)p::uspool->getStructureTypeByName(name.c_str());
     }
     
-    // TODO REFACTOR THIS
+    // @todo REFACTOR THIS
     if (0 == type) {
 //        getFont()->drawText(stat_mesg[status], sbar, dest.x + stat_pos[status].x, dest.y + stat_pos[status].y);
    		//StatusLabel.Draw(stat_mesg[status], sbar, dest.x + stat_pos[status].x, dest.y + stat_pos[status].y);
@@ -1351,7 +1403,7 @@ void Sidebar::DrawButton(Uint8 index)
         //getFont()->drawText(tmp, sbar, dest.x+3, dest.y+3);
 		QuantityLabel.Draw(tmp, sbar, dest.x+3, dest.y+3);
     }
-    /// @TODO This doesn't work when you immediately pause after starting to
+    /// @todo This doesn't work when you immediately pause after starting to
     // build (but never draws the clock for things not being built).
     if (progress > 0) {
 		StatusLabel.Draw(stat_mesg[status], sbar, dest.x + stat_pos[status].x, dest.y + stat_pos[status].y - 10);
@@ -1365,14 +1417,20 @@ SDL_Surface* Sidebar::getTabImage()
 	return pc::imgcache->getImage(tab).image;
 }
 
+/**
+ * DrawClock draw the clock under a button
+ * 
+ * @param index Number of the button
+ * @parama imgnum Number of the image in the clock
+ */
 void Sidebar::DrawClock(Uint8 index, Uint8 imgnum) 
 {
-    Uint32 num = 0;
-	SDL_Rect dest;
+    //Uint32 num = 0;
+	//SDL_Rect dest;
 
 #if 0
     try {
-        // @TODO Move this check to config object
+        // @todo Move this check to config object
         if (pc::Config.gamenum == GAME_RA || isoriginaltype) {
             num = pc::imgcache->loadImage("clock.shp");
         } else {
@@ -1395,20 +1453,23 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
     SDL_Rect dest = buttons[index]->getRect();
 
     SDL_BlitSurface(gr, NULL, sbar, &dest);
-#else
+#endif
+    
+#if 0
 
 	//
 	// This had to be done differently because of the use of glSDL
 	//
-	///TODO: the clocks cache should be reset after losing focus (so free all images and set all pointers to NULL)
-	if (Clocks[imgnum] == NULL){
+	///@todo: the clocks cache should be reset after losing focus (so free all images and set all pointers to NULL)
+	if (Clocks[imgnum] == 0)
+	{
 		try {
-			// @TODO Move this check to config object
-			if (pc::Config.gamenum == GAME_RA || isoriginaltype) {
+			// @todo Move this check to config object
+			//if (pc::Config.gamenum == GAME_RA || isoriginaltype) {
 				num = pc::imgcache->loadImage("clock.shp");
-			} else {
-				num = pc::imgcache->loadImage("hclock.shp");
-			}
+			//} else {
+			//	num = pc::imgcache->loadImage("hclock.shp");
+			//}
 		} catch (ImageNotFound& e) {
 			logger->error("Unable to load clock image!\n");
 			return;
@@ -1453,6 +1514,68 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
 	dest = buttons[index]->getRect();
 	SDL_BlitSurface(Clocks[imgnum], 0, sbar, &dest);
 #endif
+	
+	SHPImage* clockImages = 0;
+
+	//
+	// This had to be done differently because of the use of glSDL
+	//
+	///@todo: the clocks cache should be reset after losing focus (so free all images and set all pointers to NULL)
+	if (Clocks[imgnum] == 0)
+	{
+		try {
+			clockImages = new SHPImage("clock.shp", -1);			
+		} catch (ImageNotFound& e) {
+			logger->error("Unable to load clock image!\n");
+			return;
+		}
+		//num += imgnum;
+		//num |= spalnum<<11;
+
+		//ImageCacheEntry& ice = pc::imgcache->getImage(num);
+		SDL_Surface* gr = 0;
+		//gr = ice.image;
+		SDL_Surface* shadow;
+		clockImages->getImage(imgnum, &gr, &shadow, 0);
+		SDL_FreeSurface(shadow);
+		
+		Clocks[imgnum] = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, gr->w, gr->h, 32, 0, 0, 0, 0);
+		Uint32 ColorKey = SDL_MapRGB(Clocks[imgnum]->format, 12, 255, 12 );
+		SDL_Rect dest;
+		dest.x = 0;
+		dest.y = 0;
+		dest.w = Clocks[imgnum]->w;
+		dest.h = Clocks[imgnum]->h;
+
+		Uint32 color;
+
+		for (int x =0; x < gr->w; x++){
+			for (int y = 0; y < gr->h; y++){
+				SDLLayer::get_pixel(gr, color, x, y);
+				if (color != 1344){
+					SDLLayer::set_pixel(Clocks[imgnum], ColorKey, x, y);
+				}else{
+					SDLLayer::set_pixel(Clocks[imgnum], 0x101010U, x, y);
+				}
+			}
+		}
+
+		SDL_SetColorKey(Clocks[imgnum],SDL_SRCCOLORKEY|SDL_RLEACCEL, ColorKey);
+		SDL_SetAlpha(Clocks[imgnum], SDL_SRCALPHA|SDL_RLEACCEL, 128);
+
+		SDL_Surface * tmp;
+		tmp = SDL_DisplayFormatAlpha(Clocks[imgnum]);
+		SDL_FreeSurface(Clocks[imgnum]);
+		Clocks[imgnum] = tmp;
+
+
+	}
+	
+	// Get the destination rectangle from button
+	SDL_Rect dest = buttons[index]->getRect();
+	// Draw the clock
+	SDL_BlitSurface(Clocks[imgnum], 0, sbar, &dest);
+
 }
 
 SDL_Rect* Sidebar::getTabLocation()
@@ -1518,3 +1641,12 @@ SDL_Surface* Sidebar::FixGrey(SDL_Surface* gr, Uint8 imgnum)
 }
 #endif
 
+/**
+ * Return the player that sidebar control
+ * 
+ * @return Player that sidebar control
+ */
+Player* Sidebar::getPlayer()
+{
+	return this->player;
+}

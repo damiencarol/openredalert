@@ -36,6 +36,7 @@ class SidebarButton;
 class Font;
 class Player;
 class StringTableFile;
+class SHPImage;
 
 using std::vector;
 
@@ -48,6 +49,7 @@ public:
     ~Sidebar();
 
     bool getVisChanged();
+    /** Return visibility of the sidebar */
     bool getVisible() ;
     void ToggleVisible();
 
@@ -61,7 +63,6 @@ public:
     SDL_Surface* getSidebarImage(SDL_Rect location);
     bool isOriginalType();
 
-	void GetButtonName(Uint8 index, char *Name);
 	void DrawButtonTooltip (Uint8 index);
     Uint8 getButton(Uint16 x, Uint16 y);
     void ClickButton(Uint8 index, char* unitname, createmode_t* createmode);
@@ -72,18 +73,19 @@ public:
     void DrawPowerbar();
     void UpdatePowerbar();
     Uint8 getSpecialButton(Uint16 x,Uint16 y);
-    void setSpecialButtonState(Uint8 Button, Uint8 State);
-    Uint8 getSpecialButtonState(Uint8 Button);
+    void setSpecialButtonState(Uint8 button, Uint8 State);
+    Uint8 getSpecialButtonState(Uint8 button);
     void DrawSpecialIcons();
 
-    void StartRadarAnim(Uint8 mode, bool* minienable);
+    void StartRadarAnim(Uint8 mode);
 
-    /// @TODO Continue almighty jihad against naked pointers
-//    Font* getFont() {return gamefnt;}
 
     Uint8 getSteps() const;
 
     const SidebarGeometry& getGeom();
+    
+    Player* getPlayer();
+    
 private:
     Sidebar();
     Sidebar(const Sidebar&);
@@ -110,8 +112,9 @@ private:
     void AddButton(Uint16 x, Uint16 y, const char* fname, Uint8 f, Uint8 pal);
     void DrawButton(Uint8 index);
     void DrawClock(Uint8 index, Uint8 imgnum);
-
-    Uint32 radarlogo; Uint32 radaranimnumb;
+    char* getButtonName(Uint8 index);
+	
+    Uint32 radarlogo;
     SDL_Rect radarlocation;
 
     Uint32	tab;
@@ -120,9 +123,13 @@ private:
     Uint32 powerbar;
     Uint32 power_indicator;
 
-    Uint32 repair_icon; Uint32 sell_icon; Uint32 map_icon;
-    Uint8 repair_but_state; Uint8 sell_but_state; Uint8 map_but_state;
-    SDL_Rect RepairLoc; SDL_Rect SellLoc; SDL_Rect MapLoc;
+    Uint32 map_icon;
+    Uint8 repair_but_state;
+    Uint8 sell_but_state;
+    Uint8 map_but_state;
+    SDL_Rect RepairLoc;
+    SDL_Rect SellLoc;
+    SDL_Rect MapLoc;
 
     SDL_Surface* sbar;
     SDL_Rect sbarlocation;
@@ -172,6 +179,14 @@ private:
 #endif
 	/** Images of the clock animation */
     SDL_Surface* Clocks[256];
+    
+    /** USSR logo image (below radar) */
+    SHPImage* ussrAnimRadarImage;
+    
+    /** Repair Images of the sidebar (3 images for the three steps of the button) */
+    SHPImage* repairImages;
+    /** Sell Images of the sidebar (3 images for the three steps of the button) */
+    SHPImage* sellImages;
 };
 
 #endif //SIDEBAR_H
