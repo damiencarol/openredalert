@@ -1,3 +1,21 @@
+// VQAMovie.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef VQAMOVIE_H
 #define VQAMOVIE_H
 
@@ -12,12 +30,19 @@ class VQAHeader;
 
 namespace VQA {
 
+/**
+ * Movie in VQA format
+ */
 class VQAMovie
 {
 public:
+	/** Build a movie */
     VQAMovie(const char* filename);
     ~VQAMovie();
+    
+    /** Play the movie */
     void play();
+    
 private:
     VQAMovie();
 
@@ -34,9 +59,11 @@ private:
 
     static void AudioHook(void* userdata, Uint8* stream, int len);
 
-    // General VQA File Related variables
+    /** File in mix archives */
     VFile* vqafile;
+    /** Header of the movide */
     VQAHeader header;
+    
     // VQA Video Related Variables
     Uint32 CBPOffset;
     Uint16 CBPChunks;
@@ -50,7 +77,8 @@ private:
     Sint32 sndindex;
     Sint32 sndsample;
 
-    int scaleVideo; int videoScaleQuality;
+    int scaleVideo; 
+    int videoScaleQuality;
 
     // Buffer to hold ~15 audio frames
     Uint8* sndbuf; // The whole buffer
@@ -71,4 +99,4 @@ private:
 
 }
 
-#endif
+#endif //VQAMOVIE_H
