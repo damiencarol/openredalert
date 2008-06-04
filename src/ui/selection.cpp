@@ -23,17 +23,19 @@
 #include <functional>
 #include <map>
 
-#include "game/Player.h"
-#include "include/dispatcher.h"
 #include "include/Logger.h"
-#include "include/PlayerPool.h"
-
-#include "include/weaponspool.h"
+#include "game/Dispatcher.h"
+#include "game/Player.h"
+#include "game/PlayerPool.h"
+#include "game/weaponspool.h"
 #include "game/UnitOrStructure.h"
 #include "game/Structure.h"
-
 #include "game/Unit.h"
 
+namespace p {
+	extern Dispatcher* dispatcher;
+	extern PlayerPool* ppool;
+}
 extern Logger * logger;
 
 using std::map; 
@@ -45,11 +47,11 @@ using std::unary_function;
 using std::find_if;
 using std::find;
 
-/** @TODO Some stuff still uses the "for (i = begin; i != end; ++i)" pattern.
- * @TODO Some of the functions in the namespace can be replaced by further STL
+/** @todo Some stuff still uses the "for (i = begin; i != end; ++i)" pattern.
+ * @todo Some of the functions in the namespace can be replaced by further STL
  * magic.
- * @TODO Rename function names.
- * @TODO (Later) Rewrite Selection to be as close to the STL Container concept as useful
+ * @todo Rename function names.
+ * @todo (Later) Rewrite Selection to be as close to the STL Container concept as useful
  */
 
 namespace {
@@ -94,7 +96,7 @@ template<>
 struct doattack<Structure> : unary_function<Structure*, void> {
     doattack(UnitOrStructure* target, bool target_is_unit) : target(target), target_is_unit(target_is_unit) {}
     void operator()(Structure* st) {
-        /// @TODO: when power checking is done, check if structure selected
+        /// @todo: when power checking is done, check if structure selected
         /// can work given the player's power levels
         if (st->canAttack() && (!target->getType()->isWall() || st->getType()->getWeapon(true)->getWall())) {
             p::dispatcher->structureAttack(st, target, target_is_unit);
