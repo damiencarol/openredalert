@@ -56,6 +56,8 @@ namespace pc
 	extern ConfigType Config;
 	extern vector<SHPImage *> *imagepool;
 	extern GraphicsEngine * gfxeng;
+	/** SoundEngine of the game */
+	extern SoundEngine* sfxeng;
 }
 
 using VQA::VQAMovie;
