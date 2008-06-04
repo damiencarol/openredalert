@@ -32,6 +32,7 @@ using std::map;
 using std::vector;
 
 /**
+ * Object that manage talkback 
  */
 class Talkback
 {

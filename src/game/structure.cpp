@@ -62,6 +62,7 @@ namespace p {
 namespace pc {
     extern ConfigType Config;
     extern Ai * ai;
+    extern SoundEngine* sfxeng;
 }
 extern Logger * logger;
 
@@ -359,10 +360,11 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 
 
 	odam = damaged;
-
-	if (weap != NULL)
-		amount = (Sint16)((double)amount * weap->getVersus(type->getArmour()));
-
+	// If the Weapon exist
+	if (weap != 0){
+		amount = (Sint16)((double)amount * weap->getVersus(type->getArmor()));
+	}
+	
 	if ((health-amount) <= 0) {
 
 		exploding = true;

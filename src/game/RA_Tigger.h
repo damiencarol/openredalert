@@ -21,14 +21,19 @@
 
 #include "SDL/SDL_types.h"
 
+/**
+ * Event data for trigger
+ * 
+ * @see triggers.h for list of TRIGGER_EVENT_TYPE
+ */
 class RA_Tigger
 {
 public:	
-    /** Trigger event */
+    /** Trigger event type */
     int event;
     /** first parameter, -1 == off */
     int param1;
-    /** second parameter, -1 == offns, this is set to 0 when not used. */
+    /** second parameter, 0 == off */
     int param2;
 };
 

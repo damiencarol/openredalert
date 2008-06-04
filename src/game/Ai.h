@@ -43,7 +43,7 @@ class Structure;
 class AiRules;
 
 /**
- * 
+ * Artificial Intelligence that manage Units of a Player during game
  */
 class Ai 
 {

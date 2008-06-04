@@ -35,7 +35,6 @@ class TextTriggerAction : public TriggerAction
 public:    
 	/** Build a TextTriggerAction with a specified message and a messagepool */
     TextTriggerAction(string message, MessagePool* pool);
-    ~TextTriggerAction();
     
     /** Execute this Action */
     void execute();

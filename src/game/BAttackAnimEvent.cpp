@@ -1,3 +1,20 @@
+// BAttackAnimEvent.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "BAttackAnimEvent.h"
 
@@ -18,11 +35,14 @@
 #include "Structure.h"
 #include "include/Logger.h"
 
-extern Logger * logger;
-namespace p
-{
-extern ActionEventQueue * aequeue;
+namespace p {
+	extern ActionEventQueue * aequeue;
 }
+namespace pc {
+	extern SoundEngine* sfxeng;
+}
+extern Logger * logger;
+
 
 BAttackAnimEvent::BAttackAnimEvent(Uint32 p, Structure *str) :
 	BuildingAnimEvent(p, str, 8)
@@ -155,9 +175,13 @@ void BAttackAnimEvent::run()
 			if (NeedToCharge)
 			{
 				frame = StartFrame;
-				char *Snd = strct->getType()->getWeapon()->getChargingSound();
-				if (Snd != NULL)
-				pc::sfxeng->PlaySound(Snd);
+				char* Snd = 0;
+				Snd = strct->getType()->getWeapon()->getChargingSound();
+				if (Snd != 0){
+					pc::sfxeng->PlaySound(Snd);
+					delete Snd;
+				}
+				Snd = 0;
 				NeedToCharge = false;
 			}
 			if (strct->getNumbImages (0)> frame)

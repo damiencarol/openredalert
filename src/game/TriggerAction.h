@@ -1,3 +1,21 @@
+// TriggerAction.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef TRIGGERACTION_H
 #define TRIGGERACTION_H
 
@@ -5,7 +23,9 @@
 
 #include "SDL/SDL_types.h"
 
-/*
+/**
+ * Action that execute triggers
+ * 
  * TRIGGER_ACTION_NO_ACTION                0
  * TRIGGER_ACTION_WINNER_IS                1
  * TRIGGER_ACTION_LOSER_IS                 2
@@ -52,12 +72,14 @@ public:
 	/** Execute the action */
 	virtual void execute() =0;
 
+	/** Return the number of the type of the action */
 	int getAction();
 
 protected:
-	TriggerAction(int Action);
+	/** Create a TriggerAction with a specified type */
+	TriggerAction(int action);
 
-	enum
+	enum TRIGGER_TYPE
 	{
 		NO_ACTION				= 0,
 		WINNER_IS  				= 1,
@@ -75,7 +97,8 @@ protected:
 		TEXT 					= 11,
 		DESTROY_TRIGGER 		= 12,
 		AUTOCREATE_BEGINS 		= 13,
-		// There is no trigger action number 14,.
+		/** There is no trigger action number 14,. */
+		XXXX					= 14,
 		ALLOW_WIN 				= 15,
 		REVEAL_MAP 				= 16,
 		REVEAL_AROUND_WAYPOINT 	= 17,
@@ -102,7 +125,7 @@ protected:
 	
 private:
 	/** number(=type) of the action */
-	int Action;
+	int action;
 };
 
 #endif //TRIGGERACTION_H

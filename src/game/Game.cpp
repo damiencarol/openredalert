@@ -24,10 +24,10 @@
 
 #include "ActionEventQueue.h"
 #include "include/Logger.h"
-#include "include/ccmap.h"
-#include "include/dispatcher.h"
+#include "CnCMap.h"
+#include "Dispatcher.h"
 #include "video/GraphicsEngine.h"
-#include "include/PlayerPool.h"
+#include "PlayerPool.h"
 #include "include/config.h"
 #include "audio/SoundEngine.h"
 #include "audio/SoundError.h"
@@ -51,6 +51,7 @@
 #include "GameError.h"
 #include "LoadMapError.h"
 #include "video/VideoError.h"
+#include "game/UnitAndStructurePool.h"
 
 using std::string;
 using std::runtime_error;
@@ -60,6 +61,7 @@ extern Logger * logger;
 
 namespace p
 {
+	extern Dispatcher* dispatcher;
 	extern PlayerPool * ppool;
 	extern ActionEventQueue* aequeue;
 	extern RedAlertDataLoader * raLoader;
@@ -69,7 +71,13 @@ namespace pc
 	extern GraphicsEngine* gfxeng;
 	extern Ai* ai;
 	extern ConfigType Config;
-	extern vector<SHPImage *> *imagepool;	
+	extern vector<SHPImage *> *imagepool;
+	extern bool quit;	
+	extern Cursor* cursor;
+	extern ImageCache* imgcache;
+	extern Input* input;
+	extern Sidebar* sidebar;
+	extern SoundEngine* sfxeng;
 }
 extern MIXFiles * mixfiles;
 
@@ -105,33 +113,19 @@ Game::~Game()
 }
 
 /** 
- * Game menu (early game start)
- */
-void Game::HandleGameMenu()
-{
-	Menu lMenu;
-
-	// Start with a clean image cache
-	pc::imgcache->Cleanup();
-
-	// Draw the menu and handle menu input
-	lMenu.HandleMenu();
-
-	// Cleanup the image cache again
-	pc::imgcache->Cleanup();
-}
-
-/** 
  * Initialize game (after the menu)
+ * 
+ * @note in this methode we catch error during playing of movies to avoid arror when mix files is CD1 (allies) and their are not ALL soviets movies
  */
 void Game::InitializeMap(string MapName)
 {
-	// Copy the game mode
+	/// Copy the game mode
 	this->gamemode = pc::Config.gamemode;
 
+	/// Create a new action event queue
 	p::aequeue = new ActionEventQueue();
 
-	// Initialize the map
+	/// Create and initialize the map
 	try
 	{
 		p::ccmap = new CnCMap();
@@ -140,12 +134,13 @@ void Game::InitializeMap(string MapName)
 	}
 	catch (LoadMapError& ex)
 	{
-		logger->error("LoadMapError:%s\n", ex.what());
+		logger->error("Game::InitializeMap:%s\n", ex.what());
 		// loadmap will have printed the error
 		throw GameError("Error during load of the Map in Game::InitializeMap\n");
 	}
 	
-	p::dispatcher = new Dispatcher::Dispatcher();
+	/// Create a new dispatcher
+	p::dispatcher = new Dispatcher();
 	switch (pc::Config.dispatch_mode)
 	{
 	case 0:
@@ -173,19 +168,26 @@ void Game::InitializeMap(string MapName)
 			// Check that "Brief" movie is different of "<none>"
 			if (briefMovieName != "<none>")
 			{
-				VQAMovie* movBrief = new VQAMovie(briefMovieName.c_str());
-				movBrief->play();
+				// Try to play the movie
+				try {
+					VQAMovie* movBrief = new VQAMovie(briefMovieName.c_str());
+					movBrief->play();
+				} catch(runtime_error& er)
+				{}
 			}
 
 			// Try to Play the "Action" Movie
 			string actionMovieName;
 			actionMovieName = p::ccmap->getMissionData()->action;
-			//logger->note("%s line %i: Action = %s\n", __FILE__, __LINE__, actionMovieName.c_str());
 			// Check that "Action" movie is different of "<none>
 			if (actionMovieName != "<none>")
 			{
-				VQAMovie* actionMovie = new VQAMovie(actionMovieName.c_str());
-				actionMovie->play();
+				// Try to play the movie
+				try {
+					VQAMovie* actionMovie = new VQAMovie(actionMovieName.c_str());
+					actionMovie->play();
+				} catch(runtime_error& er)
+				{}
 			}
 		}
 		catch (std::runtime_error&)
@@ -197,32 +199,36 @@ void Game::InitializeMap(string MapName)
 		break;
 	}
 
-	// init sidebar
+	/// init the sidebar
 	try
 	{
 		pc::sidebar = new Sidebar(p::ppool->getLPlayer(), 
 				pc::gfxeng->getHeight(), 
 				p::ccmap->getMissionData()->theater);
 	}
-	catch (SidebarError)
+	catch (SidebarError& error)
 	{
 		// Log it
-		logger->error("Can't construct the Sidebar");
+		logger->error("%s\n", error.what());
 		// Throw game error
-		throw GameError("Can't construct the Sidebar");
+		throw GameError("Can't construct the Sidebar\n");
 	}
 
-	// init cursor
+	/// init the cursor
 	pc::cursor = new Cursor();
 
-	// init the input functions
-	pc::input = new Input(pc::gfxeng->getWidth(), pc::gfxeng->getHeight(), pc::gfxeng->getMapArea());
-
+	/// init the input functions
+	pc::input = new Input(pc::gfxeng->getWidth(), 
+						  pc::gfxeng->getHeight(), 
+						  pc::gfxeng->getMapArea());
 }
 
+/**
+ * GraphicsEngine, SoundEngine, VFSUtils file system, ImageCache and imagepool, RADataLoader and ConfigType object from ini file (externals)
+ */
 void Game::InitializeGameClasses()
 {
-	// Initialise Video
+	/// Initialise the Graphics Engine
 	try
 	{
 		logger->note("Initialising the graphics engine...");
@@ -242,8 +248,9 @@ void Game::InitializeGameClasses()
 		pc::sfxeng = new SoundEngine(pc::Config.nosound);
 		logger->note("done\n");
 	}
-	catch (SoundError&)
+	catch (SoundError& error)
 	{
+		logger->error("%s\n", error.what());
 		logger->note("failed.  exiting\n");
 		throw runtime_error("Unable to initialise the sound engine");
 	}
@@ -258,8 +265,10 @@ void Game::InitializeGameClasses()
 	// Init the image cache
 	pc::imagepool = new std::vector<SHPImage*>();
 	pc::imgcache->setImagePool(pc::imagepool);
-
-	// Init the Data Loader
+	//pc::imgcache->setImagePool(new std::vector<SHPImage*>());		
+	
+	
+	/// Init the Data Loader
 	try
 	{
 		logger->note("Initialising the RA Data loader...");
@@ -445,35 +454,80 @@ void Game::play()
 		// Create the new game classes
 		InitializeGameClasses();
 
-		
-		// TODO debug datum loader
+		//****************************
+		// @todo DEBUG
+		//****************************
 /*
-		//INIFile* rules = new INIFile("rules.ini");
-		//RedAlertDataLoader loader;
-		//loader.load();
-		CnCMap* map = new CnCMap();
-		logger->debug("0\n");
-		map->InitCnCMap();
-		logger->debug("1\n");
-		map->loadMap("scg01ea", NULL);
-		logger->debug("2\n");
+		pc::Config.UseFogOfWar	= true;
+		string SelectedMap = missions->getGdiMissionMap(0);
+		pc::Config.mapname	= SelectedMap;	//"SCU01EA";	
+		pc::Config.gamemode	= GAME_MODE_SINGLE_PLAYER;		// single player (missions)
+		pc::Config.mside	= "gdi"; //"goodguy";
+		pc::Config.cside	= "multi";
+		pc::Config.side_colour = "yellow";
+		pc::Config.pause = false;
+		pc::Config.quit_mission = false;
+		
+		InitializeMap(pc::Config.mapname);
+		pc::gfxeng->setupCurrentGame();
+
+		p::ccmap->restoreLocation(0);
+		//
+		// main gameloop
+		//
+		pc::ai = new Ai;
+		int k=0;
+		PauseMenu* lPauseMenu1 = new PauseMenu();
+		while (!pc::input->shouldQuit() && !pc::quit && k <1000*1000*10)
+		{
+			// first thing we want to do is scroll the map
+			if (p::ccmap->toScroll()){
+				p::ccmap->doscroll();
+			}
+			
+			// Draw the pause menu (when needed)
+			while (pc::Config.pause)
+			{
+				lPauseMenu1->HandleMenu();
+			}
+
+			// Draw the scene
+			pc::gfxeng->renderScene();
+
+			// Run scheduled events
+			p::aequeue->runEvents();
+
+			// Handle the input
+			pc::input->handle();
+			// Handle the ai
+			pc::ai->handle();
+			// Handle timing triggers
+			HandleTiming();
+			
+			// Handle mission actions
+			handleAiCommands();
+			
+			if (gamemode == 2)
+			{
+				// Synchronise events with server
+			}
+			//if (k==1) 
+			//	SDL_SaveBMP(pc::gfxeng->get_SDL_ScreenSurface(), "out.bmp");
+			k++;
+			//fflush(stdout);
+			//logger->debug("k\n");
+		}
+		logger->debug("end of DEBUG\n");
 		exit(0);
 */
-		// TODO DEBUG
-	/*	CnCMap* themap;
-		themap = new CnCMap();
-		logger->debug("$create ok\n");
-		themap->Init(GAME_RA, GAME_MODE_SINGLE_PLAYER);
-		logger->debug("$init ok\n");
-		themap->loadMap("scg01ea", 0);
-		logger->debug("$load ok\n");
-		exit(0);
-	*/				
+		
 		// Load the Menu sound "intro.aud"
 		pc::sfxeng->LoadSound("intro.aud");
 		// Play this sound
 		pc::sfxeng->PlayLoopedSound("intro.aud", 0);
-		
+		// Menu to use
+		Menu* lMenu = new Menu(); 
+			
 		// Draw the starting menu
 		if (!missionWon)
 		{
@@ -482,7 +536,14 @@ void Game::play()
 			{
 				pc::sfxeng->PlaySound(pc::Config.BattleControlTerm);
 			}
-			HandleGameMenu();
+			// Start with a clean image cache
+			//pc::imgcache->Cleanup();
+
+			// Draw the menu and handle menu input
+			lMenu->HandleMenu();
+
+			// Cleanup the image cache again
+			pc::imgcache->Cleanup();
 		}
 
 		BattleControlTerminated = false;
@@ -492,9 +553,9 @@ void Game::play()
 		pc::sfxeng->StopLoopedSound(-1);
 
 		// Exit the game (if the user wants to)
-		if (pc::quit)
+		if (lMenu->isQuit() == true)
 		{
-			logger->note("Exit by user\n");
+			logger->note("Exit by user (game menu)\n");
 			FreeMemory();
 			return;
 		}
@@ -534,7 +595,7 @@ void Game::play()
 		if (p::ccmap->getGameMode() == GAME_MODE_SINGLE_PLAYER)
 		{
 			/// Jump to start location
-			/// @TODO: Jump to correct start location in multiplayer games.
+			/// @todo: Jump to correct start location in multiplayer games.
 			p::ccmap->restoreLocation(0);
 		}
 		else
@@ -587,9 +648,10 @@ void Game::play()
 		// main gameloop
 		//
 		pc::ai = new Ai;
-		//pc::PauseMenu = new PauseMenu();
-		PauseMenu * lPauseMenu = new PauseMenu();
-
+		PauseMenu* lPauseMenu = new PauseMenu();
+		// Create the trigger manager
+		//TriggerManager* lTriggerManager = new TriggerManager();
+		
 		while (!pc::input->shouldQuit() && !pc::quit)
 		{
 			// first thing we want to do is scroll the map
@@ -616,6 +678,11 @@ void Game::play()
 			// Handle the ai
 			pc::ai->handle();
 
+			// Handle triggers
+			//lTriggerManager->h
+			// Handle AiCommand for mission
+			handleAiCommands();	
+			
 			// Handle timing triggers
 			HandleTiming();
 
@@ -728,4 +795,35 @@ void Game::dumpstats()
 				pl->getUnitKills(), pl->getUnitLosses(),
 				pl->getStructureKills(), pl->getStructureLosses());
 	}
+}
+
+/**
+ * 
+ */
+void Game::handleAiCommands()
+{
+	for (unsigned int n = 0; n<p::uspool->getNumbUnits(); n++)
+	{
+		Unit* unit = p::uspool->getUnit(n);
+		if (unit!=0){
+		if (!unit->IsMoving() && !unit->IsAttacking() && !unit->IsHarvesting())
+		{
+			if (unit->aiCommandList.size()>0)
+			{
+				AiCommand* com = unit->aiCommandList[0];
+				//if (com->getId() == 3 || com->getId() == 8)
+				{
+					logger->debug("AICOMMAND MOVE UNIT = %s \n", unit->getType()->getTName());
+					Uint32 pos = p::ccmap->getWaypoint(com->getWaypoint());
+					logger->debug("here$-1%d\n", pos);
+					unit->move(pos, true);
+					vector<AiCommand*>::iterator i = unit->aiCommandList.begin();
+					unit->aiCommandList.erase(i);
+				}
+			}
+		}
+	}
+	}
+		
+		
 }

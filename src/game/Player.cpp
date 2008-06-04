@@ -934,32 +934,12 @@ void Player::setPrimary(Structure* str)
  */
 void Player::revealAroundWaypoint(Uint32 waypointNumber)
 {
-	Uint16 xpos;
-	Uint16 ypos;
-	Uint32 wp_cellpos;
+	Uint32 wp_cellpos; // Position of the waypoint
 	
-	logger->debug("REVEAL AREA WAYPOINT !\n");
-
+	// Get the position of the waypoint
 	wp_cellpos = p::ccmap->getWaypoint(waypointNumber);
-	//	printf ("Waypoint = %u\n", wp_cellpos);
-
-	//p::ccmap->translateFromPos(wp_cellpos, &xpos, &ypos);
-
-//	printf ("xpos = %u, ypos = %u\n", xpos, ypos);
-
-	/*for (int x = xpos - 2; x < xpos + 2; x++){
-		for (int y = ypos -2; y < ypos +2; y++){
-			if (x > 0 && y > 0){
-				Uint32 cellpos = p::ccmap->translateToPos(x, y);
-//				printf ("reveal cellpos = %u\n", cellpos);
-				if (cellpos < mapVisible.size()){
-					mapVisible[cellpos] = true;
-					logger->debug("REVEAL AREA %d %d !\n", x, y);
-				}
-			}
-		}
-	}*/
 	
+	// Add the visibility for the player (1x1 with diameter/2 of 4)
 	addSoB(wp_cellpos, 1, 1, 4, SOB_SIGHT);
 }
 

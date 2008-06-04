@@ -28,26 +28,29 @@
 using std::string;
 
 /**
- * 
+ * This object represent a game session
  */
 class Game
 {
 public:
-    Game();
-    ~Game();
-	void HandleGameMenu();
+	Game();
+	~Game();
+
 	void InitializeMap(string MapName);
-	void InitializeGameClasses (void);
+	/** Initialise some object of the game */
+	void InitializeGameClasses();
 	void FreeMemory();
-    void play();
-    void HandleTiming (void);
-    void dumpstats();
+	void play();
+	void HandleTiming();
+	void dumpstats();
 
 private:
+	void handleAiCommands();
+
 	Uint8 MissionNr;
 	Uint32 OldUptime;
-    ConfigType config;
-    Uint8 gamemode;
+	ConfigType config;
+	Uint8 gamemode;
 	bool BattleControlTerminated;
 };
 
