@@ -30,14 +30,23 @@ namespace {
 	string binloc;
 }
 
+/** In game objects */
 namespace p {
+	/** Action event queue in game */
 	ActionEventQueue	*aequeue = 0;
+	/** Current map in game */
 	CnCMap			*ccmap = 0;
+	/** Unit and structure pool in gmae */
 	UnitAndStructurePool	*uspool = 0;
+	/** Pool of players */
 	PlayerPool*		ppool = 0;
+	/** Pool of weapon data */
 	WeaponsPool*	weappool = 0;
+	/** Dispatcher of the game */
 	Dispatcher* 	dispatcher = 0;
+	/** */
 	vector<TiniFile>	Setting;
+	/** Custom loader for loading weapons data in originals archives files */
 	RedAlertDataLoader * raLoader;
 }
 
@@ -83,6 +92,7 @@ void CleanConfig()
  */
 namespace pc {
 	Renderer		*renderer;
+	/** SoundEngine of the game */
 	SoundEngine		*sfxeng = 0;
 	GraphicsEngine	*gfxeng = 0;
 	MessagePool		*msg = 0;
