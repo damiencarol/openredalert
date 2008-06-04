@@ -13,13 +13,15 @@
 #include "video/GraphicsEngine.h"
 #include "game/RedAlertDataLoader.h"
 #include "include/Logger.h"
+#include "game/Dispatcher.h"
 
 using std::cout; 
 using std::map; 
 using std::string;
 
-typedef struct TiniFile{
-	std::string filename;
+typedef struct TiniFile
+{
+	string filename;
 	INIFile *inifile;
 } TiniFile;
 
@@ -32,10 +34,10 @@ namespace p {
 	ActionEventQueue	*aequeue = 0;
 	CnCMap			*ccmap = 0;
 	UnitAndStructurePool	*uspool = 0;
-	PlayerPool		*ppool = 0;
-	WeaponsPool		*weappool = 0;
-	Dispatcher::Dispatcher	*dispatcher = 0;
-	std::vector<TiniFile>	Setting;
+	PlayerPool*		ppool = 0;
+	WeaponsPool*	weappool = 0;
+	Dispatcher* 	dispatcher = 0;
+	vector<TiniFile>	Setting;
 	RedAlertDataLoader * raLoader;
 }
 
@@ -153,7 +155,7 @@ char normalise_delim(char c) {
 }
 
 /**
- * @TODO Something's not right, but this works better.
+ * @todo Something's not right, but this works better.
  */
 const string& determineBinaryLocation(const string& launchcmd) {
     string path(launchcmd);
