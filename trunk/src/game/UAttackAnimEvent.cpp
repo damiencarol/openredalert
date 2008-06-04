@@ -173,7 +173,7 @@ void UAttackAnimEvent::run()
     xtiles = un->getPos() % p::ccmap->getWidth() - atkpos % p::ccmap->getWidth();
     ytiles = un->getPos() / p::ccmap->getWidth() - atkpos / p::ccmap->getWidth();
     
-    // TODO modify calculs
+    // @todo modify calculs
     //distance = abs()>abs(ytiles)?abs(xtiles):abs(ytiles);
     distance = sqrt(xtiles*xtiles + ytiles*ytiles);
     
