@@ -19,7 +19,7 @@
 #ifndef SOUNDENGINE_H
 #define SOUNDENGINE_H
 
-#include <map>
+#include <vector>
 #include <string>
 
 #ifdef RA_SOUND_ENGINE
@@ -31,37 +31,43 @@
 
 class SoundBuffer;
 
-using std::map;
+using std::vector;
 using std::string;
 
-
+/**
+ * Manager of all sounds in OpenRedAlert
+ * 
+ * This object provide function to load/start/stop all music/sounds in the game
+ */
 class SoundEngine
 {
 public:
     SoundEngine(bool disableSound = false);
     ~SoundEngine();
 
-    void LoadSound(const std::string& sound);
+    void LoadSound(const string& sound);
 
-    // Game sounds
-    void SetSoundVolume(unsigned int volume);
-    void PlaySound(const std::string& sound);
-    int  PlayLoopedSound(const std::string& sound, unsigned int loops);
+    /** Set the volume in the range of 0-128 of all sounds */
+    void SetSoundVolume(int volume);
+    void PlaySound(const string& sound);
+    int  PlayLoopedSound(const string& sound, unsigned int loops);
     void StopLoopedSound(int id);
     void PauseLoopedSound(int id);
     void ResumeLoopedSound(int id);
 
-    // Music
-    void SetMusicVolume(unsigned int volume);
+    /** Set the volume in the range of 0-128 of all musics */
+    void SetMusicVolume(int volume);
     /** Create the playlist with RA musics */
     bool CreatePlaylist();
     void PlayMusic(); // Starts|Resumes playing
     void PauseMusic();
     void StopMusic();
-
-    void PlayTrack(const std::string& sound); // Plays a specific track
-    void NextTrack(); // Selects the next track in the playlist
-    void PrevTrack(); // Selects the previous track in the playlist
+    /** Plays a specific track */
+    void PlayTrack(const string& sound);
+    /** Selects the next track in the playlist */
+    void NextTrack();
+    /** Selects the previous track in the playlist */
+    void PrevTrack();
 
     static void MusicHook(void* userdata, Uint8* stream, int len);
 
@@ -72,9 +78,9 @@ public:
     bool NoSound() const;
 
 private:
-    typedef std::vector<std::string> Playlist;
+    typedef vector<string> Playlist;
 
-    SoundBuffer* LoadSoundImpl(const std::string& sound);
+    SoundBuffer* LoadSoundImpl(const string& sound);
 
     bool nosound;
     bool mutesound;
