@@ -1,4 +1,4 @@
-#include "include/weaponspool.h"
+#include "WeaponsPool.h"
 
 #include <map>
 #include <string>
@@ -6,7 +6,7 @@
 
 #include "misc/INIFile.h"
 #include "include/Logger.h"
-#include "include/ProjectileAnim.h"
+#include "ProjectileAnim.h"
 #include "audio/SoundEngine.h"
 #include "include/config.h"
 #include "Projectile.h"
@@ -25,7 +25,7 @@ WeaponsPool::WeaponsPool()
 {
 	// Load weapons file 
 	weapini = GetConfig("./ra/weapons.ini");
-	// TODO weapini = VFSUtils::VFS_Open("rules.ini");
+	// @todo weapini = VFSUtils::VFS_Open("rules.ini");
 }
 
 WeaponsPool::~WeaponsPool()
@@ -62,7 +62,7 @@ Weapon *WeaponsPool::getWeapon(const char *wname)
 	string weapname;
 	
 	weapname = (string)wname;
-	// TODO DEBUG
+	// @todo DEBUG
 	//transform(weapname.begin(), weapname.end(), weapname.begin(), toupper);
 	weapentry = weaponspool.find(weapname);
 
