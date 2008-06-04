@@ -1,4 +1,22 @@
-#include "include/PlayerPool.h"
+// PlayerPool.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
+#include "PlayerPool.h"
 
 #include <vector>
 
@@ -79,7 +97,7 @@ const int PlayerPool::MultiColourStringToNumb(const char* colour)
 		{
 			return 8;
 	} else {
-		// Error TODO -> do something better than this :)
+		// Error @todo -> do something better than this :)
 		return 1;
 	}
 }
@@ -274,7 +292,7 @@ void PlayerPool::playerUndefeated(Player* pl)
 	{
 		lost = false;
 	}
-	if (gamemode == 0)
+	if (gamemode == 0)//GAME_MODE_SINGLE_PLAYER)
 	{
 		if (!lost)
 		{
@@ -379,29 +397,64 @@ Uint8 PlayerPool::statRadar()
 	
 	// Get the localPlayer
 	localPlayer = getLPlayer();
-	if (localPlayer == 0) // check
-		return 0;
 
 	// Check if power is Ok
 	powerOk = (localPlayer->getPower()>localPlayer->getPowerUsed());
 
-	// If no change
-	if (old_numRadarLocalPlayer == localPlayer->getNumberRadars() &&
-		old_powerOk == powerOk) 
+	// by default
+	res = 0;
+	
+	// If same number of radars
+	if (old_numRadarLocalPlayer == localPlayer->getNumberRadars()) 
 	{
-		res = 0;
-	}
-	else if (localPlayer->getNumberRadars()>0)
-	{
-		if (powerOk == true)
+		// if old their was radars
+		if (old_numRadarLocalPlayer >0) 
 		{
-			res = 1;
+			if (powerOk == false && old_powerOk == true)
+			{
+				res = 3;
+			} else if (powerOk == true && old_powerOk == false)
+			{
+				res = 1;
+			}
 		}
-		else
-			res = 3;
 	}
 	else
-		res = 2;
+	// If more radar
+	if (localPlayer->getNumberRadars() > old_numRadarLocalPlayer)
+	{
+		// if old their was no radars
+		if (old_numRadarLocalPlayer == 0) 
+		{			
+			if (powerOk == true)
+			{
+				res = 1;
+			} else {
+				res = 3;
+			}
+			
+		}
+	}
+	else
+	// There are less radar
+	if (localPlayer->getNumberRadars() < old_numRadarLocalPlayer)
+	{
+		// if there are no radar
+		if (localPlayer->getNumberRadars() == 0) 
+		{
+			res = 2;
+		} 
+		else 
+		{
+			if (powerOk == true && old_powerOk == false)
+			{
+				res = 1;
+			} else if (powerOk == false && old_powerOk == true) 
+			{
+				res = 2;			
+			}
+		}
+	}
 	
 	// Save olds
 	old_numRadarLocalPlayer = localPlayer->getNumberRadars();
@@ -453,11 +506,17 @@ Uint8 PlayerPool::getStructpalNum(Uint8 player) const
 	return 0;
 }
 
+/**
+ * Return if the Local player has WON the mission
+ */
 bool PlayerPool::hasWon() const
 {
 	return won;
 }
 
+/**
+ * Return if the Local player has LOST the mission
+ */
 bool PlayerPool::hasLost() const
 {
 	return lost;
