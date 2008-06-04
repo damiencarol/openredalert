@@ -18,6 +18,8 @@
 
 #include "SoundEngine.h"
 
+#include <string>
+
 #include "include/Logger.h"
 #include "include/config.h"
 
@@ -26,11 +28,20 @@ namespace pc {
 }
 extern Logger * logger;
 
-SoundEngine::SoundEngine(bool disableSound) : nosound(disableSound), mutesound(false), musicFinished(true), currentTrack(playlist.begin())
-{
-    if (nosound)
-        return;
+using std::string;
 
+/**
+ */
+SoundEngine::SoundEngine(bool disableSound) : 
+	nosound(disableSound), 
+	mutesound(false), 
+	musicFinished(true), 
+	currentTrack(playlist.begin())
+{
+    if (nosound){
+        return;
+    }
+    
     #ifdef RA_SOUND_ENGINE
 	// Warning the Mix_OpenAudio uses libmikmod witch seems to create the music.raw file
     if (Mix_OpenAudio(SOUND_FREQUENCY, SOUND_FORMAT, SOUND_CHANNELS, 1024 /*4096*/) < 0) {
@@ -68,7 +79,8 @@ SoundEngine::~SoundEngine()
     #endif
 }
 
-
+/**
+ */
 bool SoundEngine::CreatePlaylist()
 {
 	// If no sound needed create nothing
@@ -107,7 +119,10 @@ bool SoundEngine::CreatePlaylist()
 	return true;
 }
 
-void SoundEngine::SetSoundVolume(unsigned int volume)
+/**
+ * @param volume Volume wanted between 0 and 128
+ */
+void SoundEngine::SetSoundVolume(int volume)
 {
     if (nosound){
         return;
@@ -119,14 +134,20 @@ void SoundEngine::SetSoundVolume(unsigned int volume)
     // from the SDL_mixer constantes then the sound is set to max :)
     if (volume > MIX_MAX_VOLUME) {
     	volume = MIX_MAX_VOLUME;
-    }    
+    } else if (volume < 0) {
+    	volume = 0;
+    }
     
+    // Set the volume of all channel (-1)
     Mix_Volume(-1, volume);
     #endif
+    
     soundVolume = volume;
     mutesound = volume == 0;
 }
 
+/**
+ */
 void SoundEngine::PlaySound(const string& sound)
 {
 	if (sound.empty()){
@@ -137,14 +158,16 @@ void SoundEngine::PlaySound(const string& sound)
     PlayLoopedSound(sound, 1);
 }
 
-int SoundEngine::PlayLoopedSound(const std::string& sound, unsigned int loops)
+/**
+ */
+int SoundEngine::PlayLoopedSound(const string& sound, unsigned int loops)
 {
     if (nosound || mutesound || sound.empty()){
         return -1;
     }
 
     SoundBuffer* snd = LoadSoundImpl(sound);
-    if (snd == NULL){
+    if (snd == 0){
         return -1;
     }
 
@@ -162,6 +185,8 @@ int SoundEngine::PlayLoopedSound(const std::string& sound, unsigned int loops)
     return channel;
 }
 
+/**
+ */
 void SoundEngine::StopLoopedSound(int id)
 {
     if (nosound){
@@ -173,27 +198,31 @@ void SoundEngine::StopLoopedSound(int id)
     #endif
 }
 
+/**
+ */
 void SoundEngine::PauseLoopedSound(int id)
 {
-    if (nosound)
+    if (nosound){
         return;
-
+    }
     #ifdef RA_SOUND_ENGINE
     Mix_Pause(id);
     #endif
 }
 
+/**
+ */
 void SoundEngine::ResumeLoopedSound(int id)
 {
-    if (nosound)
+    if (nosound){
         return;
-
+    }
     #ifdef RA_SOUND_ENGINE
     Mix_Resume(id);
     #endif
 }
 
-void SoundEngine::SetMusicVolume(unsigned int volume)
+void SoundEngine::SetMusicVolume(int volume)
 {
     if (nosound){
         return;
@@ -213,9 +242,9 @@ void SoundEngine::SetMusicVolume(unsigned int volume)
 
 void SoundEngine::PlayMusic()
 {
-    if (nosound)
+    if (nosound){
         return;
-
+    }
     #ifdef RA_SOUND_ENGINE
     if (!Mix_PlayingMusic()) {
         if (Mix_PausedMusic()) {
@@ -229,9 +258,9 @@ void SoundEngine::PlayMusic()
 
 void SoundEngine::PauseMusic()
 {
-    if (nosound)
+    if (nosound){
         return;
-
+    }
     #ifdef RA_SOUND_ENGINE
     Mix_PauseMusic();
     #endif
