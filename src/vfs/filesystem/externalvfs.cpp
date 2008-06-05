@@ -63,11 +63,17 @@ ExternalFiles::ExternalFiles(const char *defpath) : defpath(defpath) {
 
 /**
  */
-ExternalFiles::~ExternalFiles(void) {
-    /* printf ("%s line %i: WARING external files destructor\n", __FILE__, __LINE__);*/
+ExternalFiles::~ExternalFiles() 
+{
+    // printf ("%s line %i: WARING external files destructor\n", __FILE__, __LINE__);
 }
 
-
+/**
+ * Load an archive by this filename
+ * 
+ * @param fname file name of the archive
+ * @return <code>true</code> if the loading complete successfully else <code>false</code>
+ */
 bool ExternalFiles::loadArchive(const char *fname)
 {
     string pth(fname);
