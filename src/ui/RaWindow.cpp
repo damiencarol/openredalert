@@ -37,6 +37,7 @@ using std::string;
 namespace pc {
 	extern ConfigType Config;
 	extern GraphicsEngine * gfxeng;
+	extern ImageCache* imgcache;
 }
 
 RaWindow::RaWindow()

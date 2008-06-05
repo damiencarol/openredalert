@@ -202,8 +202,8 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
             radarlogo = pc::imgcache->loadImage(radarname, scaleq);
             isoriginaltype = !isoriginaltype;
         } catch (ImageNotFound&) {
-            logger->error("Unable to load the radar-image! (Maybe you run c&c gold but have forgoten updatec.mix?)\n");
-            throw SidebarError();
+            logger->error("Unable to load the radar-image!\n");
+            throw SidebarError("Unable to load the radar-image!");
         }
     }
     
@@ -948,18 +948,20 @@ void Sidebar::SetupButtons(Uint16 height)
 		ButtonXpos	= 25;
 		startoffs	= radarlocation.h + 5;
 	//}
-	SHPImage *strip;
+		
+	
+	SHPImage* strip = 0; // Image behind button when no option is allowed
 
 	tmpname = VFSUtils::VFS_getFirstExisting(3,"stripna.shp","hstrip.shp","strip.shp");
 	if (tmpname == 0) {
 		logger->error("Unable to find strip images for sidebar, exiting\n");
-		throw SidebarError();
+		throw SidebarError("Unable to find strip images for sidebar, exiting");
 	}
 	try {
 		strip = new SHPImage(tmpname, -1);
 	} catch (ImageNotFound&) {
 		logger->error("Unable to load strip images for sidebar, exiting\n");
-		throw SidebarError();
+		throw SidebarError("Unable to find strip images for sidebar, exiting");
 	}
 
 	geom.bh = strip->getHeight();

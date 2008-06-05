@@ -23,7 +23,7 @@
 #include "SDL/SDL_video.h"
 
 /**
- * 
+ * Component of the interface which represent a checkbox
  */
 class TCheckBox 
 {

@@ -18,16 +18,13 @@
 
 #include "TCheckBox.h"
 
-//#include <math.h>
-
 #include "SDL/SDL_video.h"
 
 #include "video/GraphicsEngine.h"
 
-using std::string;
-
-namespace pc {
-	extern GraphicsEngine * gfxeng;
+namespace pc
+{
+extern GraphicsEngine * gfxeng;
 }
 
 TCheckBox::~TCheckBox()
@@ -39,10 +36,12 @@ void TCheckBox::Draw(int X, int Y)
 {
 	SDL_Rect dest;
 
-	if (CheckBoxSurface == NULL){
+	if (CheckBoxSurface == 0)
+	{
 		return;
 	}
-	if (DisplaySurface == NULL){
+	if (DisplaySurface == 0)
+	{
 		return;
 	}
 
@@ -58,11 +57,13 @@ void TCheckBox::Create()
 {
 	SDL_Rect dest;
 
-	if (CheckBoxSurface != NULL){
+	if (CheckBoxSurface != 0)
+	{
 		SDL_FreeSurface(CheckBoxSurface);
 	}
 
-	CheckBoxSurface = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, Width, Heigth, 16, 0, 0, 0, 0);
+	CheckBoxSurface
+			= SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, Width, Heigth, 16, 0, 0, 0, 0);
 
 	// this is the destination as needed for the new surface
 	dest.x = 0;
@@ -86,17 +87,16 @@ void TCheckBox::Create()
 TCheckBox::TCheckBox()
 {
 	// Setup some vars
-	Checked		= false;
-	Width		= 20,
-	Heigth		= 20;
-	CheckBoxSurface = NULL;
+	Checked = false;
+	Width = 20, Heigth = 20;
+	CheckBoxSurface = 0;
 
 	// Initialize the surfaces
-	DisplaySurface	= pc::gfxeng->get_SDL_ScreenSurface();
+	DisplaySurface = pc::gfxeng->get_SDL_ScreenSurface();
 
 	// Initialize the checkbox color
-	CheckboxColor		= SDL_MapRGB(DisplaySurface->format, 0xff, 0, 0);
-	CheckboxBackgroundColor	= SDL_MapRGB(DisplaySurface->format, 0, 0, 0);
+	CheckboxColor = SDL_MapRGB(DisplaySurface->format, 0xff, 0, 0);
+	CheckboxBackgroundColor = SDL_MapRGB(DisplaySurface->format, 0, 0, 0);
 
 	this->Create();
 }

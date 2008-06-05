@@ -27,7 +27,7 @@ class StructureType;
 class Selection;
 
 /**
- * 
+ * Manager of all interaction with user
  */
 class Input
 {

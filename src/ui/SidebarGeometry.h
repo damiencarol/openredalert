@@ -21,11 +21,16 @@
 
 #include "SDL/SDL_types.h"
 
+/**
+ * Information about Height and Width to manage drawing of sidebar buttons
+ * 
+ * @todo complete documentation about this class
+ */
 class SidebarGeometry {
 public:   
-	/** */
+	/** Width of sidebar buttons in the sidebar */
 	Uint16 bw;
-	/** */
+	/** Height of all sidebar buttons in the sidebar */
     Uint16 bh;
 };
 
