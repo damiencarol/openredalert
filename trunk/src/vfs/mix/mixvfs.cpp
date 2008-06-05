@@ -244,7 +244,7 @@ void MIXFiles::readMIXHeader(VFile *mix)
     mix->readDWord(&header.size, 1);
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-// Don't know it this is needed.
+// Don't know if this is needed.
 //    header.flags = SDL_Swap32(header.flags);
 #endif
 

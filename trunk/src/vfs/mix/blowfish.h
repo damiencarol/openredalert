@@ -1,3 +1,21 @@
+// Blowfish.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef BLOWFISH_H
 #define BLOWFISH_H
 
@@ -6,6 +24,9 @@
 typedef Uint32 t_bf_p[18];
 typedef Uint32 t_bf_s[4][256];
 
+/**
+ * Object to encipher/decipher data with BlowFish algorythm
+ */
 class Cblowfish
 {
 public:
@@ -294,4 +315,4 @@ const t_bf_s bfs =
          0xb74e6132, 0xce77e25b, 0x578fdfe3, 0x3ac372e6}
     };
 
-#endif
+#endif //BLOWFISH_H

@@ -47,8 +47,12 @@ inline game_t which_game(unsigned int d) {
     return (d == 0 || d == mix_checksum || d == mix_encrypted || d == (mix_encrypted | mix_checksum)) ? game_ra : game_td;
 }
 
-struct MixHeader {
+/** Information about size and hash of a packed file in mix archive */
+struct MixHeader 
+{
+	/** =hash ?? =calculated id ??? */
     Uint16 c_files;
+    /** Sie of the file */
     Uint32 size;
 };
 
