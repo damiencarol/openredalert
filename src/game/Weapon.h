@@ -63,7 +63,7 @@ public:
 
     bool isInaccurate() const;
 
-    double getVersus(armour_t armour) const;
+    double getVersus(armor_t armour) const;
 
     Uint8 getFuel() const;
 

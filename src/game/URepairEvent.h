@@ -1,35 +1,60 @@
+// URepairEvent.h
+// 1.5
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef UREPAIREVENT_H
 #define UREPAIREVENT_H
 
 #include "SDL/SDL_types.h"
 
 #include "UnitAnimEvent.h"
-#include "Unit.h"
 
+class Unit;
 class UnitOrStructure;
 
-class URepairEvent : public UnitAnimEvent {
+/**
+ * Anim to repair a Unit
+ */
+class URepairEvent : public UnitAnimEvent
+{
 public:
-    URepairEvent(Uint32 p, Unit *un);
-    virtual ~URepairEvent();
-    void stop();
-    virtual void update();
-    virtual void run();
+	URepairEvent(Uint32 p, Unit *un);
+	virtual ~URepairEvent();
+	
+	void stop();
+	virtual void update();
+	virtual void run();
+	
 private:
 	Uint32 fix_str_num;
 	Uint16 fix_str_pos;
-	Uint8	moveCounter;
-	Uint16 dmg_cost; // Total cost of damage remaining
+	Uint8 moveCounter;
+	/** Total cost of damage remaining */
+	Uint16 dmg_cost;
 
-	Uint8	ReturnStep;
-	Unit	*un;
-	bool	stopping;
+	Uint8 ReturnStep;
+	Unit* un;
+	bool stopping;
 	UnitOrStructure * FixStr;
 	int index;
-    int delay;
-	int	facing;
+	int delay;
+	int facing;
 	Uint32 MoveTargePos;
-    Uint32 OrgImage;
+	Uint32 OrgImage;
 };
 
-#endif
+#endif //UREPAIREVENT_H

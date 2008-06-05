@@ -46,7 +46,7 @@ void WarheadDataList::loadWarheadData(INIFile* file, string name)
 	// Load the Warhead
 	WarheadData* ptrWaH = WarheadData::loadWarheadData(file, name);
 	
-	// TODO DEBUG
+	// @todo DEBUG
 	if (ptrWaH == NULL) {
 		
 	}
