@@ -47,26 +47,12 @@ void CleanConfig (void);
 
 #include "config.h"
 
-// These ifdefs are for compile-time enforcement rather than building at this
-// time.  They should only get defined in .cpp files before including common.h.
-/* #ifdef FREECNC_CLIENT */
-// Client only
-namespace pc {
-	extern Renderer* renderer;
-	extern SoundEngine* sfxeng;
-	extern MessagePool* msg;
-	extern std::vector<SHPImage *>* imagepool;
-	extern ImageCache* imgcache;
-	extern Sidebar * sidebar;
-	extern Cursor* cursor;
-	extern Input* input;
-}
-/* #endif FREECNC_CLIENT */
-
+/*
 #ifdef _MSC_VER
 #define strcasecmp(str1, str2) _stricmp((str1), (str2))
 #define strncasecmp(str1, str2, count) _strnicmp((str1), (str2), (count))
 #endif
+*/
 
 using std::max;
 using std::min;
