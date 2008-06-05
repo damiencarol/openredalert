@@ -19,6 +19,11 @@
 #ifndef UNITANDSTRUCTUREMAT_H
 #define UNITANDSTRUCTUREMAT_H
 
+/**
+ * Information about a position
+ * 
+ * This object keep flags of a position, Unit number, Structure number and air Unit number
+ */
 class UnitAndStructureMat
 {
 public:
