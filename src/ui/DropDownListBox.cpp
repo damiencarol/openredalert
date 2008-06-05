@@ -38,6 +38,7 @@
 using std::string;
 
 namespace pc {
+	extern ImageCache* imgcache;
 	extern GraphicsEngine * gfxeng;
 }
 
@@ -101,14 +102,16 @@ bool DropDownListBox::need_redraw(void)
 /** 
  * Set the surface (window) to draw the button on
  */
-void DropDownListBox::SetDrawingWindow(RaWindow* Window)
+void DropDownListBox::SetDrawingWindow(RaWindow* window)
 {
-	if (Window != NULL){
-		this->WindowToDrawOn = Window;
+	if (window != 0){
+		this->WindowToDrawOn = window;
 	}
 }
 
-void DropDownListBox::Create (void)
+/**
+ */
+void DropDownListBox::Create()
 {
 	SDL_Rect	dest;
 	Uint16		Ypos;
