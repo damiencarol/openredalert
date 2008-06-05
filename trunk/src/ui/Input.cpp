@@ -26,12 +26,11 @@
 #include "Cursor.h"
 #include "Selection.h"
 #include "Sidebar.h"
-#include "RA_Label.h"
 
-#include "include/ccmap.h"
-#include "include/dispatcher.h"
+#include "game/cncmap.h"
+#include "game/dispatcher.h"
 #include "include/Logger.h"
-#include "include/PlayerPool.h"
+#include "game/PlayerPool.h"
 #include "audio/SoundEngine.h"
 #include "game/Unit.h"
 #include "game/StructureType.h"
@@ -61,8 +60,14 @@ SDL_Rect Input::markrect;
 
 namespace pc {
     extern ConfigType Config;
+    extern Cursor* cursor;
+    extern MessagePool* msg;
+    extern Sidebar* sidebar;
+    extern ImageCache* imgcache;
+    extern SoundEngine* sfxeng;
 }
 extern Logger * logger;
+extern bool GlobalVar[100];
 
 /** 
  * Constructor, sets up the input handeler.
@@ -114,13 +119,10 @@ Input::Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea) :
 }
 
 /**
- * Destructor
- * 
- * - free selection
  */
 Input::~Input()
 {
-	// Free selected object
+	/// Free selected object
 	delete this->selected;
 }
 
@@ -332,9 +334,9 @@ void Input::handle()
                 		} else {
                 			logger->debug("Structure bombing !!!\n");                		                	
                 			selected->getStructure(0)->bomb();
-                			/*Uint32 num = pc::imgcache->loadImage("fire1.shp");
-                			new ExplosionAnim(1, selected->getStructure(0)->getPos(),
-                					num, pc::imgcache->getNumbImages(num), 23, 23);*/
+                			//Uint32 num = pc::imgcache->loadImage("fire1.shp");
+                			//new ExplosionAnim(1, selected->getStructure(0)->getPos(),
+                			//		num, pc::imgcache->getNumbImages(num), 23, 23);
                 			//static_cast<Uint8>(p::ccmap->getMoveFlash()->getNumImg()), 0, 0);
                 		}
                 	} else {
@@ -353,8 +355,19 @@ void Input::handle()
                     p::ppool->playerUndefeated(p::ppool->getLPlayer());
                     break;
                 case SDLK_F10:
-                    p::ppool->playerDefeated(p::ppool->getLPlayer());
-                    break;
+                	p::ppool->playerDefeated(p::ppool->getLPlayer());
+                	break;
+                // Debug for blobals variables
+                case SDLK_F11:
+                	GlobalVar[2]=1;
+                	GlobalVar[3]=1;
+                	break;
+                // Debug for blobals variables
+                case SDLK_F12:
+                	GlobalVar[2]=0;
+                	GlobalVar[3]=0;
+                	break;
+                	
                 case SDLK_v:
                     if (!lplayer->canSeeAll()) {
                         lplayer->setVisBuild(Player::SOB_SIGHT, true);
@@ -501,7 +514,7 @@ void Input::handle()
     	printf ("%s line %i: got radar\n", __FILE__, __LINE__);
     	pc::sfxeng->PlaySound(pc::Config.RadarUp);
     	// Start the Radar up anim
-        pc::sidebar->StartRadarAnim(0,&minimapEnabled);
+        pc::sidebar->StartRadarAnim(0); // 0 = RADAR ON
         pc::sidebar->UpdateSidebar();
         break;
     case 2: // lost radar
@@ -509,7 +522,7 @@ void Input::handle()
     	minimapEnabled = false; // Only in this case minimap is suppress   
     case 3: // radar powered down
     	printf ("%s line %i: powerdown/lost radar\n", __FILE__, __LINE__);
-        pc::sidebar->StartRadarAnim(1,&minimapEnabled);
+        pc::sidebar->StartRadarAnim(1); // 1 = RADAR OFF
 		pc::sfxeng->PlaySound(pc::Config.RadarDown);
 		pc::sidebar->UpdateSidebar();
 		break;
@@ -571,8 +584,8 @@ void Input::updateMousePos()
 
     SDL_GetMouseState(&mx, &my);
 
-
-    if( drawing ) { /* set cursor to the default one when drawing */
+    // set cursor to the default one when drawing
+    if( drawing ) { 
         if( mx < maparea->x )
             markrect.w = maparea->x;
         else if( mx >= maparea->x+maparea->w )
@@ -667,6 +680,9 @@ void Input::updateMousePos()
     pc::cursor->setXY(mx, my);
 }
 
+/**
+ * When a click is detected in the map
+ */
 void Input::clickMap(int mx, int my)
 {
     Unit *curunit;
@@ -686,13 +702,7 @@ void Input::clickMap(int mx, int my)
 	// Check if we need to heal anybody
 	//
 	if (selected->numbUnits() == 1)
-	{		
-		// Draw debug
-		pc::msg->clear();
-		pc::msg->postMessage(string(p::ppool->getPlayer(selected->getUnit(0)->getOwner())->getName()));
-		pc::msg->postMessage(string(selected->getUnit(0)->getType()->getTName()));
-		
-		
+	{
 		if (strcmp ((char*)selected->getUnit(0)->getType()->getTName(), "MEDI") == 0 && 
 				selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum() && 
 				p::uspool->getUnitAt(pos) != NULL)
@@ -701,7 +711,7 @@ void Input::clickMap(int mx, int my)
 				p::uspool->getUnitAt(pos)->getHealth() < p::uspool->getUnitAt(pos)->getType()->getMaxHealth())
 			{
 				//printf ("%s line %i: I am here\n", __FILE__, __LINE__);
-				selected->getUnit(0)->attack( p::uspool->getUnitAt(pos) );
+				selected->getUnit(0)->attack(p::uspool->getUnitAt(pos));
 				return;
 			}
 		}
@@ -728,10 +738,27 @@ void Input::clickMap(int mx, int my)
  				if (p::uspool->getStructureAt(pos)->isRefinery ())
  				{
 					//printf ("Now try to set the base ref...\n");
-					selected->getUnit(0)->SetBaseRefinery (p::uspool->getStructureAt(pos));
+					selected->getUnit(0)->SetBaseRefinery(p::uspool->getStructureAt(pos));
+					return;
 				}
 			}
-			return;
+			
+		}
+		
+		
+		
+		// Check if this unit can infiltrate
+		if (selected->getUnit(0)->getType()->isInfiltrate() == true)
+		{
+			// If their are a structure at this position
+			if (p::uspool->getStructureAt(pos) != 0)
+			{
+				selected->getUnit(0)->doRandTalk(TB_ack);
+				logger->debug("Infiltrate !!!\n");
+				selected->getUnit(0)->Infiltrate(
+						p::uspool->getStructureAt(pos));
+				return;
+			}
 		}
 	}
 
@@ -739,7 +766,8 @@ void Input::clickMap(int mx, int my)
 
 
 
-    switch (currentaction) {
+    switch (currentaction)
+    {
     case a_place:
         pos = checkPlace(mx, my);
         if (pos != 0xffff) {
@@ -751,7 +779,7 @@ void Input::clickMap(int mx, int my)
                 p::dispatcher->unitCreate(placename, pos, 0, lplayer->getPlayerNum());
             } else {
                 StructureType* stype = p::uspool->getStructureTypeByName(placename);
-                /// @TODO Is it really OK to have input and buildqueue dealing
+                /// @todo Is it really OK to have input and buildqueue dealing
                 // with the end result of production?
 				if (p::dispatcher->structurePlace(placename, pos, lplayer->getPlayerNum())) {
 					if (pc::Config.gamenum == GAME_RA) {
@@ -895,7 +923,7 @@ void Input::clickMap(int mx, int my)
                 if (tmpunit != NULL) {
                     pc::sfxeng->PlaySound(((UnitType *)tmpunit->getType())->getRandTalk(TB_atkst));
                 }
-            } else if (!curstructure->isWall()) {
+            } else if (curstructure->getType()->isWall() == false) {
                 selected->clearSelection();
                 selected->addStructure(curstructure, enemy);
             }
@@ -910,27 +938,33 @@ void Input::clickMap(int mx, int my)
                 }
                 return;
             }
-        } else if( kbdmod == k_shift ) {
+        } else if( kbdmod == k_shift ) // SHIFT
+        {
             if( selected->isEnemy() ) {
                 selected->clearSelection();
             }
-            if( curstructure->isSelected() )
+            if( curstructure->isSelected() ){
                 selected->removeStructure(curstructure);
-            else {
-                if (!curstructure->isWall())
+            } else {
+                if (curstructure->getType()->isWall() == false)
+                {
                     selected->addStructure(curstructure, false);
+                }
             }
             return;
-        } else if( kbdmod == k_alt ) {
+        } else if( kbdmod == k_alt ) // ALT
+        {
             // hack
             curstructure->runSecAnim(5);
             return;
-        } else if( !curstructure->isSelected() ) {
+        } else if(curstructure->isSelected() == false) 
+        {
             /*if (!enemy && !selected->empty() && !selected->isEnemy() && selected->canLoad(curstructure)) {
               selected->loadUnits(curstructure);
               } else {*/
             selected->clearSelection();
-            if (!curstructure->isWall()) {
+            if (curstructure->getType()->isWall() == false) 
+            {
                 selected->addStructure(curstructure, false);
             }
             //}
@@ -953,17 +987,21 @@ void Input::clickMap(int mx, int my)
 				}
 				printf ("%s line %i: Move water based unit\n", __FILE__, __LINE__);
 				selected->moveUnits(pos);
-				new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
+			/*	new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
 					static_cast<Uint8>(p::ccmap->getMoveFlash()->getNumImg()), 0, 0);
+			*/	
 			}
-		}else if( selected->canMove() && p::ccmap->getCost(pos) < 0xfff0) {
+		} 
+		else if( selected->canMove() && p::ccmap->getCost(pos) < 0xfff0) 
+		{
             if (!sndplayed) {
                 pc::sfxeng->PlaySound(((UnitType *)selected->getRandomUnit()->getType())->getRandTalk(TB_ack));
                 sndplayed = true;
             }
             selected->moveUnits(pos);
-            new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
+            /*new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
                     static_cast<Uint8>(p::ccmap->getMoveFlash()->getNumImg()), 0, 0);
+            */    
         }
     }
 }
@@ -1021,26 +1059,56 @@ void Input::setCursorByPos(int mx, int my)
         // If the position is ok
         if( pos != 0xffff ) 
         {
-        	// If their are just one unit selected
-        	if (selected->numbUnits() == 1)
+        	// If their are just one unit selected and it's a player unit
+        	if (selected->numbUnits() == 1 &&
+        		selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum())
         	{
-        		//
-        		// Handle C4
-        		//
-        		// If the unit has C4 
-        		// AND there are a structure
-        		// AND the local player is owner of the unit
-        		// AND the structure exist AND is not owned by local player
-        		if ((selected->getUnit(0)->getType()->isC4()) &&
-        			(p::uspool->getStructureAt(pos) != 0) &&
-        			(selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum()))
-        		{
-        			if (p::uspool->getStructureAt(pos)->getOwner() != p::ppool->getLPlayerNum())
-        			{        				
-        				pc::cursor->setCursor("bom");
-        				return;
+        		// If the cursor is under a structure
+        		if (p::uspool->getStructureAt(pos) != 0)
+        		{        			        					
+        			//
+        			// Handle Infiltrate
+        			// (if the selected unit can infiltrate)
+        			if (selected->getUnit(0)->getType()->isInfiltrate() == true)
+        			{	        					
+        				// ENGINEER
+        				if (strcmp((char*)selected->getUnit(0)->getType()->getTName(), "E6") == 0)
+        				{
+        					// if structure is enemy structure
+        					if (p::uspool->getStructureAt(pos)->getOwner() != p::ppool->getLPlayerNum())
+        					{
+        						pc::cursor->setCursor("red_enter");
+        						return;
+        					} else {
+        						pc::cursor->setCursor("enter");
+        						return;        					        					
+        					}
+        				}
+        					 
+        				// SPY
+        				if (strcmp((char*)selected->getUnit(0)->getType()->getTName(), "SPY") == 0)
+        				{
+        					// if structure is enemy structure
+        					if (p::uspool->getStructureAt(pos)->getOwner() != p::ppool->getLPlayerNum())
+        					{
+        						pc::cursor->setCursor("red_enter");
+        						return;
+        					}
+        				}
+        				
+        				// if C4
+        				if (selected->getUnit(0)->getType()->isC4())
+        				{
+        					// if structure is enemy structure
+        					if (p::uspool->getStructureAt(pos)->getOwner() != p::ppool->getLPlayerNum())
+        					{
+        						pc::cursor->setCursor("bom");
+        						return;
+        					}
+        				}
         			}
         		}
+        	
         
         		// Handle FIX for all units
         		if (selected->getUnit(0)->getHealth() <  selected->getUnit(0)->getType()->getMaxHealth() && p::uspool->getStructureAt(pos)!=NULL && selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum())
@@ -1170,7 +1238,7 @@ void Input::setCursorByPos(int mx, int my)
                         pc::cursor->setCursor("attack");
                         return;
                     } else if( !enemy || selected->empty() || selected->isEnemy()) {
-                        if (curstruct->isWall()) {
+                        if (curstruct->getType()->isWall()) {
                             pc::cursor->setCursor("nomove");
                             return;
                         } else {
@@ -1305,7 +1373,7 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
         return;
     }
     
-    /** TODO find a more elegant way to do this, as scrolling will blank
+    /** @todo find a more elegant way to do this, as scrolling will blank
      *  current place.
      */
     //placename = strdup("xxxx");
@@ -1334,7 +1402,7 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
             return;
         }
 
-        // TODO Get these strings from a global config thiny for interop with RA
+        // @todo Get these strings from a global config thiny for interop with RA
         if (BQ_PAUSED == status) {
             pc::sfxeng->PlaySound(pc::Config.BuildingOnHold);
         } else if (BQ_CANCELLED == status) {
@@ -1365,7 +1433,7 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
     {
     	// add in player build queue
         lplayer->startBuilding(type);
-        /// @TODO Check if we're building a unit and use "training" instead
+        /// @todo Check if we're building a unit and use "training" instead
         // Play buiding sound here!!!
         if (!type->isStructure()){
         	pc::sfxeng->PlaySound(pc::Config.TrainUnit);
@@ -1407,9 +1475,10 @@ Uint16 Input::checkPlace(int mx, int my)
     p::ccmap->translateFromPos(pos, &x, &y);
     delta = (maparea->w / tilewidth)+p::ccmap->getXScroll();
     delta -= (x + (placetype->getXsize()-1));
-    if (delta <= 0) {
+    if (delta <= 0) 
+    {
         x += delta-1;
-        /// @BUG: Find a better way than this.
+        /// @bug: Find a better way than this.
         // While working on this section, I had problems with it working only
         // when the sidebar was/wasn't visible, this seems to work around the
         // problem, but it's horrible, IMO.
@@ -1420,9 +1489,10 @@ Uint16 Input::checkPlace(int mx, int my)
     }
     delta = (maparea->h / tilewidth)+p::ccmap->getYScroll();
     delta -= (y + (placetype->getYsize()-1));
-    if (delta <= 0) {
+    if (delta <= 0) 
+    {
         y += delta-1;
-        /// @BUG: Find a better way than this.
+        /// @bug: Find a better way than this.
         // (See above for explanation)
         if (maparea->h % tilewidth) {
             ++y;
@@ -1432,16 +1502,19 @@ Uint16 Input::checkPlace(int mx, int my)
 
     // check if pos is valid and set cursor
     placeposvalid = true;
-    /// @TODO Assumes land based buildings for now
+    /// @todo Assumes land based buildings for now
     p::uspool->setCostCalcOwnerAndType(lplayer->getPlayerNum(),0);
     placemat = new Uint8[placetype->getXsize()*placetype->getYsize()];
     double blockedcount = 0.0;
     double rangecount = 0.0;
-    for (placeypos = 0; placeypos < placetype->getYsize(); placeypos++) {
-        for (placexpos = 0; placexpos < placetype->getXsize(); placexpos++) {
+    for (placeypos = 0; placeypos < placetype->getYsize(); placeypos++) 
+    {
+        for (placexpos = 0; placexpos < placetype->getXsize(); placexpos++) 
+        {
             curpos = pos+placeypos*p::ccmap->getWidth()+placexpos;
             placeoff = placeypos*placetype->getXsize()+placexpos;
-            if (placetype->isBlocked(placeoff)) {
+            if (placetype->isBlocked(placeoff))
+            {
                 ++blockedcount;
                 placemat[placeoff] = 1;
 				if (!p::ccmap->isBuildableAt( lplayer->getPlayerNum(), curpos, placetype->isWaterBound() )) {
@@ -1462,6 +1535,8 @@ Uint16 Input::checkPlace(int mx, int my)
             }
         }
     }
+    
+    // @todo change the test to check "Adjacent"
     if (rangecount/blockedcount < getConfig().buildable_ratio) {
         placeposvalid = false;
     }
