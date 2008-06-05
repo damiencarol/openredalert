@@ -48,7 +48,7 @@
 
 #include "UnitOrStructure.h"
 
-struct RA_Teamtype;
+class RA_Teamtype;
 class UnitAndStructureMat;
 class UnitOrStructure;
 class UnitOrStructureType;
@@ -62,6 +62,7 @@ class StructureType;
 class InfantryGroup;
 class Talkback;
 class CnCMap;
+class AiCommand;
 
 using std::string;
 using std::vector;
@@ -89,8 +90,11 @@ public:
                                  Uint8* pcol, bool* blocked);
     bool hasL2overlay(Uint16 cellpos) const ;
     Uint8 getL2overlays(Uint16 cellpos, Uint32 **inumbers, Sint8 **xoddset, Sint8 **yoffset);
-    multimap<Uint16, L2Overlay*>::iterator addL2overlay(Uint16 cellpos, L2Overlay *ov);
-    void removeL2overlay(std::multimap<Uint16, L2Overlay*>::iterator entry);
+    
+    /** Add an overlay */
+    multimap<Uint16, L2Overlay*>::iterator addL2overlay(Uint16 cellpos, L2Overlay* overlay);
+    /** Remove an overlay */
+    void removeL2overlay(multimap<Uint16, L2Overlay*>::iterator entry);
 
     bool createReinforcements(RA_Teamtype* Team);
     
@@ -101,12 +105,18 @@ public:
     /** Create a structure in a map with this pool */
     bool createStructure(StructureType* type, Uint16 cellpos, Uint8 owner,
             Uint16 health, Uint8 facing, bool makeanim, string trigger_name);
-    bool createUnit(const char* typen, Uint16 cellpos, Uint8 subpos,
-            Uint8 owner, Uint16 health, Uint8 facing, Uint8 action = COMMAND_GUARD, string trigger_name = "None");
-    bool createUnit(UnitType* type, Uint16 cellpos, Uint8 subpos,
-            Uint8 owner, Uint16 health, Uint8 facing, Uint8 action = COMMAND_GUARD, string trigger_name = "None");
-
-    bool createCellTrigger( Uint32 cellpos );
+    
+    
+    /** Create a Unit and return it or return NULL */
+    Unit* createUnit(const char* typen, Uint16 cellpos, Uint8 subpos,
+            Uint8 owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name);
+    /** Create a Unit and return it or return NULL */
+    Unit* createUnit(UnitType* type, Uint16 cellpos, Uint8 subpos,
+    		Uint8 owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name);
+    
+    
+    /** Create a trigger on a cell */
+    bool createCellTrigger(Uint32 cellpos);
 
     bool spawnUnit(const char* typen, Uint8 owner);
     bool spawnUnit(UnitType* type, Uint8 owner);
