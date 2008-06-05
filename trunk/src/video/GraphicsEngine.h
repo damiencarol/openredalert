@@ -79,6 +79,7 @@ private:
     void drawSidebar();
     void drawLine(Sint16 startx, Sint16 starty,
                   Sint16 stopx, Sint16 stopy, Uint16 width, Uint32 colour);
+    void DrawStructures();
     void drawMissionLabel();
     
     SDL_Surface* screen;

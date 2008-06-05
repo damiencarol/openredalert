@@ -43,8 +43,14 @@
 using std::string;
 using std::runtime_error;
 
+namespace pc {
+	/** SoundEngine of the game */
+	extern SoundEngine* sfxeng;
+}
 extern Logger * logger;
 
+/**
+ */
 WSAMovie::~WSAMovie()
 {
     delete[] wsadata;
@@ -52,6 +58,9 @@ WSAMovie::~WSAMovie()
     delete[] framedata;
     delete[] sndfile;
 }
+
+/**
+ */
 void WSAMovie::animate(GraphicsEngine* grafEngine)
 {
     float fps, delay;
@@ -103,6 +112,7 @@ void WSAMovie::animate(GraphicsEngine* grafEngine)
      * in the buffer after the wsa finishes?
      */
 }
+
 SDL_Surface* WSAMovie::decodeFrame(Uint16 framenum)
 {
     Uint32 frameLength;
@@ -133,11 +143,13 @@ SDL_Surface* WSAMovie::decodeFrame(Uint16 framenum)
 
     return frame;
 }
-WSAMovie::WSAMovie(string fname){
+
+WSAMovie::WSAMovie(string fname)
+{
     int i;
     int j;
-    INIFile *wsa_ini;
-    VFile* wfile;
+    INIFile* wsa_ini = 0;
+    VFile* wfile = 0;
 
     // Load the animation file from mix archives
     wfile = VFSUtils::VFS_Open(fname.c_str());
@@ -207,5 +219,4 @@ WSAMovie::WSAMovie(string fname){
     	// There are no data to load in this file
         throw WSAError("No data in WSA file " + fname);
     }
-
 }

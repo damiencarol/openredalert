@@ -33,6 +33,7 @@ using std::string;
 
 namespace pc {
 	extern GraphicsEngine * gfxeng;
+	extern MessagePool* msg;
 }
 extern Logger * logger;
 

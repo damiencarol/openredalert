@@ -57,6 +57,7 @@ VQA::VQAMovie::VQAMovie(const char* filename) : vqafile(0), CBF_LookUp(0),
 {
     string fname(filename);
 
+    
     if (toupper(filename[0]) != 'X') {
         fname += ".VQA";
         vqafile = VFSUtils::VFS_Open(fname.c_str());
@@ -114,12 +115,11 @@ VQA::VQAMovie::VQAMovie(const char* filename) : vqafile(0), CBF_LookUp(0),
     videoScaleQuality = inif->readInt("video", "movieQuality", 0);
 
     //logger->debug("Video is %dfps %d %d %d\n", header.FrameRate, header.Freq, header.Channels, header.Bits);
-#ifdef RA_SOUND_ENGINE
+
     if (SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, header.Channels, header.Freq, SOUND_FORMAT, SOUND_CHANNELS, SOUND_FREQUENCY) < 0) {
         logger->error("Could not build SDL_BuildAudioCVT filter\n");
         return;
     }
-#endif
 
     empty = SDL_CreateSemaphore(0);
     full = SDL_CreateSemaphore(1);
@@ -131,12 +131,17 @@ VQA::VQAMovie::VQAMovie(const char* filename) : vqafile(0), CBF_LookUp(0),
     sndbufEnd = sndbuf;
 }
 
+/**
+ * 
+ */
 VQA::VQAMovie::~VQAMovie()
 {
     delete[] CBF_LookUp;
     delete[] CBP_LookUp;
     delete[] VPT_Table;
     delete[] offsets;
+    
+    /// Close the Virtual file
     VFSUtils::VFS_Close(vqafile);
 
     SDL_DestroySemaphore(empty);
@@ -147,7 +152,6 @@ VQA::VQAMovie::~VQAMovie()
 }
 
 /**
- * Play the VQA movie
  */
 void VQA::VQAMovie::play()
 {
@@ -259,10 +263,10 @@ void VQA::VQAMovie::play()
     }
 }
 
-bool VQA::VQAMovie::ReadChunk ()
+bool VQA::VQAMovie::ReadChunk()
 {
-	printf ("%s line %i: ***Read Chunk***\n", __FILE__, __LINE__);
-	printf ("%s line %i: Chunk Start = %i\n", __FILE__, __LINE__, vqafile->tell());
+	//printf ("%s line %i: ***Read Chunk***\n", __FILE__, __LINE__);
+	//printf ("%s line %i: Chunk Start = %i\n", __FILE__, __LINE__, vqafile->tell());
 
 	Uint8 chunkid[4];
 	vqafile->readByte(chunkid, 4);
@@ -276,7 +280,7 @@ bool VQA::VQAMovie::ReadChunk ()
 	printf ("Length = %i\n", len);
 	vqafile->seekSet(vqafile->tell() + len);
 
-	printf ("Curpos = %i\n", vqafile->tell());
+	//printf ("Curpos = %i\n", vqafile->tell());
 
 	// try again
 //	vqafile->readByte(chunkid, 4);
