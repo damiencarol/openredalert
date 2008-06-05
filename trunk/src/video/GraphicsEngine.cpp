@@ -26,11 +26,11 @@
 #include "SDL/SDL_timer.h"
 #include "SDL/SDL_video.h"
 
-#include "include/ccmap.h"
 #include "include/common.h"
 #include "include/config.h"
 #include "include/Logger.h"
-#include "include/PlayerPool.h"
+#include "game/CnCMap.h"
+#include "game/PlayerPool.h"
 #include "game/Player.h"
 #include "game/Unit.h"
 #include "game/UnitAndStructurePool.h"
@@ -47,12 +47,16 @@
 #include "ImageCacheEntry.h"
 #include "Dune2Image.h"
 
-using pc::imgcache;
 using std::string;
 using std::runtime_error;
 
 namespace pc {
+	extern ImageCache* imgcache;
     extern ConfigType Config;
+    extern Cursor* cursor;
+    //extern vector<SHPImage*>* img
+    extern MessagePool* msg;
+    extern Sidebar* sidebar;
 }
 extern Logger * logger;
 
@@ -109,7 +113,7 @@ GraphicsEngine::GraphicsEngine()
 
 	if (screen == 0) {
 		logger->error("Unable to set %dx%d video: %s\n", width, height, SDL_GetError());
-		//TODO throw VideoError("Unable to set " + width + "x" + height + " video: " );//+ SDL_GetError());
+		//@todo throw VideoError("Unable to set " + width + "x" + height + " video: " );//+ SDL_GetError());
 	}
 
 	if ( (screen->flags & 0x00004000	/* Surface is RLE encoded */) == 0x00004000	/* Surface is RLE encoded */ ) {
@@ -138,7 +142,7 @@ GraphicsEngine::GraphicsEngine()
 	redpix		= SDL_MapRGB(screen->format, 0xff, 0, 0);
 	blackpix	= SDL_MapRGB(screen->format, 0, 0, 0);
 
-	imgcache = new ImageCache();
+	pc::imgcache = new ImageCache();
 
 	repairing_icon = 0;
 
@@ -180,9 +184,6 @@ GraphicsEngine::GraphicsEngine()
 	
 	// Free the string file
 	delete stringFile;
-	
-	// Set bombing_icon to zero
-	bombing_icon = 0;
 }
 
 /** 
@@ -190,9 +191,10 @@ GraphicsEngine::GraphicsEngine()
  */
 GraphicsEngine::~GraphicsEngine()
 {
-	if (imgcache != 0)
-		delete imgcache;
-	imgcache = 0;
+	if (pc::imgcache != 0){
+		delete pc::imgcache;
+	}
+	pc::imgcache = 0;
 
     logger->renderGameMsg(false);
 
@@ -401,7 +403,13 @@ void GraphicsEngine::clearScreen()
 
 }
 
-void GraphicsEngine::renderLoading(const std::string& buff, SDL_Surface* logo)
+/**
+ * Render a loading screen
+ * 
+ * @param buff Message to show
+ * @param logo background screen of the loading screen 
+ */
+void GraphicsEngine::renderLoading(const string& buff, SDL_Surface* logo)
 {
     SDL_Rect dest;
     SDL_Surface *curimg;
@@ -594,7 +602,7 @@ void GraphicsEngine::DrawMinimap()
         bool blocked;
 
         // Need the exact dimensions in tiles
-        // @TODO Positioning needs tweaking
+        // @todo Positioning needs tweaking
         SDL_Surface *minimap = p::ccmap->getMiniMap(minizoom);
         // Draw black under minimap if haven't previously drawn (or was drawn,
         // then disabled, then reenabled).
@@ -638,7 +646,7 @@ void GraphicsEngine::DrawMinimap()
 				// USPool.
 				if (p::uspool->getUnitOrStructureLimAt(curpos, &width,
 					&height, &cellpos, &igroup, &owner, &pcol, &blocked)) {
-					/// @TODO drawing infanty groups as smaller pixels
+					/// @todo drawing infanty groups as smaller pixels
 					if (blocked) {
 						dest.x = maparea.x+maparea.w+clip.x+xpos*minizoom;
 						dest.y = maparea.y+clip.y+ypos*minizoom;
@@ -664,7 +672,83 @@ void GraphicsEngine::DrawMinimap()
         }
     }
 
-   SDL_SetClipRect( screen, &maparea);
+   SDL_SetClipRect(screen, &maparea);
+}
+
+/** 
+ * Handle drawing the structures
+ */
+void GraphicsEngine::DrawStructures()
+{
+	//static Uint32	last_repair_tick;
+	//static bool		DrawSmallRepair;
+
+	Structure*		str = 0;
+	Sint16			xpos;
+	Sint16			ypos;
+	//SDL_Surface*	RepairImg = 0;
+	//SDL_Rect		udest;
+	//int				scaleq = -1; // For image (always -1 for RA)
+
+	//printf("p::uspool->getNumbStructures()=%d\n", p::uspool->getNumbStructures());
+	
+	// For all structures
+	for (unsigned int i = 0; i < p::uspool->getNumbStructures(); i++)
+	{
+		// Get a structure
+		str = p::uspool->getStructure(i);
+		// Check that we actually found a structure
+		if (str == 0){
+			//printf("Structur = NULL\n");
+			continue;
+		}
+		//printf("Structure type = %s\n", str->getType()->getTName());
+		
+		// Check if the structure is being build
+		if (str->IsBuilding()){
+			continue;
+		}
+		
+		// Load the repairing icon image (displayed while repairing a structure
+		//if (repairing_icon == 0)
+		//	repairing_icon = pc::imgcache->loadImage("select.shp", scaleq);
+
+		// Update the animation icon (small or large)
+		//if ( (SDL_GetTicks() - last_repair_tick) > 300){
+		//	if (DrawSmallRepair){
+		//		DrawSmallRepair = false;
+		//	}else{
+		//		DrawSmallRepair = true;
+		//	}
+		//	last_repair_tick = SDL_GetTicks();
+		//}
+
+		// Get the animated icon (small or large)
+		//if (DrawSmallRepair){
+		//	RepairImg = pc::imgcache->getImage(repairing_icon,3).image;
+		//}else{
+		//	RepairImg = pc::imgcache->getImage(repairing_icon,2).image;
+		//}
+		
+		//if (RepairImg == 0){
+		//	continue;
+		//}
+		
+		// Get x and y coords with a hash cursor and 
+		// Check that structure is in the screen 
+		if (!MapPosToScreenXY(str->getPos(), &xpos, &ypos, p::ccmap)){
+			continue;
+		}
+		
+		// Get the image
+		/*SDL_Surface* img = pc::imgcache->getImage(str->getImageNum(0)).image;
+		// Draw Structure
+		udest.x = xpos + (str->getType()->getXsize() * tilewidth);//- (RepairImg->w/2); //+ (str->getType()->getXsize() * tilewidth)
+		udest.y = ypos + (str->getType()->getYsize() * tileheight);// - (RepairImg->h/2)// + (str->getType()->getYsize() * tileheight);
+		udest.w = img->w;
+		udest.h = img->h;
+		SDL_UpperBlit(img, 0, screen, &udest);*/
+	}
 }
 
 /** 
@@ -748,8 +832,7 @@ void GraphicsEngine::DrawBombing()
 {
 	static Uint32	last_repair_tick;
 	static Uint8	numImage;
-	static Uint32	tempNum; 
-	
+
 	Structure		*str = 0;
 
 	Sint16			xpos;
@@ -778,10 +861,13 @@ void GraphicsEngine::DrawBombing()
 		if (str->isBombing()==false){
 			continue;
 		}
+		printf("str bb = %s\n", 
+				p::uspool->getStructure(i)->getType()->getTName());
 		
 		// Load the bombing icon image (displayed while bombing a structure)
 		if (bombing_icon == 0){
 			bombing_icon = new Dune2Image("mouse.shp", scaleq);
+			//bombing_icon = pc::imgcache->loadImage("mouse.shp", scaleq);						
 		}
 		
 		// Update the animation icon (from the first (116) to the last (118))
@@ -795,6 +881,7 @@ void GraphicsEngine::DrawBombing()
 		}
 
 		// Get the icon (116, 117 or 118)
+		//bombImage = pc::imgcache->getImage(bombing_icon, 116).image;
 		bombImage = bombing_icon->getImage(numImage);
 		
 		if (bombImage == 0){
@@ -847,7 +934,7 @@ void GraphicsEngine::DrawVehicleSmoke(void)
 		// Check if we should draw smoke
 		if (Health < MaxHealth){
 
-			// TODO Implement the smoking anim on vehicule
+			// @todo Implement the smoking anim on vehicule
 		}
 
 #if 0
@@ -1106,7 +1193,7 @@ void GraphicsEngine::DrawL2Overlays()
 				printf ("%s line %i: ERROR: Imagenumb > numbimages for image %s, numb images = %i\n", __FILE__, __LINE__, Name.c_str(), NumbImages);
 #endif
 			
-			ImageCacheEntry& images = imgcache->getImage(unitorstructshps[curdpos]);
+			ImageCacheEntry& images = pc::imgcache->getImage(unitorstructshps[curdpos]);
 			if (images.image != 0){
 				udest.x = dest.x + uxoffsets[curdpos];
 				udest.y = dest.y + uyoffsets[curdpos];
@@ -1114,7 +1201,6 @@ void GraphicsEngine::DrawL2Overlays()
 				udest.h = images.image->h;
 				SDL_UpperBlit(images.image, 0, screen, &udest);
 			}
-			
         }
    
 		if (unitorstructshps != 0){
@@ -1158,7 +1244,7 @@ void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 	dest.h = tilewidth;
 	curpos = p::ccmap->getScrollPos();
 	dest.y = maparea.y-p::ccmap->getYTileScroll();
-	// TODO This uses hardcoded values which it shouldn't do.
+	// @todo This uses hardcoded values which it shouldn't do.
 	// It should also cache the imagenums. If the imagenum is out
 	// of reach NULL will be returned, we should check for this
 	int shadowoffs;
@@ -1378,7 +1464,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 				// Draw smudges
 				smudge = p::ccmap->getSmudge(curpos);
 				if (smudge != 0) {
-					ImageCacheEntry& images = imgcache->getImage(smudge);
+					ImageCacheEntry& images = pc::imgcache->getImage(smudge);
 					if (images.image != 0){
 						SDL_UpperBlit(images.image, &src, screen, &udest);
 						SDL_UpperBlit(images.shadow, &src, screen, &udest);
@@ -1388,7 +1474,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 				// Draw the tiberium
 				tiberium = p::ccmap->getResourceFrame(curpos);
 				if (tiberium != 0) {
-					ImageCacheEntry& images = imgcache->getImage(tiberium);
+					ImageCacheEntry& images = pc::imgcache->getImage(tiberium);
 					if (images.image != 0){
 						SDL_UpperBlit(images.image, &src, screen, &udest);
 					}
@@ -1397,7 +1483,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 				// Draw the overlay
 				overlay = p::ccmap->getOverlay(curpos);
 				if (overlay != 0) {
-					ImageCacheEntry& images = imgcache->getImage(overlay);
+					ImageCacheEntry& images = pc::imgcache->getImage(overlay);
 					if (images.image != 0){
 						SDL_UpperBlit(images.image, &src, screen, &udest);
 						SDL_UpperBlit(images.shadow, &src, screen, &udest);
@@ -1410,12 +1496,11 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 				// Draw the terrain overlay (worn down ground under buildings)
 				TerrainOverlay = p::ccmap->getTerrainOverlay(curpos);
 				if (TerrainOverlay != 0 ) {
-					ImageCacheEntry& images = imgcache->getImage(TerrainOverlay);
+					ImageCacheEntry& images = pc::imgcache->getImage(TerrainOverlay);
 					if (images.image != 0){
 						SDL_UpperBlit(images.image, &src, screen, &udest);
 					}
                 }
-
 			}
 
 			if (ypos > 1) {
@@ -1423,7 +1508,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 				curdpos = curpos - (p::ccmap->getWidth()<<1);
 				terrain = p::ccmap->getTerrain(curdpos, &txoff, &tyoff);
 				if (terrain != 0) {
-					ImageCacheEntry& images = imgcache->getImage(terrain);
+					ImageCacheEntry& images = pc::imgcache->getImage(terrain);
 					if (images.image != 0){
 						src.x = 0;
 						src.y = 0;
@@ -1449,7 +1534,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 				{
 					//printf("shpnum structur is <> 0\n");
 					for( i  = 0; i < numshps; i++) {
-						ImageCacheEntry& images = imgcache->getImage(unitorstructshps[i]);
+						ImageCacheEntry& images = pc::imgcache->getImage(unitorstructshps[i]);
 						if (images.image != 0){
 							src.x = 0;
 							src.y = 0;
@@ -1559,7 +1644,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 				numshps = p::uspool->getUnitNum(curdpos, &unitorstructshps, &uxoffsets, &uyoffsets);
 				if (numshps > 0) {
 					for( i  = 0; i < numshps; i++) {
-						ImageCacheEntry& images = imgcache->getImage(unitorstructshps[i]);
+						ImageCacheEntry& images = pc::imgcache->getImage(unitorstructshps[i]);
 						if (images.image != 0){
 							src.x = 0;
 							src.y = 0;
@@ -1594,7 +1679,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 				if (numshps > 0) {
 					//printf ("%s line %i: Found air based units to draw\n", __FILE__, __LINE__);
 					for( i  = 0; i < numshps; i++) {
-						ImageCacheEntry& images = imgcache->getImage(unitorstructshps[i]);
+						ImageCacheEntry& images = pc::imgcache->getImage(unitorstructshps[i]);
 						if (images.image != 0){
 							src.x = 0;
 							src.y = 0;
@@ -1638,7 +1723,10 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 	DrawRepairing();
 
 	// Draw smoke on vehicules
-	DrawVehicleSmoke();		
+	DrawVehicleSmoke();
+		
+	// Test
+	DrawStructures();
 	
 	// Handle drawing the BOMB (C4) icon
 	DrawBombing();
@@ -1697,7 +1785,7 @@ void GraphicsEngine::drawMissionLabel()
 		// If the sidebar is visible
 		if (pc::sidebar->getVisible()) 
 		{
-			// TODO get the real width of the sidebar
+			// @todo get the real width of the sidebar
 			// resX -= pc::sidebar->getSidebarImage()->w;
 			resX -=30;
 		}
@@ -1716,7 +1804,7 @@ void GraphicsEngine::drawMissionLabel()
 		// If the sidebar is visible
 		if (pc::sidebar->getVisible()) 
 		{
-			// TODO get the real width of the sidebar
+			// @todo get the real width of the sidebar
 			// resX -= pc::sidebar->getSidebarImage()->w;
 			resX -=30;
 		}
