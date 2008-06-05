@@ -40,11 +40,11 @@ public :
     UnitOrStructureType();
     virtual ~UnitOrStructureType();
 
-    /** Turn speed is measured in arbitrary units */
+    /** @brief Turn speed is measured in arbitrary units */
     virtual Uint8 getTurnspeed() const = 0;
 
     /** @brief Returns a number corresponding to the type's armour class. See common.h for the enum definition */
-    virtual armour_t getArmour() const = 0;
+    virtual armor_t getArmor() const = 0;
 
     /**
      * @brief Returns number of layers to render, 1 or 2.  The only TD
@@ -53,16 +53,13 @@ public :
      */
     virtual Uint8 getNumLayers() const = 0;
 
-    /**
-     * Units and structures can have at most two weapons. Currently any secondary weapons are ignored.
-     * @todo Write a version that accepts an armour type and returns the weapon that'll cause the most damage.
-     */
+    /** @brief Return the weapon of the Unit or Structure */
     virtual Weapon * getWeapon(bool primary) const = 0;
 
     /** Only applicable to units.  StructureType always returns false. */
     virtual bool isInfantry() const = 0;
 
-    /** Only applicable to structures.  UnitType always returns false. */
+    /** @brief Return true if this Unit or Structure is a Wall */
     virtual bool isWall() const = 0;
 
     /** Only applicable to units.  StructureType always returns zero. */
@@ -116,8 +113,8 @@ protected :
 	/** Sight of the Unit (in Cell) */
     Uint8 sight;
     animinfo_t animinfo;
-    /** Armour of the Unit */
-    armour_t armour;
+    /** Armor of the Unit */
+    armor_t armour;
     /** Secondary weapon of the Unit */
     Weapon* secondary_weapon;
     /** Primary weapon of the Unit */

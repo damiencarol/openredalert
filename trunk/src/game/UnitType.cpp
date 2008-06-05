@@ -49,14 +49,17 @@ using std::string;
 using std::vector;
 
 namespace pc {
-	extern ImageCache* imgcache;	
+	extern ImageCache* imgcache;
+	extern vector<SHPImage*>* imagepool;
 }
 namespace p {
 	extern UnitAndStructurePool* uspool;
-	extern WeaponsPool* weappool;
+	extern WeaponsPool* weappool;	
 }
 extern Logger * logger;
 
+/**
+ */
 UnitType::UnitType(const char *typeName, INIFile* unitini) : 
 	UnitOrStructureType(), 
 	shpnums(0), 
@@ -462,7 +465,7 @@ Uint8 UnitType::getTurnspeed() const
 	return turnspeed;
 }
 
-armour_t UnitType::getArmour() const
+armor_t UnitType::getArmor() const
 {
 	return armour;
 }

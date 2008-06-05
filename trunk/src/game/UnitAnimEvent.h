@@ -4,8 +4,12 @@
 #include "SDL/SDL_types.h"
 
 #include "ActionEvent.h"
-#include "Unit.h"
 
+class Unit;
+
+/**
+ * Base Class for all Unit anim
+ */
 class UnitAnimEvent : public ActionEvent {
 public:
 	UnitAnimEvent(Uint32 p, Unit* un);

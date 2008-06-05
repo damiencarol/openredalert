@@ -57,13 +57,14 @@ Weapon::Weapon(const char* wname)
 {
 	char *pname= 0;
 	char *whname= 0;
-	char *faname= 0;
-	char *faimage= 0;
+	//char *faname= 0;
+	//char *faimage= 0;
 	map<string, Projectile*>::iterator projentry;
 	map<string, Warhead*>::iterator wheadentry;
 	INIFile * weapini;
-	SHPImage * fireanimtemp;
-	Uint8 additional, i;
+	//SHPImage * fireanimtemp;
+	//Uint8 additional;
+	//Uint8 i;
 	string projname, warheadname;
 	string weapname;
 	string::iterator p;
@@ -384,9 +385,9 @@ bool Weapon::isInaccurate() const
 	return this->projectile->getInaccurate();
 }
 
-double Weapon::getVersus(armour_t armour) const
+double Weapon::getVersus(armor_t armor) const
 {
-	return (this->whead->getVersus(armour)) / (double)100.0;
+	return (this->whead->getVersus(armor)) / (double)100.0;
 }
 
 Uint8 Weapon::getFuel() const
@@ -406,7 +407,7 @@ const char * Weapon::getName() const
 
 void Weapon::Reload()
 {
-	if (reloadsound != NULL)
+	if (reloadsound != 0)
 	{
 		pc::sfxeng->PlaySound(reloadsound);
 	}

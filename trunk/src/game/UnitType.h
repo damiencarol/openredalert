@@ -45,12 +45,14 @@ public:
 
     Uint8 getTurnspeed() const ;
 
-    armour_t getArmour() const ;
+    armor_t getArmor() const ;
+    
 #ifdef LOOPEND_TURN
     animinfo_t getAnimInfo() const {
         return animinfo;
     }
 #endif
+    
     const char* getRandTalk(TalkbackType type) const;
     
     /** Returns the primary Weapon of this type of Unit */
