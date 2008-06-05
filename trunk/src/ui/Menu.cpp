@@ -18,7 +18,7 @@
 
 #include "Menu.h"
 
-#include "RA_WindowClass.h"
+#include "RaWindow.h"
 #include "RA_Label.h"
 #include "DropDownListBox.h"
 #include "ListboxClass.h"
@@ -51,8 +51,7 @@ extern Logger * logger;
 
 /**
  */ 
-Menu::Menu() :
-  StartNewGameButton()
+Menu::Menu() : StartNewGameButton()
 {
 	SDL_Color	palette[256];
 	SDL_Color	Fcolor;
@@ -154,24 +153,31 @@ Menu::Menu() :
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
+	
 	InternetGameButton.CreateSurface("Internet Game", ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
+	
 	// (the string 35 is "Load game" but located)
 	LoadMissionButton.CreateSurface(strFile->getString(35), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;;
 
+	
 	MultiplayerGameButton.CreateSurface("Multiplayer Game", ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
+	
+	// Create the "Intro & Sneak Peek" button
+	IntroAndSneakPeekButton = new Button();
 	// (the string 18 is "Intro & Sneak Peek" but located)
-	IntroAndSneakPeekButton.CreateSurface(strFile->getString(18), ButtonXpos, ButtonYpos, button_width, button_height);
+	IntroAndSneakPeekButton->CreateSurface(strFile->getString(18), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
+	
 	// (the string 46 is "quit game" but located)
 	ExitGameButton.CreateSurface(strFile->getString(46), ButtonXpos, ButtonYpos, button_width, button_height);
 
@@ -364,6 +370,9 @@ Menu::Menu() :
 	
 	// Build Lisbox with mission multi
 	listBox = new ListboxClass();
+	
+	// Set that the user don't want quit the game
+	this->quit = false;
 }
 
 /**
@@ -408,7 +417,7 @@ void Menu::DrawMenuBackground()
 		dest.y = (display->h - SDLlogo->h)/2;
 
 		//printf ("dest.x = %i, dest.y = %i, logo.w = %i, logo.h = %i\n", dest.x, dest.y, SDLlogo->w, SDLlogo->h);
-		SDL_BlitSurface(SDLlogo, NULL, display, &dest);
+		SDL_BlitSurface(SDLlogo, 0, display, &dest);
 	}
 }
 
@@ -441,7 +450,7 @@ void Menu::DrawMousePointer()
 }
 
 /**
- * 
+ * Draw the button under the window
  */
 void Menu::DrawMainMenuButtons()
 {
@@ -454,7 +463,7 @@ void Menu::DrawMainMenuButtons()
 //	if (MultiplayerGameButton.NeedRedraw())
 		MultiplayerGameButton.drawbutton();
 //	if (IntroAndSneakPeekButton.NeedRedraw())
-		IntroAndSneakPeekButton.drawbutton();
+		IntroAndSneakPeekButton->drawbutton();
 //	if (ExitGameButton.NeedRedraw())
 		ExitGameButton.drawbutton();
 
@@ -487,7 +496,7 @@ void Menu::HandleInput()
 				InternetGameButton.handleMouseEvent(event);
 				LoadMissionButton.handleMouseEvent(event);
 				MultiplayerGameButton.handleMouseEvent(event);
-				IntroAndSneakPeekButton.handleMouseEvent(event);
+				IntroAndSneakPeekButton->handleMouseEvent(event);
 				ExitGameButton.handleMouseEvent(event);
 				break;
 			case 2:
@@ -565,14 +574,13 @@ void Menu::HandleInput()
 								MenuState = 2;
 								//isDone=true;
 							}else if (ExitGameButton.MouseOver()){
-	printf ("Exit\n");
 								isDone=true;
-								pc::quit = true;
+								this->quit = true;
 							}else if (MultiplayerGameButton.MouseOver()){
 								MenuState = 3;
 								Oke.SetDrawingWindow (&MultiPlayerMenu);
 								Cancel.SetDrawingWindow (&MultiPlayerMenu);
-							}else if (IntroAndSneakPeekButton.MouseOver()){
+							}else if (IntroAndSneakPeekButton->MouseOver()){
 								VQAMovie mov("prolog");
 								mov.play();
 							}
@@ -674,7 +682,7 @@ void Menu::HandleInput()
 							MenuState = 1;
 						}else{
 							isDone=true;
-							pc::quit = true;
+							this->quit = true;
 						}
 						break;
 					default:
@@ -717,7 +725,11 @@ int Menu::HandleMenu()
 
     // Free strings
     delete strFile;
-
+    
+    // Start with no done
+    isDone = false;
+    
+    //
 	while( !isDone ) 
 	{
 		// get mouse coords
@@ -819,3 +831,12 @@ void Menu::ResetSideColorButtonStates()
 	ButtonColFranse.setButtonState (1);
 	ButtonColTurkey.setButtonState (1);
 }
+
+/** 
+ * Return true if the user want qui the game
+ */
+bool Menu::isQuit()
+{
+	return quit;
+}
+

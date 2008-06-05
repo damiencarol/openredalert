@@ -19,17 +19,14 @@
 #ifndef RAWINDOW_H
 #define RAWINDOW_H
 
-#include <list>
-#include <string>
-#include <vector>
-
-#include "SDL/SDL_events.h"
+#include "SDL/SDL_types.h"
+#include "SDL/SDL_video.h"
 
 class Font;
 class RA_Label;
 
 /**
- * 
+ * Window in the game
  */
 class RaWindow
 {
@@ -48,10 +45,10 @@ public:
 	void DrawWindow();
 
 private:
-	SDL_Surface *ReadShpImage(char *Name, int ImageNumb, Uint8 palnum = 1);
+	SDL_Surface* ReadShpImage(char *Name, int ImageNumb, Uint8 palnum = 1);
 	
-	SDL_Surface *DisplaySurface;
-	SDL_Surface *WindowSurface;
+	SDL_Surface* DisplaySurface;
+	SDL_Surface* WindowSurface;
 	SDL_Rect SizeAndPosition;
 
 	Uint32 Background;

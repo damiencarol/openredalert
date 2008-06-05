@@ -29,7 +29,7 @@
 #include "RA_Label.h"
 #include "Button.h"
 #include "TTextBox.h"
-#include "RA_WindowClass.h"
+#include "RaWindow.h"
 #include "DropDownListBox.h"
 
 #define MENUSTATE_MAIN_MENU	1
@@ -63,7 +63,13 @@ public:
 	void HandleInput();
 	int HandleMenu();
 
+	/** Return true if the user want qui the game */
+	bool isQuit();
+
 private:
+	void loadPal(const string& paln, SDL_Color *palette);
+	void ResetSideColorButtonStates();
+	
 	/** List of mission in archives */
 	MissionMapsClass* missionList;
 	
@@ -83,7 +89,7 @@ private:
 	Button MultiplayerGameButton;
 	
 	/** Button "review intro video" for the main menu */
-	Button IntroAndSneakPeekButton;
+	Button* IntroAndSneakPeekButton;
 	
 	/** Button "exit" for the main menu */
 	Button ExitGameButton;
@@ -128,8 +134,8 @@ private:
 	/** Listbox that contains multi-player missions map */
 	ListboxClass* listBox;
 
-	RA_WindowClass MissionMenu1;
-	RA_WindowClass MultiPlayerMenu;
+	RaWindow MissionMenu1;
+	RaWindow MultiPlayerMenu;
 
 	Dune2Image* cursorimg;
 	CPSImage* dos_logo;
@@ -152,9 +158,9 @@ private:
 	 */
 	int MenuState;
 	int MultiplayerMapnr;
-
-	void loadPal(const std::string& paln, SDL_Color *palette);
-	void ResetSideColorButtonStates(void);
+	
+	/** Is true if the user want qui the game */
+	bool quit;
 };
 
 #endif //MENU_H
