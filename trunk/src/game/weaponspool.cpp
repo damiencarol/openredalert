@@ -1,4 +1,4 @@
-#include "WeaponsPool.h"
+#include "weaponspool.h"
 
 #include <map>
 #include <string>
