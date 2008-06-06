@@ -21,7 +21,7 @@
 #include <string>
 
 #include "ActionEventQueue.h"
-#include "cncmap.h"
+#include "CnCMap.h"
 #include "include/common.h"
 #include "include/config.h"
 #include "include/Logger.h"
