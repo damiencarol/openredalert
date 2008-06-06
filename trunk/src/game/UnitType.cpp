@@ -25,7 +25,7 @@
 #include "SDL/SDL_timer.h"
 
 #include "include/common.h"
-#include "cncmap.h"
+#include "CnCMap.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
 #include "PlayerPool.h"
