@@ -32,7 +32,7 @@
 #include "include/Logger.h"
 #include "PlayerPool.h"
 #include "game/Unit.h"
-#include "WeaponsPool.h"
+#include "weaponspool.h"
 #include "video/ImageCache.h"
 #include "InfantryGroup.h"
 #include "StructureType.h"
