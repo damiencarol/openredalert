@@ -21,7 +21,7 @@
 #include <cmath>
 
 #include "BTurnAnimEvent.h"
-#include "cncmap.h"
+#include "CnCMap.h"
 #include "include/common.h"
 #include "PlayerPool.h"
 #include "ProjectileAnim.h"
