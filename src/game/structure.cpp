@@ -23,7 +23,7 @@
 
 #include "SDL/SDL_timer.h"
 
-#include "cncmap.h"
+#include "CnCMap.h"
 #include "PlayerPool.h"
 #include "Player.h"
 #include "BTurnAnimEvent.h"
@@ -35,7 +35,7 @@
 #include "BAttackAnimEvent.h"
 #include "UnitAndStructurePool.h"
 #include "weaponspool.h"
-#include "dispatcher.h"
+#include "Dispatcher.h"
 #include "BRepairUnitAnimEvent.h"
 #include "weaponspool.h"
 #include "StructureType.h"
