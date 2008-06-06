@@ -261,6 +261,8 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
 	
 	// Create the string table object
 	stringFile = new StringTableFile("conquer.eng");
+	
+	this->sbar = 0;
 }
 
 /**
@@ -383,9 +385,10 @@ SDL_Surface *Sidebar::getSidebarImage(SDL_Rect location)
 //    }
     sbarlocation = location;
 
-	SDL_Surface* radar;
-	if (!Input::isMinimapEnabled())
+	SDL_Surface* radar = 0;
+	if (player->getNumberRadars() > 0)
 	{
+		SDL_Surface* shadow = 0;
 	//	if (pc::Config.gamenum == GAME_TD)
 	//		radar = pc::imgcache->getImage(radarlogo).image;
 	//	else
@@ -397,7 +400,8 @@ SDL_Surface *Sidebar::getSidebarImage(SDL_Rect location)
 
 		// overdraw the with the correct upper part
 		//radar = pc::imgcache->getImage(radaranimnumb, 0).image;
-		ussrAnimRadarImage->getImageAsAlpha(0, &radar);
+		ussrAnimRadarImage->getImage(0, &radar, &shadow, 0);
+		
 		SDL_SetColorKey(radar,SDL_SRCCOLORKEY, 0xffffff);
 		newdest.x = radarlocation.x;
 		newdest.y = radarlocation.y;
@@ -1651,4 +1655,12 @@ SDL_Surface* Sidebar::FixGrey(SDL_Surface* gr, Uint8 imgnum)
 Player* Sidebar::getPlayer()
 {
 	return this->player;
+}
+
+/**
+ * Return if the radar anim is playing
+ */
+bool Sidebar::isRadaranimating()
+{
+	return this->radaranimating;
 }

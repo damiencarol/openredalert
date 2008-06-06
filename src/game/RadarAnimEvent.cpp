@@ -44,11 +44,11 @@ namespace p {
  * @param isBad If isBad = true => Player is bad side 
  *              If isBad = false => Player is good side
  */
-RadarAnimEvent::RadarAnimEvent(Uint8 mode, Sidebar* sideBar)
+RadarAnimEvent::RadarAnimEvent(Uint8 mode, Sidebar* theSidebar)
     : ActionEvent(1)
 {
 	// Set the sidebar
-	this->sidebar = sidebar;
+	this->sidebar = theSidebar;
 	
 	// Get the mode
 	this->mode = mode;
@@ -57,29 +57,31 @@ RadarAnimEvent::RadarAnimEvent(Uint8 mode, Sidebar* sideBar)
     switch (mode) {
     case 0:
         frame = 0;
-        framend = 20;
+        framend = 25;
         break;
     case 1:
-        frame = 20;
-        framend = 30;
+        frame = 22;
+        framend = 42;
         break;
     default:
         frame = 0;
     }
 
 
-    // If the player of the sidebar is GOOD or BAD
-    //if (sideBar->getPlayer()->getSide() &~PS_MULTI) == PS_BAD)
-    //{
-    //	animImages = 
-    //}    
+    // Load the image for logo BAD
+    logoRadarBad = new SHPImage("uradrfrm.shp", -1);
+    
+    // Load the image for logo GOOD
+    logoRadarGood = new SHPImage("nradrfrm.shp", -1);
+    
     
     // Load the image for anim BAD
-    animImagesBad = new SHPImage("ussrradr.shp" , -1);
+    animImagesBad = new SHPImage("ussrradr.shp", -1);
 	
     // Load the image for anim GOOD
-    animImagesGood = new SHPImage("natoradr.shp" , -1);
-    	
+    animImagesGood = new SHPImage("natoradr.shp", -1);
+    
+
     // Schedule this
     p::aequeue->scheduleEvent(this);
 }
@@ -89,8 +91,9 @@ RadarAnimEvent::RadarAnimEvent(Uint8 mode, Sidebar* sideBar)
  */
 void RadarAnimEvent::run()
 {
-	//SDL_Rect *dest = &pc::sidebar->radarlocation;
-	SDL_Surface* radarFrame;
+	SDL_Surface* radarFrame = 0;
+	SDL_Surface* shadow = 0;
+	
 	SDL_Rect dest;
 	dest.x = sidebar->radarlocation.x;
 	dest.y = sidebar->radarlocation.y;
@@ -105,18 +108,22 @@ void RadarAnimEvent::run()
         	// If the player of the sidebar is GOOD or BAD
         	if ((sidebar->getPlayer()->getSide() &~PS_MULTI) == PS_BAD)
         	{
-        		animImagesBad->getImageAsAlpha(frame, &radarFrame);
+        		animImagesBad->getImage(frame, &radarFrame, &shadow, 0);
         	} else {
-        		animImagesGood->getImageAsAlpha(frame, &radarFrame);        	        	
+        		animImagesGood->getImage(frame, &radarFrame, &shadow, 0);
         	}
-        	
+        	//SDL_free 
         	dest.h = radarFrame->h;
             //SDL_FillRect(pc::sidebar->sbar, &dest, SDL_MapRGB(pc::sidebar->sbar->format, 0x0a, 0x0a, 0x0a));
 			SDL_BlitSurface(radarFrame, 0, sidebar->sbar, &dest);
         }
 
         ++frame;
+        // Set delay of 1 ?s between 2 images
+        setDelay(2);
+        
         p::aequeue->scheduleEvent(this);
+        // Draw special icons
     	sidebar->DrawSpecialIcons();
     } else {
         if (mode == 0) 
@@ -124,13 +131,13 @@ void RadarAnimEvent::run()
         	// We got radar
         	if (sidebar->sbar != 0) 
         	{
-        		printf ("%s line %i: Draw last radar image (radar up, mode = %i)\n", __FILE__, __LINE__, mode);
+        		//printf ("%s line %i: Draw last radar image (radar up, mode = %i)\n", __FILE__, __LINE__, mode);
         		// If the player of the sidebar is GOOD or BAD
         		if ((sidebar->getPlayer()->getSide() &~PS_MULTI) == PS_BAD)
         		{
-        			logoRadarBad->getImageAsAlpha(1, &radarFrame);
+        			logoRadarBad->getImage(1, &radarFrame, &shadow, 0);
         		} else {
-        			logoRadarGood->getImageAsAlpha(1, &radarFrame); 
+        			logoRadarGood->getImage(1, &radarFrame, &shadow, 0);
         		}
         		//radarFrame = pc::imgcache->getImage(pc::sidebar->radarlogo, 1).image;
         		SDL_SetColorKey(radarFrame,SDL_SRCCOLORKEY,  0xffffff);
@@ -141,13 +148,13 @@ void RadarAnimEvent::run()
         	// We don't have radar anymore
         	if (sidebar->sbar != 0) 
         	{
-        		printf ("%s line %i: Draw last radar image (radar down, mode = %i)\n", __FILE__, __LINE__, mode);
+        		//printf ("%s line %i: Draw last radar image (radar down, mode = %i)\n", __FILE__, __LINE__, mode);
         		// If the player of the sidebar is GOOD or BAD
         		if ((sidebar->getPlayer()->getSide() &~PS_MULTI) == PS_BAD)
         		{
-        			logoRadarBad->getImageAsAlpha(0, &radarFrame);
+        			animImagesBad->getImage(0, &radarFrame, &shadow, 0);
         		} else {
-        			logoRadarGood->getImageAsAlpha(0, &radarFrame); 
+        			animImagesGood->getImage(0, &radarFrame, &shadow, 0);
         		}
         		SDL_SetColorKey(radarFrame,SDL_SRCCOLORKEY, 0xffffff);
         		dest.h = radarFrame->h;
