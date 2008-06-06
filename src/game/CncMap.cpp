@@ -53,7 +53,7 @@
 #include "include/imageproc.h"
 #include "include/Logger.h"
 #include "PlayerPool.h"
-#include "Triggers.h"
+#include "triggers.h"
 #include "AiCommand.h"
 
 using std::vector;
@@ -2149,7 +2149,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 						}
 						linenum = (ty-y)*width + tx - x;
 						
-						//printf("cncmap::loadIni(%s)\n", owner);							
+						//printf("CnCMap::loadIni(%s)\n", owner);							
 						
 						p::uspool->createStructure(type, linenum, p::ppool->getPlayerNum(owner), health, facing, false, trigger);
 						//                    printf ("%s line %i: createStructure STRUCTURE %s, trigger = %s\n", __FILE__, __LINE__, type, trigger);
@@ -2172,7 +2172,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 						}
 						linenum = (ty-y)*width + tx - x;
 						
-						printf("cncmap::advancedSections(%s)\n", owner);							
+						//printf("CnCMap::advancedSections(%s)\n", owner);							
 						p::uspool->createStructure(type, linenum, p::ppool->getPlayerNum(owner),
 								health, facing, false, trigger);
 					}
