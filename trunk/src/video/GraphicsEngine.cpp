@@ -591,7 +591,7 @@ void GraphicsEngine::DrawMinimap()
 	vector<bool>& mapvis = lplayer->getMapVis();
 
     // draw minimap
-    if (Input::isMinimapEnabled()) 
+    if (lplayer->getNumberRadars()>0 && !pc::sidebar->isRadaranimating()) 
     {
         const Uint8 minizoom = *mz;
         const Uint32 mapwidth = p::ccmap->getWidth();

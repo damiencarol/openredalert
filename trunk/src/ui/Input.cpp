@@ -27,8 +27,8 @@
 #include "Selection.h"
 #include "Sidebar.h"
 
-#include "game/cncmap.h"
-#include "game/dispatcher.h"
+#include "game/CnCMap.h"
+#include "game/Dispatcher.h"
 #include "include/Logger.h"
 #include "game/PlayerPool.h"
 #include "audio/SoundEngine.h"
@@ -55,7 +55,6 @@
 #endif
 
 bool Input::drawing = false;
-bool Input::minimapEnabled = false;
 SDL_Rect Input::markrect;
 
 namespace pc {
@@ -133,7 +132,8 @@ void Input::handle()
 {
     SDL_Event event;
     int mx, my;
-    Uint8 sdir, radarstat;
+    Uint8 sdir;
+    Uint8 radarstat = 0;
     Uint8* keystate;
     static ConfigType config = getConfig();
 
@@ -359,13 +359,17 @@ void Input::handle()
                 	break;
                 // Debug for blobals variables
                 case SDLK_F11:
-                	GlobalVar[2]=1;
-                	GlobalVar[3]=1;
+                	radarstat = 1;
+                	logger->gameMsg("radarstat = %i", radarstat);
+                    //GlobalVar[2]=1;
+                	//GlobalVar[3]=1;
                 	break;
                 // Debug for blobals variables
                 case SDLK_F12:
-                	GlobalVar[2]=0;
-                	GlobalVar[3]=0;
+                	radarstat = 2;
+                	logger->gameMsg("radarstat = %i", radarstat);
+                    //GlobalVar[2]=0;
+                	//GlobalVar[3]=0;
                 	break;
                 	
                 case SDLK_v:
@@ -511,17 +515,16 @@ void Input::handle()
     case 0: // do nothing
         break;
     case 1: // got radar
-    	printf ("%s line %i: got radar\n", __FILE__, __LINE__);
+    	//printf ("%s line %i: got radar\n", __FILE__, __LINE__);
     	pc::sfxeng->PlaySound(pc::Config.RadarUp);
     	// Start the Radar up anim
         pc::sidebar->StartRadarAnim(0); // 0 = RADAR ON
         pc::sidebar->UpdateSidebar();
         break;
     case 2: // lost radar
-    	printf ("%s line %i: lost radar\n", __FILE__, __LINE__);
-    	minimapEnabled = false; // Only in this case minimap is suppress   
+    	//printf ("%s line %i: lost radar\n", __FILE__, __LINE__);
     case 3: // radar powered down
-    	printf ("%s line %i: powerdown/lost radar\n", __FILE__, __LINE__);
+    	//printf ("%s line %i: powerdown/lost radar\n", __FILE__, __LINE__);
         pc::sidebar->StartRadarAnim(1); // 1 = RADAR OFF
 		pc::sfxeng->PlaySound(pc::Config.RadarDown);
 		pc::sidebar->UpdateSidebar();
@@ -1564,16 +1567,15 @@ Uint8 Input::shouldQuit()
 	}
 }
 
-bool Input::isMinimapEnabled()
-{
-    return minimapEnabled;
-}
-
+/**
+ */
 bool Input::isDrawing()
 {
     return drawing;
 }
 
+/**
+ */
 SDL_Rect Input::getMarkRect()
 {
     return markrect;

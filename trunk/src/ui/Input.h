@@ -34,9 +34,9 @@ class Input
 public:
     Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea);
     ~Input();
+    
     void handle();
     Uint8 shouldQuit();
-    static bool isMinimapEnabled();
     static bool isDrawing();
     static SDL_Rect getMarkRect();
     
@@ -73,7 +73,6 @@ private:
 
     static bool drawing;
     static SDL_Rect markrect;
-    static bool minimapEnabled;
 
     Player * lplayer;
     keymod kbdmod;

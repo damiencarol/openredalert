@@ -86,6 +86,9 @@ public:
     
     Player* getPlayer();
     
+    /** @return true if the radar anim is playing */
+    bool isRadaranimating();
+    
 private:
     Sidebar();
     Sidebar(const Sidebar&);
