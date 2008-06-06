@@ -25,7 +25,7 @@
 
 #include "SDL/SDL_timer.h"
 
-#include "cncmap.h"
+#include "CnCMap.h"
 #include "weaponspool.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
