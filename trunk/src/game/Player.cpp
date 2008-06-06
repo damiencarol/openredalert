@@ -25,7 +25,7 @@
 
 #include "CnCMap.h"
 #include "include/config.h"
-#include "dispatcher.h"
+#include "Dispatcher.h"
 #include "misc/INIFile.h"
 #include "PlayerPool.h"
 #include "include/Logger.h"
