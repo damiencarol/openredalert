@@ -21,7 +21,7 @@
 #include <cmath>
 
 #include "ActionEventQueue.h"
-#include "cncmap.h"
+#include "CnCMap.h"
 #include "audio/SoundEngine.h"
 #include "BAttackAnimEvent.h"
 #include "include/Logger.h"
