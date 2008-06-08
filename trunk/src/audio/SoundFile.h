@@ -28,13 +28,16 @@
 
 class VFile;
 
+/**
+ * Audio file
+ */
 class SoundFile
 {
 public:
     SoundFile();
     ~SoundFile();
 
-    bool Open(const std::string& filename);
+    bool Open(const string& filename);
     void Close();
 
     // Length is the max size in bytes of the uncompressed sample, returned
@@ -42,16 +45,19 @@ public:
     Uint32 Decode(SampleBuffer& buffer, Uint32 length = 0);
 
 private:
-    // File data
-    std::string filename;
+    /** Name of the audio file */
+    string filename;
+    /** Reference to the file */
     VFile* file;
     //Uint32 offset;
     bool fileOpened;
 
     // Header information
     Uint16 frequency;
-    Uint32 comp_size; Uint32 uncomp_size;
-    Uint8 flags; Uint8 type;
+    Uint32 comp_size;
+    Uint32 uncomp_size;
+    Uint8 flags;
+    Uint8 type;
 
     // IMADecode state
     Sint32 imaSample;
@@ -61,4 +67,4 @@ private:
     SDL_AudioCVT* conv;
 };
 
-#endif
+#endif //SOUNDFILE_H
