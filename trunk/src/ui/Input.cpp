@@ -131,10 +131,11 @@ Input::~Input()
 void Input::handle()
 {
     SDL_Event event;
-    int mx, my;
+    int mx;
+    int my;
     Uint8 sdir;
     Uint8 radarstat = 0;
-    Uint8* keystate;
+    Uint8* keystate = 0;
     static ConfigType config = getConfig();
 
     while (SDL_PollEvent(&event)) 
