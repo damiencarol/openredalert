@@ -41,6 +41,9 @@ class TemplateImage;
 
 using std::string;
 
+/**
+ * Information about terrain placement
+ */
 struct TerrainEntry
 {
     Uint32 shpnum;
