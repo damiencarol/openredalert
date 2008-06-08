@@ -1,44 +1,71 @@
+// UHarvestEvent.h
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #ifndef UHARVESTEVENT_H
 #define UHARVESTEVENT_H
 
 #include "SDL/SDL_types.h"
 
 #include "UnitAnimEvent.h"
-#include "Unit.h"
 
 #define HARVEST_RETURN_STEP_1	1
 #define HARVEST_RETURN_STEP_2	2
 #define HARVEST_RETURN_STEP_3	3
 #define HARVEST_RETURN_STEP_4	4
 
+class Unit;
 class UnitOrStructure;
 
-class UHarvestEvent : public UnitAnimEvent {
+/**
+ * Animation played when harvester is harvesting
+ */
+class UHarvestEvent : public UnitAnimEvent
+{
 public:
-    UHarvestEvent(Uint32 p, Unit * un);
-    virtual ~UHarvestEvent();
-    void stop();
-    void setHarvestingPos(Uint32 pos);
-    virtual void update();
-    virtual void run();
+	UHarvestEvent(Uint32 p, Unit * un);
+	virtual ~UHarvestEvent();
+
+	void stop();
+	void setHarvestingPos(Uint32 pos);
+	virtual void update();
+	virtual void run();
+
 private:
-	Uint16	RetryMoveCounter;
-	bool	ForceEmpty;		// this is used to empty the truck when it is not full jet.
-	Uint8	ReturnStep;
-	bool	new_orgimage;
-	Unit	*un;
+	int GetBaseRefineryPos();
+
+	Uint16 RetryMoveCounter;
+	/** this is used to empty the truck when it is not full jet. */
+	bool ForceEmpty;
+	Uint8 ReturnStep;
+	bool new_orgimage;
+	Unit* un;
 	bool stopping;
-    bool manual_pauze;
+	bool manual_pauze;
 	UnitOrStructure * target;
 	int index;
-    int delay;
-	int	facing;
+	int delay;
+	int facing;
 	Uint32 MoveTargePos;
-    Uint32 OrgImage;
-	Uint8	NumbResources;		// Number of pieces resource in harvester
-	Uint8	ResourceTypes[10];	// Resource type in harvester
-
-	int GetBaseRefineryPos (void);
+	Uint32 OrgImage;
+	/** Number of pieces resource in harvester */
+	Uint8 NumbResources;
+	/** Resource type in harvester */
+	Uint8 ResourceTypes[10];
 };
 
-#endif
+#endif //UHARVESTEVENT_H
