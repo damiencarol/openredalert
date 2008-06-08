@@ -228,6 +228,7 @@ void VQA::VQAMovie::play()
 	        }
 	    }
 
+        // Unlock the mutex
         SDL_UnlockMutex(sndBufLock);
 
         if (!DecodeVQFRChunk(frame)) {
@@ -477,7 +478,10 @@ Uint32 VQA::VQAMovie::DecodeSNDChunk(Uint8 *outbuf)
 
     return chunklen;
 }
-/** Decodes VQFR Chunk into one frame(?)
+
+/** 
+ * Decodes VQFR Chunk into one frame(?)
+ * 
  * @param pointer to decoded frame
  * @param Current Frame to decode
  */
