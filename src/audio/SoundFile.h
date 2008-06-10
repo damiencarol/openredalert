@@ -28,6 +28,8 @@
 
 class VFile;
 
+using std::string;
+
 /**
  * Audio file
  */
