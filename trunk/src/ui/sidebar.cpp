@@ -138,18 +138,14 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
             throw runtime_error("Unable to load the power image!");
         }
 
-        // Load the sell icon image
+        // Load the sell icon image (-1 = disable scale
         sellImages = new SHPImage("sell.shp", -1);
 
         // Load the repair icon image (-1 = disable scale)
         repairImages = new SHPImage("repair.shp", -1);
         
-        // Load the map icon image
-        try {
-            map_icon = pc::imgcache->loadImage("map.shp", scaleq);
-        } catch (ImageNotFound&) {
-            throw runtime_error("Unable to load the map icon!");
-        }
+        // Load the map icon image (-1 = disable scale)
+        mapImages = new SHPImage("map.shp", -1);
 
         //Powerbar_up	= this->ReadShpImage ("powerbar.shp", 0);
         //Powerbar_down	= this->ReadShpImage ("powerbar.shp", 1);
@@ -839,7 +835,7 @@ Uint8 Sidebar::getSpecialButtonState(Uint8 button)
 }
 
 /**
- * Draw the three specail button below the map location in the sidebar
+ * Draw the three special button below the map location in the sidebar
  */
 void Sidebar::DrawSpecialIcons()
 {
@@ -878,6 +874,7 @@ void Sidebar::DrawSpecialIcons()
 		} else {
 			sellImages->getImage(0, &Sell, &shadow, 0);
 		}
+		SDL_FreeSurface(shadow);
 		SellLoc.x	= 18+IconSpacing;
 		SellLoc.y	= radarlocation.h - Sell->h +2;
 		SellLoc.w	= Sell->w;
@@ -886,10 +883,11 @@ void Sidebar::DrawSpecialIcons()
 
 		// Draw the map icon
 		if (map_but_state < 3){
-			Map	= pc::imgcache->getImage(map_icon,map_but_state).image;
+			mapImages->getImage(map_but_state, &Map, &shadow, 0);
 		} else {
-			Map	= pc::imgcache->getImage(map_icon,3).image;
+			mapImages->getImage(0, &Map, &shadow, 0);
 		}
+		SDL_FreeSurface(shadow);
 		MapLoc.x	= 18+2*IconSpacing;
 		MapLoc.y	= radarlocation.h - Map->h +2;
 		MapLoc.w	= Map->w;

@@ -126,12 +126,16 @@ private:
     Uint32 powerbar;
     Uint32 power_indicator;
 
-    Uint32 map_icon;
+
     Uint8 repair_but_state;
     Uint8 sell_but_state;
     Uint8 map_but_state;
+    
+    /** Location of the "Repair" special button */ 
     SDL_Rect RepairLoc;
+    /** Location of the "Sell" special button */ 
     SDL_Rect SellLoc;
+    /** Location of the "map" special button */ 
     SDL_Rect MapLoc;
 
     SDL_Surface* sbar;
@@ -186,10 +190,12 @@ private:
     /** USSR logo image (below radar) */
     SHPImage* ussrAnimRadarImage;
     
-    /** Repair Images of the sidebar (3 images for the three steps of the button) */
+    /** Repair button images of the sidebar (3 images for the three steps of the button) */
     SHPImage* repairImages;
-    /** Sell Images of the sidebar (3 images for the three steps of the button) */
+    /** Sell button images of the sidebar (3 images for the three steps of the button) */
     SHPImage* sellImages;
+    /** Map button images of the sidebar (3 images for the three steps of the button) */
+    SHPImage* mapImages;
 };
 
 #endif //SIDEBAR_H
