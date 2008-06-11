@@ -58,9 +58,10 @@ using std::max;
 using std::min;
 using std::string;
 
-const string VERSION = "V0.47 beta";
 
-// Bounded by colours.  This will change later
+const string VERSION = "release 307 (beta)";
+
+/** Bounded by colours.  This will change later */
 const Uint8 MAXPLAYERS = 6;
 
 
