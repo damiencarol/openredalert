@@ -71,10 +71,9 @@ extern bool GlobalVar[100];
 /** 
  * Constructor, sets up the input handeler.
  * 
- * @param the sidebar.
- * @param the map.
- * @param the width of the screen.
- * @param the height of the screen.
+ * @param maparea area of the map
+ * @param screenwidth the width of the screen.
+ * @param screenheight the height of the screen.
  */
 Input::Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea) :
     width(screenwidth), 
