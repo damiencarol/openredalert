@@ -59,6 +59,7 @@ namespace pc {
     extern Sidebar* sidebar;
 }
 extern Logger * logger;
+extern const string VERSION;
 
 /** 
  * Constructor, inits the sdl graphics and prepares to render maps and 
@@ -69,7 +70,6 @@ extern Logger * logger;
 GraphicsEngine::GraphicsEngine()
 {
     ConfigType config;
-    string caption;
     config = getConfig();
     width = config.width;
     height = config.height;
@@ -81,31 +81,20 @@ GraphicsEngine::GraphicsEngine()
 	MoneySurface = 0;
 	OptionsSurface = 0;
 
-	// Set the caption, not nessesary but nice =)
-	switch (config.gamemode) {
-		case 0:
-			caption = "FreeRA - " + config.mapname;
-			break;
-		case 1:
-			caption = "FreeRA - skirmish on " + config.mapname + " with ";// + string(config.totalplayers-1) + " bots.";
-			break;
-		case 2:
-			caption = "FreeRA - multiplayer on " + config.mapname + " as " + config.nick;// + " (" + config.playernum + "/" + config.totalplayers +")";
-			break;
-		default:
-			caption = "THIS IS A BUG. (unknown mode)";// + string(config.gamemode) + ")";
-			break;
-	};
+
+	/// Set the caption of the game window
+	string caption = "OpenRedAlert - ";
+    caption += VERSION;
 	SDL_WM_SetCaption(caption.c_str(), 0);
 	
 	
 	SDL_WM_GrabInput(config.grabmode);
 
-	// Init the screen
-	icon = SDL_LoadBMP_RW(SDL_RWFromFile("data/gfx/icon.bmp", "rb"), 1);
-	if (icon != 0){
-		SDL_WM_SetIcon(icon, 0);
-	}
+	// Init the icon of the main window
+	//icon = SDL_LoadBMP_RW(SDL_RWFromFile("data/gfx/icon.bmp", "rb"), 1);
+	//if (icon != 0){
+	//	SDL_WM_SetIcon(icon, 0);
+	//}
 
 	//config.videoflags = SDL_SWSURFACE|SDL_ANYFORMAT|SDL_GLSDL|SDL_DOUBLEBUF;
 
@@ -201,9 +190,9 @@ GraphicsEngine::~GraphicsEngine()
 	if (pc::msg != 0)
 		delete pc::msg;
     pc::msg = 0;
-	if (icon != 0)
-		SDL_FreeSurface(icon);
-	icon = 0;
+	//if (icon != 0)
+	//	SDL_FreeSurface(icon);
+	//icon = 0;
 
 	if (FrameRateSurface != 0)
 		SDL_FreeSurface (FrameRateSurface);
