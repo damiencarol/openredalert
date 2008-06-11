@@ -290,7 +290,7 @@ void Player::setMultiColour(const char* colour)
 /**
  * Set the palette of the player
  * 
- * @colour number of the palette
+ * @param colour number of the palette
  */
 void Player::setMultiColour(const int colour)
 {
