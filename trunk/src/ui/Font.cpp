@@ -1,3 +1,21 @@
+// Font.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "Font.h"
 
 #include <string>
@@ -232,8 +250,7 @@ Uint32 Font::Font(const std::string& text) const {
  * @param BGcolor is the background of the text
  * @param startx is the xpos on the surface where the text will be drawn
  * @param starty is the ypos on the surface where the text will be drawn
- * @returns void
- **/
+ */
 void Font::drawText(const string& text, SDL_Surface *SrcSurf, Uint32 SrcStartx, Uint32 SrcStarty, SDL_Surface *DestSurf, SDL_Color FGcolor, Uint32 DestStartx, Uint32 DestStarty)
 {
 	Uint32 i;
