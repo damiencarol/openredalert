@@ -44,7 +44,7 @@ extern Logger * logger;
 /** 
  * Constructor, opens the file
  * 
- * @param the name of the inifile to open.
+ * @param filename the name of the inifile to open.
  */
 INIFile::INIFile(const char* filename)
 {
@@ -177,8 +177,8 @@ INIFile::~INIFile()
  * Function to extract a string from a ini file. The string is mallocated 
  * in this function so it should be freed.
  * 
- * @param the section in the file to extract string from.
- * @param the name of the string to extract.
+ * @param section the section in the file to extract string from.
+ * @param value the name of the string to extract.
  * @return the extracted string.
  */
 char* INIFile::readString(const char* section, const char* value)
@@ -240,6 +240,9 @@ char* INIFile::readString(const char* section, const char* value,
 	return tmp;
 }
 
+/**
+ * 
+ */
 int INIFile::readInt(const char* section, const char* value, Uint32 deflt)
 {
 	try
@@ -267,8 +270,8 @@ int INIFile::readInt(const char* section, const char* value, Uint32 deflt)
  * Function to extract a integer value from a ini file. The value
  * can be given in hex if it starts with 0x.
  * 
- * @param the section in the file to extract values from.
- * @param the name of the value to extract.
+ * @param section the section in the file to extract values from.
+ * @param value the name of the value to extract.
  * @return the value.
  */
 int INIFile::readInt(const char* section, const char* value)
@@ -315,8 +318,8 @@ int INIFile::readInt(const char* section, const char* value)
  * Function to extract a float value from a ini file. The value
  * can be given in hex if it starts with 0x.
  * 
- * @param the section in the file to extract values from.
- * @param the name of the value to extract.
+ * @param section the section in the file to extract values from.
+ * @param value the name of the value to extract.
  * @return the value.
  */
 float INIFile::readFloat(const char* section, const char* value)
