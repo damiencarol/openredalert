@@ -50,6 +50,8 @@ namespace pc {
 extern Logger * logger;
 
 /**
+ * 
+ * @bug the constructor of menu make some bugs in map drawing
  */ 
 Menu::Menu() : StartNewGameButton()
 {
