@@ -23,15 +23,17 @@
 #include "ActionEventQueue.h"
 #include "Player.h"
 #include "include/config.h"
-
+#include "include/Logger.h"
 #include "misc/INIFile.h"
+#include "GameMode.h"
 
 using std::vector;
 
 namespace pc
 {
-extern ConfigType Config;
+	extern ConfigType Config;
 }
+extern Logger* logger;
 
 PlayerPool::PlayerPool(INIFile *inifile, Uint8 gamemode)
 {
@@ -274,6 +276,14 @@ void PlayerPool::playerDefeated(Player *pl)
 			won = true;
 		}
 	}
+	
+	
+	// If it's not single player mission
+	if (gamemode == GAME_MODE_SKIRMISH ||
+		gamemode == GAME_MODE_MULTI_PLAYER)
+	{
+		logger->gameMsg("Player \"%s\" defeated", pl->getName());
+	}
 }
 
 void PlayerPool::playerUndefeated(Player* pl)
@@ -301,7 +311,34 @@ void PlayerPool::playerUndefeated(Player* pl)
 	}
 }
 
-INIFile * PlayerPool::getMapINI()
+/**
+ * 
+ */
+void PlayerPool::playerVictorious(Player* pl)
+{
+	Uint8 i;
+
+	pl->setAlliances();
+	for (i = 0; i < playerpool.size(); i++)
+	{
+		if (playerpool[i] == pl)
+		{
+			pl->setVictorious(true);
+			break;
+		}
+	}
+	
+	if (gamemode == 0)//GAME_MODE_SINGLE_PLAYER)
+	{
+		if (i == localPlayer)
+		{
+			lost = false;
+			won = true;
+		}
+	}
+}
+
+INIFile* PlayerPool::getMapINI()
 {
 	return mapini;
 }
