@@ -241,7 +241,7 @@ void Game::InitializeGameClasses()
 		throw runtime_error("Unable to initialise the graphics engine");
 	}
 
-	// Initialise Sound
+	/// Initialise Sound
 	try
 	{
 		logger->note("Initialising the sound engine...");
@@ -255,6 +255,7 @@ void Game::InitializeGameClasses()
 		throw runtime_error("Unable to initialise the sound engine");
 	}
 
+	/// Initialise the VFS file system
 	VFSUtils::VFS_PreInit(pc::Config.binpath.c_str());
 	VFSUtils::VFS_Init(pc::Config.binpath.c_str());
 	VFSUtils::VFS_LoadGame(pc::Config.gamenum);
@@ -450,9 +451,16 @@ void Game::play()
 	missions = new MissionMapsClass();
 
 	do
-	{
+	{		
 		// Create the new game classes
 		InitializeGameClasses();
+
+		// Menu to use
+		Menu* lMenu = new Menu(); 
+	
+		// Start with a clean image cache
+		pc::imgcache->Cleanup();
+		
 
 		//****************************
 		// @todo DEBUG
@@ -525,8 +533,6 @@ void Game::play()
 		pc::sfxeng->LoadSound("intro.aud");
 		// Play this sound
 		pc::sfxeng->PlayLoopedSound("intro.aud", 0);
-		// Menu to use
-		Menu* lMenu = new Menu(); 
 			
 		// Draw the starting menu
 		if (!missionWon)
@@ -543,7 +549,7 @@ void Game::play()
 			lMenu->HandleMenu();
 
 			// Cleanup the image cache again
-			pc::imgcache->Cleanup();
+			//pc::imgcache->Cleanup();
 		}
 
 		BattleControlTerminated = false;
