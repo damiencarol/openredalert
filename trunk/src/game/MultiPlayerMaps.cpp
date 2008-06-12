@@ -67,6 +67,23 @@ void MultiPlayerMaps::readMapData()
 	Uint32	pos;
 	Uint32	pos1;
 
+	// Test the ABANDON1.mpr file
+	MapFile = VFSUtils::VFS_Open("ABANDON1.INI");
+	// Return with error
+	if (MapFile == 0) 
+	{
+		// Logg it
+		logger->error("Unable to locate ABANDON1.MPR file!\n");
+	}
+	else
+	{	// Logg it
+		logger->note("Load ABANDON1.mpr file\n");
+		MapNames.push_back(string("ABANDON1"));
+		MapDescriptions.push_back(string("Abandoned Battlefield (Med)"));										
+	}
+
+
+
  	// Open the MP map description file "missions.pkt"
 	MapFile = VFSUtils::VFS_Open("missions.pkt");
 	// Return with error
