@@ -55,6 +55,9 @@ public:
     /** Called by input to see if radar status has changed.*/
     Uint8 statRadar();
 
+	/** Set a player victorious */
+	void playerVictorious(Player* pl);
+
 private:
     PlayerPool();
     PlayerPool(const PlayerPool&);
