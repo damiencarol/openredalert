@@ -27,6 +27,7 @@
 #include "Selection.h"
 #include "Sidebar.h"
 
+#include "game/GameMode.h"
 #include "game/CnCMap.h"
 #include "game/Dispatcher.h"
 #include "include/Logger.h"
@@ -94,6 +95,16 @@ Input::Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea) :
     sx(0), 
     sy(0)
 {
+	
+	// Add a message for Single player game (Missions)
+	if (pc::Config.gamemode == GAME_MODE_SINGLE_PLAYER) 
+	{
+		logger->gameMsg("MISSIONS ARE NOT FULLY IMPLEMENTED YOU CAN CHEAT NOW.");
+		logger->gameMsg("PRESS F9 TO GO TO THE NEXT MISSION.");
+	}
+    
+	
+	
     if (lplayer->isDefeated()) {
         logger->gameMsg("%s line %i: TEMPORARY FEATURE: Free MCV because of no initial", __FILE__, __LINE__);
         logger->gameMsg("units or structures.  Fixing involves adding triggers.");
@@ -352,7 +363,7 @@ void Input::handle()
                     p::uspool->showMoves();
                     break;
                 case SDLK_F9:
-                    p::ppool->playerUndefeated(p::ppool->getLPlayer());
+                    p::ppool->playerVictorious(p::ppool->getLPlayer());
                     break;
                 case SDLK_F10:
                 	p::ppool->playerDefeated(p::ppool->getLPlayer());
