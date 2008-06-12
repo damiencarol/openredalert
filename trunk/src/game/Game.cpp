@@ -586,7 +586,10 @@ void Game::play()
 		InitializeMap(pc::Config.mapname);
 
 		// Start playing the background music
-		pc::sfxeng->PlayTrack(p::ccmap->getMissionData()->theme);
+		if (p::ccmap->getMissionData()->theme != 0)
+		{
+			pc::sfxeng->PlayTrack(p::ccmap->getMissionData()->theme);
+		}
 
 		// Setup the current game
 		pc::gfxeng->setupCurrentGame();
