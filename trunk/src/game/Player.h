@@ -47,7 +47,8 @@ class Player
 public:
 	explicit Player(const char *pname, INIFile *mapini);
 	~Player();
-	bool isLPlayer (void);
+	
+	bool isLPlayer();
 	void setPlayerNum(Uint8 num);
 	void setMultiColour(const char* colour);
 	void setMultiColour(const int colour);
@@ -138,7 +139,14 @@ public:
 	void enableInfMoney();
 	
 	Sint32 getTechLevel();
+	/** Return number of radar of the player */
 	Uint32 getNumberRadars();
+	
+	/** Set if the player is victorious */
+	void setVictorious(bool victorious);
+	/** Return if the player is victorious */
+	bool isVictorious();
+	
 private:
 	/** Do not want player being constructed using default constructor*/
 	Player() ;
@@ -216,6 +224,9 @@ private:
 	Uint8 brad;
 	/** @todo : REMOVE THAT  Map Width */
 	Uint16 mwid;
+	
+	/** Is true if the player is victorious */
+	bool victorious;
 };
 
 #endif //PLAYER_H

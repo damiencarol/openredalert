@@ -520,6 +520,10 @@ void Player::builtUnit(Unit* un)
     }
 }
 
+/**
+ * @param un the Unit lost
+ * @param wasDeployed true if the Unit was lost after deploy
+ */
 void Player::lostUnit(Unit* un, bool wasDeployed)
 {
     Uint32 i;
@@ -532,8 +536,9 @@ void Player::lostUnit(Unit* un, bool wasDeployed)
 //        logger->gameMsg("%s has %d structs and %d units", playername, (Uint32)structurepool.size(), (Uint32)unitpool.size()-1);
         ++unitlosses;
     }
-    if( unitpool.size() <= 1 && structurepool.empty() && !wasDeployed) {
-        logger->gameMsg("Player \"%s\" defeated", playername);
+    if( unitpool.size() <= 1 && structurepool.empty() && !wasDeployed) 
+    {
+    	// Defeat this player
         defeated = true;
         p::ppool->playerDefeated(this);
     } else {
@@ -1130,7 +1135,26 @@ Player::Player(const Player&)
 {
 }
 
+/**
+ * @return Number of Radars.
+ */
 Uint32 Player::getNumberRadars()
 {
 	return numberRadars;
+}
+
+/** 
+ * @param value the new value for victorious
+ */
+void Player::setVictorious(bool value)
+{
+	this->victorious = value;
+}
+
+/** 
+ * @return <code>true</code> if the player is victorious else <code>false</code>
+ */
+bool Player::isVictorious()
+{
+	return victorious;
 }
