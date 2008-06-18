@@ -619,9 +619,13 @@ void Player::builtStruct(Structure* str)
     if (playernum == p::ppool->getLPlayerNum()) {
     	p::ppool->updateSidebar();
     }
-        
-    // Check TRIGGER "Low Power"
-    HandleGlobalTrigger(TRIGGER_EVENT_LOW_POWER, this->getPlayerNum());
+
+    // If this player has no power
+    if (this->getPowerUsed() > this->getPower())
+    {
+    	// Check TRIGGER "Low Power"
+        HandleGlobalTrigger(TRIGGER_EVENT_LOW_POWER, p::ppool->getHouseNumByPlayerNum(this->getPlayerNum()));
+    }
 }
 
 void Player::lostStruct(Structure* str)
@@ -1135,26 +1139,7 @@ Player::Player(const Player&)
 {
 }
 
-/**
- * @return Number of Radars.
- */
 Uint32 Player::getNumberRadars()
 {
 	return numberRadars;
-}
-
-/** 
- * @param value the new value for victorious
- */
-void Player::setVictorious(bool value)
-{
-	this->victorious = value;
-}
-
-/** 
- * @return <code>true</code> if the player is victorious else <code>false</code>
- */
-bool Player::isVictorious()
-{
-	return victorious;
 }
