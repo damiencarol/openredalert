@@ -25,7 +25,6 @@
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_video.h"
 
-
 #include "ui/RA_Label.h"
 
 class Message;
@@ -34,25 +33,28 @@ using std::list;
 using std::string;
 
 /**
- * 
+ * Object which manage all in-game message 
  */
 class MessagePool
 {
 public:
-    MessagePool();
-    void setWidth(Uint32 width) ;
-    Uint32 getWidth() const ;
-    ~MessagePool();
-    SDL_Surface *getMessages();
-    void postMessage(string msg);
-    void clear();
-    void refresh();
+	MessagePool();
+	~MessagePool();
+
+	void setWidth(Uint32 width);
+	Uint32 getWidth() const;
+	SDL_Surface *getMessages();
+	void postMessage(string msg);
+	void clear();
+	void refresh();
+
 private:
-    list<Message> msglist;
-    bool updated;
-    SDL_Surface* textimg;
-    RA_Label msglabel;
-    Uint32 width;
+	list<Message> msglist;
+	bool updated;
+	SDL_Surface* textimg;
+	/** Current Label */
+	RA_Label* msglabel;
+	Uint32 width;
 };
 
 #endif //MESSAGEPOOL_H

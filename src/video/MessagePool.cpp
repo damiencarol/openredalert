@@ -22,6 +22,7 @@
 #include <functional>
 
 #include "SDL/SDL_types.h"
+#include "SDL/SDL_video.h"
 #include "SDL/SDL_timer.h"
 
 #include "video/Renderer.h"
@@ -32,21 +33,35 @@
 
 using std::list;
 
+/**
+ */
 MessagePool::MessagePool() : updated(false), textimg(0), width(0)
 {
-    const SDL_Color White = {255, 255, 255, 0};
+	/// Create a new color for text (here pure LIGHT GREEN)
+    SDL_Color textColor = {208, 255, 208, 0};
 
-	msglabel.setColor(White);
-	msglabel.UseAntiAliasing(false);
-	msglabel.SetFont("grad6fnt.fnt");
+    /// Create and init the label
+    msglabel = new RA_Label();
+    // Set the color, antiliasing and font
+	msglabel->setColor(textColor);
+	msglabel->UseAntiAliasing(false);
+	msglabel->SetFont("grad6fnt.fnt");
 }
 
+/**
+ */
 MessagePool::~MessagePool()
 {
+	// Free surface of the text
     SDL_FreeSurface(textimg);
+    
+    // Free the label
+    delete msglabel;
 }
 
-SDL_Surface *MessagePool::getMessages()
+/**
+ */
+SDL_Surface* MessagePool::getMessages()
 {
     Uint32 curtick = SDL_GetTicks();
     SDL_Rect dest;
@@ -67,12 +82,12 @@ SDL_Surface *MessagePool::getMessages()
     }
     updated = false;
     SDL_FreeSurface(textimg);
-    textimg = NULL;
+    textimg = 0;
     if (msglist.empty()) {
         return textimg;
     }
     textimg = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, width,
-            static_cast<int>(msglist.size()*(msglabel.getHeight()+1)), 16, 0, 0, 0, 0);
+            static_cast<int>(msglist.size()*(msglabel->getHeight()+1)), 16, 0, 0, 0, 0);
     dest.x = 0;
     dest.y = 0;
     dest.w = textimg->w;
@@ -85,6 +100,8 @@ SDL_Surface *MessagePool::getMessages()
     return textimg;
 }
 
+/**
+ */
 void MessagePool::postMessage(string msg)
 {
 	string mess = msg;	
@@ -92,12 +109,16 @@ void MessagePool::postMessage(string msg)
     updated = true;
 }
 
+/**
+ */
 void MessagePool::clear()
 {
     msglist.clear();
     updated = true;
 }
 
+/**
+ */
 void MessagePool::refresh()
 {
     //Reload the font
@@ -107,11 +128,15 @@ void MessagePool::refresh()
     getMessages(); //Forces the SDL_Surface to reload
 }
 
+/**
+ */
 void MessagePool::setWidth(Uint32 width)
 {
 	this->width = width;
 }
 
+/**
+ */
 Uint32 MessagePool::getWidth() const 
 {
 	return width;
