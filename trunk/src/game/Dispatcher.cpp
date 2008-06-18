@@ -165,7 +165,8 @@ bool Dispatcher::structurePlace(const char* tname, Uint32 pos, Uint8 owner)
     return true;
 }
 
-bool Dispatcher::unitSpawn(UnitType* type, Uint8 owner) {
+bool Dispatcher::unitSpawn(UnitType* type, Uint8 owner) 
+{
     switch (logstate) {
         case RECORDING:
             // deliberate fallthrough
