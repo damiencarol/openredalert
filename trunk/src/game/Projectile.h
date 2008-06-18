@@ -13,7 +13,9 @@ class SHPImage;
 using std::string;
 using std::vector;
 
-
+/**
+ * Projectille in game
+ */
 class Projectile
 {
 public:
@@ -37,4 +39,4 @@ private:
 };
 
 
-#endif
+#endif //PROJECTILE_H
