@@ -51,7 +51,7 @@ MIXFiles::~MIXFiles()
  */
 bool MIXFiles::loadArchive(const char *fname) 
 {
-    VFile *file;
+    VFile* file = 0;
     
     // 
     //logger->debug("Loading archive [%s]\n", fname);
