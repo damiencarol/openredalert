@@ -23,8 +23,7 @@ extern Logger * logger;
 ExternalFiles * VFSUtils::externals = 0;
 MIXFiles * VFSUtils::mixfiles = 0;
 
-/** 
- * Sets up externals so that the logger can work
+/**
  */
 void VFSUtils::VFS_PreInit(const char* binpath)
 {
@@ -160,6 +159,8 @@ void VFSUtils::VFS_Init(const char* binpath)
 	exit(1);
 }
 
+/**
+ */
 void VFSUtils::VFS_Destroy()
 {
 	// Free mixfiles (originals from Westwood)
@@ -214,7 +215,6 @@ VFile * VFSUtils::VFS_Open(const char *fname, const char* mode)
 }
 
 /**
- * Close a VFile
  */
 void VFSUtils::VFS_Close(VFile* file)
 {
@@ -226,6 +226,8 @@ void VFSUtils::VFS_Close(VFile* file)
 	}
 }
 
+/**
+ */
 const char* VFSUtils::VFS_getFirstExisting(const std::vector<const char*>& files)
 {
 	VFile* tmp;
@@ -241,6 +243,8 @@ const char* VFSUtils::VFS_getFirstExisting(const std::vector<const char*>& files
 	return NULL;
 }
 
+/**
+ */
 const char* VFSUtils::VFS_getFirstExisting(Uint32 count, ...)
 {
 	VFile* tmp;
@@ -261,8 +265,8 @@ const char* VFSUtils::VFS_getFirstExisting(Uint32 count, ...)
 	va_end(ap);
 	return NULL;
 }
-/** 
- * Try to load all archive of a specific game
+
+/**
  */
 void VFSUtils::VFS_LoadGame(gametypes gt)
 {
