@@ -1570,6 +1570,7 @@ void CnCMap::loadIni()
 	// (the circle when clicking for movement)
 	char moveflsh[13] = "moveflsh.";
 	strncat(moveflsh, missionData->theater, 3);
+	flashnum = 0;
 	// Load the images and save the number
 	flashnum = pc::imgcache->loadImage(moveflsh);
 	
