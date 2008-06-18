@@ -156,7 +156,8 @@ Menu::Menu() : StartNewGameButton()
 	ButtonYpos += button_height + button_space;
 
 	
-	InternetGameButton.CreateSurface("Internet Game", ButtonXpos, ButtonYpos, button_width, button_height);
+	// Set pos and label (the string 479 is "internet game" but located)
+	InternetGameButton.CreateSurface(strFile->getString(479), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
@@ -167,7 +168,9 @@ Menu::Menu() : StartNewGameButton()
 	ButtonYpos += button_height + button_space;;
 
 	
-	MultiplayerGameButton.CreateSurface("Multiplayer Game", ButtonXpos, ButtonYpos, button_width, button_height);
+	// Set pos and label (the string 154 is "multiplayer game" but located)
+	// Set pos and label (the string 482 is "Escamouche game" but located)
+	MultiplayerGameButton.CreateSurface(strFile->getString(482), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
