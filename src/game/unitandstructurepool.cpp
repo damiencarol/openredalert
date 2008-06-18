@@ -1020,16 +1020,20 @@ Unit* UnitAndStructurePool::getGroundUnitAt( Uint32 cell, Uint8 subcell )
 		return 0;
 	}
 
-	if (unitandstructmat[cell].flags & US_IS_UNIT) {
+	if (unitandstructmat[cell].flags & US_IS_UNIT) 
+	{
 		un = getUnit(unitandstructmat[cell].unitnumb);
-		if( un != 0 ){
-			if( ((UnitType *)un->getType())->isInfantry() ){
+		if (un != 0)
+		{
+			if( ((UnitType *)un->getType())->isInfantry() )
+			{
 				if (subcell == 0x80){
 					return un;
-				}else
+				} else {
 					return un->getInfantryGroup()->UnitAt(subcell);
+				}
 			}
-        	return (un);
+        	return un;
 		}
 	}
 	return 0;
