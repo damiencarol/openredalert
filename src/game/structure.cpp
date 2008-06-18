@@ -54,8 +54,7 @@
 #include "InfantryGroup.h"
 #include "include/config.h"
 #include "ActionEventQueue.h"
-#include "video/ImageCache.h"
-#include "ExplosionAnim.h"
+#include "BarrelExplosionActionEvent.h"
 
 namespace p {
 	extern ActionEventQueue* aequeue;
@@ -65,7 +64,6 @@ namespace pc {
     extern ConfigType Config;
     extern Ai * ai;
     extern SoundEngine* sfxeng;
-    extern ImageCache* imgcache;
 }
 extern Logger * logger;
 
@@ -381,7 +379,6 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 			if (attacker != 0){
 				p::ppool->getPlayer(attacker->getOwner())->addStructureKill();
 			}
-
 			//printf ("%s line %i: Start explode anim for structure: %i\n", __FILE__, __LINE__, (int) this);
 			BExplodeAnimEvent* boom = new BExplodeAnimEvent(1,this);
 			if (animating) {
@@ -392,15 +389,12 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 				p::aequeue->scheduleEvent(boom);
 			}
 			
-			// Add barril explosion
-			if (string(type->getTName()) == "BARL" || string(type->getTName()) == "BRL3")
+			// If it was a barrel
+			if (string(type->getTName()) == "BARL" ||
+				string(type->getTName()) == "BRL3")
 			{
-				//Uint32 numImageExplosion = pc::imgcache->load("firel.shp");
-				Uint32 num = pc::imgcache->loadImage("napalm3.shp");
-				new ExplosionAnim(3, this->getPos(),
-                			num, 14, -36, -36);
-                			//static_cast<Uint8>(p::ccmap->getMoveFlash()->getNumImg()), 0, 0);
-                		
+				// Create the barrel Explosion Anim
+				new BarrelExplosionActionEvent(3, this->getPos());
 			}
 		}
 		return;
