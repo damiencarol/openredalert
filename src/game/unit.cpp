@@ -569,7 +569,7 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 		doRandTalk(TB_die);
 
         // Add a death for stats
-        if (attacker != NULL){
+        if (attacker != 0){
         	p::ppool->getPlayer(attacker->getOwner())->addUnitKill();
         }
         
@@ -591,16 +591,22 @@ void Unit::updateDamaged()
 	ratio = (double)getHealth() / (double)type->getMaxHealth();
 }
 
+/**
+ * @return <code>true</code> if the unit is an harvester else return <code>false</code>
+ */
 bool Unit::IsHarvester() 
 {
-	if (strcmp ((char*)type->getTName(), "HARV") == 0)
+	if (string(type->getTName()) == "HARV")
+	{
 		return true;
+	}
 	return false;
 }
 
 bool Unit::IsHarvesting() 
 {
-	if (harvestanim != NULL){
+	if (harvestanim != 0)
+	{
 		return true;
 	}
 	return false;
@@ -611,7 +617,7 @@ bool Unit::IsHarvesting()
  */
 Uint32 Unit::FindTiberium()
 {
-	Uint32 tiberium;
+	Uint32 tiberium = 0;
 	Uint32 ClosesedPos = 0;
 	Uint32 ClosesedDistance = 0;
 	Uint32 Distance = 0;
@@ -620,13 +626,16 @@ Uint32 Unit::FindTiberium()
 	bool FirstFound = false;
 	bool FirstExpensiveFound = false;
 	
-	Uint8 type, amount;
+	Uint8 type;
+	Uint8 amount;
 	
 	//getUnitAt(Uint32 cell, Uint8 subcell);
 
-	for (unsigned int pos =0; pos < p::ccmap->getSize(); pos++){
+	for (unsigned int pos =0; pos < p::ccmap->getSize(); pos++)
+	{
 		tiberium = p::ccmap->getResource(pos, &type, &amount);
-		if (tiberium != 0) {
+		if (tiberium != 0)
+		{
 			// Found tiberium
 			//printf ("Found tiberium\n");
 			Distance = this->getDist(pos);
@@ -891,7 +900,7 @@ void Unit::SetBaseRefinery (Structure *Bref)
 {
 	printf ("Set base refinery\n");
 	BaseRefinery = Bref;
-	if (harvestanim == NULL) 
+	if (harvestanim == 0) 
 	{
 		harvestanim = new UHarvestEvent(0, this);
 		p::aequeue->scheduleEvent(harvestanim);
@@ -976,7 +985,7 @@ void Unit::setInfianim(UInfiltrateAnimEvent* anim)
 }
 
 /** 
- * Action to infiltrate
+ * @param target Structure to infiltrate
  */
 void Unit::Infiltrate(Structure* target)
 {
