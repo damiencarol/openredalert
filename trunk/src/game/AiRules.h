@@ -13,9 +13,12 @@ class AiRules
 public:
     /** Average delay between computer attacks. (defaut = 3) */
 	Uint8 AttackInterval;
-	Uint8 AttackDelay;	//=5		; average delay time before computer begins first attack
-	float PatrolScan;	//=.016		; minute interval between scanning for enemys while patrolling.
-	Uint8 CreditReserve;	//=100		; Structure repair will not begin if available cash falls below this amount.
+	/** Average delay time before computer begins first attack (defaut = 5) */
+	Uint8 AttackDelay;
+	/** Minute interval between scanning for enemys while patrolling. (defaut = 0.016) */
+	float PatrolScan;
+	/** Structure repair will not begin if available cash falls below this amount. (defaut = 100) */
+	Uint8 CreditReserve;
 	float PathDelay;	//=.01		; Delay (minutes) between retrying when path is blocked.
 	Uint8 OreNearScan;	//=6		; cell radius to scan when harvesting a single patch of ore
 	Uint8 OreFarScan;	//=48		; cells radius to scan when looking for a new ore patch to harvest
@@ -38,7 +41,8 @@ public:
 	Uint8 TeslaLimit;	//=10		; maximum number of tesla coils to build
 	float HelipadRatio;	//=.12		; ratio of base that should be composed of helipads
 	Uint8 HelipadLimit;	//=5		; maximum number of helipads to build
-	float AirstripRatio;	//=.12		; ratio of base that should be composed of airstrips
+	/** Ratio of base that should be composed of airstrips (defaut = 0.12) */
+	float AirstripRatio;
 	Uint8 AirstripLimit;	//=5		; maximum number of airstrips to build
 	bool CompEasyBonus;	//=yes		; When more than one human in game, computer player goes to "easy" mode?
 	bool Paranoid;		//=yes		; Will computer players ally with each other if the situation looks bleak?
