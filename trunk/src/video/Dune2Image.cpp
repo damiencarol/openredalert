@@ -40,16 +40,17 @@ extern Logger * logger;
 /**
  * Constructor loads a dune2 shpfile.
  *
- * @param the mixfiles.
- * @param the name of the dune2 shpfile.
+ * @param fname the name of the dune2 shpfile.
+ * @param scaleq do scalling or not
  */
 Dune2Image::Dune2Image(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
 {
-    VFile *imgfile;
+    VFile* imgfile = 0;
     
     // Open the file in .mix archivefile
     imgfile = VFSUtils::VFS_Open(fname);
-    if( imgfile == 0 ) {
+    if (imgfile == 0) 
+    {
         logger->error(" File \"%s\" not found.\n", fname);
         shpdata = 0;
         throw ImageNotFound("File \"" + string(fname) + "\" not found.");
@@ -76,20 +77,23 @@ Dune2Image::~Dune2Image()
 /** 
  * Decode a image in the dune2 shp.
  * 
- * @param the number of the image to decode.
- * @returns a SDL_Surface containing the image.
+ * @param imgnum the number of the image to decode.
+ * @return a SDL_Surface containing the image.
  */
-SDL_Surface *Dune2Image::getImage(Uint16 imgnum)
+SDL_Surface* Dune2Image::getImage(Uint16 imgnum)
 {
-    SDL_Surface *image, *optimage;
+    SDL_Surface* image = 0;
+    SDL_Surface* optimage = 0;
     Uint32 startpos;
-    Uint8 *d, *data;
+    Uint8* d = 0;
+    Uint8* data = 0;
 
-    startpos = getD2Header( imgnum );
+    startpos = getD2Header(imgnum);
 
     data = new Uint8[lnkHeader.cx * lnkHeader.cy];
 
-    if( ~lnkHeader.compression & 2 ) {
+    if( ~lnkHeader.compression & 2 ) 
+    {
         d = new Uint8[lnkHeader.size_out];
 
         memset(d, 0, lnkHeader.size_out);
@@ -135,8 +139,8 @@ SDL_Surface *Dune2Image::getImage(Uint16 imgnum)
 /** 
  * Read the header of a specified dune2 shp.
  * 
- * @param the number of the image to read the header from.
- * @returns the offset of the image.
+ * @param imgnum the number of the image to read the header from.
+ * @return the offset of the image.
  */
 Uint32 Dune2Image::getD2Header(Uint16 imgnum)
 {
