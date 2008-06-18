@@ -348,7 +348,7 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
 			param);
 	
 	// Check if there are someone behind this trigger :)
-    if (UnitOrStructure == NULL){
+    if (UnitOrStructure == 0){
     	logger->warning("%s line %i: No structure defined ! \n", __FILE__, __LINE__);
         return;
     }
@@ -399,7 +399,7 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
   		//printf ("%s line %i: FREE REPEATING TRIGGER %i\n", __FILE__, __LINE__, AssociatedTrigger->repeatable);
   		break;
   	}
-return;
+
     switch (AssociatedTrigger->activate)
     {
         // Only trigger event 1 must be true
