@@ -1001,9 +1001,9 @@ void Input::clickMap(int mx, int my)
 				}
 				printf ("%s line %i: Move water based unit\n", __FILE__, __LINE__);
 				selected->moveUnits(pos);
-			/*	new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
-					static_cast<Uint8>(p::ccmap->getMoveFlash()->getNumImg()), 0, 0);
-			*/	
+				new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
+					static_cast<Uint8>(8), 0, 0);
+			
 			}
 		} 
 		else if( selected->canMove() && p::ccmap->getCost(pos) < 0xfff0) 
@@ -1013,9 +1013,10 @@ void Input::clickMap(int mx, int my)
                 sndplayed = true;
             }
             selected->moveUnits(pos);
-            /*new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
-                    static_cast<Uint8>(p::ccmap->getMoveFlash()->getNumImg()), 0, 0);
-            */    
+           // Uint32 numImageFlash = 
+            new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
+                    static_cast<Uint8>(8), 0, 0);
+              
         }
     }
 }
