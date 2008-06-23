@@ -999,10 +999,10 @@ void Input::clickMap(int mx, int my)
 					pc::sfxeng->PlaySound(((UnitType *)selected->getRandomUnit()->getType())->getRandTalk(TB_ack));
 					sndplayed = true;
 				}
-				printf ("%s line %i: Move water based unit\n", __FILE__, __LINE__);
+				//printf ("%s line %i: Move water based unit\n", __FILE__, __LINE__);
 				selected->moveUnits(pos);
 				new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
-					static_cast<Uint8>(8), 0, 0);
+					static_cast<Uint8>(5), 0, 0);
 			
 			}
 		} 
@@ -1015,8 +1015,7 @@ void Input::clickMap(int mx, int my)
             selected->moveUnits(pos);
            // Uint32 numImageFlash = 
             new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
-                    static_cast<Uint8>(8), 0, 0);
-              
+                    static_cast<Uint8>(5), 0, 0);              
         }
     }
 }
