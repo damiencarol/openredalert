@@ -1139,7 +1139,26 @@ Player::Player(const Player&)
 {
 }
 
+/**
+ * @return Number of Radars.
+ */
 Uint32 Player::getNumberRadars()
 {
 	return numberRadars;
+}
+
+/** 
+ * @param value the new value for victorious
+ */
+void Player::setVictorious(bool value)
+{
+	this->victorious = value;
+}
+
+/** 
+ * @return <code>true</code> if the player is victorious else <code>false</code>
+ */
+bool Player::isVictorious()
+{
+	return victorious;
 }
