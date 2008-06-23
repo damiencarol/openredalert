@@ -1,45 +1,62 @@
+// BarrelExplosionActionEvent.cpp
+// 1.1
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "BarrelExplosionActionEvent.h"
+
+#include <cmath> 
 
 #include "ExplosionAnim.h"
 #include "video/ImageCache.h"
 #include "ActionEventQueue.h"
-#include "CncMap.h"
+#include "CnCMap.h"
 #include "UnitAndStructurePool.h"
-#include "Structure.h"
+#include "Structure.h" 
 
-namespace p
-{
-extern ActionEventQueue* aequeue;
-extern CnCMap* ccmap;
-extern UnitAndStructurePool* uspool;
-
+namespace p {
+	extern ActionEventQueue* aequeue;
+	extern CnCMap* ccmap;
+	extern UnitAndStructurePool* uspool;
 }
-namespace pc
-{
-extern ImageCache* imgcache;
+namespace pc {
+	extern ImageCache* imgcache;
 }
-
+ 
 /**
  * @param p  of the anim
  */
 BarrelExplosionActionEvent::BarrelExplosionActionEvent(Uint32 p, Uint32 pos) :
-	ActionEvent(p)
+      ActionEvent(p)
 {
-	// Set a delay (0.512 sec)
-	setDelay(6);
-
-	// Save the position
-	position = pos;
-
-	// Reschedule this anim
-	p::aequeue->scheduleEvent(this);
+      // Set a delay (0.512 sec)
+      setDelay(6);
+ 
+      // Save the position
+      position = pos;
+ 
+      // Reschedule this anim
+      p::aequeue->scheduleEvent(this);
 }
 
 /**
  */
 BarrelExplosionActionEvent::~BarrelExplosionActionEvent()
 {
-	// Do nothing
+      // Do nothing
 }
 
 /**
@@ -50,81 +67,53 @@ void BarrelExplosionActionEvent::run()
 {
 	// Play the flame sound #1
 	//pc::sfxeng->PlaySound("firebl3.aud");
-
+	
 	// Play the large fire misc anim
 	Uint32 numImageNapalmBarrel = pc::imgcache->loadImage("napalm3.shp");
 	// 3 = delay 14 = num image in ^    -36 = height/2 in ^  -36 = width/2 in ^
 	new ExplosionAnim(3, position, numImageNapalmBarrel, 14, -36, -36);
-
 	
+	Uint32 curpos = 0;
+	Uint32 xtiles = 0;
+	Uint32 ytiles = 0;
+	Uint32 xpos, ypos;
+	Sint16 damage;
 	
-	
-	//
-	// APPLY DAMAGE FOR STRUCTURE
-	//
-	Structure* str = 0;
-	// to the left
-	str = p::uspool->getStructureAt(position - 1, false);
-	if (str != 0)
+	for (ypos = 0; ypos < p::ccmap->getHeight(); ypos++)
 	{
-		str->applyDamage(77, 0, 0);
+		for (xpos = 0; xpos < p::ccmap->getWidth(); xpos++)
+		{
+			curpos = xpos + ypos * p::ccmap->getWidth();
+			
+			xtiles = position % p::ccmap->getWidth() - curpos % p::ccmap->getWidth();
+			ytiles = position / p::ccmap->getWidth() - curpos / p::ccmap->getWidth();
+			
+			Uint32 distance = sqrt(xtiles*xtiles + ytiles*ytiles);
+			damage = 256;
+			for (unsigned int m = 0; m<distance; m++)
+			{
+				damage = damage * 0.3;
+			}
+			
+			// Structure to find
+            Structure* str = p::uspool->getStructureAt(curpos, false);
+			// If their are a structure
+            if (str != 0)
+            {
+            	str->applyDamage(damage, 0, 0);
+            }
+            else
+            {
+            	// Find an unit
+            	Unit* unitTarget = p::uspool->getGroundUnitAt(curpos, 0x80);
+            	if (unitTarget != 0)
+            	{
+            		unitTarget->applyDamage(damage, 0, 0);
+            	}
+            }
+		}
 	}
-	// to the right
-	str = p::uspool->getStructureAt(position + 1, false);
-	if (str != 0)
-	{
-		str->applyDamage(77, 0, 0);
-	}
-	// to the up
-	str = p::uspool->getStructureAt(position - p::ccmap->getWidth(), false);
-	if (str != 0)
-	{
-		str->applyDamage(77, 0, 0);
-	}
-	// to the down
-	str = p::uspool->getStructureAt(position + p::ccmap->getWidth(), false);
-	if (str != 0)
-	{
-		str->applyDamage(77, 0, 0);
-	}
-
 	
-	
-	
-	//
-	// APPLY DAMAGE FOR GROUND UNIT
-	//
-	Unit* unitTarget = 0;	
-	// to the left
-	unitTarget = p::uspool->getGroundUnitAt(position - 1, 0x80);
-	if (unitTarget != 0)
-	{
-		unitTarget->applyDamage(77, 0, 0);
-	}
-	// to the right
-	unitTarget = p::uspool->getGroundUnitAt(position + 1, 0x80);
-	if (unitTarget != 0)
-	{
-		unitTarget->applyDamage(77, 0, 0);
-	}
-	// to the up
-	unitTarget = p::uspool->getGroundUnitAt(position - p::ccmap->getWidth(), 0x80);
-	if (unitTarget != 0)
-	{
-		unitTarget->applyDamage(77, 0, 0);
-	}
-	// to the down
-	unitTarget = p::uspool->getGroundUnitAt(position + p::ccmap->getWidth(), 0x80);
-	if (unitTarget != 0)
-	{
-		unitTarget->applyDamage(77, 0, 0);
-	}
-
-	
-	
-	
-	
-
-	// After launched anim destroye this anim
+	// After launched anim and apply damage, destroy this animation
 	delete this;
 }
