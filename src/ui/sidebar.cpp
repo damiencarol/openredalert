@@ -924,7 +924,7 @@ SDL_Surface* Sidebar::ReadShpImage(char *Name, int ImageNumb)
 		return 0;
 	}
 
-	printf ("%s line %i: %s has %i images\n", __FILE__, __LINE__, Name, TempPic->getNumImg());
+	//printf ("%s line %i: %s has %i images\n", __FILE__, __LINE__, Name, TempPic->getNumImg());
 
 	TempPic->getImage(ImageNumb, &image, &shadow, 1);
 
