@@ -53,10 +53,7 @@ public:
 	~Structure();
 
 	Uint8 getImageNums(Uint32 **inums, Sint8 **xoffsets, Sint8 **yoffsets);
-	Uint16* getImageNums() const
-	{
-		return imagenumbers;
-	}
+	Uint16* getImageNums() const;
 	void changeImage(Uint8 layer, Sint16 imagechange);
 	/** Return the actual current image number (without side color etc)*/
 	Uint32 getRealImageNum(Uint8 layer);
