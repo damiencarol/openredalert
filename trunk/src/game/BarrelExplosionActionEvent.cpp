@@ -1,5 +1,5 @@
 // BarrelExplosionActionEvent.cpp
-// 1.1
+// 1.2
 
 //    This file is part of OpenRedAlert.
 //
@@ -77,7 +77,6 @@ void BarrelExplosionActionEvent::run()
 	Uint32 xtiles = 0;
 	Uint32 ytiles = 0;
 	Uint32 xpos, ypos;
-	Sint16 damage;
 	
 	for (ypos = 0; ypos < p::ccmap->getHeight(); ypos++)
 	{
@@ -88,29 +87,33 @@ void BarrelExplosionActionEvent::run()
 			xtiles = position % p::ccmap->getWidth() - curpos % p::ccmap->getWidth();
 			ytiles = position / p::ccmap->getWidth() - curpos / p::ccmap->getWidth();
 			
-			Uint32 distance = sqrt(xtiles*xtiles + ytiles*ytiles);
-			damage = 256;
+			double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
+			double realDamage = 256;
 			for (unsigned int m = 0; m<distance; m++)
 			{
-				damage = damage * 0.3;
+				realDamage = realDamage * 0.3;
 			}
 			
-			// Structure to find
-            Structure* str = p::uspool->getStructureAt(curpos, false);
-			// If their are a structure
-            if (str != 0)
-            {
-            	str->applyDamage(damage, 0, 0);
-            }
-            else
-            {
-            	// Find an unit
-            	Unit* unitTarget = p::uspool->getGroundUnitAt(curpos, 0x80);
-            	if (unitTarget != 0)
+			Sint16 damage = realDamage;
+			if (damage > 1)
+			{
+				// Structure to find
+            	Structure* str = p::uspool->getStructureAt(curpos, false);
+				// If their are a structure
+            	if (str != 0)
             	{
-            		unitTarget->applyDamage(damage, 0, 0);
+            		str->applyDamage(damage, 0, 0);
             	}
-            }
+            	else
+            	{
+            		// Find an unit
+            		Unit* unitTarget = p::uspool->getGroundUnitAt(curpos, 0x80);
+            		if (unitTarget != 0)
+            		{
+            			unitTarget->applyDamage(damage, 0, 0);
+            		}
+            	}
+			}
 		}
 	}
 	
