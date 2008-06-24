@@ -1,5 +1,5 @@
 // SHPImage.h
-// 1.0
+// 1.1
 
 //    This file is part of OpenRedAlert.
 //
@@ -24,8 +24,9 @@
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_video.h"
 
-#include "SHPHeader.h"
 #include "SHPBase.h"
+
+class SHPHeader;
 
 using std::string;
 
@@ -53,7 +54,7 @@ private:
 
 	void DecodeSprite(Uint8 * imgdst, Uint16 imgnum);
 	Uint8* shpdata;
-	SHPHeader lnkHeader;
+	SHPHeader* lnkHeader;
 };
 
 #endif //SHPIMAGE_H
