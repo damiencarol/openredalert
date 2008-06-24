@@ -63,6 +63,9 @@
  * TRIGGER_ACTION_ADD_SPEC_WEAPON          34
  * TRIGGER_ACTION_PREFERRED_TARGET         35
  * TRIGGER_ACTION_LAUNCH_NUKES             36
+ * @author Damien Carol (OpenRedAlert)
+ * @version 1.0
+ * @since r360
  * 
  */
 class TriggerAction
