@@ -525,14 +525,16 @@ void HandleGlobalTrigger(int Event, int value)
 	{
 		TriggNumb++;
 
-		if (Trigger == NULL)
+		if (Trigger == 0){
 			return;
-		
+		}
 		//logger->debug("TRIG = [%s]  (activate=%d)\n", Trigger->name.c_str(), Trigger->activate);
 
 		//if (Trigger->name == "EINS")
 		//		continue;
 		//if (Trigger->name == "REVL")
+		//		continue;
+		//if (Trigger->name == "RSPD")
 		//		continue;
 				
 		// Check if already done 	
@@ -671,12 +673,12 @@ void CheckCellTriggers(Uint32 pos)
 */
     unit = p::uspool->getGroundUnitAt(pos);
 
-	if (unit == NULL)
+	if (unit == 0){
     	unit = p::uspool->getFlyingAt(pos);
-
-	if (unit == NULL)
+	}
+	if (unit == 0){
 		return;
-
+	}
 
 
     if (unit->getTriggerName() == "None")
@@ -686,9 +688,9 @@ void CheckCellTriggers(Uint32 pos)
 
     Trigger = p::ccmap->getTriggerByName(unit->getTriggerName().c_str());
 
-    if (Trigger == NULL)
+    if (Trigger == 0){
         return;
-
+    }
     int countrynr = p::ppool->getHouseNumByPlayerNum(unit->getOwner());
 
     // Check if the trigger was meant for us
@@ -717,22 +719,21 @@ void CheckCellTriggers(Uint32 pos)
 #if 1
     PrintTrigger ( *Trigger );
 #endif
-
 }
 
 
 void ExecuteTriggerAction(TriggerAction* action)
 //void ExecuteTriggerAction(unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigger )
 {
-   /* unsigned int    Action;
+    /*unsigned int    Action;
     int             parameter;
     RA_Tiggers      *Trig;
     Structure       *str;
     std::string     TriggerName;
     int             TeamNr;
     RA_Teamtype     *Team;
-    Uint32 Waypoint = 0; // For reveal around waypoint/zone
-*/
+    Uint32 Waypoint = 0;*/ // For reveal around waypoint/zone
+
 	// Check if the trigger should be executed (if it is not 
     // repeatable and has already exectued once it should not 
     // exectute again)
