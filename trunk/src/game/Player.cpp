@@ -18,6 +18,7 @@
 
 #include "Player.h"
 
+#include <cmath>
 #include <algorithm>
 #include <cassert>
 #include <cstring>
@@ -974,6 +975,98 @@ vector<bool>& Player::getMapBuildable()
 	return mapBuildable;
 }
 
+#if 1
+
+void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode)
+{
+	Uint32 initX = 0;
+	Uint32 endX = 0;
+	Uint32 initY = 0;
+	Uint32 endY = 0;
+	vector<bool>* mapVoB = 0;
+	
+
+
+	if (mode == SOB_SIGHT) {
+        mapVoB = &mapVisible;
+    } else if (mode == SOB_BUILD) {
+        mapVoB = &mapBuildable;
+        sight  = brad;			// Buildable radius from config file internal-global.ini
+    } else {
+        logger->error("addSoB was given an invalid mode: %i\n", mode);
+        return;
+    }
+    		
+	
+	// check min X
+	if ((pos % p::ccmap->getWidth() - sight) < 0)
+	{
+		initX = 0;
+	} else {
+		initX = pos % p::ccmap->getWidth() - sight;
+	}
+	
+	// check max X
+	if ((pos % p::ccmap->getWidth() + sight) > p::ccmap->getWidth())
+	{
+		endX = p::ccmap->getWidth();
+	} else {
+		endX = pos % p::ccmap->getWidth() + sight;
+	}
+	
+	
+	// check min Y
+	if ((pos / p::ccmap->getWidth() - sight) < 0)
+	{
+		initY = 0;
+	} else {
+		initY = pos / p::ccmap->getWidth() - sight;
+	}
+	
+	// check max Y
+	if ((pos / p::ccmap->getWidth() + sight) > p::ccmap->getWidth())
+	{
+		endY = p::ccmap->getWidth();
+	} else {
+		endY = pos / p::ccmap->getWidth() + sight;
+	}
+	
+	
+	// parse all cell
+	Uint32 curpos = 0;
+	Uint32 xtiles = 0;
+	Uint32 ytiles = 0;
+	Uint32 xpos, ypos;	
+	for (ypos = initY; ypos < endY; ypos++)
+	{
+		for (xpos = initX; xpos < endX; xpos++)
+		{
+			curpos = xpos + ypos * p::ccmap->getWidth();
+			
+			xtiles = pos % p::ccmap->getWidth() - curpos % p::ccmap->getWidth();
+			ytiles = pos / p::ccmap->getWidth() - curpos / p::ccmap->getWidth();
+			
+			double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
+			
+			//printf("curpos=%d\n", curpos);
+			
+			//printf("x=%d y=%d xt=%d yt=%d  distance=%d\n", xpos, ypos, xtiles, ytiles, distance);
+			double dSight = sight;
+	
+			if (distance <= dSight)
+			{
+				sightMatrix[curpos] += (mode == SOB_SIGHT);
+				buildMatrix[curpos] += (mode == SOB_BUILD);
+				(*mapVoB)[curpos] = true;        	
+			}
+		}
+	}
+	
+	
+}
+
+#else
+
 void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode)
 {
     Uint32 curpos, xsize, ysize, cpos;
@@ -1018,6 +1111,8 @@ void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_upda
             curpos += p::ccmap->getWidth()-xsize;
     }
 }
+
+#endif
 
 void Player::removeSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode)
 {
