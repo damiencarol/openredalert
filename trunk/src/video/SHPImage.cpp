@@ -32,9 +32,10 @@
 #include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
-#include "video/ImageNotFound.h"
 #include "include/config.h"
-#include "video/headerformats.h"
+#include "headerformats.h"
+#include "ImageNotFound.h"
+#include "SHPHeader.h"
 
 using std::runtime_error;
 using std::string;
@@ -56,9 +57,12 @@ SHPImage::SHPImage(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
     int i; // variable use for loop
     int j; // variable use for loop
     VFile *imgfile; // link to the file in mix archives
+    
+    // Create the header
+    lnkHeader = new SHPHeader();
 
     // Set to 0 before reading of the header
-    lnkHeader.NumImages = 0;
+    lnkHeader->NumImages = 0;
 
 	// Open the file in archive
     imgfile = VFSUtils::VFS_Open(fname);    
@@ -72,33 +76,34 @@ SHPImage::SHPImage(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
 
     // Allocate data for the data
     shpdata = new Uint8[imgfile->fileSize()];
-    // Read all the file
+    // Read all the file and store it in 'shpdata'
     imgfile->readByte(shpdata, imgfile->fileSize());
 
     // lnkHeader
-    lnkHeader.NumImages = shpdata[0] + (shpdata[0+1] << 8);
-    lnkHeader.Width = shpdata[6] + (shpdata[6+1] << 8);
+    lnkHeader->NumImages = shpdata[0] + (shpdata[0+1] << 8);
+    lnkHeader->Width = shpdata[6] + (shpdata[6+1] << 8);
 
     // Read unknow variables
-    lnkHeader.A = shpdata[2] + (shpdata[2+1] << 8);
-    lnkHeader.B = shpdata[4] + (shpdata[4+1] << 8);
+    lnkHeader->A = shpdata[2] + (shpdata[2+1] << 8);
+    lnkHeader->B = shpdata[4] + (shpdata[4+1] << 8);
 
-    lnkHeader.Height = shpdata[8] + (shpdata[8+1] << 8);
-    lnkHeader.Offset = new Uint32[lnkHeader.NumImages + 2];
-    lnkHeader.Format = new Uint8[lnkHeader.NumImages + 2];
-    lnkHeader.RefOffs = new Uint32[lnkHeader.NumImages + 2];
-    lnkHeader.RefFormat = new Uint8[lnkHeader.NumImages + 2];
+    lnkHeader->Height = shpdata[8] + (shpdata[8+1] << 8);
+    lnkHeader->Offset = new Uint32[lnkHeader->NumImages + 2];
+    lnkHeader->Format = new Uint8[lnkHeader->NumImages + 2];
+    lnkHeader->RefOffs = new Uint32[lnkHeader->NumImages + 2];
+    lnkHeader->RefFormat = new Uint8[lnkHeader->NumImages + 2];
 
     // "Offsets"
     j = 14;
-    for (i = 0; i < lnkHeader.NumImages + 2; i++) {
-        lnkHeader.Offset[i] = shpdata[j] + (shpdata[j+1] << 8) + (shpdata[j+2] << 16) + (0 << 24);
+    for (i = 0; i < lnkHeader->NumImages + 2; i++)
+    {
+        lnkHeader->Offset[i] = shpdata[j] + (shpdata[j+1] << 8) + (shpdata[j+2] << 16) + (0 << 24);
         j += 3;
-        lnkHeader.Format[i] = shpdata[j];
+        lnkHeader->Format[i] = shpdata[j];
         j += 1;
-        lnkHeader.RefOffs[i] = shpdata[j] + (shpdata[j+1] << 8) + (shpdata[j+2] << 16) + (0 << 24);
+        lnkHeader->RefOffs[i] = shpdata[j] + (shpdata[j+1] << 8) + (shpdata[j+2] << 16) + (0 << 24);
         j += 3;
-        lnkHeader.RefFormat[i] = shpdata[j];
+        lnkHeader->RefFormat[i] = shpdata[j];
         j += 1;
     }
     
@@ -114,10 +119,13 @@ SHPImage::~SHPImage()
 	// Free data from the file
     delete[] shpdata;
     // free headers vars
-    delete[] lnkHeader.Offset;
-    delete[] lnkHeader.Format;
-    delete[] lnkHeader.RefOffs;
-    delete[] lnkHeader.RefFormat;
+    delete[] lnkHeader->Offset;
+    delete[] lnkHeader->Format;
+    delete[] lnkHeader->RefOffs;
+    delete[] lnkHeader->RefFormat;
+    
+    // free the header
+    delete lnkHeader;
 }
 
 /** 
@@ -130,7 +138,8 @@ SHPImage::~SHPImage()
  */
 void SHPImage::getImage(Uint16 imgnum, SDL_Surface **img, SDL_Surface **shadow, Uint8 palnum)
 {
-	if (0 == img) {
+	if (0 == img) 
+	{
 		string s = name + ": can't decode to a NULL surface";
 		throw runtime_error(s);
 	}
@@ -142,27 +151,31 @@ void SHPImage::getImage(Uint16 imgnum, SDL_Surface **img, SDL_Surface **shadow, 
 	palette[palnum][0].g = 255;
 	palette[palnum][0].b = 22;
 
-	if ( imgnum >= lnkHeader.NumImages){
-		printf ("%s line %i: Error want imgnum %i but only %i images availeble, image name = %s\n", __FILE__, __LINE__, imgnum, lnkHeader.NumImages, name.c_str());
-		*img = NULL;
-		*shadow = NULL;
+	if (imgnum >= lnkHeader->NumImages)
+	{
+		logger->error("%s line %i: Error want imgnum %i but only %i images availeble, image name = %s\n", __FILE__, __LINE__, imgnum, lnkHeader->NumImages, name.c_str());
+		*img = 0;
+		*shadow = 0;
 		return;
 	}
 
-	Uint8* imgdata = new Uint8[lnkHeader.Width * lnkHeader.Height];
+	Uint8* imgdata = new Uint8[lnkHeader->Width * lnkHeader->Height];
 	DecodeSprite(imgdata, imgnum);
 
-	if (shadow != 0) {
-		Uint8* shadowdata = new Uint8[lnkHeader.Width * lnkHeader.Height];
-		memset(shadowdata, 0, lnkHeader.Width * lnkHeader.Height);
-		for (int i = 0; i<lnkHeader.Width * lnkHeader.Height; ++i) {
-		if (imgdata[i] == 4) {
-			imgdata[i] = 0;
-			shadowdata[i] = 1;
-		}
+	if (shadow != 0) 
+	{
+		Uint8* shadowdata = new Uint8[lnkHeader->Width * lnkHeader->Height];
+		memset(shadowdata, 0, lnkHeader->Width * lnkHeader->Height);
+		for (int i = 0; i<lnkHeader->Width * lnkHeader->Height; ++i) 
+		{
+			if (imgdata[i] == 4)
+			{
+				imgdata[i] = 0;
+				shadowdata[i] = 1;
+			}
 		}
 		SDL_Surface* shadowimg = SDL_CreateRGBSurfaceFrom(shadowdata,
-			lnkHeader.Width, lnkHeader.Height, 8, lnkHeader.Width, 0, 0, 0, 0);
+			lnkHeader->Width, lnkHeader->Height, 8, lnkHeader->Width, 0, 0, 0, 0);
 		SDL_SetColors(shadowimg, shadowpal, 0, 2);
 		SDL_SetColorKey(shadowimg, SDL_SRCCOLORKEY, 0);
 		SDL_SetAlpha(shadowimg, SDL_SRCALPHA|SDL_RLEACCEL, 128);
@@ -176,8 +189,10 @@ void SHPImage::getImage(Uint16 imgnum, SDL_Surface **img, SDL_Surface **shadow, 
 		SDL_FreeSurface(shadowimg);
 		delete[] shadowdata;
 	} else {
-		for (int i = 0; i<lnkHeader.Width * lnkHeader.Height; ++i) {
-			if (imgdata[i] == 4) {
+		for (int i = 0; i<lnkHeader->Width * lnkHeader->Height; ++i) 
+		{
+			if (imgdata[i] == 4)
+			{
 				imgdata[i] = 0;
 			}
 		}
@@ -190,7 +205,7 @@ void SHPImage::getImage(Uint16 imgnum, SDL_Surface **img, SDL_Surface **shadow, 
 	}
 	*/
 
-	SDL_Surface* imageimg = SDL_CreateRGBSurfaceFrom(imgdata, lnkHeader.Width, lnkHeader.Height, 8, lnkHeader.Width, 0, 0, 0, 0);
+	SDL_Surface* imageimg = SDL_CreateRGBSurfaceFrom(imgdata, lnkHeader->Width, lnkHeader->Height, 8, lnkHeader->Width, 0, 0, 0, 0);
 	SDL_SetColors(imageimg, palette[palnum], 0, 256);
 
 //	SDL_SetColorKey(imageimg, SDL_SRCCOLORKEY, 0);
@@ -223,11 +238,11 @@ void SHPImage::getImage(Uint16 imgnum, SDL_Surface **img, SDL_Surface **shadow, 
  */
 void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
 {
-    Uint8* imgdata = new Uint8[lnkHeader.Width * lnkHeader.Height];
+    Uint8* imgdata = new Uint8[lnkHeader->Width * lnkHeader->Height];
 
     DecodeSprite(imgdata, imgnum);
 
-    for (Uint16 i = 0; i < lnkHeader.Width * lnkHeader.Height; ++i)  {
+    for (Uint16 i = 0; i < lnkHeader->Width * lnkHeader->Height; ++i)  {
         // The shadows.shp only uses 0, 12-16
         // So we map them to 0-5
         if (imgdata[i] > 11) {
@@ -235,8 +250,8 @@ void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
         }
     }
 
-    SDL_Surface* imageimg = SDL_CreateRGBSurfaceFrom(imgdata, lnkHeader.Width,
-        lnkHeader.Height, 8, lnkHeader.Width, 0, 0, 0, 0);
+    SDL_Surface* imageimg = SDL_CreateRGBSurfaceFrom(imgdata, lnkHeader->Width,
+        lnkHeader->Height, 8, lnkHeader->Width, 0, 0, 0, 0);
     SDL_SetColors(imageimg, alphapal, 0, 7);
 
     SDL_PixelFormat fmt = {NULL, 32, 4, 0, 0, 0, 0, 8, 16, 24, 32, 0x000000ff,
@@ -247,7 +262,7 @@ void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
 
     // Use the Red value as the alpha value for each pixel
     Uint32 *p = (Uint32 *)alphaimg->pixels;
-    for (Uint16 i = 0; i < lnkHeader.Width * lnkHeader.Height; ++i) {
+    for (Uint16 i = 0; i < lnkHeader->Width * lnkHeader->Height; ++i) {
         #if SDL_BYTEORDER == SDL_BIG_ENDIAN
         *p = SDL_Swap32(*p);
         #endif
@@ -276,7 +291,7 @@ void SHPImage::getImageAsAlpha(Uint16 imgnum, SDL_Surface **img)
  */
 Uint32 SHPImage::getWidth() const 
 { 
-	return lnkHeader.Width; 
+	return lnkHeader->Width; 
 }
 
 /**
@@ -285,7 +300,7 @@ Uint32 SHPImage::getWidth() const
  */
 Uint32 SHPImage::getHeight() const 
 { 
-	return lnkHeader.Height; 
+	return lnkHeader->Height; 
 }
 
 /**
@@ -294,7 +309,7 @@ Uint32 SHPImage::getHeight() const
  */
 Uint16 SHPImage::getNumImg() const 
 {
-	return lnkHeader.NumImages;
+	return lnkHeader->NumImages;
 }
 
 /**
@@ -330,43 +345,45 @@ SDL_Color SHPImage::alphapal[6] =
  */
 void SHPImage::DecodeSprite(Uint8 *imgdst, Uint16 imgnum)
 {
-    if (imgnum >= lnkHeader.NumImages) {
-        logger->error("%s: Invalid SHP imagenumber (%i >= %i)\n", name.c_str(), imgnum, lnkHeader.NumImages);
+	// Check if imgnum to decompress is <= images in SHP
+    if (imgnum >= lnkHeader->NumImages) 
+    {
+        logger->error("%s: Invalid SHP imagenumber (%i >= %i)\n", name.c_str(), imgnum, lnkHeader->NumImages);
         return;
     }
 
     Uint32 len;
     Uint8* imgsrc;
-    switch (lnkHeader.Format[imgnum]) {
+    switch (lnkHeader->Format[imgnum]) {
         case FORMAT_80:
-            len = lnkHeader.Offset[imgnum + 1] - lnkHeader.Offset[imgnum];
+            len = lnkHeader->Offset[imgnum + 1] - lnkHeader->Offset[imgnum];
             imgsrc = new Uint8[len];
-            memcpy(imgsrc, shpdata + lnkHeader.Offset[imgnum], len);
+            memcpy(imgsrc, shpdata + lnkHeader->Offset[imgnum], len);
             memset(imgdst, 0, sizeof(imgdst));
             Compression::decode80(imgsrc, imgdst);
             break;
         case FORMAT_40:{
             Uint32 i;
-            for (i = 0; i < lnkHeader.NumImages; i++ ) {
-                if (lnkHeader.Offset[i] == lnkHeader.RefOffs[imgnum])
+            for (i = 0; i < lnkHeader->NumImages; i++ ) {
+                if (lnkHeader->Offset[i] == lnkHeader->RefOffs[imgnum])
                     break;
             }
             DecodeSprite(imgdst, i);
-            len = lnkHeader.Offset[imgnum + 1] - lnkHeader.Offset[imgnum];
+            len = lnkHeader->Offset[imgnum + 1] - lnkHeader->Offset[imgnum];
             imgsrc = new Uint8[len];
-            memcpy(imgsrc, shpdata + lnkHeader.Offset[imgnum], len);
+            memcpy(imgsrc, shpdata + lnkHeader->Offset[imgnum], len);
             Compression::decode40(imgsrc, imgdst);
             break;
         }
         case FORMAT_20:
             DecodeSprite(imgdst, imgnum - 1);
-            len = lnkHeader.Offset[imgnum + 1] - lnkHeader.Offset[imgnum];
+            len = lnkHeader->Offset[imgnum + 1] - lnkHeader->Offset[imgnum];
             imgsrc = new Uint8[len];
-            memcpy(imgsrc, shpdata + lnkHeader.Offset[imgnum], len);
+            memcpy(imgsrc, shpdata + lnkHeader->Offset[imgnum], len);
             Compression::decode40(imgsrc, imgdst);
             break;
         default:
-            logger->error("Possible memory corruption detected: unknown lnkHeader format in %s at frame %i/%i.\n",name.c_str(),imgnum,lnkHeader.NumImages);
+            logger->error("Possible memory corruption detected: unknown lnkHeader format in %s at frame %i/%i.\n", name.c_str(), imgnum, lnkHeader->NumImages);
             return;
     }
     delete[] imgsrc;
