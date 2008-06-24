@@ -133,9 +133,10 @@ void UAttackAnimEvent::update()
     stopping = false;
 }
 
+/**
+ */
 void UAttackAnimEvent::run()
 {
-    Uint32 distance;
     Sint32 xtiles, ytiles;
     Uint16 atkpos;
     float alpha;
@@ -175,7 +176,7 @@ void UAttackAnimEvent::run()
     
     // @todo modify calculs
     //distance = abs()>abs(ytiles)?abs(xtiles):abs(ytiles);
-    distance = sqrt(xtiles*xtiles + ytiles*ytiles);
+    double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
     
     if( distance > un->type->getWeapon(UsePrimaryWeapon)->getRange() /* weapons range */ ) {
         setDelay(0);
