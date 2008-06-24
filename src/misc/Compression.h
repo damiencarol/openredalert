@@ -27,7 +27,6 @@
  * 
  * @author Olaf van der spek (XCC mixer)
  * @author Kareem Dana (FreeCNC)
- * @author Damien Carol (FreeRA)
  */
 class Compression
 {
