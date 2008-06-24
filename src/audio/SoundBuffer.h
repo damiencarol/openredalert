@@ -27,7 +27,9 @@
 #include "SDL/SDL_mixer.h"
 #endif
 
-typedef std::vector<Uint8> SampleBuffer;
+using std::vector;
+
+typedef vector<Uint8> SampleBuffer;
 
 class SoundBuffer
 {
