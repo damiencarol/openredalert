@@ -157,10 +157,10 @@ void Cursor::setCursor(const char* curname)
 
 void Cursor::setPlaceCursor(Uint8 stw, Uint8 sth, Uint8 *icn) 
 {
-	int i, x, y;
-	SDL_Surface *bigimg;
+	int i;
+	SDL_Surface* bigimg = 0;
 
-	Uint8 *data;
+	Uint8* data = 0;
 	SDL_Rect dest;
 	Uint32 newptr;
 
@@ -174,8 +174,8 @@ void Cursor::setPlaceCursor(Uint8 stw, Uint8 sth, Uint8 *icn)
 	}
 	oldptr = newptr;
 
-	for (i = 0; i < nimgs; i++) {
-		SDL_FreeSurface(image[i]);
+	for (int a = 0; a < nimgs; a++) {
+		SDL_FreeSurface(image[a]);
 	}
 
 	curimg = 0;
@@ -206,15 +206,18 @@ void Cursor::setPlaceCursor(Uint8 stw, Uint8 sth, Uint8 *icn)
 	dest.h = transw->h;
 
 	dest.y = 0;
-	for (y = 0; y < sth; y++) {
+	for (int ycord = 0; ycord < sth; ycord++)
+    {
 		dest.x = 0;
-		for (x = 0; x < stw; x++) {
+		for (int xcord = 0; xcord < stw; xcord++)
+        {
 			SDL_Surface** tile = 0;
-			if (icn[y*stw+x] == 0) {
+			if (icn[ycord*stw + xcord] == 0)
+            {
 				dest.x += dest.w;
 				continue;
 			}
-			switch (icn[y*stw+x]) {
+			switch (icn[ycord * stw + xcord]) {
 			case 1:
 				tile = &transw;
 				break;
