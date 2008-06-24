@@ -1,3 +1,21 @@
+// CursorPool.cpp
+// 1.0
+
+//    This file is part of OpenRedAlert.
+//
+//    OpenRedAlert is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    OpenRedAlert is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
+
 #include "CursorPool.h"
 
 #include <iterator>
@@ -204,7 +222,16 @@ CursorPool::CursorPool()
 	//	 mini heal       194
 	//	 attack          195->202
 	//	 mini attack     203->210
+	
 	//	 no deploy       211
+	index = static_cast<Uint16>(cursorpool.size());
+	data = new CursorInfo();
+	data->setAnStart(211);
+	data->setAnEnd(211);
+	cname = "nodeploy";
+	cursorpool.push_back(data);
+	name2index[cname] = index;
+
 	//	 no enter        212
 	//	 no gold fix     213
 	//	 mini deploysupr 214-221
