@@ -529,13 +529,14 @@ void Structure::runAnim(Uint32 mode)
 					buildAnim = new RefineAnimEvent(speed,this,5);
 					break;
 				default:
-					buildAnim = NULL;
+					buildAnim = 0;
 					animating = false;
 					break;
 			}
 		}
-		if (buildAnim != NULL) {
-			p::aequeue->scheduleEvent(buildAnim);
+        if (buildAnim != 0)
+        {
+            p::aequeue->scheduleEvent(buildAnim);
 		}
 	}
 	//else
@@ -550,16 +551,17 @@ void Structure::runSecAnim(Uint32 param, bool extraParam)
 	
     BuildingAnimEvent* sec_anim = 0;
     Uint8 secmode = type->getAnimInfo().sectype;
-    if (secmode != 0) {
+    if (secmode != 0)
+    {
         switch (secmode) {
         case 7:
-            sec_anim = new RefineAnimEvent(2,this,param);
+            sec_anim = new RefineAnimEvent(2, this, param);
             break;
         case 5:
-            sec_anim = new DoorAnimEvent(2,this, extraParam);
+            sec_anim = new DoorAnimEvent(2, this, extraParam);
             break;
 //        case 8:
-//            sec_anim = new RepairAnimEvent(3,this);
+//            sec_anim = new RepairAnimEvent(3, this);
 //            break;
         }
         if (animating) {
@@ -569,9 +571,10 @@ void Structure::runSecAnim(Uint32 param, bool extraParam)
             buildAnim = sec_anim;
             p::aequeue->scheduleEvent(buildAnim);
             animating = true;
-	if (this->is("BARR"))
-		printf ("!!!!!!!!!!!start animating\n");
 
+            if (this->is("BARR")){
+                printf ("!!!!!!!!!!!start animating\n");
+            }
         }
     }
 }
@@ -710,14 +713,17 @@ void Structure::ChangeHealth (Sint16 amount)
 
 //	printf ("%s line %i: health = %i\n", __FILE__, __LINE__, health);
 }
+
+/**
+ */
 bool Structure::CreateUnitAnimation (UnitType* UnType, Uint8 owner)
 {
     Player* player = p::ppool->getPlayer(owner);
     assert(player != 0);
     Structure* tmpstruct = player->getPrimary(type);
-	if (tmpstruct != this)
+	if (tmpstruct != this){
 		return false;
-
+    }
 	CreateUnitType	= UnType;
 	CreateUnitOwner	= owner;
 
@@ -727,6 +733,9 @@ bool Structure::CreateUnitAnimation (UnitType* UnType, Uint8 owner)
 	}
 	return false;
 }
+
+/**
+ */
 bool Structure::RepairUnint (Unit *Un)
 {
 	if (strcmp ((char*)this->getType()->getTName(), "FIX") != 0 )
@@ -965,4 +974,9 @@ bool Structure::isPrimary() const
 StructureType* Structure::getType()
 {
 	return type;
+}
+
+Uint16* Structure::getImageNums() const
+{
+	return imagenumbers;
 }
