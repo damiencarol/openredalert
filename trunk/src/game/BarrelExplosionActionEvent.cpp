@@ -53,13 +53,6 @@ BarrelExplosionActionEvent::BarrelExplosionActionEvent(Uint32 p, Uint32 pos) :
 }
 
 /**
- */
-BarrelExplosionActionEvent::~BarrelExplosionActionEvent()
-{
-      // Do nothing
-}
-
-/**
  * @todo Add sound code
  * @todo change 3 in delay of ExploAnim
  */
