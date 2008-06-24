@@ -832,7 +832,7 @@ void Ai::Build (Player *Player, int PlayerNumb)
 	int					NumbUnits;
 	int					NumbStructures;
 	vector<Unit*>	unitpool;
-	Unit			*Unit;
+	Unit*			theUnit;
 	Structure		*OreRefinery;
 	Uint32			NumbOfInfantry = 0, NumbWarfactorys = 0, NumbOreRefs = 0, NumbConstYards = 0, NumbBarracks = 0, NumbOfOreTrucks = 0, NumbTanks = 0, NumbTeslaCoils = 0 , NumbOfPowerPlants = 0;
 	Structure*		Structure;
@@ -898,40 +898,50 @@ Uint16				xpos,
 	}
 
 	// Count Units from this computer player
-	for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++){
-		Unit = unitpool[UnitNumb];
+	for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++)
+	{
+		theUnit = unitpool[UnitNumb];
 
-		if (Unit->getType()->isInfantry()){
+		if (theUnit->getType()->isInfantry()){
 			NumbOfInfantry++;
 		}
 
-		if ( Unit->is ("HARV") ){
-			if (Unit->GetBaseRefinery() == NULL)
-				Unit->SetBaseRefinery (OreRefinery);
+		if (theUnit->is("HARV") == true)
+		{
+			if (theUnit->GetBaseRefinery() == 0)
+			{
+				theUnit->SetBaseRefinery(OreRefinery);
+			}
 			NumbOfOreTrucks++;
 		}
 
-		if ( Unit->is ("1TNK") ){
+		if (theUnit->is("1TNK") == true)
+		{
 			NumbTanks++;
 		}
 	}
 
-	// Check our units if we can deploy them (only for MCV jet)
-	if (NumbConstYards == 0){
-		for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++){
-			Unit = unitpool[UnitNumb];
+	// Check our units if we can deploy them (only for MCV yet)
+	if (NumbConstYards == 0)
+	{
+		for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++)
+		{
+			theUnit = unitpool[UnitNumb];
 
-			if ( Unit->is ("MCV") ){
-				if (Unit->canDeploy()){
+			if ( theUnit->is ("MCV") )
+			{
+				if (theUnit->canDeploy(p::ccmap) == true)
+				{
 					// We don't have any structures, randomly deploy
-					Unit->deploy();
-				}else{
-					if (!Unit->IsMoving ()){
-						p::ccmap->translateFromPos(Unit->getPos(), &xpos, &ypos);
+					theUnit->deploy();
+				} else {
+					if (!theUnit->IsMoving())
+					{
+						p::ccmap->translateFromPos(theUnit->getPos(), &xpos, &ypos);
 						if (xpos + 20 < p::ccmap->getWidth()){
-							Unit->move (p::ccmap->translateToPos(xpos + 20, ypos));
+							theUnit->move(p::ccmap->translateToPos(xpos + 20, ypos));
 						}else{
-							Unit->move (p::ccmap->translateToPos(xpos - 20, ypos));
+							theUnit->move(p::ccmap->translateToPos(xpos - 20, ypos));
 						}
 					}
 					RetryDeploy[PlayerNumb] = true;
@@ -967,10 +977,13 @@ Uint16				xpos,
 
 		// build power plant (if needed)
 		//printf ("Power = %i, PowerUsed = %i, PowerSurplus = %i\n", Player->getPower(), Player->getPowerUsed(), Rules->PowerSurplus);
-		if (!StructureWasBuild && ((signed)(Player->getPower() - Rules->PowerSurplus) < (signed)Player->getPowerUsed())){
+		if (!StructureWasBuild && ((signed)(Player->getPower() - Rules->PowerSurplus) < (signed)Player->getPowerUsed()))
+		{
 			cost = p::uspool->getStructureTypeByName("APWR")->getCost();
-			if (Player->getMoney() > cost){
-				if (NumbOfPowerPlants > 0){
+			if (Player->getMoney() > cost)
+			{
+				if (NumbOfPowerPlants > 0)
+				{
 					if (BuildStructure (Player, PlayerNumb, "APWR", ConstYardPos))
 						Player->changeMoney(-1 * cost);
 				}else{
