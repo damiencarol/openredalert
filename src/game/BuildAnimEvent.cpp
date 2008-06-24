@@ -32,7 +32,8 @@ namespace p {
 	extern PlayerPool* ppool;
 }
 
-BuildAnimEvent::BuildAnimEvent(Uint32 p, Structure* str, bool sell) : BuildingAnimEvent(p,str,0)
+BuildAnimEvent::BuildAnimEvent(Uint32 p, Structure* str, bool sell) : 
+	BuildingAnimEvent(p, str, 0)
 {
 	updateDamaged();
 	this->sell = sell;
@@ -50,16 +51,17 @@ BuildAnimEvent::~BuildAnimEvent()
 	Uint16 dmg_cost;
 
 	// Remove the structure if it was sold
-	if (this->sell){
-		printf ("%s line %i: Remove sold structure: %li\n", __FILE__, __LINE__, (long) structure);
+	if (this->sell)
+    {
+		//printf ("%s line %i: Remove sold structure: %li\n", __FILE__, __LINE__, (long) structure);
 		p::uspool->removeStructure(structure);
 		Uint16 Cost = structure->getType()->getCost();
 
-		if (structure->getHealth() > 0)
+		if (structure->getHealth() > 0) {
 			dmg_cost = (Uint16)(((double)Cost/(double)structure->getType()->getMaxHealth()) * ((double)structure->getType()->getMaxHealth() - (double)structure->getHealth()));
-		else
+        } else {
 			dmg_cost = (Uint16)Cost;
-
+        }
 
 		p::ppool->getPlayer(structure->getOwner())->changeMoney(Cost - dmg_cost);
 	}
@@ -70,7 +72,8 @@ void BuildAnimEvent::anim_func(anim_nfo* data)
 	//    if (structure->buildAnim == NULL)
 	//	structure->buildAnim = this;
 
-    if (!sell) {
+    if (!sell)
+    {
         if (frame < framend) {
             data->frame0 = frame;
             ++frame;
