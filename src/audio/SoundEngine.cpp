@@ -327,16 +327,17 @@ void SoundEngine::PrevTrack()
  */
 void SoundEngine::MusicHook(void* userdata, Uint8* stream, int len)
 {
-    bool* musicFinished = reinterpret_cast<bool*>(userdata);
-    if (!*musicFinished) {
+    bool* musicFinishedPtr = reinterpret_cast<bool*>(userdata);
+    if (!*musicFinishedPtr)
+    {
         SampleBuffer buffer;
         Uint32 ret = musicDecoder.Decode(buffer, len);
         if (ret == SOUND_DECODE_COMPLETED) {
             musicDecoder.Close();
-            *musicFinished = true;
+            *musicFinishedPtr = true;
         } else if (ret == SOUND_DECODE_ERROR) {
             logger->error("Sound: Error during music decoding, stopping playback of current track.\n");
-            *musicFinished = true;
+            *musicFinishedPtr = true;
             return;
         }
         memcpy(stream, &buffer[0], buffer.size());
