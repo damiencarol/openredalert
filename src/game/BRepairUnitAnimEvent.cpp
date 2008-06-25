@@ -144,3 +144,4 @@ void BRepairUnitAnimEvent::update()
 {
 	logger->error ("%s line %i: Structure anim update\n", __FILE__, __LINE__);
 }
+void BRepairUnitAnimEvent::anim_func(anim_nfo* data) {}
