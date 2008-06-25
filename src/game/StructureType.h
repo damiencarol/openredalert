@@ -132,7 +132,6 @@ private:
 	Sint8 xoffset;
 	Sint8 yoffset;
 	Uint8 turnspeed;
-	Uint8 sight;
 	Uint8 xsize;
 	Uint8 ysize;
 	Uint8 numshps;
