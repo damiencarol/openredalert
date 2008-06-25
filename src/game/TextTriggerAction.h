@@ -29,17 +29,21 @@ using std::string;
 
 /**
  * Action that display a text to the screen
+ * @author Damien Carol (OpenRedAlert)
+ * @version 1.0
  */
 class TextTriggerAction : public TriggerAction 
 {
 public:    
 	/** Build a TextTriggerAction with a specified message and a messagepool */
-    TextTriggerAction(string message, MessagePool* pool);
-    
+    TextTriggerAction(string message, MessagePool* pool);    
+
     /** Execute this Action */
     void execute();
-private:    
+private:
+    /** Message to display */
     string message;
+    /** Message Pool */
     MessagePool* pool;
 };
 
