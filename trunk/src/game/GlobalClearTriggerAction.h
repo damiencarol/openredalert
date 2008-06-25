@@ -22,17 +22,22 @@
 #include "TriggerAction.h"
 
 /**
- * Action that CLEAR a Global variable. 
+ * Action that CLEAR a Global variable.
+ * 
+ * @author Damien Carol (OpenRedAlert)
+ * @version 1.0
+ * @since r371
  */
-class GlobalClearTriggerAction : public TriggerAction 
-{
-public:    
+class GlobalClearTriggerAction : public TriggerAction {
+public:
+    /** Constructor */
+    GlobalClearTriggerAction(int number);
 
-	GlobalClearTriggerAction(int number);
-
+    /** Execute the action, clear the global variable set */
     void execute();
 
-private:    
+private:
+    /** Number of the global variable to Clear */
     int number;
 };
 
