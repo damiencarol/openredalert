@@ -53,8 +53,8 @@ void fcnc_terminate_handler();
 
 namespace pc
 {
-	extern ConfigType Config;
-	extern vector<SHPImage *> *imagepool;
+    extern ConfigType Config;
+    extern vector<SHPImage *> *imagepool;
 	extern GraphicsEngine * gfxeng;
 	/** SoundEngine of the game */
 	extern SoundEngine* sfxeng;
