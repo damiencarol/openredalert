@@ -53,3 +53,4 @@ TextTriggerAction::TextTriggerAction(string message, MessagePool* pool) :
 	// Set the pool to use
 	this->pool = pool;
 }
+
