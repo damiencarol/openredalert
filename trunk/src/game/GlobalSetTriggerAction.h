@@ -22,16 +22,25 @@
 #include "TriggerAction.h"
 
 /**
- * Action that set a Global variable. 
+ * Action that set a Global variable.
+ * 
+ * @version 1.0, may 2008
+ * @author Damien Carol (OpenRedAlert)
+ * @since r376
  */
 class GlobalSetTriggerAction : public TriggerAction {
-public:    
-	/** Build a Global Set Action for a number */
+public:
+    /** Build a Global Set Action for a number */
     GlobalSetTriggerAction(int number);
+
     /** Execute the action */
     void execute();
 
-private:    
+private:
+
+    /**
+     * Number of the variable of the TriggerAction 
+     */
     int number;
 };
 

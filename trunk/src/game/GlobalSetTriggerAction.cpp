@@ -21,13 +21,19 @@
 
 extern bool GlobalVar[100];
 
+/**
+ */
 GlobalSetTriggerAction::GlobalSetTriggerAction(int number) :
 	TriggerAction(TriggerAction::GLOBAL_SET)
 {
+    // Set the number
 	this->number = number;
 }
 
+/**
+ */
 void GlobalSetTriggerAction::execute()
 {
+    // Set the blobal variable
 	GlobalVar[number] = true;
 }
