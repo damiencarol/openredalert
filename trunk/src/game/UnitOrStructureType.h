@@ -32,7 +32,9 @@ using std::vector;
 
 /**
  * UnitOrStructureType is used when you can't or don't need to know whether you are dealing with a unit type or a structure
- * type.  Note that this class is abstract, it is only used for performing casts.
+ * type.
+ * 
+ * @note This class is abstract, it is used for performing casts.
  */
 class UnitOrStructureType 
 {
@@ -40,20 +42,21 @@ public :
     UnitOrStructureType();
     virtual ~UnitOrStructureType();
 
-    /** @brief Turn speed is measured in arbitrary units */
+    /** Turn speed is measured in arbitrary units */
     virtual Uint8 getTurnspeed() const = 0;
 
-    /** @brief Returns a number corresponding to the type's armour class. See common.h for the enum definition */
+    /** Returns a number corresponding to the type's armour class. See armour_t.h for the enum definition */
     virtual armor_t getArmor() const = 0;
 
-    /**
-     * @brief Returns number of layers to render, 1 or 2.  The only TD
-     * structure that returns 2 is the weapons factory.  Units with
-     * turrets (tanks, humvee, buggy, missile launchers) return 2.
+    /** 
+     * Returns number of layers to render, 1 or 2 
+     * 
+     * The only CnC structure that returns 2 is the weapons factory.
+     * Units with turrets (tanks, humvee, buggy, missile launchers) return 2.
      */
     virtual Uint8 getNumLayers() const = 0;
 
-    /** @brief Return the weapon of the Unit or Structure */
+    /** Returns the weapon of the Unit or Structure */
     virtual Weapon * getWeapon(bool primary) const = 0;
 
     /** Only applicable to units.  StructureType always returns false. */
@@ -65,22 +68,22 @@ public :
     /** Only applicable to units.  StructureType always returns zero. */
     virtual Uint8 getOffset() const = 0;
 
-    /** @returns the internal name, e.g. E1 */
+    /** Returns the internal name, e.g. E1 */
     virtual const char * getTName() const = 0;
 
-    /** @returns the external name, e.g. Minigunner */
+    /** Returns the external name, e.g. Minigunner */
     virtual const char * getName() const = 0;
 
-    /** @returns the names of the sides that can build this */
+    /** Returns the names of the sides that can build this */
     virtual vector < char * > getOwners() const = 0;
 
-    /** @returns whether the type is valid or not (loaded fully) */
+    /** Returns whether the type is valid or not (loaded fully) */
     virtual bool isValid() const;
 
-    /** @returns which production queue the type is for */
+    /** Returns which production queue the type is for */
     virtual Uint8 getPQueue() const = 0;
 
-    /** @returns the production type of this type. */
+    /** Returns the production type of this type. */
     Uint8 getPType() const;
     void setPType(Uint8 p);
 
@@ -90,7 +93,7 @@ public :
     /** Returns the prerequisites. */
     vector <char* > getPrereqs() const;
 
-    /** tech level required to build this [-1 means can't build] (def=-1)*/
+    /** Return the tech level required to build this [-1 means can't build] (def=-1)*/
     Sint32 getTechLevel() const;
 
     /** Cost to build object (in credits).*/
@@ -99,14 +102,10 @@ public :
     /** Speed is measured in artitrary units. */
     Uint8 getSpeed() const;
 
-    /**
-     * Returns the maximum health for this type. 
-     */
+    /** Returns the maximum health for this type. */
     Uint16 getMaxHealth() const;
 
-    /**
-     * Sight range, in cells (def=1). 
-     */
+    /** Sight range, in cells (def=1). */
     Uint8 getSight() const;
     
 protected :
@@ -122,6 +121,7 @@ protected :
     Uint16 maxhealth;
     Uint8 speed;
     Uint16 cost;
+    /** Tech level required to build this [-1 means can't build] (def=-1)*/
     Sint32 techLevel;
     vector<char*> prereqs;
     Uint8 ptype;
