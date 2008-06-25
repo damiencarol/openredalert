@@ -44,8 +44,8 @@ namespace p {
 BuildingAnimEvent::BuildingAnimEvent(Uint32 p, Structure* str, Uint8 mode) :
 	ActionEvent(p) 
 {
-	strct = str;
-	strct->referTo();
+	this->strct = str;
+	this->strct->referTo();
 	this->strct = strct;
 
 	anim_data.done = false;
@@ -57,17 +57,23 @@ BuildingAnimEvent::BuildingAnimEvent(Uint32 p, Structure* str, Uint8 mode) :
 	
 	toAttack = false;
 	
-	// no delay for building anim
-	if (getaniminfo().animdelay != 0 && mode != 0) {
+	// if no delay for building anim
+	if (getaniminfo().animdelay != 0 && mode != 0) 
+	{
+		// Set the delay with animation information
 		setDelay(getaniminfo().animdelay);
 	}
-	e = NULL;
-	ea = NULL;
+	
+	// sub animation are NULL now
+	this->e = 0;
+	this->ea = 0;
 
-	if (strct->type->getNumLayers()==2) {
-		layer2 = true;
+	// if their are 2 layer 
+	if (this->strct->type->getNumLayers()==2) 
+	{
+		this->layer2 = true;
 	} else {
-		layer2 = false;
+		this->layer2 = false;
 	}
 }
 
@@ -91,7 +97,6 @@ BuildingAnimEvent::~BuildingAnimEvent()
 }
 
 /**
- * 
  */
 void BuildingAnimEvent::run()
 {
@@ -103,9 +108,10 @@ void BuildingAnimEvent::run()
 	}
 	anim_func(&anim_data);
 
-	if (strct->getNumbImages(0) > anim_data.frame0){
+	if (strct->getNumbImages(0) > anim_data.frame0)
+    {
 		strct->setImageNum(anim_data.frame0, 0);
-	}else{
+	} else {
 		logger->error("%s line %i: Failed to set frame %i, numb frames = %i\n",__FILE__ , __LINE__, anim_data.frame0, strct->getNumbImages (0));
 	}
 	
@@ -181,14 +187,16 @@ void BuildingAnimEvent::run()
 }
 
 /**
- * 
  */
 void BuildingAnimEvent::updateDamaged() 
 {
 	bool odam = anim_data.damaged;
 	anim_data.damaged = strct->checkdamage();
-	if (anim_data.damaged) {
-		if (getaniminfo().dmgoff != 0 || getaniminfo().dmgoff2 != 0) {
+	
+	if (anim_data.damaged)
+	{
+		if (getaniminfo().dmgoff != 0 || getaniminfo().dmgoff2 != 0)
+		{
 			anim_data.damagedelta = getaniminfo().dmgoff;
 			anim_data.damagedelta2 = getaniminfo().dmgoff2;
 		} else {
@@ -208,12 +216,12 @@ void BuildingAnimEvent::updateDamaged()
 
 animinfo_t BuildingAnimEvent::getaniminfo()
 {
-	return ((StructureType *)strct->getType())->getAnimInfo();
+	return this->strct->getType()->getAnimInfo();
 }
 
 StructureType* BuildingAnimEvent::getType()
 {
-	return strct->type;
+	return this->strct->type;
 }
 
 void BuildingAnimEvent::update()
@@ -225,6 +233,10 @@ void BuildingAnimEvent::setSchedule(BuildingAnimEvent* e)
 	this->e = e;
 }
 
+/**
+ * @param ea Attack anim
+ * @param attack specify if it's attack anim
+ */
 void BuildingAnimEvent::setSchedule(BAttackAnimEvent* ea, bool attack)
 {
 	if (attack) {
@@ -236,7 +248,6 @@ void BuildingAnimEvent::setSchedule(BAttackAnimEvent* ea, bool attack)
 }
 
 /**
- * 
  */
 void BuildingAnimEvent::stop()
 {
