@@ -31,6 +31,16 @@ using std::string;
 
 /**
  * Movie in .WSA format
+ * 
+ * WSA files contain short animations and can be found in the GENERAL.MIX files.
+ * They are basically a series of Format40 images, that are then compressed with
+ * Format80.
+ * 
+ * The images are in Format40 but are then compressed with Format80.
+ * That means that you first have to uncompress the Format80 and then decode 
+ * the Format40 image you obtain.
+ * The first frame should be xor-ed over a black image (filled with zeros), 
+ * all the other are xor-ed over the previous one.
  */
 class WSAMovie
 {
