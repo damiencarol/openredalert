@@ -74,7 +74,6 @@ BAttackAnimEvent::~BAttackAnimEvent()
 
 void BAttackAnimEvent::run()
 {
-	Uint32 distance;
 	Sint32 xtiles, ytiles;
 	Uint16 atkpos, mwid;
 	float alpha;
@@ -110,7 +109,7 @@ void BAttackAnimEvent::run()
 	
 	// @todo modify calculs
 	//distance = abs()>abs(ytiles)?abs(xtiles):abs(ytiles);
-	distance = sqrt(xtiles*xtiles + ytiles*ytiles);
+	double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
 
 	if (distance > strct->getType()->getWeapon()->getRange())
 	{
@@ -230,4 +229,10 @@ void BAttackAnimEvent::update()
 	target->unrefer();
 	target = strct->getTarget();
 	target->referTo();
+}
+
+/**
+ */
+void BAttackAnimEvent::anim_func(anim_nfo* data)
+{
 }

@@ -25,12 +25,15 @@ struct anim_nfo;
 class Structure;
 class UnitOrStructure;
 
-
 /** 
  * Defines the attack logic
  *
  * This animation is different to the others as it overrides
  * the run function rather than the anim_func function.
+ *
+ * @author Damien Carol (OpenRedAlert)
+ * @version 1.0
+ * @since r377
  */
 class BAttackAnimEvent : public BuildingAnimEvent 
 {
@@ -45,7 +48,7 @@ public:
     
     void run();
     void stop();
-    void anim_func(anim_nfo* data) {}
+    void anim_func(anim_nfo* data);
     void update();
     
 private:
