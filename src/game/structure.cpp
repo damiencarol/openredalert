@@ -366,12 +366,17 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 		amount = (Sint16)((double)amount * weap->getVersus(type->getArmor()));
 	}
 	
-	if ((health-amount) <= 0) {
+	if ((health-amount) <= 0) 
+	{
 
 		exploding = true;
 
 		// Throw the event (-1 means nothing)
-		HandleTriggers((UnitOrStructure*)this, TRIGGER_EVENT_DESTROYED, -1);
+		int houseNum = -1;
+		if (attacker != 0){
+			p::ppool->getHouseNumByPlayerNum(attacker->getOwner());
+		}
+		HandleTriggers((UnitOrStructure*)this, TRIGGER_EVENT_DESTROYED, houseNum);
 
 		if (type->isWall()) {
 			p::uspool->removeStructure(this);
@@ -380,7 +385,7 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 				p::ppool->getPlayer(attacker->getOwner())->addStructureKill();
 			}
 			//printf ("%s line %i: Start explode anim for structure: %i\n", __FILE__, __LINE__, (int) this);
-			BExplodeAnimEvent* boom = new BExplodeAnimEvent(1,this);
+			BExplodeAnimEvent* boom = new BExplodeAnimEvent(1, this);
 			if (animating) {
 				buildAnim->setSchedule(boom);
 				buildAnim->stop();
@@ -544,11 +549,7 @@ void Structure::runAnim(Uint32 mode)
 }
 
 void Structure::runSecAnim(Uint32 param, bool extraParam)
-{
-	if (this->is("BARR")){
-		printf ("!!!!!!!!!!!start sec anim\n");
-	}
-	
+{	
     BuildingAnimEvent* sec_anim = 0;
     Uint8 secmode = type->getAnimInfo().sectype;
     if (secmode != 0)
@@ -974,9 +975,4 @@ bool Structure::isPrimary() const
 StructureType* Structure::getType()
 {
 	return type;
-}
-
-Uint16* Structure::getImageNums() const
-{
-	return imagenumbers;
 }
