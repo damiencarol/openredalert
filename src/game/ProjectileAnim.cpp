@@ -235,8 +235,23 @@ void ProjectileAnim::run()
     {
     	// Play the anim for piff
     	Uint32 numPiffShp = pc::imgcache->loadImage("piff.shp", -1);
-    	new ExplosionAnim(1, dest, numPiffShp, 4, 0, 0);
-    	
+    	Uint32 numPiffPiffShp = pc::imgcache->loadImage("piffpiff.shp", -1);
+    	Uint32 numAtomShp = pc::imgcache->loadImage("atomsfx.shp", -1);
+    	Uint32 type = weap->getWarhead()->getType()->getExplosion();
+    	switch (type)
+    	{
+    	case 1:
+    		new ExplosionAnim(1, dest, numPiffShp, 4, 0,0);    		
+    		//	target->getXoffset(), 
+    		//	target->getYoffset());
+    		break;
+    	case 2:
+    		new ExplosionAnim(1, dest, numPiffPiffShp, 8, 0, 0);
+    		break;
+    	default:
+    		//new ExplosionAnim(1, dest, numAtomShp, 27, 0, 0);
+    		break;
+    	} 
     	
     	// Play report of the weapon 
     	//pc::sfxeng->PlaySound(weap->getProjectile()->lnkProjectileData->Warhead()->getExplosionsound());  	        
@@ -270,13 +285,13 @@ void ProjectileAnim::run()
     		} catch (...) {
     			logger->error("Unenable to load the image of piff\n");
     			throw new ImageNotFound("Unenable to load the image of piff");
-    		}*/
-    		/*
+    		}
+    		
     		new ExplosionAnim(1, dest, imageExplosionNum, 4, 0, 0);
     	}
-    	*/
+    	
     	// 2=piffs
-    	/*if (type==2)
+    	if (type==2)
     	{
     		SHPImage* temp;
     		try {
@@ -287,7 +302,11 @@ void ProjectileAnim::run()
     	    }
     	    new ExplosionAnim(1, dest, explosionimage, 8, 0, 0);
     	}
-    	*/ 	
+    	*/
+    	
+    	
+    	
+    	
     	
     	// Apply damages to a structure if founded
         starget = p::uspool->getStructureAt(dest,weap->getWall());
@@ -300,11 +319,15 @@ void ProjectileAnim::run()
         
         // Apply damages to a Unit if founded
         utarget = p::uspool->getUnitAt(dest, subdest);
-        if( (utarget != 0) || inaccurate ) {
-            if (inaccurate) {
-                for (int sud=0;sud<5;++sud) {
+        if( (utarget != 0) || inaccurate )
+        {
+            if (inaccurate) 
+            {
+                for (int sud=0; sud<5; ++sud) 
+                {
                     utarget = p::uspool->getUnitAt(dest, sud);
-                    if (utarget != NULL) {
+                    if (utarget != 0) 
+                    {
                         // each soldier in that cell gets one third of
                         // normal damage
                         utarget->applyDamage((Sint16)((float)weap->getDamage()/3.0),weap,owner);
