@@ -58,12 +58,6 @@ namespace {
     Uint8 tmpbuff[SOUND_MAX_UNCOMPRESSED_SIZE * 4];
 }
 
-enum SOUND_DECODE_STATE {
-    SOUND_DECODE_ERROR = 0,
-    SOUND_DECODE_COMPLETED = 1,
-    SOUND_DECODE_STREAMING = 2
-};
-
 namespace Sound {
     void IMADecode(Uint8 *output, Uint8 *input, Uint16 compressed_size, Sint32& sample, Sint32& index);
     void WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_size, Uint16 uncompressed_size);

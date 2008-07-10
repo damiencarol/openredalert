@@ -24,6 +24,7 @@
 
 #include "SDL/SDL_audio.h"
 
+#include "SOUND_DECODE_STATE.h"
 #include "SoundCommon.h"
 #include "SoundUtils.h"
 #include "include/Logger.h"

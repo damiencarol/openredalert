@@ -18,46 +18,44 @@
 
 #include "BarrelExplosionActionEvent.h"
 
-#include <cmath> 
+#include <cmath>
 
 #include "ExplosionAnim.h"
 #include "video/ImageCache.h"
 #include "ActionEventQueue.h"
 #include "CnCMap.h"
 #include "UnitAndStructurePool.h"
-#include "Structure.h" 
+#include "Structure.h"
 
 namespace p {
-	extern ActionEventQueue* aequeue;
-	extern CnCMap* ccmap;
-	extern UnitAndStructurePool* uspool;
+    extern ActionEventQueue* aequeue;
+    extern CnCMap* ccmap;
+    extern UnitAndStructurePool* uspool;
 }
 namespace pc {
-	extern ImageCache* imgcache;
+    extern ImageCache* imgcache;
 }
- 
+
 /**
  * @param p  of the anim
  */
 BarrelExplosionActionEvent::BarrelExplosionActionEvent(Uint32 p, Uint32 pos) :
-      ActionEvent(p)
-{
-      // Set a delay (0.512 sec)
-      setDelay(6);
- 
-      // Save the position
-      position = pos;
- 
-      // Reschedule this anim
-      p::aequeue->scheduleEvent(this);
+ActionEvent(p) {
+    // Set a delay (0.512 sec)
+    setDelay(6);
+    
+    // Save the position
+    position = pos;
+    
+    // Reschedule this anim
+    p::aequeue->scheduleEvent(this);
 }
 
 /**
  * @todo Add sound code
  * @todo change 3 in delay of ExploAnim
  */
-void BarrelExplosionActionEvent::run()
-{
+void BarrelExplosionActionEvent::run() {
 	// Play the flame sound #1
 	//pc::sfxeng->PlaySound("firebl3.aud");
 	
@@ -86,8 +84,8 @@ void BarrelExplosionActionEvent::run()
 			{
 				realDamage = realDamage * 0.3;
 			}
-			
-			Sint16 damage = realDamage;
+            
+            Sint16 damage = (Sint16)realDamage;
 			if (damage > 1)
 			{
 				// Structure to find

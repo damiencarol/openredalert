@@ -73,11 +73,11 @@ void MultiPlayerMaps::readMapData()
 	if (MapFile == 0) 
 	{
 		// Logg it
-		logger->error("Unable to locate ABANDON1.MPR file!\n");
+		logger->error("Unable to locate ABANDON1.INI file!\n");
 	}
 	else
 	{	// Logg it
-		logger->note("Load ABANDON1.mpr file\n");
+		logger->note("Load ABANDON1.INI file\n");
 		MapNames.push_back(string("ABANDON1"));
 		MapDescriptions.push_back(string("Abandoned Battlefield (Med)"));										
 	}

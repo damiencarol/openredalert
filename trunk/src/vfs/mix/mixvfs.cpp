@@ -165,7 +165,7 @@ Uint32 MIXFiles::calcID(const char *fname)
  * @param tscheck if equal to check_ts, will check if mix is from Tiberian Sun.
  * @return pointer to MixRecord
  */
-MixRecord *MIXFiles::decodeHeader(VFile* mix, MixHeader* header, tscheck_ tscheck)
+MixRecord* MIXFiles::decodeHeader(VFile* mix, MixHeader* header, tscheck_ tscheck)
 {
     Uint8 WSKey[80];        // 80-byte Westwood key
     Uint8 BFKey[56];        // 56-byte blow fish key

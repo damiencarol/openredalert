@@ -1,5 +1,5 @@
 // Unit.cpp
-// 1.0
+// 1.1
 
 //    This file is part of OpenRedAlert.
 //
@@ -65,23 +65,24 @@ using std::vector;
 
 
 /** 
- * note to self, pass owner, cellpos, 
- * facing and health to this (maybe subcellpos)
+ * @note to self, pass owner, cellpos, facing and health to this (maybe subcellpos)
  */
 Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
         Uint8 owner, Uint16 rhealth, Uint8 facing, Uint8 action, string trigger_name) : UnitOrStructure()
 {
     EmptyResources ();
 
-    BaseRefinery = NULL;
+    BaseRefinery = 0;
     targetcell = cellpos;
     Uint32 i;
     this->type = type;
     imagenumbers = new Uint16[type->getNumLayers()];
-    for( i = 0; i < type->getNumLayers(); i++ ) {
+    for( i = 0; i < type->getNumLayers(); i++ )
+    {
         imagenumbers[i] = facing;
-        if( owner != 0xff ) {
-            if (type->getDeployTarget() != NULL) {
+        if (owner != 0xff)
+        {
+            if (type->getDeployTarget() != 0) {
                 palettenum = (p::ppool->getStructpalNum(owner)<<11);
             } else {
                 palettenum = (p::ppool->getUnitpalNum(owner)<<11);
@@ -103,22 +104,25 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
     
     infgrp = group;
 
-    if (infgrp) {
+    if (infgrp != 0)
+    {
         if (infgrp->IsClear(subpos)) { /* else select another subpos */
             infgrp->AddInfantry(this, subpos);
         }
     }
-    moveanim = NULL;
-    attackanim = NULL;
-    walkanim = NULL;
-    harvestanim = NULL;
-	repairanim = NULL;
-    turnanim1 = turnanim2 = NULL;
+    moveanim = 0;
+    attackanim = 0;
+    walkanim = 0;
+    harvestanim = 0;
+	repairanim = 0;
+    turnanim1 = 0;
+    turnanim2 = 0;
     deployed = false;
     p::ppool->getPlayer(owner)->builtUnit(this);
 
-    if (strcmp ((char*)type->getTName(), "HARV") == 0){
-	   this->Harvest (0, NULL);
+    if (strcmp ((char*)type->getTName(), "HARV") == 0)
+    {
+	   this->Harvest(0, 0);
     }
     
     AI_Mission = 1;
@@ -126,17 +130,10 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
 	TriggerName = trigger_name;
 	Command     = action;
 
-	mapwidth = p::ccmap->getWidth();
-	mapheight = p::ccmap->getHeight();
-
 	fix_str_num = 0;
 
 	// Init last damage tick var
 	LastDamageTick = SDL_GetTicks();
-
-	// testing code for medic healing
-	//health -= 20;
-	//updateDamaged();
 	
 	// Initialisation
 	infianim = 0;
@@ -227,7 +224,7 @@ Uint32 Unit::getImageNum(Uint8 layer) const
 	return type->getSHPNums()[layer]+imagenumbers[layer];
 }
 
-Uint16 Unit::getNumbImages( Uint8 layer )
+Uint16 Unit::getNumbImages(Uint8 layer)
 {
 	if (type->getSHPTNum() != 0)
 	{
@@ -236,20 +233,28 @@ Uint16 Unit::getNumbImages( Uint8 layer )
 	return 0;
 }
 
+/**
+ * @param num set the number of the image in a layer
+ * @param layer Layer to aply
+ */
 void Unit::setImageNum(Uint32 num, Uint8 layer)
 {
 	if (getNumbImages( layer ) > num)
+    {
     	imagenumbers[layer] = num | palettenum;
+    }
 	else
+    {
 		logger->error("%s line %i: FAILED to set imagenumb %i, numb images = %i\n", __FILE__, __LINE__, num, getNumbImages( layer ));
+    }
 }
 
 Sint8 Unit::getXoffset() const
 {
-    if (l2o != NULL) {
+    if (l2o != 0) {
         return l2o->xoffsets[0];
     } else {
-        return xoffset-type->getOffset();
+        return xoffset - type->getOffset();
     }
 }
 
@@ -320,11 +325,11 @@ void Unit::move(Uint16 dest)
     move(dest, true);
 }
 
-void Unit::move(Uint16 dest, bool stop)
+void Unit::move(Uint16 dest, bool needStop)
 {
     targetcell = dest;
 
-    if (stop && (attackanim != NULL)) {
+    if (needStop && (attackanim != NULL)) {
         attackanim->stop();
         if (target != NULL) {
             target->unrefer();
@@ -332,11 +337,11 @@ void Unit::move(Uint16 dest, bool stop)
         }
     }
 
-	if (stop && harvestanim != NULL){
+	if (needStop && harvestanim != NULL){
 		harvestanim->stop();
 	}
 	
-	if (stop && infianim != 0){
+	if (needStop && infianim != 0){
 		infianim->stop();
 	}
 
@@ -626,33 +631,37 @@ Uint32 Unit::FindTiberium()
 	bool FirstFound = false;
 	bool FirstExpensiveFound = false;
 	
-	Uint8 type;
+	Uint8 typeNumber;
 	Uint8 amount;
 	
 	//getUnitAt(Uint32 cell, Uint8 subcell);
 
 	for (unsigned int pos =0; pos < p::ccmap->getSize(); pos++)
 	{
-		tiberium = p::ccmap->getResource(pos, &type, &amount);
+		tiberium = p::ccmap->getResource(pos, &typeNumber, &amount);
 		if (tiberium != 0)
 		{
 			// Found tiberium
 			//printf ("Found tiberium\n");
 			Distance = this->getDist(pos);
-			if (Distance < ClosesedDistance || !FirstFound){
-				if (p::uspool->getUnitAt(pos) == NULL){
+			if (Distance < ClosesedDistance || !FirstFound)
+            {
+				if (p::uspool->getUnitAt(pos) == 0)
+                {
 					ClosesedPos		= pos;
 					ClosesedDistance	= Distance;
 					FirstFound = true;
 				}
 
 				// Initialize the expensive values
-				if (type < 4 && ClosesedExpensivePos == 0){
+				if (typeNumber < 4 && ClosesedExpensivePos == 0)
+                {
 					ClosesedExpensivePos		= pos;
 					ClosesedExpensiveDistance	= Distance;
 				}
 			}
-			if (type < 4){
+			if (typeNumber < 4)
+            {
 				//Christal
 				Distance = this->getDist(pos);
 				if (Distance < ClosesedExpensiveDistance || !FirstExpensiveFound){
@@ -733,21 +742,28 @@ bool Unit::Repair(Structure *str)
 	return true;
 }
 
+/**
+ */
 void Unit::doRandTalk(TalkbackType ttype)
 {
     const char* sname;
     sname = type->getRandTalk(ttype);
-    if (sname != NULL) {
+    if (sname != 0)
+    {
         pc::sfxeng->PlaySound(sname);
     }
 }
 
+/**
+ * @return <code>true</code> if the Unit deployed successfully
+ */
 bool Unit::deploy()
 {
 	// error catching
-    if (canDeploy()) 
+    //if (canDeploy()) 
     { 
-        if (type->getDeployTarget() != NULL) {
+        if (type->getDeployTarget() != 0)
+        {
             deployed = true;
             p::uspool->removeUnit(this);
 	    	return true;
@@ -756,45 +772,69 @@ bool Unit::deploy()
     return false;
 }
 
-bool Unit::canDeploy()
+/**
+ * @param theMap The map to deploy in
+ * @return <code>true</code> if the Unit can deploy
+ */
+bool Unit::canDeploy(CnCMap* theMap)
 {
-    if (type->canDeploy())
+	if (type->canDeploy())
     {
-        if (type->getDeployTarget() != NULL)
+        if (type->getDeployTarget() != 0)
         {
-            if (!deployed)
-                return checkDeployTarget(calcDeployPos());
-            return false;
+        	if (!deployed)
+        	{
+        		return checkDeployTarget(theMap, calcDeployPos());
+        	}
+        	return false;
         }
-   }
-    return false;
+    }
+	return false;
 }
 
-bool Unit::checkDeployTarget(Uint32 pos)
+/**
+ * @param theMap The map to deploy in
+ * @param pos Position to check
+ * @return <code>true</code> if the Unit can deploy
+ */ 
+bool Unit::checkDeployTarget(CnCMap* theMap, Uint32 pos)
 {
-    Uint8 placexpos, placeypos;
+    Uint8 placexpos;
+    Uint8 placeypos;
     Uint32 curpos;
-    Uint8 typewidth, typeheight;
-    if (pos == (Uint32)(-1)) {
+    Uint8 typewidth;
+    Uint8 typeheight;
+    
+    if (pos == (Uint32)(-1))
+    {
         return false;
     }
-    if (type->getDeployType() == NULL) {
-        //return (p::ccmap->getCost(pos,this)<=1);
+    if (type->getDeployType() == 0) 
+    {
         return false;
     }
+    
     typewidth = type->getDeployType()->getXsize();
     typeheight = type->getDeployType()->getYsize();
-    if ((pos%mapwidth)+typewidth > mapwidth) {
+    
+    if ((pos%theMap->getWidth())+typewidth > theMap->getWidth()) 
+    {
         return false;
     }
-    if ((pos/mapwidth)+typeheight > mapheight) {
+    if ((pos/theMap->getWidth())+typeheight > theMap->getHeight()) 
+    {
         return false;
     }
-    for( placeypos = 0; placeypos < typeheight; ++placeypos) {
-        for( placexpos = 0; placexpos < typewidth; ++placexpos) {
-            curpos = pos+placeypos*mapwidth+placexpos;
-            if( type->getDeployType()->isBlocked(placeypos*typewidth+placexpos) ) {
-                if (!p::ccmap->isBuildableAt(this->getOwner(), curpos,this)) {
+    
+    for( placeypos = 0; placeypos < typeheight; ++placeypos)
+    {
+        for( placexpos = 0; placexpos < typewidth; ++placexpos)
+        {
+            curpos = pos + placeypos*theMap->getWidth() + placexpos;
+            if( type->getDeployType()->isBlocked(placeypos*typewidth+placexpos) ) 
+            {
+                if (!p::ccmap->isBuildableAt(this->getOwner(), curpos,this)) 
+                {
                     return false;
                 }
             }
@@ -803,14 +843,22 @@ bool Unit::checkDeployTarget(Uint32 pos)
     return true;
 }
 
+/**
+ */
 Uint32 Unit::calcDeployPos() const
 {
     Uint32 deploypos;
-    Uint32 mapwidth = p::ccmap->getWidth();
-    Uint8 w,h;
+    Uint32 mapwidth;
+    Uint8 w;
+    Uint8 h;
 
-    if (type->getDeployType() == NULL) {
-        if (cellpos%mapwidth == mapwidth) {
+
+    mapwidth = p::ccmap->getWidth();
+
+    if (type->getDeployType() == 0)
+    {
+        if (cellpos%mapwidth == mapwidth)
+        {
             return (Uint32)-1;
         }
         deploypos = cellpos+1;
@@ -994,11 +1042,3 @@ void Unit::Infiltrate(Structure* target)
 	this->infianim = new UInfiltrateAnimEvent(0, this);
 	p::aequeue->scheduleEvent(infianim);
 }
-
-
-
-
-
-
-
-

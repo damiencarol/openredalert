@@ -1,10 +1,7 @@
-/*****************************************************************************
- * blowfish.cpp - C++ implementation of the blowfish algorithm
- *     Modified slightly for FreeCNC use by Kareem Dana
- * Special Thanks to Olaf van der Spek (xcc.ra2mods.com) for the original
- ****************************************************************************/
-#include <cstring>
 #include "blowfish.h"
+
+#include <cstring>
+
 #include "SDL/SDL_endian.h"
 
 void Cblowfish::set_key(const Uint8* key, Uint32 cb_key)

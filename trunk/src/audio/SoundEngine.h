@@ -22,11 +22,11 @@
 #include <vector>
 #include <string>
 
+#include "SDL/SDL_types.h"
 #ifdef RA_SOUND_ENGINE
 #include "SDL/SDL_mixer.h"
 #endif
 
-#include "SoundCommon.h"
 #include "SoundCache.h"
 
 class SoundBuffer;

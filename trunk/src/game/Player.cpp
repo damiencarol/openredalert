@@ -1241,19 +1241,20 @@ Uint32 Player::getNumberRadars()
 {
 	return numberRadars;
 }
-
+	
 /** 
- * @param value the new value for victorious
+ * @param value Victorious Set if the player is victorious
  */
 void Player::setVictorious(bool value)
 {
 	this->victorious = value;
 }
-
+	
 /** 
  * @return <code>true</code> if the player is victorious else <code>false</code>
  */
 bool Player::isVictorious()
 {
-	return victorious;
+	return this->victorious;
 }
+
