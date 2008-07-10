@@ -42,6 +42,7 @@
 #include "UInfiltrateAnimEvent.h"
 #include "AiCommand.h"
 
+class CnCMap;
 class L2Overlay;
 class WalkAnimEvent;
 class MoveAnimEvent;
@@ -81,17 +82,15 @@ public:
 	void setInfantryGroup(InfantryGroup *ig);
 	Uint32 getImageNum(Uint8 layer) const;
 	Uint16 getNumbImages(Uint8 layer);
+
+    /** Set the number of the image in a layer */
 	void setImageNum(Uint32 num, Uint8 layer);
 	Sint8 getXoffset() const; // return xoffset-type->getOffset();
 	Sint8 getYoffset() const; // return yoffset-type->getOffset();
 	void setXoffset(Sint8 xo);
 	void setYoffset(Sint8 yo);
 	UnitType * getType();
-	
-	
-	//Uint8 getSight() const;
-	
-	
+
 	Uint16 getPos() const;
 	Uint16 getBPos(Uint16 pos) const;
 	Uint16 getSubpos() const;
@@ -100,8 +99,9 @@ public:
 
 	void ChangeHealth(Sint16 amount);
 
+    /** Command to the Unit to move at a destination */
 	void move(Uint16 dest);
-	void move(Uint16 dest, bool stop);
+	void move(Uint16 dest, bool needStop);
 	bool IsMoving(void);
 	bool IsAttacking(void);
 	bool canAttack(bool primary = true);
@@ -119,14 +119,17 @@ public:
 
 	bool IsHarvester();
 	bool IsHarvesting();
-	unsigned int FindTiberium(void);
+	Uint32 FindTiberium();
 	void Harvest(Uint32 pos, Structure *Struct);
 	bool Repair(Structure *str);
 
 	void doRandTalk(TalkbackType ttype);
-	bool deploy(void);
-	bool canDeploy();
-	bool checkDeployTarget(Uint32 pos);
+	/** Command deploy to Unit */
+	bool deploy();
+	/** Check if the unit can deploy */
+	bool canDeploy(CnCMap* theMap);
+	/** Check if the position in this map is ok to deploy for the unit deploy type */
+	bool checkDeployTarget(CnCMap* theMap, Uint32 pos);
 	Uint32 calcDeployPos() const;
 	Uint32 calcDeployPos(Uint32 pos) const;
 	Uint32 getExitCell() const;
@@ -194,7 +197,7 @@ private:
 	L2Overlay* l2o;
 	multimap<Uint16, L2Overlay*>::iterator l2entry;
 
-	InfantryGroup * infgrp;
+	InfantryGroup* infgrp;
 
 	MoveAnimEvent* moveanim;
 	URepairEvent* repairanim;
@@ -215,10 +218,6 @@ private:
 
 	/** The command this unit should execute */
 	Uint8 Command;
-
-	Uint32 mapwidth;
-	Uint32 mapheight;
-
 	Uint32 LastAttackTick;
 };
 

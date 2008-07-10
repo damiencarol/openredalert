@@ -17,6 +17,12 @@
 //    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "SoundUtils.h"
+
+#include <algorithm>
+
+using std::copy;
+
+
 #include "SoundCommon.h"
 
 Uint8 SoundUtils::Clip (int value)
@@ -40,9 +46,8 @@ Uint8 SoundUtils::Clip (int value, int min, int max)
     return (Uint8) value;
 }
 
-
-
-
+/**
+ */
 void SoundUtils::IMADecode(Uint8 *output, Uint8 *input, Uint16 compressed_size, Sint32& sample, Sint32& index)
 {
     int  Samples;
@@ -114,9 +119,10 @@ void SoundUtils::WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_s
     Uint16 i;
     Uint16 shifted_input;
 
-    if (compressed_size==uncompressed_size) {
-        std::copy(input, input+uncompressed_size, output);
-        return;
+    if (compressed_size==uncompressed_size) 
+    {
+    	copy(input, input+uncompressed_size, output);
+    	return;    
     }
 
     CurSample=0x80;

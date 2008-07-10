@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include "SoundCommon.h"
+#include "SOUND_DECODE_STATE.h"
 #include "include/Logger.h"
 #include "include/config.h"
 
@@ -162,17 +164,20 @@ void SoundEngine::PlaySound(const string& sound)
  */
 int SoundEngine::PlayLoopedSound(const string& sound, unsigned int loops)
 {
-    if (nosound || mutesound || sound.empty()){
+    if (nosound || mutesound || sound.empty())
+    {
         return -1;
     }
 
     SoundBuffer* snd = LoadSoundImpl(sound);
-    if (snd == 0){
+    if (snd == 0)
+    {
         return -1;
     }
 
     #ifdef RA_SOUND_ENGINE
-	if (Mix_Paused (-1)) {
+	if (Mix_Paused (-1)) 
+	{
 		Mix_Resume(-1);
 	}
     #endif
@@ -202,9 +207,11 @@ void SoundEngine::StopLoopedSound(int id)
  */
 void SoundEngine::PauseLoopedSound(int id)
 {
-    if (nosound){
+    if (nosound)
+    {
         return;
     }
+    
     #ifdef RA_SOUND_ENGINE
     Mix_Pause(id);
     #endif
@@ -214,9 +221,11 @@ void SoundEngine::PauseLoopedSound(int id)
  */
 void SoundEngine::ResumeLoopedSound(int id)
 {
-    if (nosound){
+    if (nosound)
+    {
         return;
     }
+    
     #ifdef RA_SOUND_ENGINE
     Mix_Resume(id);
     #endif
@@ -224,7 +233,8 @@ void SoundEngine::ResumeLoopedSound(int id)
 
 void SoundEngine::SetMusicVolume(int volume)
 {
-    if (nosound){
+    if (nosound)
+    {
         return;
     }
 
@@ -370,7 +380,9 @@ SoundBuffer* SoundEngine::LoadSoundImpl(const string& sound)
         // Load and cache sound
         if (soundDecoder.Open(sound)) {
             buffer = new SoundBuffer();
-            if (soundDecoder.Decode(buffer->data) == SOUND_DECODE_COMPLETED) {
+            // length = 0 because we don't know the size
+            if (soundDecoder.Decode(buffer->data, 0) == SOUND_DECODE_COMPLETED)
+            {
                 #ifdef RA_SOUND_ENGINE
                 buffer->chunk = Mix_QuickLoad_RAW(&buffer->data[0], static_cast<Uint32>(buffer->data.size()));
                 #endif

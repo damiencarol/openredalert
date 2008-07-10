@@ -65,7 +65,7 @@ void RedAlertDataLoader::load()
 	 */
 
 	//
-	// Loads all warhead in the REDALERT/LOCAL/rules.ini
+	// Loads all warhead in the REDALERT.mix/LOCAL.mix/rules.ini
 	//
 	// Load the rules ini file
 	rules_ini = new INIFile("rules.ini");
@@ -141,7 +141,7 @@ void RedAlertDataLoader::load()
 	//
 	// Try to load strings from MIX archive file
 	// @todo DEBUG MAKE READING OF KEYS
-	// Loads all strings in the REDALERT/LOCAL/conquer.eng
+	// Loads all strings in the REDALERT.mix/LOCAL.mix/conquer.eng
 	//VFile* raStrings = VFSUtils::VFS_Open("conquer.eng");
 	//logger->debug("File SIZE = %d", raStrings->fileSize());
 	//raStrings->tell();

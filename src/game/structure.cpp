@@ -976,3 +976,8 @@ StructureType* Structure::getType()
 {
 	return type;
 }
+
+Uint16* Structure::getImageNums() const
+{
+	return imagenumbers;
+}

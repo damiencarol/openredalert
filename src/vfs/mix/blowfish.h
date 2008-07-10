@@ -26,6 +26,11 @@ typedef Uint32 t_bf_s[4][256];
 
 /**
  * Object to encipher/decipher data with BlowFish algorythm
+ *
+ * Modified slightly for FreeCNC use by Kareem Dana
+ * Special Thanks to Olaf van der Spek (xcc.ra2mods.com) for the original
+ *
+ *
  */
 class Cblowfish
 {

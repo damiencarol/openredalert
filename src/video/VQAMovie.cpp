@@ -282,7 +282,7 @@ bool VQA::VQAMovie::ReadChunk()
 		   ((Uint8*)(&len))[3]);
 	
 	//len = SDL_Swap32(len);
-	printf ("Length = %i\n", len);
+	printf ("Length = %i\n", (int)len);
 	vqafile->seekSet(vqafile->tell() + len);
 
 	//printf ("Curpos = %i\n", vqafile->tell());

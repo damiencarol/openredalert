@@ -27,6 +27,10 @@ class RA_Label;
 
 /**
  * Window in the game
+ * @author Joris Meijer (FreeRA)
+ * @author Damien Carol (OpenRedAlert)
+ * @version 1.0
+ * @since r???
  */
 class RaWindow
 {
