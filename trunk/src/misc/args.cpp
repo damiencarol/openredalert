@@ -44,8 +44,8 @@ extern Logger * logger;
  */
 void PrintUsage()
 {
-    printf("FreeCNC - %s\n\n", VERSION.c_str());
-    printf("Usage: freecnc [OPTIONS]\n");
+    printf("OpenRedAlert - %s\n\n", VERSION.c_str());
+    printf("Usage: OpenRedAlert [OPTIONS]\n");
     printf("  -map mapname       - Name of mission to load\n");
     printf("  -w width           - Width of screen\n");
     printf("  -h height          - Height of screen\n");
