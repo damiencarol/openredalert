@@ -276,7 +276,11 @@ bool VQA::VQAMovie::ReadChunk()
 	Uint32 len;
 	//Uint8  byte;
 	vqafile->readDWord(&len, 1);
-	len = ((((Uint8*)(&len))[0] << 24) |                     (((Uint8*)(&len))[1] << 16) |                     (((Uint8*)(&len))[2] << 8) |                      ((Uint8*)(&len))[3]);
+	len = ((((Uint8*)(&len))[0] << 24) |
+		   (((Uint8*)(&len))[1] << 16) |
+		   (((Uint8*)(&len))[2] << 8) | 
+		   ((Uint8*)(&len))[3]);
+	
 	//len = SDL_Swap32(len);
 	printf ("Length = %i\n", len);
 	vqafile->seekSet(vqafile->tell() + len);
