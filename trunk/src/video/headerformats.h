@@ -18,6 +18,12 @@
 #ifndef HEADERFORMATS_H
 #define HEADERFORMATS_H
 
+/**
+ * Compression format of some files. 
+ * 
+ * The format can have one of the three values : 80h, 40h, 20h.
+ * Call 'Format80', 'Format40' and 'Format20'.
+ */
 enum headerformats {
     FORMAT_20 = 0x20, FORMAT_40 = 0x40, FORMAT_80 = 0x80
 };
