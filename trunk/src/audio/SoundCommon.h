@@ -23,9 +23,7 @@
 
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_audio.h"
-#ifdef RA_SOUND_ENGINE
 #include "SDL/SDL_mixer.h"
-#endif
 
 #include "SoundCache.h"
 #include "SoundBuffer.h"
@@ -67,10 +65,8 @@ namespace {
 struct SoundCacheCleaner : public std::unary_function<SoundCache::value_type, void>
 {
     void operator()(const SoundCache::value_type& p) {
-        #ifdef RA_SOUND_ENGINE
         Mix_FreeChunk(p.second->chunk);
         delete p.second;
-        #endif
     }
 };
 

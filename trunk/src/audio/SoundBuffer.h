@@ -22,21 +22,19 @@
 
 #include "SDL/SDL_types.h"
 
-#ifdef RA_SOUND_ENGINE
 #include "SDL/SDL_mixer.h"
-#endif
 
 using std::vector;
 
 typedef vector<Uint8> SampleBuffer;
 
+/**
+ */
 class SoundBuffer
 {
 public:
     SampleBuffer data;
-    #ifdef RA_SOUND_ENGINE
     Mix_Chunk * chunk;
-    #endif
 };
 
 #endif //SOUNDBUFFER_H

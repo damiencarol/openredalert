@@ -37,8 +37,8 @@ extern Logger * logger;
  */
 SoundFile::SoundFile() : fileOpened(false)
 {
-    if (!initconv) {
-        #ifdef RA_SOUND_ENGINE
+    if (!initconv)
+    {
         if (SDL_BuildAudioCVT(&eightbitconv, AUDIO_U8, 1, 22050, SOUND_FORMAT, SOUND_CHANNELS, SOUND_FREQUENCY) < 0) {
             logger->error("Could not build 8bit->16bit conversion filter\n");
             return;
@@ -48,7 +48,6 @@ SoundFile::SoundFile() : fileOpened(false)
             logger->error("Could not build mono->stereo conversion filter\n");
             return;
         }
-        #endif
         initconv = true;
     }
 }
@@ -78,7 +77,7 @@ bool SoundFile::Open(const std::string& filename){
     file->readByte(&flags,1);
     file->readByte(&type,1);
 
-#ifdef RA_SOUND_ENGINE
+
     // Check for known format
     if (type == 1) {
         conv = &eightbitconv;
@@ -90,7 +89,9 @@ bool SoundFile::Open(const std::string& filename){
     }
 
     if (frequency != 22050)
+    {
         logger->warning("Sound: \"%s\" needs converting from %iHz (should be 22050Hz)\n", filename.c_str(), frequency);
+    }
 
     imaSample = 0;
     imaIndex  = 0;
@@ -99,9 +100,6 @@ bool SoundFile::Open(const std::string& filename){
     fileOpened = true;
 
     return true;
-#else
-    return false;
-#endif
 }
 
 void SoundFile::Close(){
@@ -111,13 +109,15 @@ void SoundFile::Close(){
     }
 }
 
+/**
+ */
 Uint32 SoundFile::Decode(SampleBuffer& buffer, Uint32 length){
     if (!initconv || !fileOpened)
         return SOUND_DECODE_ERROR;
 
     assert(buffer.empty());
 
-#ifdef RA_SOUND_ENGINE
+
     Uint32 max_size = length == 0 ? uncomp_size * conv->len_mult : length;
     buffer.resize(max_size);
 
@@ -177,7 +177,4 @@ Uint32 SoundFile::Decode(SampleBuffer& buffer, Uint32 length){
         buffer.resize(written);
 
     return SOUND_DECODE_COMPLETED;
-#else
-    return SOUND_DECODE_ERROR;
-#endif
 }
