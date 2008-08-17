@@ -162,14 +162,10 @@ void VQA::VQAMovie::play()
         return;
     }
     
-    // @todo : DEBUG
-#ifndef RA_SOUND_ENGINE
-    logger->debug("SWAP VQA MOVIE FOR DEBUG\n");
-    return;
-#endif
-        
+ 
     
-    SDL_Surface *frame, *cframe;
+    SDL_Surface* frame;
+    SDL_Surface* cframe;
     SDL_Rect dest;
     SDL_Event esc_event;
     static ImageProc scaler;

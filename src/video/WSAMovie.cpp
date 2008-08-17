@@ -65,15 +65,11 @@ void WSAMovie::animate(GraphicsEngine* grafEngine)
     float fps, delay;
     SDL_Rect dest;
     int i;
-    SDL_Surface *frame;
+    SDL_Surface* frame;
     ImageProc scaler;
     
     
-    // @todo DEBUG SWAP WSA FOR DEBUG
-#ifndef RA_SOUND_ENGINE
-    logger->debug("DEBUG SWAP WSA FOR DEBUG\n");
-    return;    
-#endif
+
 
     frame = 0;
     dest.w = header.width<<1;

@@ -43,19 +43,16 @@ SoundEngine::SoundEngine(bool disableSound) :
         return;
     }
     
-    #ifdef RA_SOUND_ENGINE
+    
 	// Warning the Mix_OpenAudio uses libmikmod witch seems to create the music.raw file
     if (Mix_OpenAudio(SOUND_FREQUENCY, SOUND_FORMAT, SOUND_CHANNELS, 1024 /*4096*/) < 0) {
         logger->error("%s line %i: Unable to open sound: %s\n", __FILE__, __LINE__, Mix_GetError());
         nosound = true;
     }
-    #endif
 
-    #ifdef RA_SOUND_ENGINE
     // Set volumes to half of max by default; this should be a fallback, real setting should be read from config
     SetSoundVolume(MIX_MAX_VOLUME / 2);
     SetMusicVolume(MIX_MAX_VOLUME / 2);
-    #endif
 }
 
 /**
@@ -66,18 +63,14 @@ SoundEngine::~SoundEngine()
         return;
     }
 
-    #ifdef RA_SOUND_ENGINE
     // Stop all playback
     Mix_HaltChannel(-1);
     Mix_HookMusic(NULL, NULL);
-    #endif
-
+    
     // Clean up the sound cache
     for_each(soundCache.begin(), soundCache.end(), SoundCacheCleaner());
 
-    #ifdef RA_SOUND_ENGINE
     Mix_CloseAudio();
-    #endif
 }
 
 /**
@@ -129,7 +122,6 @@ void SoundEngine::SetSoundVolume(int volume)
         return;
     }
     
-    #ifdef RA_SOUND_ENGINE
     // standard control
     // if the sound volume asked is > to the sound volume MAX 
     // from the SDL_mixer constantes then the sound is set to max :)
@@ -141,7 +133,6 @@ void SoundEngine::SetSoundVolume(int volume)
     
     // Set the volume of all channel (-1)
     Mix_Volume(-1, volume);
-    #endif
     
     soundVolume = volume;
     mutesound = volume == 0;
@@ -174,18 +165,15 @@ int SoundEngine::PlayLoopedSound(const string& sound, unsigned int loops)
         return -1;
     }
 
-    #ifdef RA_SOUND_ENGINE
-	if (Mix_Paused (-1)) 
-	{
-		Mix_Resume(-1);
-	}
-    #endif
+    if (Mix_Paused (-1))
+    {
+        Mix_Resume(-1);
+    }
 
     int channel = 0;
-    #ifdef RA_SOUND_ENGINE
     channel = Mix_PlayChannel(-1, snd->chunk, static_cast<int>(loops)-1);
     Mix_Volume(channel, soundVolume);
-    #endif
+
     return channel;
 }
 
@@ -197,9 +185,7 @@ void SoundEngine::StopLoopedSound(int id)
         return;
     }
     
-    #ifdef RA_SOUND_ENGINE
     Mix_HaltChannel(id);
-    #endif
 }
 
 /**
@@ -211,9 +197,7 @@ void SoundEngine::PauseLoopedSound(int id)
         return;
     }
     
-    #ifdef RA_SOUND_ENGINE
     Mix_Pause(id);
-    #endif
 }
 
 /**
@@ -225,9 +209,7 @@ void SoundEngine::ResumeLoopedSound(int id)
         return;
     }
     
-    #ifdef RA_SOUND_ENGINE
     Mix_Resume(id);
-    #endif
 }
 
 void SoundEngine::SetMusicVolume(int volume)
@@ -237,7 +219,6 @@ void SoundEngine::SetMusicVolume(int volume)
         return;
     }
 
-	#ifdef RA_SOUND_ENGINE
     // standard control
     // if the sound volume asked is > to the sound volume MAX 
     // from the SDL_mixer constantes then the sound is set to max :)
@@ -246,7 +227,6 @@ void SoundEngine::SetMusicVolume(int volume)
     }  
 
     Mix_VolumeMusic(volume);
-    #endif
 }
 
 void SoundEngine::PlayMusic()
@@ -254,7 +234,6 @@ void SoundEngine::PlayMusic()
     if (nosound){
         return;
     }
-    #ifdef RA_SOUND_ENGINE
     if (!Mix_PlayingMusic()) {
         if (Mix_PausedMusic()) {
             Mix_ResumeMusic();
@@ -262,7 +241,6 @@ void SoundEngine::PlayMusic()
             PlayTrack(*currentTrack);
         }
     }
-    #endif
 }
 
 void SoundEngine::PauseMusic()
@@ -270,9 +248,7 @@ void SoundEngine::PauseMusic()
     if (nosound){
         return;
     }
-    #ifdef RA_SOUND_ENGINE
     Mix_PauseMusic();
-    #endif
 }
 
 void SoundEngine::StopMusic()
@@ -280,10 +256,8 @@ void SoundEngine::StopMusic()
     if (nosound)
         return;
 
-    #ifdef RA_SOUND_ENGINE
     Mix_HookMusic(NULL, NULL);
     musicDecoder.Close();
-    #endif
 }
 
 
@@ -301,9 +275,7 @@ void SoundEngine::PlayTrack(const string& sound)
 
     if (musicDecoder.Open(sound)) {
         musicFinished = false;
-        #ifdef RA_SOUND_ENGINE
         Mix_HookMusic(MusicHook, reinterpret_cast<void*>(&musicFinished));
-        #endif
     }
 }
 
@@ -357,9 +329,7 @@ void SoundEngine::MusicHook(void* userdata, Uint8* stream, int len)
  */
 void SoundEngine::SetMusicHook(MixFunc mixfunc, void* arg)
 {
-#ifdef RA_SOUND_ENGINE
     Mix_HookMusic(mixfunc, arg);
-#endif
 }
 
 void SoundEngine::LoadSound(const string& sound)
@@ -382,9 +352,7 @@ SoundBuffer* SoundEngine::LoadSoundImpl(const string& sound)
             // length = 0 because we don't know the size
             if (soundDecoder.Decode(buffer->data, 0) == SOUND_DECODE_COMPLETED)
             {
-                #ifdef RA_SOUND_ENGINE
                 buffer->chunk = Mix_QuickLoad_RAW(&buffer->data[0], static_cast<Uint32>(buffer->data.size()));
-                #endif
                 soundCache.insert(SoundCache::value_type(sound, buffer));
             } else {
                 delete buffer;
