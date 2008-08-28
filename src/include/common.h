@@ -59,7 +59,7 @@ using std::min;
 using std::string;
 
 
-const string VERSION = "release 395";
+const string VERSION = "release 407";
 
 /** Bounded by colours.  This will change later */
 const Uint8 MAXPLAYERS = 6;
