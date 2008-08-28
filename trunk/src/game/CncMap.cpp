@@ -2434,14 +2434,14 @@ void CnCMap::advancedSections(INIFile *inifile)
 	
 
 	// Load  [BASE] section
-	try
+	/*try
 	{
 		for( keynum = 0;;keynum++ )
 		{
 			if (maptype == GAME_RA)
 			{
 				key = inifile->readKeyValue("Base", keynum);
-				/* is the char which separate terraintype from action. */
+				// is the char which separate terraintype from action.
 				//                printf ("%s line %i: Base text 1: %s\n", __FILE__, __LINE__, key->first.c_str());
 				//                printf ("%s line %i: Base text 2: %s\n", __FILE__, __LINE__, key->second.c_str());
 				//printf ("%s line %i: Base text: %s\n", __FILE__, __LINE__, key->third.c_str());
@@ -2450,14 +2450,14 @@ void CnCMap::advancedSections(INIFile *inifile)
 			else if (maptype == GAME_TD)
 			{
 				//key = inifile->readUnsortedKeyValue("TRIGERS", keynum);
-				/* is the char which separate terraintype from action. */
+				// is the char which separate terraintype from action.
 				//logger->warning ("%s line %i: Trigger1 text: %s\n", __FILE__, __LINE__, key->first.c_str());
 				//              logger->warning ("%s line %i: Trigger2 text: %s\n", __FILE__, __LINE__, key->second.c_str());
 			}
 		}
 	}
 	catch(...)
-	{}
+	{}*/
 
 	//
 	// Digest
@@ -2680,8 +2680,7 @@ void CnCMap::parseBin(TileList* bindata)
 	Uint8 tile;
 	Uint32 tileidx;
 	int xtile, ytile;
-	INIFile *templini;
-
+	
 	SDL_Surface *tileimg;
 	SDL_Color palette[5*256];
 
@@ -2703,7 +2702,8 @@ void CnCMap::parseBin(TileList* bindata)
 	SHPBase::calculatePalettes();
 
 	// Load the templates.ini
-	templini = GetConfig("templates.ini");
+	//templini = GetConfig("templates.ini");
+        INIFile* templini = new INIFile("templates.ini");
 
 	index = 0;
 	for (ytile = 0; ytile < height; ytile++)
@@ -3199,72 +3199,83 @@ bool CnCMap::isEndOfGame()
  * Loading of TeamTypes
  */
 void CnCMap::loadTeamTypes(INIFile* fileIni)
-{	
-	Uint32 keynum = 0; // Use to parse the key
-	INIKey key; // Key to get the key values
-	
-	try
-	{
-		for(keynum = 0;;keynum++ )
-		{
-			if (maptype == GAME_RA)
-			{
-				RA_Teamtype team;
-				int pos;
-				char teamname[255]; // Use to keep the team name
-				
-				team.Units.clear();
-				key = fileIni->readKeyValue("Teamtypes", keynum);
-				team.tname = key->first;
-				sscanf(key->second.c_str(), "%i, %i, %i, %i, %i, %i, %i, %i, %[^,]", &team.country, &team.props, &team.unknown1, &team.unknown2, &team.maxteams, &team.waypoint, &team.trigger, &team.numb_teamtypes, teamname );
-				pos = key->second.find(teamname,0);
-				string temp = key->second.substr (pos, key->second.size());
-				for (int j = 0; j < team.numb_teamtypes; j++)
-				{
-					RA_TeamUnits unit;
-					sscanf(temp.c_str(), "%[^:]:%i ,", teamname, &unit.numb);
-					unit.tname = teamname;
-					 printf ("%s line %i: Team = %s, push back unit: %s, %i\n", __FILE__, __LINE__, team.tname.c_str(), unit.tname.c_str(), unit.numb);
-					team.Units.push_back(unit);
-					pos = temp.find (",", 0);
-					temp = temp.substr(pos+1, temp.size());
-					//printf("%s line %i: New string: %s\n", __FILE__, __LINE__, temp.c_str());
-				}
-				
-				//We should start reading the commands from std::string temp here :)
-				//printf("temp = %s\n", temp.c_str());
-				string temp3 = string(splitList(strdup(temp.c_str()), ',')[0]);
-				//printf("temp3 = %s\n", temp3.c_str());
-				pos = temp.find (",", 0);
-				string temp2 = temp.substr(pos+1, temp.size());
-				//printf("temp2 = %s\n", temp2.c_str());
-													
-				int numcommand;
-				sscanf(temp3.c_str(), "%i", &numcommand);
-				//team.aiCommandList = new vector<AiCommand*>();
-				//team.aiCommandList->resize(numcommand);
-				for (int j=0; j<numcommand; j++)
-				{
-					int id;
-					int wayp;
-					sscanf(splitList(strdup(temp2.c_str()), ':')[0], "%i", &id);
-					sscanf(splitList(strdup(temp2.c_str()), ':')[1], "%i", &wayp);
-					AiCommand* aiCom = new AiCommand();
-					aiCom->setId(id); 
-					aiCom->setWaypoint(wayp);
-					
-					pos = temp2.find (",", 0);
-					temp2 = temp2.substr(pos+1, temp2.size());
-					//printf("temp2 = %s\n", temp2.c_str());
-					printf("id=%d, wayp=%d\n", aiCom->getId(), aiCom->getWaypoint());	
-					
-					team.aiCommandList.push_back(aiCom);					
-				}
-				
-				RaTeamtypes.push_back(team);
-			}
-		}
-	}
-	catch(...)
-	{}
+{
+    // Checks that fileIni exist
+    if (fileIni == 0)
+    {
+        logger->error("[CnCMap::loadTeamTypes] fileIni == NULL !!!\n");
+        return;
+    }
+
+    // Check if the "[TeamTypes]" section exist
+    if (fileIni->isSection("Teamtypes"))
+    {
+        logger->error("[CnCMap::loadTeamTypes] section [TeamTypes] was not found in ini file.\n");
+        return;
+    }
+
+    // get number of line in '[TeamTypes]' section of the ini file
+    int numberOfKey = fileIni->getNumberOfKeysInSection("TeamTypes");
+
+    Uint32 keynum = 0; // Use to parse the key
+    INIKey key; // Key to get the key values
+    for (keynum = 0; keynum < numberOfKey; keynum++)
+    {
+        if (maptype == GAME_RA)
+        {
+            RA_Teamtype team;
+            int pos;
+            char teamname[255]; // Use to keep the team name
+
+            team.Units.clear();
+            key = fileIni->readKeyValue("TeamTypes", keynum);
+            team.tname = key->first;
+            sscanf(key->second.c_str(), "%i, %i, %i, %i, %i, %i, %i, %i, %[^,]", &team.country, &team.props, &team.unknown1, &team.unknown2, &team.maxteams, &team.waypoint, &team.trigger, &team.numb_teamtypes, teamname);
+            pos = key->second.find(teamname, 0);
+            string temp = key->second.substr(pos, key->second.size());
+            for (int j = 0; j < team.numb_teamtypes; j++)
+            {
+                RA_TeamUnits unit;
+                sscanf(temp.c_str(), "%[^:]:%i ,", teamname, &unit.numb);
+                unit.tname = teamname;
+                printf("%s line %i: Team = %s, push back unit: %s, %i\n", __FILE__, __LINE__, team.tname.c_str(), unit.tname.c_str(), unit.numb);
+                team.Units.push_back(unit);
+                pos = temp.find(",", 0);
+                temp = temp.substr(pos + 1, temp.size());
+                //printf("%s line %i: New string: %s\n", __FILE__, __LINE__, temp.c_str());
+            }
+
+            //We should start reading the commands from std::string temp here :)
+            //printf("temp = %s\n", temp.c_str());
+            string temp3 = string(splitList(strdup(temp.c_str()), ',')[0]);
+            //printf("temp3 = %s\n", temp3.c_str());
+            pos = temp.find(",", 0);
+            string temp2 = temp.substr(pos + 1, temp.size());
+            //printf("temp2 = %s\n", temp2.c_str());
+
+            int numcommand;
+            sscanf(temp3.c_str(), "%i", &numcommand);
+            //team.aiCommandList = new vector<AiCommand*>();
+            //team.aiCommandList->resize(numcommand);
+            for (int j = 0; j < numcommand; j++)
+            {
+                int id;
+                int wayp;
+                sscanf(splitList(strdup(temp2.c_str()), ':')[0], "%i", &id);
+                sscanf(splitList(strdup(temp2.c_str()), ':')[1], "%i", &wayp);
+                AiCommand* aiCom = new AiCommand();
+                aiCom->setId(id);
+                aiCom->setWaypoint(wayp);
+
+                pos = temp2.find(",", 0);
+                temp2 = temp2.substr(pos + 1, temp2.size());
+                //printf("temp2 = %s\n", temp2.c_str());
+                printf("id=%d, wayp=%d\n", aiCom->getId(), aiCom->getWaypoint());
+
+                team.aiCommandList.push_back(aiCom);
+            }
+
+            RaTeamtypes.push_back(team);
+        }
+    }
 }
