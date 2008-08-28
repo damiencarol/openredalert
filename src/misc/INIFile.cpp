@@ -388,6 +388,29 @@ float INIFile::readFloat(const char* section, const char* value, float deflt)
 }
 
 /** 
+ * Function to get number of key/value per section 
+ */
+int INIFile::getNumberOfKeysInSection(string section)
+{
+    map<string, INISection>::iterator sec_new;
+    INIKey Key;
+    string s;
+
+    // get the string from (char*) section
+    s = string(section);
+
+    // Upper the section string
+    transform(s.begin(), s.end(), s.begin(), toupper);
+
+    sec_new = Inidata.find(s);
+    if (sec_new == Inidata.end()) {
+        throw KeyNotFound("Section [" + string(section) + "] not found in .ini file.");
+    }
+
+    return sec_new->second.size();
+}
+    
+/** 
  * Use inside a loop to read all keys of a section.  The order is as read
  * from the inifile.
  *

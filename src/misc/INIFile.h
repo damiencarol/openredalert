@@ -62,6 +62,9 @@ public:
     /** Function to test if a section is in the inifile */
     bool isSection(string section);
     
+    /** Function to get number of key/value per section */
+    int getNumberOfKeysInSection(string section);
+    
 private:
     /** Internal data */
     map<string, INISection> Inidata;
