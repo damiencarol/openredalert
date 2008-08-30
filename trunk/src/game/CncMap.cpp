@@ -3217,7 +3217,7 @@ void CnCMap::loadTeamTypes(INIFile* fileIni)
     // get number of line in '[TeamTypes]' section of the ini file
     int numberOfKey = fileIni->getNumberOfKeysInSection("TeamTypes");
 
-    Uint32 keynum = 0; // Use to parse the key
+    int keynum = 0; // Use to parse the key
     INIKey key; // Key to get the key values
     for (keynum = 0; keynum < numberOfKey; keynum++)
     {
