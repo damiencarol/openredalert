@@ -3208,7 +3208,7 @@ void CnCMap::loadTeamTypes(INIFile* fileIni)
     }
 
     // Check if the "[TeamTypes]" section exist
-    if (fileIni->isSection("Teamtypes"))
+    if (fileIni->isSection("TeamTypes") == false)
     {
         logger->error("[CnCMap::loadTeamTypes] section [TeamTypes] was not found in ini file.\n");
         return;
