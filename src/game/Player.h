@@ -127,6 +127,9 @@ public:
 
 	/** Turns on a block of cells in either the sight or buildable matrix */
 	void addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode);
+	/** Turns on cells around one cell depending on sight */
+	void addSoB(Uint32 pos, Uint8 sight, SOB_update mode);
+	
 	/** Turns off a block of cells in either the sight or buildable matrix */
 	void removeSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode);
 

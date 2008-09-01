@@ -49,6 +49,7 @@ namespace pc {
 }
 namespace p {
 	extern UnitAndStructurePool* uspool;
+	extern CnCMap* ccmap;
 }
 extern Logger * logger;
 
@@ -575,10 +576,10 @@ void Player::builtStruct(Structure* str)
     
 	// Add some sight (sight of the building)
     // @todo change this feature to test during the placement
-    addSoB(str->getPos(), st->getXsize(), st->getYsize(), 3, SOB_SIGHT);
+    addSoB(str->getPos(), st->getXsize(), st->getYsize(), st->getSight(), SOB_SIGHT);
     // If building 
     // @todo change this feature to test during the placement
-    addSoB(str->getPos(), st->getXsize(), st->getYsize(), 1, SOB_BUILD);
+    addSoB(str->getPos(), st->getXsize(), st->getYsize(), 2, SOB_BUILD);
     
     // get the power info and update constants
     PowerInfo newpower = st->getPowerInfo();
@@ -974,9 +975,25 @@ vector<bool>& Player::getMapBuildable()
 	return mapBuildable;
 }
 
+/**
+ */
+void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode)
+{
+	// for each line of the screen
+	for (int j=0; j<height; j++)
+	{
+		// for each column of the screen
+		for (int i = 0; i<width; i++)
+		{
+			// Turns on cells
+			addSoB(pos + i + (j*p::ccmap->getWidth()), sight, mode);
+		}
+	}
+}
+
 #if 1
 
-void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode)
+void Player::addSoB(Uint32 pos, Uint8 sight, SOB_update mode)
 {
 	Uint32 initX = 0;
 	Uint32 endX = 0;
@@ -992,8 +1009,10 @@ void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_upda
         mapVoB = &mapBuildable;
         sight  = brad;			// Buildable radius from config file internal-global.ini
     } else {
-        logger->error("addSoB was given an invalid mode: %i\n", mode);
-        return;
+        //logger->error("addSoB was given an invalid mode: %i\n", mode);
+        //return;
+        // By default it's about visibility
+        mapVoB = &mapVisible;
     }
     		
 	
@@ -1006,11 +1025,11 @@ void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_upda
 	}
 	
 	// check max X
-	if ((pos % p::ccmap->getWidth() + sight) > p::ccmap->getWidth())
+	if ((pos % p::ccmap->getWidth() + sight +1) > p::ccmap->getWidth())
 	{
 		endX = p::ccmap->getWidth();
 	} else {
-		endX = pos % p::ccmap->getWidth() + sight;
+		endX = pos % p::ccmap->getWidth() + sight+1;
 	}
 	
 	
@@ -1023,11 +1042,11 @@ void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_upda
 	}
 	
 	// check max Y
-	if ((pos / p::ccmap->getWidth() + sight) > p::ccmap->getWidth())
+	if ((pos / p::ccmap->getWidth() + sight + 1) > p::ccmap->getWidth())
 	{
 		endY = p::ccmap->getWidth();
 	} else {
-		endY = pos / p::ccmap->getWidth() + sight;
+		endY = pos / p::ccmap->getWidth() + sight+1;
 	}
 	
 	
@@ -1042,17 +1061,29 @@ void Player::addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_upda
 		{
 			curpos = xpos + ypos * p::ccmap->getWidth();
 			
-			xtiles = pos % p::ccmap->getWidth() - curpos % p::ccmap->getWidth();
-			ytiles = pos / p::ccmap->getWidth() - curpos / p::ccmap->getWidth();
+			// x
+			if (pos % p::ccmap->getWidth() > curpos % p::ccmap->getWidth()) 
+			{
+				xtiles = pos % p::ccmap->getWidth() - curpos % p::ccmap->getWidth();
+			} else {
+				xtiles = curpos % p::ccmap->getWidth() - pos % p::ccmap->getWidth();			
+			}
+			// y
+			if (pos / p::ccmap->getWidth() > curpos / p::ccmap->getWidth()) {
+				ytiles = pos / p::ccmap->getWidth() - curpos / p::ccmap->getWidth();
+			} else {
+				ytiles = curpos / p::ccmap->getWidth() - pos / p::ccmap->getWidth();
+			}
 			
-			double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
+			
+			int distance = xtiles*xtiles + ytiles*ytiles;
 			
 			//printf("curpos=%d\n", curpos);
 			
 			//printf("x=%d y=%d xt=%d yt=%d  distance=%d\n", xpos, ypos, xtiles, ytiles, distance);
-			double dSight = sight;
+			//double dSight = sight;
 	
-			if (distance <= dSight)
+			if (distance <= (sight*sight))
 			{
 				sightMatrix[curpos] += (mode == SOB_SIGHT);
 				buildMatrix[curpos] += (mode == SOB_BUILD);
