@@ -1,0 +1,30 @@
+#labels Phase-Support
+#OpenRedAlert How-To describe how to get src/package, compil and run the game.
+
+= Introduction =
+
+Add your content here.
+
+
+= Get the source =
+
+You can get the entire sources at Google code page of the project.
+
+Use this command to anonymously check out the latest project source code:
+
+# Non-members may check out a read-only working copy anonymously over HTTP.
+svn checkout http://openredalert.googlecode.com/svn/trunk/ openredalert-read-only
+
+= Compil =
+
+Use GCC with 
+
+SDL - library
+SDL_mixer - library
+
+= Run the game =
+
+Copy the folder '/data/' from a compiled archive and copy it in the folder of the programme.
+Copy the REDALERT.mix and MAIN.mix files from original archives of the game into the folder '/data/mix'
+
+and run the programme.
