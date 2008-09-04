@@ -1,0 +1,13 @@
+#How to run the game with correct files
+
+= Run the game =
+
+Copy the folder '/data/' from a compiled archive and to the folder of the programme.
+
+Copy the REDALERT.mix and MAIN.mix files from original archives of the game into the folder '/data/mix'
+
+and run the programme.
+
+= CD1&2 =
+
+CD1 and CD2 have their own MAIN.MIX
