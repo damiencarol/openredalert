@@ -17,6 +17,8 @@
 
 #include "ImageCache.h"
 
+#include <algorithm>
+
 #include "ImageNotFound.h"
 #include "SHPImage.h"
 #include "ImageCacheEntry.h"
@@ -25,7 +27,7 @@ using std::string;
 using std::map;
 using std::transform;
 
-/** 
+/**
  * Return the numb of images contained in the shp (find the image by
  *  number)
  */
@@ -35,40 +37,40 @@ Uint32 ImageCache::getNumbImages(Uint32 imgnum)
 	return getImage(imgnum, 0).NumbImages;
 }
 
-/** 
+/**
  * Return the numb of images contained in the shp (find the image by name)
  */
 Uint32 ImageCache::getNumbImages(const char* fname)
 {
 	Uint32 imgnum; // number of main image
-	
+
 	// Try to load the image or return index of main image (image 0 of SHP)
 	imgnum = loadImage(fname);
-	
+
 	// return the number of image in the SHP
 	return getImage(imgnum).NumbImages;
 }
 
-/** 
+/**
  * Assigns the source for images and purges both caches.
- * 
+ *
  * @param imagepool The imagepool to use.
  */
 void ImageCache::setImagePool(vector<SHPImage*>* imagepool)
 {
 	// set the Image pool
-    this->imagepool = imagepool;    
+    this->imagepool = imagepool;
     // Clear cache
     cache.clear();
     // Clear previous cache
     prevcache.clear();
 }
 
-/** 
- * Gets an image from the cache.  
- * 
+/**
+ * Gets an image from the cache.
+ *
  * If the image isn't cached, it is loaded in from the imagepool.
- * 
+ *
  * @param imgnum The number of the image in the imagepool.
  *           The imgnum stores 3 values
  *           <--------------32bits------------>
@@ -109,9 +111,9 @@ ImageCacheEntry& ImageCache::getImage(Uint32 imgnum)
     // the imagepool.
 	// This is the only part of the imagecache that uses code
     // from elsewhere i.e. change the type of the vector and
-    // how the decoded sprite data is stored into the "entry" 
+    // how the decoded sprite data is stored into the "entry"
     // and it'll work elsewhere.
-    
+
 	ImageCacheEntry& entry = cache[imgnum];
 
 	//Uint8 palnum = p::ppool->getLPlayer()->getMultiColour ();
@@ -139,7 +141,7 @@ ImageCacheEntry& ImageCache::getImage(Uint32 imgnum)
     return entry;
 }
 
-ImageCacheEntry& ImageCache::getImage(Uint32 imgnum, Uint32 frame) 
+ImageCacheEntry& ImageCache::getImage(Uint32 imgnum, Uint32 frame)
 {
     return getImage(imgnum | (frame &0x7FF));
 }
@@ -178,7 +180,7 @@ void ImageCache::setImage(SDL_Surface* Image, SDL_Surface* Shadow, Uint32 imgnum
 
 /**
  * Load an image with this name
- * 
+ *
  * @param fname Name of the file.
  */
 Uint32 ImageCache::loadImage(const char* fname)
@@ -189,27 +191,27 @@ Uint32 ImageCache::loadImage(const char* fname)
 
 /**
  * Load an image with this name
- * 
+ *
  * @param fname Name of the file.
  * @param scaleq scale factor (-1 = no factor)
  */
-Uint32 ImageCache::loadImage(const char* fname, int scaleq) 
+Uint32 ImageCache::loadImage(const char* fname, int scaleq)
 {
     string name; // Name of the file wanted
     map<string, Uint32>::iterator cachentry; // Iterator use to parse cache
-    
+
     // coppy the char* string in c++ string
     name = string(fname);
-    
+
     // UPPER the fname string
     transform(name.begin(), name.end(), name.begin(), toupper);
 
     // Parse the vector to find the image
     cachentry = namecache.find(name);
-    
-    // if the iterator is at end (image NOT FOUND) load the image and 
+
+    // if the iterator is at end (image NOT FOUND) load the image and
     // push it on the vector
-    if (cachentry == namecache.end()) 
+    if (cachentry == namecache.end())
     {
     	// Get the initial index
         Uint32 size = static_cast<Uint32>(imagepool->size());
@@ -221,7 +223,7 @@ Uint32 ImageCache::loadImage(const char* fname, int scaleq)
             namecache[name] = (Uint32)-1;
         }
     }
-    
+
     // Check if the index is -1 and trow ImageNotFound
     if ((Uint32)-1 == namecache[name]) {
     	// Throw an ImageNotFound exception
@@ -232,22 +234,22 @@ Uint32 ImageCache::loadImage(const char* fname, int scaleq)
     return cachentry->second;
 }
 
-/** 
- * Rotates caches so a new cache will be created next time an image is 
+/**
+ * Rotates caches so a new cache will be created next time an image is
  * requested.
  */
-void ImageCache::newCache() 
+void ImageCache::newCache()
 {
 	// Clean previous cache
 	prevcache.clear();
-	// Swap the 2 cache (prevcache = cache AND cache = a new cache) 
+	// Swap the 2 cache (prevcache = cache AND cache = a new cache)
     prevcache.swap(cache);
 }
 
-/** 
+/**
  * Clears both the current and previous caches
  */
-void ImageCache::flush() 
+void ImageCache::flush()
 {
 	// Clean previous cache
 	prevcache.clear();
@@ -255,7 +257,7 @@ void ImageCache::flush()
     cache.clear();
 }
 
-/** 
+/**
  * Removes all images from the image pool and clears both caches
  */
 void ImageCache::Cleanup()

@@ -19,6 +19,7 @@
 
 #include <list>
 #include <functional>
+#include <algorithm>
 
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_video.h"
@@ -53,7 +54,7 @@ MessagePool::~MessagePool()
 {
 	// Free surface of the text
     SDL_FreeSurface(textimg);
-    
+
     // Free the label
     delete msglabel;
 }
@@ -103,7 +104,7 @@ SDL_Surface* MessagePool::getMessages()
  */
 void MessagePool::postMessage(string msg)
 {
-	string mess = msg;	
+	string mess = msg;
     msglist.push_back(Message(mess, SDL_GetTicks() + 10000));
     updated = true;
 }
@@ -136,7 +137,7 @@ void MessagePool::setWidth(Uint32 width)
 
 /**
  */
-Uint32 MessagePool::getWidth() const 
+Uint32 MessagePool::getWidth() const
 {
 	return width;
 }
