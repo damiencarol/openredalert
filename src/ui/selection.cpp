@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <functional>
 #include <map>
+#include <algorithm>
 
 #include "include/Logger.h"
 #include "game/Dispatcher.h"
@@ -37,12 +38,12 @@ namespace p {
 }
 extern Logger * logger;
 
-using std::map; 
-using std::list; 
-using std::mem_fun; 
+using std::map;
+using std::list;
+using std::mem_fun;
 using std::bind2nd;
-using std::ptr_fun; 
-using std::unary_function; 
+using std::ptr_fun;
+using std::unary_function;
 using std::find_if;
 using std::find;
 
@@ -87,7 +88,7 @@ struct doattack<Unit> : unary_function<Unit*, void> {
             p::dispatcher->unitAttack(un, target, target_is_unit);
         }
     }
-    UnitOrStructure* target; 
+    UnitOrStructure* target;
     bool target_is_unit;
 };
 
@@ -101,7 +102,7 @@ struct doattack<Structure> : unary_function<Structure*, void> {
             p::dispatcher->structureAttack(st, target, target_is_unit);
         }
     }
-    UnitOrStructure* target; 
+    UnitOrStructure* target;
     bool target_is_unit;
 };
 
@@ -176,7 +177,7 @@ template<class T> void purgeImpl(T* sel, list<T*> (&saved)[10])
 
 }
 
-Selection::Selection() : numattacking(0), enemy_selected(false) 
+Selection::Selection() : numattacking(0), enemy_selected(false)
 {
 }
 
@@ -504,7 +505,7 @@ bool Selection::areWaterBound()
 	return true;
 }
 
-Uint32 Selection::numbUnits() const 
+Uint32 Selection::numbUnits() const
 {
 	return sel_units.size();
 }
@@ -531,22 +532,22 @@ Structure* Selection::getStructure(Uint32 structureNumber)
 	return 0;
 }
 
-bool Selection::canAttack() const 
+bool Selection::canAttack() const
 {
 	return !enemy_selected && (numattacking>0);
 }
 
-bool Selection::canMove() const 
+bool Selection::canMove() const
 {
 	return !enemy_selected && (sel_units.size() > 0);
 }
 
-bool Selection::isEnemy() const 
+bool Selection::isEnemy() const
 {
 	return enemy_selected;
 }
 
-bool Selection::empty() const 
+bool Selection::empty() const
 {
 	return sel_units.empty() && sel_structs.empty();
 }

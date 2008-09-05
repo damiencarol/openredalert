@@ -14,7 +14,7 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 #include "Sidebar.h"
 
 #include <cstdlib>
@@ -22,6 +22,7 @@
 #include <string>
 #include <iosfwd>
 #include <sstream>
+#include <algorithm>
 
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_video.h"
@@ -142,7 +143,7 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
 
         // Load the repair icon image (-1 = disable scale)
         repairImages = new SHPImage("repair.shp", -1);
-        
+
         // Load the map icon image (-1 = disable scale)
         mapImages = new SHPImage("map.shp", -1);
 
@@ -201,7 +202,7 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
             throw SidebarError("Unable to load the radar-image!");
         }
     }
-    
+
 	//if (pc::Config.gamenum == GAME_RA) {
 	//	if ((player->getSide()&~PS_MULTI) == PS_BAD) {
     ussrAnimRadarImage = new SHPImage("ussrradr.shp", scaleq);
@@ -210,7 +211,7 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
 	//		radaranimnumb = pc::imgcache->loadImage("natoradr.shp", scaleq);
 	//}
 
-	
+
     SDL_Surface *radar;
     //if (pc::Config.gamenum == GAME_TD){
     //	radar = pc::imgcache->getImage(radarlogo).image;
@@ -219,9 +220,9 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
     //}
     //	radar = ReadShpImage ((char *)radarnames[side], 1);
 
-    radarlocation.x = 0;  
+    radarlocation.x = 0;
     radarlocation.y = 0;
-    radarlocation.w = radar->w;  
+    radarlocation.w = radar->w;
     radarlocation.h = radar->h;
 
     // Set steps for CLOCK ?????
@@ -253,10 +254,10 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
 	QuantityLabel.setColor(0xff, 0xff, 0xff);
 	QuantityLabel.SetFont("grad6fnt.fnt");
 	QuantityLabel.UseAntiAliasing(false);
-	
+
 	// Create the string table object
 	stringFile = new StringTableFile("conquer.eng");
-	
+
 	this->sbar = 0;
 }
 
@@ -283,7 +284,7 @@ Sidebar::~Sidebar()
 			SDL_FreeSurface(Clocks[i]);
 		}
 	}
-	
+
 	// Free the string table object
 	delete stringFile;
 }
@@ -342,7 +343,7 @@ SDL_Surface *Sidebar::getSidebarImage(SDL_Rect location)
     if (location.w == sbarlocation.w && location.h == sbarlocation.h){
         return sbar;
     }
-    
+
     SDL_FreeSurface(sbar);
 
     temp = SDL_CreateRGBSurface(SDL_SWSURFACE, location.w, location.h, 16, 0, 0, 0, 0);
@@ -396,7 +397,7 @@ SDL_Surface *Sidebar::getSidebarImage(SDL_Rect location)
 		// overdraw the with the correct upper part
 		//radar = pc::imgcache->getImage(radaranimnumb, 0).image;
 		ussrAnimRadarImage->getImage(0, &radar, &shadow, 0);
-		
+
 		SDL_SetColorKey(radar,SDL_SRCCOLORKEY, 0xffffff);
 		newdest.x = radarlocation.x;
 		newdest.y = radarlocation.y;
@@ -441,7 +442,7 @@ char* Sidebar::getButtonName(Uint8 index)
 	if ((function&0x3) != 1){
 		return 0;
 	}
-	
+
 	Uint8 VecPtrIndex = index - 3 - ((function&sbo_unit)?0:buildbut);
 
 	type = (function&sbo_unit);
@@ -454,20 +455,20 @@ char* Sidebar::getButtonName(Uint8 index)
 		vecptr = &structicons;
 	}
 
-	if ( (unsigned)(*vecptr).size() > ((unsigned)(*offptr)+VecPtrIndex - 1) ) 
-	{		
+	if ( (unsigned)(*vecptr).size() > ((unsigned)(*offptr)+VecPtrIndex - 1) )
+	{
 		res = strdup((*vecptr)[(*offptr+VecPtrIndex-1)]);
 	} else {
 		// Out of range
 		return 0;
 	}
-	
+
 	return res;
 }
 
 void Sidebar::DrawButtonTooltip(Uint8 index)
 {
-	char* UnitOrStructureName = 0;	// 
+	char* UnitOrStructureName = 0;	//
 	Uint8 			unit;
 	Uint8 			function;
 	ostringstream	TipString;
@@ -503,38 +504,38 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
 		if (nameOfType=="POWR"){
 			TipString << stringFile->getString(126);
 		} else if (nameOfType=="BRIK"){
-			TipString << stringFile->getString(134);				
+			TipString << stringFile->getString(134);
 		} else if (nameOfType=="FENC"){
-			TipString << stringFile->getString(135);				
+			TipString << stringFile->getString(135);
 		} else if (nameOfType=="SBAG"){
-			TipString << stringFile->getString(132);				
+			TipString << stringFile->getString(132);
 		} else if (nameOfType=="TENT"){
-			TipString << stringFile->getString(129);				
+			TipString << stringFile->getString(129);
 		} else if (nameOfType=="BARR"){
-			TipString << stringFile->getString(129);				
+			TipString << stringFile->getString(129);
 		} else if (nameOfType=="FACF"){
-			TipString << stringFile->getString(430);				
+			TipString << stringFile->getString(430);
 		} else if (nameOfType=="PROC"){
-			TipString << stringFile->getString(85);				
+			TipString << stringFile->getString(85);
 		} else if (nameOfType=="SPEN"){
-			TipString << stringFile->getString(412);				
+			TipString << stringFile->getString(412);
 		} else if (nameOfType=="APWR"){
-			TipString << stringFile->getString(127);	
+			TipString << stringFile->getString(127);
 		} else if (nameOfType=="SYRD"){
-			TipString << stringFile->getString(411);				
+			TipString << stringFile->getString(411);
 		} else if (nameOfType=="GUN"){
-			TipString << stringFile->getString(434);				
+			TipString << stringFile->getString(434);
 		} else if (nameOfType=="IRON"){
-			TipString << stringFile->getString(424);				
+			TipString << stringFile->getString(424);
 		} else {
 			TipString << type->getName();
-		}		
-	} 
+		}
+	}
 	else
 	{
 		TipString << "?";
 	}
-	
+
 	// Complete the tooltip text with cost
 	TipString << "\n" << "$"<< type->getCost();
 
@@ -544,7 +545,7 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
 
 /**
  * Return the index of the button which is at coordinates x and y
- * 
+ *
  * @param x coordinate X
  * @param y coordinate Y
  * @return Number of the sidebar button or 255 if no button found
@@ -562,18 +563,18 @@ Uint8 Sidebar::getButton(Uint16 x, Uint16 y)
     return 255;
 }
 
-/** 
+/**
  * Event handler for clicking buttons.
  *
  * @bug This is an evil hack that should be replaced by something more flexible.
  */
-void Sidebar::ClickButton(Uint8 index, char* unitname, createmode_t* createmode) 
+void Sidebar::ClickButton(Uint8 index, char* unitname, createmode_t* createmode)
 {
     Uint8 f;
-    
-    f = buttons[index]->getFunction();    
+
+    f = buttons[index]->getFunction();
     *createmode = CM_INVALID;
-    
+
     switch (f&0x3) {
     case 0:
         return;
@@ -608,7 +609,7 @@ void Sidebar::ResetButton()
 
 /**
  * Scroll the two icons list
- * 
+ *
  * @param scrollup if scrollup==true then scroll up the two icons list
  */
 void Sidebar::ScrollSidebar(bool scrollup)
@@ -621,7 +622,7 @@ void Sidebar::ScrollSidebar(bool scrollup)
 
 
 void Sidebar::UpdateSidebar()
-{	
+{
 	// update list of available icons
 	UpdateAvailableLists();
 	// Updates all buttons
@@ -645,7 +646,7 @@ void Sidebar::DrawPowerbar()
 	//if (pc::Config.gamenum != GAME_RA){
 	//	return;
 	//}
-		
+
 	Powerbar_up = pc::imgcache->getImage(powerbar,0).image;
 	dest.x	= 0;
 	dest.y	= radarlocation.h;
@@ -682,7 +683,7 @@ void Sidebar::UpdatePowerbar()
 	//if (pc::Config.gamenum != GAME_RA){
 	//	return;
 	//}
-		
+
 	// Get the power status of the player
 	unsigned int power = this->player->getPower();
 	unsigned int powerused = this->player->getPowerUsed();
@@ -804,14 +805,14 @@ void Sidebar::setSpecialButtonState(Uint8 Button, Uint8 State)
 			break;
 
 	}
-	
+
 	// Force redraw of special Icons
 	DrawSpecialIcons();
 }
 
 /**
  * Get the state of a special button
- * 
+ *
  * @param button Number of the button
  * @return state of the button
  */
@@ -838,7 +839,7 @@ Uint8 Sidebar::getSpecialButtonState(Uint8 button)
  */
 void Sidebar::DrawSpecialIcons()
 {
-	SDL_Surface *shadow;		
+	SDL_Surface *shadow;
 	//SDL_Rect	dest;
 	SDL_Surface* Repair;
 	SDL_Surface* Sell;
@@ -897,7 +898,7 @@ void Sidebar::DrawSpecialIcons()
 
 /**
  * Start the drawing of the animation radar (ON or OFF)
- * 
+ *
  * @param mode If mode = 0 then RADAR ON anim wil be render
  *             If mode = 1 then RADAR OFF anim wil be render
  */
@@ -949,8 +950,8 @@ void Sidebar::SetupButtons(Uint16 height)
 		ButtonXpos	= 25;
 		startoffs	= radarlocation.h + 5;
 	//}
-		
-	
+
+
 	SHPImage* strip = 0; // Image behind button when no option is allowed
 
 	tmpname = VFSUtils::VFS_getFirstExisting(3,"stripna.shp","hstrip.shp","strip.shp");
@@ -1025,7 +1026,7 @@ void Sidebar::SetupButtons(Uint16 height)
 
     // Update icons
     UpdateIcons();
-    
+
     // Hide the sidebars if they are no object
     if (uniticons.empty() && structicons.empty()) {
         visible = false;
@@ -1034,12 +1035,12 @@ void Sidebar::SetupButtons(Uint16 height)
 }
 
 /**
- * Scroll icons 
- * 
+ * Scroll icons
+ *
  * @param dir direction to scroll (0==down 0!=up)
  * @param type which icon list (0==Structure(first) 0!=Units(second))
  */
-void Sidebar::ScrollBuildList(Uint8 dir, Uint8 type) 
+void Sidebar::ScrollBuildList(Uint8 dir, Uint8 type)
 {
     Uint8* offptr;
     vector<char*>* vecptr;
@@ -1062,7 +1063,7 @@ void Sidebar::ScrollBuildList(Uint8 dir, Uint8 type)
         }
     }
 
-    // Updates Icons 
+    // Updates Icons
     // (to draw only icons which are in scrolling area)
     UpdateIcons();
 }
@@ -1088,7 +1089,7 @@ void Sidebar::Build(Uint8 index, Uint8 type, char* unitname, createmode_t* creat
         // Out of range
         return;
     }
-        
+
     if (*createmode != CM_STRUCT) {
         // createmode was set to CM_INVALID in the caller of this function
         UnitType* utype = p::uspool->getUnitTypeByName(unitname);
@@ -1098,12 +1099,12 @@ void Sidebar::Build(Uint8 index, Uint8 type, char* unitname, createmode_t* creat
     }
 }
 
-/** 
+/**
  * Sets the images of the visible icons, having scrolled.
- * 
+ *
  * @todo Provide a way to only update certain icons
  */
-void Sidebar::UpdateIcons() 
+void Sidebar::UpdateIcons()
 {
     Uint8 i;
 
@@ -1143,63 +1144,63 @@ void Sidebar::UpdateIcons()
 	}
 }
 
-/** 
+/**
  * Rebuild the list of icons that are available.
  *
  * - first get list of availlable
  * - control and reset offsets
  * - play "new" sound if good
  * - add icon in fonction
- * 
+ *
  * @bug Newer items should be appended, although with some grouping (i.e. keep
  * infantry at top, vehicles, aircraft, boats, then superweapons).
  * @todo implement superweapons
  */
-void Sidebar::UpdateAvailableLists() 
+void Sidebar::UpdateAvailableLists()
 {
 	vector<const char*> units_avail; // list of units available (temp)
 	vector<const char*> structs_avail; // list of structures available (temp)
 	vector<const char*> superWeapons_avail; // list of superWeapons available (temp)
-	char* nametemp;    
+	char* nametemp;
 	Uint32 i;
 
     // Get UNITS availlable (like "3tnk","typ2" ... etc)
     units_avail = p::uspool->getBuildableUnits(player);
-    
+
     // Get STRUCTURES availlable
     structs_avail = p::uspool->getBuildableStructures(player);
-    
+
     // Get SUPERWEAPONS availlable
     // @todo get super weapon like that superWeapon_avail = p::uspool->getBuildableStructures(player);
-    //superWeapons_avail.push_back("gpss"); // "gpss" value is to emulate 
-    
+    //superWeapons_avail.push_back("gpss"); // "gpss" value is to emulate
+
     //
     // CONTROL AND RESETS OFFSETS
     //
-    // if their are less options available then offset = 0 
+    // if their are less options available then offset = 0
     // LIKE IN ORIGINAL GAME !!!
     if (  (units_avail.size() + superWeapons_avail.size()) < uniticons.size() ) {
     	// OFFSET = 0
     	unitoff = 0;
     }
-    // if their are less options available then offset = 0 
+    // if their are less options available then offset = 0
     if (structs_avail.size() < structicons.size()){
     	structoff = 0;
     }
-    
+
     //
     // PLAY "NEW" SOUND IF GOOD
     //
     if ((units_avail.size() + superWeapons_avail.size()) > uniticons.size() ||
-    	(structs_avail.size() > structicons.size()) ) 
+    	(structs_avail.size() > structicons.size()) )
     {
  		// Play new sound
  		pc::sfxeng->PlaySound("newopt1.aud");
  	}
- 	
+
     //
     // FREE LIST OF AVAILABLE
-    //    
+    //
     // Free list of availlable icons
     // Delete all icons in the second list (unit)
     for (i=0; i<uniticons.size(); ++i) {
@@ -1207,7 +1208,7 @@ void Sidebar::UpdateAvailableLists()
     }
     // resize the vector
     uniticons.resize(0);
-        	
+
     // Free list of availlable icons
     // Delete all icons in the first list (structure)
     for (i=0;i<structicons.size();++i) {
@@ -1215,9 +1216,9 @@ void Sidebar::UpdateAvailableLists()
     }
     // resize the vector
     structicons.resize(0);
-    
-    
-    //  
+
+
+    //
     // ADD UNITS at icons
     //
     // Add icons
@@ -1225,9 +1226,9 @@ void Sidebar::UpdateAvailableLists()
         nametemp = new char[13];
         memset(nametemp,0x0,13);
         sprintf(nametemp,"%sICON.SHP",units_avail[i]);
-        uniticons.push_back(nametemp);    
+        uniticons.push_back(nametemp);
     }
-    
+
     //
     // ADD STRUCTURES at icons
     //
@@ -1238,8 +1239,8 @@ void Sidebar::UpdateAvailableLists()
     	sprintf(nametemp, "%sICON.SHP", structs_avail[i]);
     	structicons.push_back(nametemp);
     }
-    
-    // 
+
+    //
     // ADD SUPERWEAPONS at icons
     //
     // Add icon
@@ -1249,15 +1250,15 @@ void Sidebar::UpdateAvailableLists()
     	sprintf(nametemp,"%sICON.SHP", superWeapons_avail[i]);
     	uniticons.push_back(nametemp);
     }
-    
-    
+
+
     // if all stack are empty then sidebar = hide
     if (uniticons.empty() && structicons.empty()) {
         visible = false;
     } else {
-    	visible = true;    	
+    	visible = true;
     }
-    
+
     // Notify that something had changed
     vischanged = true;
 }
@@ -1277,7 +1278,7 @@ void Sidebar::DownButton(Uint8 index)
     {
         buttons[index]->ChangeImage("stripdn.shp",1);
     }
-    
+
     // Update the button because some changes
     UpdateIcons();
 }
@@ -1285,13 +1286,13 @@ void Sidebar::DownButton(Uint8 index)
 void Sidebar::AddButton(Uint16 x, Uint16 y, const char* fname, Uint8 f, Uint8 pal)
 {
     SidebarButton* t = 0; // Reference to the new button
-    
+
     // Create the button
     t = new SidebarButton(x, y, fname, f, theatre, pal);
-    
+
     // Add it to the buttons list
     buttons.push_back(t);
-    
+
     // Notify that their was changes ????
     vischanged = true;
 }
@@ -1343,7 +1344,7 @@ void Sidebar::DrawButton(Uint8 index)
 	}
 
     // Extract type name from icon name, e.g. NUKE from NUKEICON.SHP
-    Uint32 length = strlen(icons[offset])-8; 
+    Uint32 length = strlen(icons[offset])-8;
     if (length>13) length = 13;
     string name(icons[offset], length);
 
@@ -1376,18 +1377,18 @@ void Sidebar::DrawButton(Uint8 index)
     } else {
         type = (UnitOrStructureType*)p::uspool->getStructureTypeByName(name.c_str());
     }
-    
+
     // @todo REFACTOR THIS
     if (0 == type) {
 //        getFont()->drawText(stat_mesg[status], sbar, dest.x + stat_pos[status].x, dest.y + stat_pos[status].y);
    		//StatusLabel.Draw(stat_mesg[status], sbar, dest.x + stat_pos[status].x, dest.y + stat_pos[status].y);
         // Grey out invalid items for prettyness
-        DrawClock(index, 0);        
+        DrawClock(index, 0);
         // return instead of trowing
         return;
         //throw runtime_error("Asking for \""+name+"\" resulted in a null pointer");
     }
-    
+
     status = player->getStatus(type, &quantity, &progress);
     if (BQ_INVALID == status) {
 //        getFont()->drawText(stat_mesg[status], sbar, dest.x + stat_pos[status].x, dest.y + stat_pos[status].y);
@@ -1414,7 +1415,7 @@ void Sidebar::DrawButton(Uint8 index)
 
 }
 
-SDL_Surface* Sidebar::getTabImage() 
+SDL_Surface* Sidebar::getTabImage()
 {
 	// Get image from the cache
 	return pc::imgcache->getImage(tab).image;
@@ -1422,11 +1423,11 @@ SDL_Surface* Sidebar::getTabImage()
 
 /**
  * DrawClock draw the clock under a button
- * 
+ *
  * @param index Number of the button
  * @parama imgnum Number of the image in the clock
  */
-void Sidebar::DrawClock(Uint8 index, Uint8 imgnum) 
+void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
 {
     //Uint32 num = 0;
 	//SDL_Rect dest;
@@ -1457,7 +1458,7 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
 
     SDL_BlitSurface(gr, NULL, sbar, &dest);
 #endif
-    
+
 #if 0
 
 	//
@@ -1517,7 +1518,7 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
 	dest = buttons[index]->getRect();
 	SDL_BlitSurface(Clocks[imgnum], 0, sbar, &dest);
 #endif
-	
+
 	SHPImage* clockImages = 0;
 
 	//
@@ -1527,7 +1528,7 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
 	if (Clocks[imgnum] == 0)
 	{
 		try {
-			clockImages = new SHPImage("clock.shp", -1);			
+			clockImages = new SHPImage("clock.shp", -1);
 		} catch (ImageNotFound& e) {
 			logger->error("Unable to load clock image!\n");
 			return;
@@ -1541,7 +1542,7 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
 		SDL_Surface* shadow;
 		clockImages->getImage(imgnum, &gr, &shadow, 0);
 		SDL_FreeSurface(shadow);
-		
+
 		Clocks[imgnum] = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, gr->w, gr->h, 32, 0, 0, 0, 0);
 		Uint32 ColorKey = SDL_MapRGB(Clocks[imgnum]->format, 12, 255, 12 );
 		SDL_Rect dest;
@@ -1573,7 +1574,7 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
 
 
 	}
-	
+
 	// Get the destination rectangle from button
 	SDL_Rect dest = buttons[index]->getRect();
 	// Draw the clock
@@ -1596,7 +1597,7 @@ Uint8 Sidebar::getSteps() const
 	return steps;
 }
 
-const SidebarGeometry& Sidebar::getGeom() 
+const SidebarGeometry& Sidebar::getGeom()
 {
 	return geom;
 }
@@ -1605,11 +1606,11 @@ Sidebar::Sidebar()
 {
 }
 
-Sidebar::Sidebar(const Sidebar&) 
+Sidebar::Sidebar(const Sidebar&)
 {
 }
 
-Sidebar& Sidebar::operator=(const Sidebar&) 
+Sidebar& Sidebar::operator=(const Sidebar&)
 {
 	return *this;
 }
@@ -1646,7 +1647,7 @@ SDL_Surface* Sidebar::FixGrey(SDL_Surface* gr, Uint8 imgnum)
 
 /**
  * Return the player that sidebar control
- * 
+ *
  * @return Player that sidebar control
  */
 Player* Sidebar::getPlayer()

@@ -18,6 +18,7 @@
 #include "mixvfs.h"
 
 #include <cmath>
+#include <string>
 
 #include "blowfish.h"
 #include "ws-key.h"
@@ -35,11 +36,11 @@ using namespace MIXPriv;
 
 extern Logger * logger;
 
-MIXFiles::MIXFiles() 
+MIXFiles::MIXFiles()
 {
 }
 
-MIXFiles::~MIXFiles() 
+MIXFiles::~MIXFiles()
 {
 	// Unload all MIX archives
     unloadArchives();
@@ -48,13 +49,13 @@ MIXFiles::~MIXFiles()
 /**
  * Load a specifique archive
  */
-bool MIXFiles::loadArchive(const char *fname) 
+bool MIXFiles::loadArchive(const char *fname)
 {
     VFile* file = 0;
-    
-    // 
+
+    //
     //logger->debug("Loading archive [%s]\n", fname);
-    
+
     // Try to load the archive file
     file = VFSUtils::VFS_Open(fname);
     if (file == 0) {
@@ -66,7 +67,7 @@ bool MIXFiles::loadArchive(const char *fname)
 }
 
 /**
- * Unload all MIX archives 
+ * Unload all MIX archives
  */
 void MIXFiles::unloadArchives() {
     Uint32 i;
@@ -80,17 +81,17 @@ void MIXFiles::unloadArchives() {
 /**
  * Search a file from a name ???
  */
-Uint32 MIXFiles::getFile(const char *fname) 
+Uint32 MIXFiles::getFile(const char *fname)
 {
     VFile *myvfile;
     mixheaders_t::iterator epos;
     openfiles_t::iterator of;
     OpenFile newfile;
     Uint32 id;
-    
+
     // Calcul ID of the string ???
     id = calcID(fname);
-    
+
     epos = mixheaders.find(id);
     if (mixheaders.end() == epos) {
         return (Uint32)-1;
@@ -101,7 +102,7 @@ Uint32 MIXFiles::getFile(const char *fname)
     newfile.pos = 0;
 
     openfiles_t::const_iterator ofe = openfiles.end();
-    do { 
+    do {
     	// @todo Rewrite this loop.
         of = openfiles.find(id++);
     } while (ofe != of);
@@ -121,13 +122,13 @@ void MIXFiles::releaseFile(Uint32 file)
     openfiles.erase(file);
 }
 
-/** 
+/**
  * Function to calculate a idnumber from a filename
- * 
+ *
  * @param the filename
  * @return the id.
  */
-Uint32 MIXFiles::calcID(const char *fname) 
+Uint32 MIXFiles::calcID(const char *fname)
 {
     Uint32 calc;
     int i;
@@ -135,7 +136,7 @@ Uint32 MIXFiles::calcID(const char *fname)
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     Uint32 tmpswap;
 #endif
-    
+
     for (i=0; *fname!='\0' && i<12; i++){
         buffer[i]=toupper(*(fname++));
     }
@@ -155,7 +156,7 @@ Uint32 MIXFiles::calcID(const char *fname)
     return calc;
 }
 
-/** 
+/**
  * Decodes RA/TS Style MIX headers. Assumes you have already checked if
  *  header is encrypted and that mix is seeked to the start of the WSKey
  *
@@ -226,10 +227,10 @@ MixRecord* MIXFiles::decodeHeader(VFile* mix, MixHeader* header, tscheck_ tschec
 }
 
 
-/** 
+/**
  * read the mixheader
  */
-void MIXFiles::readMIXHeader(VFile *mix) 
+void MIXFiles::readMIXHeader(VFile *mix)
 {
     MIXEntry mentry;
     MixHeader header;
@@ -310,7 +311,7 @@ void MIXFiles::readMIXHeader(VFile *mix)
     delete[] m_index;
 }
 
-Uint32 MIXFiles::readByte(Uint32 file, Uint8 *databuf, Uint32 numBytes) 
+Uint32 MIXFiles::readByte(Uint32 file, Uint8 *databuf, Uint32 numBytes)
 {
     Uint32 numRead;
     Uint32 id, pos;
@@ -329,7 +330,7 @@ Uint32 MIXFiles::readByte(Uint32 file, Uint8 *databuf, Uint32 numBytes)
     return numRead;
 }
 
-Uint32 MIXFiles::readWord(Uint32 file, Uint16 *databuf, Uint32 numWords) 
+Uint32 MIXFiles::readWord(Uint32 file, Uint16 *databuf, Uint32 numWords)
 {
     Uint32 numRead;
     Uint32 id, pos;
@@ -348,7 +349,7 @@ Uint32 MIXFiles::readWord(Uint32 file, Uint16 *databuf, Uint32 numWords)
     return numRead;
 }
 
-Uint32 MIXFiles::readThree(Uint32 file, Uint32 *databuf, Uint32 numThrees) 
+Uint32 MIXFiles::readThree(Uint32 file, Uint32 *databuf, Uint32 numThrees)
 {
     Uint32 numRead;
     Uint32 id, pos;
@@ -367,7 +368,7 @@ Uint32 MIXFiles::readThree(Uint32 file, Uint32 *databuf, Uint32 numThrees)
     return numRead;
 }
 
-Uint32 MIXFiles::readDWord(Uint32 file, Uint32 *databuf, Uint32 numDWords) 
+Uint32 MIXFiles::readDWord(Uint32 file, Uint32 *databuf, Uint32 numDWords)
 {
     Uint32 numRead;
     Uint32 id, pos;
@@ -459,7 +460,7 @@ const char* MIXFiles::getPath(Uint32 file) const
     return NULL;
 }
 
-const char* MIXFiles::getArchiveType() const 
+const char* MIXFiles::getArchiveType() const
 {
 	return "mix archive";
 }
