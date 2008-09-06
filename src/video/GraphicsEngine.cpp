@@ -60,10 +60,10 @@ namespace pc {
 extern Logger * logger;
 extern const string VERSION;
 
-/** 
- * Constructor, inits the sdl graphics and prepares to render maps and 
+/**
+ * Constructor, inits the sdl graphics and prepares to render maps and
  * draw vqaframes.
- * 
+ *
  * @param commandline arguments regarding video.
  */
 GraphicsEngine::GraphicsEngine()
@@ -85,8 +85,8 @@ GraphicsEngine::GraphicsEngine()
 	string caption = "OpenRedAlert - ";
     caption += VERSION;
 	SDL_WM_SetCaption(caption.c_str(), 0);
-	
-	
+
+
 	SDL_WM_GrabInput(config.grabmode);
 
 	// Init the icon of the main window
@@ -116,14 +116,14 @@ GraphicsEngine::GraphicsEngine()
 		logger->note("Screen is in system memory\n");
 	}
 	*/
-	
+
 	// Indicate if we use OpenGL
 	/*
 	if ( (screen->flags & SDL_OPENGL) == SDL_OPENGL ) {
 		logger->note("Using opengl\n");
 	}
 	*/
-	
+
 	whitepix	= SDL_MapRGB(screen->format, 0xff, 0xff, 0xff);
 	greenpix	= SDL_MapRGB(screen->format, 0, 0xff, 0);
 	yellowpix	= SDL_MapRGB(screen->format, 0xff, 0xff, 0);
@@ -154,27 +154,27 @@ GraphicsEngine::GraphicsEngine()
 
 	//oldmouse.x = oldmouse.y = oldmouse.w = oldmouse.h = 0;
 	memset(&oldmouse, 0, sizeof (SDL_Rect));
-	
-	
+
+
 	// Create the label for victory msg
 	victoryLabel = new RA_Label();
 	victoryLabel->setColor(0xAA, 0x00, 0x00);
 	victoryLabel->SetFont("vcr.fnt");
 	victoryLabel->UseAntiAliasing(false);
 	victoryLabel->setText(stringFile->getString(15));
-	
+
 	// Create the label for defeat msg
 	defeatLabel = new RA_Label();
 	defeatLabel->setColor(0xAA, 0x00, 0x00);
 	defeatLabel->SetFont("vcr.fnt");
 	defeatLabel->UseAntiAliasing(false);
 	defeatLabel->setText(stringFile->getString(16));
-	
+
 	// Free the string file
 	delete stringFile;
 }
 
-/** 
+/**
  * Destructor, free the memory used by the graphicsengine.
  */
 GraphicsEngine::~GraphicsEngine()
@@ -211,20 +211,20 @@ GraphicsEngine::~GraphicsEngine()
 	if (MoneyLabel != 0){
 		delete MoneyLabel;
 	}
-    
+
     // Delete Label for victory message
     if (victoryLabel != 0){
     	delete victoryLabel;
-    }    
+    }
     // Delete Label for defeat message
     if (defeatLabel != 0){
     	delete defeatLabel;
-    }  	
+    }
 }
 
-/** 
+/**
  * Setup the vars for the current mission.
- * 
+ *
  * @param the current map.
  * @param the current sidebar.
  * @param the current cursor.
@@ -275,7 +275,7 @@ void GraphicsEngine::setupCurrentGame()
     }
 }
 
-/** 
+/**
  * Render a scene complete with map, sidebar and cursor.
  */
 void GraphicsEngine::renderScene(bool flipscreen)
@@ -319,7 +319,7 @@ void GraphicsEngine::renderScene(bool flipscreen)
 
 		SDL_UpperBlit(curimg, 0, screen, &dest);
 	}
-	
+
 	//	printf ("%s line %i: Elapsed = %02f sec\n", __FILE__, __LINE__, (float)((double)SDL_GetTicks() - (double)starttick)/(double)1000);
 	//printf("%d structure in the pool\n", p::uspool->getNumbStructures());
 
@@ -327,7 +327,7 @@ void GraphicsEngine::renderScene(bool flipscreen)
 		// Draw the mouse cursor to the screen, between 0.000 and 0.001 sec
 		DrawMouse();
 		DrawTooltip();
-		
+
 		SDL_Flip(screen);
 	}
 
@@ -336,9 +336,9 @@ void GraphicsEngine::renderScene(bool flipscreen)
 #endif
 }
 
-/** 
+/**
  * Draw a VQA frame to the screen.
- * 
+ *
  * @param the vqaframe.
  * @param where to draw the frame.
  */
@@ -353,7 +353,7 @@ void GraphicsEngine::drawVQAFrame(SDL_Surface *frame)
     SDL_Flip(screen);
 }
 
-/** 
+/**
  * Clear the frontBuffer, i.e. paint it black.
  */
 void GraphicsEngine::clearBuffer()
@@ -369,7 +369,7 @@ void GraphicsEngine::clearBuffer()
 
 }
 
-/** 
+/**
  * Clear the screen, i.e. paint it black.
  */
 void GraphicsEngine::clearScreen()
@@ -393,9 +393,9 @@ void GraphicsEngine::clearScreen()
 
 /**
  * Render a loading screen
- * 
+ *
  * @param buff Message to show
- * @param logo background screen of the loading screen 
+ * @param logo background screen of the loading screen
  */
 void GraphicsEngine::renderLoading(const string& buff, SDL_Surface* logo)
 {
@@ -442,9 +442,9 @@ void GraphicsEngine::renderLoading(const string& buff, SDL_Surface* logo)
 
 }
 
-/** 
+/**
  * Get a screen position from a map position
- * 
+ *
  * @param MapPos position in map coordinates
  * @param ScreenX returning screen x position
  * @param ScreenY returning screen y position
@@ -457,7 +457,7 @@ bool GraphicsEngine::MapPosToScreenXY (Uint32 MapPos, Sint16 *ScreenX, Sint16 *S
 	if (scrollpos > MapPos){
 		return false;
 	}
-	
+
 	map->translateFromPos((MapPos-scrollpos), (Uint16*) ScreenX, (Uint16*)ScreenY);
 
 	*ScreenX *= tilewidth;
@@ -466,14 +466,14 @@ bool GraphicsEngine::MapPosToScreenXY (Uint32 MapPos, Sint16 *ScreenX, Sint16 *S
 	if (*ScreenX >= screen->w || *ScreenY >= screen->h){
 		return false;
 	}
-	
+
 	*ScreenX -= map->getXTileScroll();
 	*ScreenY -= map->getYTileScroll();
-	
+
 	return true;
 }
 
-/** 
+/**
  * Render the top left selection box.
  */
 void GraphicsEngine::DrawSelectionBox ()
@@ -502,7 +502,7 @@ void GraphicsEngine::DrawSelectionBox ()
 	SDL_SetClipRect( screen, &dest);
 }
 
-/** 
+/**
  * Render the cursor.
  */
 void GraphicsEngine::DrawMouse()
@@ -510,7 +510,7 @@ void GraphicsEngine::DrawMouse()
 	SDL_Surface	*curimg = 0;
 	SDL_Rect	dest;
 	//oldmouse = {0, 0, 0, 0}; // Old var
-	
+
 	// Draw the mouse
 	dest.x = pc::cursor->getX();
 	dest.y = pc::cursor->getY();
@@ -533,7 +533,7 @@ void GraphicsEngine::DrawMouse()
 	memcpy(&oldmouse, &dest, sizeof (SDL_Rect));
 }
 
-/** 
+/**
  * Render the tooltip.
  */
 void GraphicsEngine::DrawTooltip()
@@ -560,7 +560,7 @@ void GraphicsEngine::DrawTooltip()
 	}
 }
 
-/** 
+/**
  * Render the radar mini map
  */
 void GraphicsEngine::DrawMinimap()
@@ -579,7 +579,7 @@ void GraphicsEngine::DrawMinimap()
 	vector<bool>& mapvis = lplayer->getMapVis();
 
     // draw minimap
-    if (lplayer->getNumberRadars()>0 && !pc::sidebar->isRadaranimating()) 
+    if (lplayer->getNumberRadars()>0 && !pc::sidebar->isRadaranimating())
     {
         const Uint8 minizoom = *mz;
         const Uint32 mapwidth = p::ccmap->getWidth();
@@ -663,7 +663,7 @@ void GraphicsEngine::DrawMinimap()
    SDL_SetClipRect(screen, &maparea);
 }
 
-/** 
+/**
  * Handle drawing the structures
  */
 void GraphicsEngine::DrawStructures()
@@ -679,7 +679,7 @@ void GraphicsEngine::DrawStructures()
 	//int				scaleq = -1; // For image (always -1 for RA)
 
 	//printf("p::uspool->getNumbStructures()=%d\n", p::uspool->getNumbStructures());
-	
+
 	// For all structures
 	for (unsigned int i = 0; i < p::uspool->getNumbStructures(); i++)
 	{
@@ -691,12 +691,12 @@ void GraphicsEngine::DrawStructures()
 			continue;
 		}
 		//printf("Structure type = %s\n", str->getType()->getTName());
-		
+
 		// Check if the structure is being build
 		if (str->IsBuilding()){
 			continue;
 		}
-		
+
 		// Load the repairing icon image (displayed while repairing a structure
 		//if (repairing_icon == 0)
 		//	repairing_icon = pc::imgcache->loadImage("select.shp", scaleq);
@@ -717,17 +717,17 @@ void GraphicsEngine::DrawStructures()
 		//}else{
 		//	RepairImg = pc::imgcache->getImage(repairing_icon,2).image;
 		//}
-		
+
 		//if (RepairImg == 0){
 		//	continue;
 		//}
-		
-		// Get x and y coords with a hash cursor and 
-		// Check that structure is in the screen 
+
+		// Get x and y coords with a hash cursor and
+		// Check that structure is in the screen
 		if (!MapPosToScreenXY(str->getPos(), &xpos, &ypos, p::ccmap)){
 			continue;
 		}
-		
+
 		// Get the image
 		/*SDL_Surface* img = pc::imgcache->getImage(str->getImageNum(0)).image;
 		// Draw Structure
@@ -739,7 +739,7 @@ void GraphicsEngine::DrawStructures()
 	}
 }
 
-/** 
+/**
  * Handle drawing the repair icon for structures that are being repaired
  */
 void GraphicsEngine::DrawRepairing()
@@ -769,12 +769,12 @@ void GraphicsEngine::DrawRepairing()
 		if (str == 0){
 			continue;
 		}
-		
+
 		// Check if the structure is being repaired
 		if (!str->isRepairing ()){
 			continue;
 		}
-		
+
 		// Load the repairing icon image (displayed while repairing a structure
 		if (repairing_icon == 0)
 			repairing_icon = pc::imgcache->loadImage("select.shp", scaleq);
@@ -795,15 +795,15 @@ void GraphicsEngine::DrawRepairing()
 		}else{
 			RepairImg = pc::imgcache->getImage(repairing_icon,2).image;
 		}
-		
+
 		if (RepairImg == 0){
 			continue;
 		}
-		
+
 		if (!MapPosToScreenXY (str->getPos(), &xpos, &ypos, p::ccmap)){
 			continue;
 		}
-		
+
 		// Draw the repair icon (animation)
 		udest.x = xpos + (str->getType()->getXsize() * tilewidth/2)- (RepairImg->w/2); //+ (str->getType()->getXsize() * tilewidth)
 		udest.y = ypos + (str->getType()->getYsize() * tileheight/2) - (RepairImg->h/2)/* + (str->getType()->getYsize() * tileheight) */;
@@ -813,7 +813,7 @@ void GraphicsEngine::DrawRepairing()
 	}
 }
 
-/** 
+/**
  * Handle drawing the BOMB (C4) icon for structures that are being bombing
  */
 void GraphicsEngine::DrawBombing()
@@ -844,20 +844,20 @@ void GraphicsEngine::DrawBombing()
 		if (str == 0){
 			continue;
 		}
-		
+
 		// Check if the structure is being bombing
 		if (str->isBombing()==false){
 			continue;
 		}
-		printf("str bb = %s\n", 
+		printf("str bb = %s\n",
 				p::uspool->getStructure(i)->getType()->getTName());
-		
+
 		// Load the bombing icon image (displayed while bombing a structure)
 		if (bombing_icon == 0){
 			bombing_icon = new Dune2Image("mouse.shp", scaleq);
-			//bombing_icon = pc::imgcache->loadImage("mouse.shp", scaleq);						
+			//bombing_icon = pc::imgcache->loadImage("mouse.shp", scaleq);
 		}
-		
+
 		// Update the animation icon (from the first (116) to the last (118))
 		if ( (SDL_GetTicks() - last_repair_tick) > 1000){//300
 			if (numImage>117 || numImage<116){
@@ -871,16 +871,16 @@ void GraphicsEngine::DrawBombing()
 		// Get the icon (116, 117 or 118)
 		//bombImage = pc::imgcache->getImage(bombing_icon, 116).image;
 		bombImage = bombing_icon->getImage(numImage);
-		
+
 		if (bombImage == 0){
-			logger->error("bombimage = 0 \n");		                	
+			logger->error("bombimage = 0 \n");
 			continue;
 		}
-		
+
 		if (!MapPosToScreenXY(str->getPos(), &xpos, &ypos, p::ccmap)){
 			continue;
 		}
-		
+
 		// Draw the repair icon (animation)
 		udest.x = xpos + (str->getType()->getXsize() * tilewidth - bombImage->w)/2; //+ (str->getType()->getXsize() * tilewidth)
 		udest.y = ypos + (str->getType()->getYsize() * tileheight - bombImage->h)/2; /* + (str->getType()->getYsize() * tileheight) */
@@ -891,7 +891,7 @@ void GraphicsEngine::DrawBombing()
 	}
 }
 
-/** 
+/**
  * Handle drawing the some on a damaged vehicule
  */
 void GraphicsEngine::DrawVehicleSmoke(void)
@@ -961,7 +961,7 @@ void GraphicsEngine::DrawVehicleSmoke(void)
 	}
 }
 
-/** 
+/**
  * Render the health bars for selected structures
  */
 void GraphicsEngine::DrawStructureHealthBars(SDL_Rect dest, SDL_Rect udest, Uint32 curdpos)
@@ -999,7 +999,7 @@ void GraphicsEngine::DrawStructureHealthBars(SDL_Rect dest, SDL_Rect udest, Uint
 	}
 }
 
-/** 
+/**
  * Render the health bars for selected units
  */
 void GraphicsEngine::DrawGroundUnitHealthBars(SDL_Rect dest, SDL_Rect udest, Uint32 curdpos)
@@ -1012,7 +1012,7 @@ void GraphicsEngine::DrawGroundUnitHealthBars(SDL_Rect dest, SDL_Rect udest, Uin
 	if (curdpos >= p::ccmap->getSize()){
 		return;
 	}
-	
+
 	selection = p::uspool->getSelected(curdpos);
 
 	if ((selection&0xff) != 0){
@@ -1105,7 +1105,7 @@ void GraphicsEngine::DrawGroundUnitHealthBars(SDL_Rect dest, SDL_Rect udest, Uin
 	}
 }
 
-/** 
+/**
  * Render the health bars for selected flying units
  */
 void GraphicsEngine::DrawFlyingUnitHealthBars(SDL_Rect dest, SDL_Rect	udest, Uint32 curdpos)
@@ -1118,7 +1118,7 @@ void GraphicsEngine::DrawFlyingUnitHealthBars(SDL_Rect dest, SDL_Rect	udest, Uin
 	if (curdpos >= p::ccmap->getSize()){
 		return;
 	}
-	
+
 	selection = p::uspool->getSelected(curdpos);
 
 	if ((selection&0xff) != 0){
@@ -1143,7 +1143,7 @@ void GraphicsEngine::DrawFlyingUnitHealthBars(SDL_Rect dest, SDL_Rect	udest, Uin
 	}
 }
 
-/** 
+/**
  * Render the flying objects (l2overlays).
  */
 void GraphicsEngine::DrawL2Overlays()
@@ -1156,22 +1156,22 @@ void GraphicsEngine::DrawL2Overlays()
 	Uint32		*unitorstructshps = 0;
 	Sint8		*uxoffsets = 0;
 	Sint8		*uyoffsets = 0;
-				
 
 
-	for( i = 0; i < l2overlays.size(); i++) 
+
+	for( i = 0; i < l2overlays.size(); i++)
 	{
 		curpos = l2overlays[i];
 
 		dest.x = maparea.x-p::ccmap->getXTileScroll()+(curpos%p::ccmap->getWidth()-p::ccmap->getXScroll())*tilewidth;
 		dest.y = maparea.y-p::ccmap->getYTileScroll()+(curpos/p::ccmap->getWidth()-p::ccmap->getYScroll())*tilewidth;
-		
+
 		numshps = p::uspool->getL2overlays(curpos, &unitorstructshps, &uxoffsets, &uyoffsets);
-		
-		
-		for ( curdpos = 0; curdpos < numshps; curdpos++) 
+
+
+		for ( curdpos = 0; curdpos < numshps; curdpos++)
 		{
-						
+
 #ifdef DEBUG_SHP_IMAGES
 			Uint16 imagenumb	= unitorstructshps[curdpos]&0x7FF;
 			Uint16 NumbImages	= imgcache->getNumbImages(unitorstructshps[curdpos]);
@@ -1180,7 +1180,7 @@ void GraphicsEngine::DrawL2Overlays()
 			if (imagenumb > NumbImages)
 				printf ("%s line %i: ERROR: Imagenumb > numbimages for image %s, numb images = %i\n", __FILE__, __LINE__, Name.c_str(), NumbImages);
 #endif
-			
+
 			ImageCacheEntry& images = pc::imgcache->getImage(unitorstructshps[curdpos]);
 			if (images.image != 0){
 				udest.x = dest.x + uxoffsets[curdpos];
@@ -1190,7 +1190,7 @@ void GraphicsEngine::DrawL2Overlays()
 				SDL_UpperBlit(images.image, 0, screen, &udest);
 			}
         }
-   
+
 		if (unitorstructshps != 0){
 			delete[] unitorstructshps;
 		}
@@ -1204,12 +1204,12 @@ void GraphicsEngine::DrawL2Overlays()
 		if (uyoffsets != 0){
 			delete[] uyoffsets;
 		}
-		uyoffsets = 0;		
+		uyoffsets = 0;
     }
 
 }
 
-/** 
+/**
  * Render the fog of war
  */
 void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
@@ -1227,7 +1227,8 @@ void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
     mapHeight = min(mapHeight, p::ccmap->getHeight());
 
 	//	printf ("Start draw fog of war\n");
-	/* draw black on all non-visible squares (fog of war)*/
+
+	// draw black on all non-visible squares (fog of war)
 	dest.w = tilewidth;
 	dest.h = tilewidth;
 	curpos = p::ccmap->getScrollPos();
@@ -1380,7 +1381,7 @@ void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 	}
 }
 
-/** 
+/**
  * Render the map
  */
 void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
@@ -1398,7 +1399,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 	Uint32		tiberium;
 	Uint32		smudge;
 	Uint32		TerrainOverlay;
-	
+
 	Sint16		txoff;
 	Sint16		tyoff;
 	Uint8		numshps;
@@ -1425,10 +1426,10 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 //	printf ("%s line %i: width = %i, height = %i\n", __FILE__, __LINE__, (tilewidth * (mapWidth+xmax)), (tileheight * (mapHeight+ymax+2)));
 //	printf ("%s line %i: startx = %i, starty = %i, xmax = %i, ymax = %i\n", __FILE__, __LINE__, p::ccmap->getXScroll(), p::ccmap->getYScroll(), (mapWidth+xmax), (mapHeight+ymax+2));
 
-	for (ypos = 0; ypos < mapHeight+ymax+2; ypos++) 
+	for (ypos = 0; ypos < mapHeight+ymax+2; ypos++)
 	{
 		dest.x = maparea.x - p::ccmap->getXTileScroll();
-		for( xpos = 0; xpos < mapWidth+xmax; xpos++) 
+		for( xpos = 0; xpos < mapWidth+xmax; xpos++)
 		{
 			dest.w = tilewidth;
 			dest.h = tilewidth;
@@ -1518,7 +1519,7 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 
 				// Handle drawing the structures
 				numshps = p::uspool->getStructureNum(curdpos, &unitorstructshps, &uxoffsets, &uyoffsets);
-				if (numshps > 0) 
+				if (numshps > 0)
 				{
 					//printf("shpnum structur is <> 0\n");
 					for( i  = 0; i < numshps; i++) {
@@ -1712,10 +1713,10 @@ void GraphicsEngine::DrawMap(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 
 	// Draw smoke on vehicules
 	DrawVehicleSmoke();
-		
+
 	// Test
 	DrawStructures();
-	
+
 	// Handle drawing the BOMB (C4) icon
 	DrawBombing();
 }
@@ -1752,7 +1753,7 @@ void GraphicsEngine::clipToMaparea(SDL_Rect *src, SDL_Rect *dest)
     }
 }
 
-/** 
+/**
  * Draw the victory or the defeat label.
  */
 void GraphicsEngine::drawMissionLabel()
@@ -1760,51 +1761,51 @@ void GraphicsEngine::drawMissionLabel()
 	// Get the local player
 	//Player* lplayer = p::ppool->getLPlayer();
 	//printf("x=%d y=%d w=%d h=%d\n", maparea.x, maparea.y, maparea.w, maparea.h);
-	//printf("resX=%d W=%d resY=%d  H=%d\n", 
+	//printf("resX=%d W=%d resY=%d  H=%d\n",
 	//maparea.x + (maparea.w + defeatLabel->getWidth())/2, defeatLabel->getWidth(),
 	//maparea.y + (maparea.h + defeatLabel->getHeight())/2, defeatLabel->getHeight());
-	
-	
+
+
 	// If the local player is winning
-	if (p::ppool->hasWon() == true) 
+	if (p::ppool->hasWon() == true)
 	{
 		Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
-		
+
 		// If the sidebar is visible
-		if (pc::sidebar->getVisible()) 
+		if (pc::sidebar->getVisible())
 		{
 			// @todo get the real width of the sidebar
 			// resX -= pc::sidebar->getSidebarImage()->w;
 			resX -=30;
 		}
-		
+
 		victoryLabel->Draw(screen, // Draw at screen
 							resX,
 							maparea.y + (maparea.h + victoryLabel->getHeight())/2
 							);
 	}
-	
+
 	// If the local player is lossing
-	if (p::ppool->hasLost() == true) 
+	if (p::ppool->hasLost() == true)
 	{
 		Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
-		
+
 		// If the sidebar is visible
-		if (pc::sidebar->getVisible()) 
+		if (pc::sidebar->getVisible())
 		{
 			// @todo get the real width of the sidebar
 			// resX -= pc::sidebar->getSidebarImage()->w;
 			resX -=30;
 		}
-		
+
 		defeatLabel->Draw(screen, // Draw at screen
 							resX,
 							maparea.y + (maparea.h - defeatLabel->getHeight())/2
 							);
-	}  
+	}
 }
 
-/** 
+/**
  * Draw the sidebar and tabs.
  */
 void GraphicsEngine::drawSidebar()
