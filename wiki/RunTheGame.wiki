@@ -1,4 +1,5 @@
-#How to run the game with correct files
+#summary How to run the game with correct files
+#labels Phase-Support
 
 = Run the game =
 
