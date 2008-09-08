@@ -1,5 +1,5 @@
+#summary How-To describe how to get src/package, compil and run the game.
 #labels Phase-Support
-#OpenRedAlert How-To describe how to get src/package, compil and run the game.
 
 = Introduction =
 
