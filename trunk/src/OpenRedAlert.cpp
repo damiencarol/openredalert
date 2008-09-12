@@ -65,8 +65,10 @@ int main(int argc, char** argv) {
     set_terminate(fcnc_terminate_handler);
     
     // Loads arguments
-    if ((argc > 1) && ( (strcasecmp(argv[1], "-help")==0) || (strcasecmp(
-            argv[1], "--help")==0))) {
+    if ((argc > 1) && ( (strcasecmp(argv[1], "-help")==0) || 
+						(strcasecmp(argv[1], "--help")==0)||
+						(strcasecmp(argv[1], "-?")==0)))
+	{
         PrintUsage();
         return 1;
     }
