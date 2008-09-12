@@ -25,7 +25,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else
-#include <unistd.h>
+// #include <unistd.h>   // <-- Is this really needed ?
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -57,8 +57,14 @@ bool isdir(const string& path);
 
 using namespace ExtPriv; // XXX:  This compiles, namespace ExtPriv {...} doesn't.
 
+#ifdef __MORPHOS__
+ExternalFiles::ExternalFiles(const char *defpath) : defpath("PROGDIR:") {
+}
+#else
 ExternalFiles::ExternalFiles(const char *defpath) : defpath(defpath) {
 }
+#endif
+
 
 /**
  */
@@ -77,11 +83,19 @@ bool ExternalFiles::loadArchive(const char *fname)
 {
     string pth(fname);
     if ("." == pth || "./" == pth) {
+#ifdef __MORPHOS__
+	path.push_back("PROGDIR:");
+#else
         path.push_back("./");
+#endif
         return true;
     }
     if (isRelativePath(fname)) {
+#ifdef __MORPHOS__
+	pth = defpath + fname;
+#else
         pth = defpath + "/" + fname;
+#endif
     } else {
         pth = fname;
     }
@@ -377,7 +391,7 @@ FILE* ret;
     if (NULL != ret) {
         return ret;
     }
-#ifdef _WIN32
+#if defined (_WIN32) || defined (__MORPHOS__)
     return NULL;
 #else
     string& fname = *name;
@@ -417,6 +431,10 @@ bool isdir(const string& path) {
 		delete[] orig_path;
 	orig_path = NULL;
     return true;
+#elif defined (__MORPHOS__)
+        struct stat fileinfo;
+	stat( path.c_str(), &fileinfo );
+	return S_ISDIR( fileinfo.st_mode );
 #else
     int curdirfd = open("./", O_RDONLY);
     if (-1 == curdirfd) {
