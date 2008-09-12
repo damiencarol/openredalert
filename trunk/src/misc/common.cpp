@@ -69,7 +69,7 @@ namespace p {
 /** 
  * Check if a inifile was already loaded in the p::Setting list
  * 
- * if not this fonction load it in the list
+ * if not this function loads it in the list
  * We pass by value because we could copy anyway
  */
 INIFile* GetConfig(string name) 
