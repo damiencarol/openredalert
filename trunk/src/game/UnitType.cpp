@@ -53,16 +53,16 @@ namespace pc {
 }
 namespace p {
 	extern UnitAndStructurePool* uspool;
-	extern WeaponsPool* weappool;	
+	extern WeaponsPool* weappool;
 }
 extern Logger * logger;
 
 /**
  */
-UnitType::UnitType(const char *typeName, INIFile* unitini) : 
-	UnitOrStructureType(), 
-	shpnums(0), 
-	name(0), 
+UnitType::UnitType(const char *typeName, INIFile* unitini) :
+	UnitOrStructureType(),
+	shpnums(0),
+	name(0),
 	deploytarget(0),
 	c4(false)
 {
@@ -77,13 +77,13 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 
 	// Set deploy target to NULL
 	deploytarget = 0;
-    
+
     // Ensure that there is a section in the ini file
-    if (unitini->isSection(typeName) == false) 
+    if (unitini->isSection(typeName) == false)
     {
     	// Log it
     	logger->error("%s line %i: Unknown type: %s\n", __FILE__, __LINE__, typeName);
-    	
+
         name = 0;
         shpnums = 0;
         shptnum = 0;
@@ -109,15 +109,15 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 	}
 
 	numlayers = unitini->readInt(tname, "layers", 1);
-	
+
 	shpnums = new Uint32[numlayers];
 	shptnum = new Uint16[numlayers];
 
 	// get string with this name
-	shpname = string(typeName);	    
+	shpname = string(typeName);
 	shpname += ".shp";
 	// @todo TRY THIS !!!
-	try 
+	try
 	{
 		shpimage = new SHPImage(shpname.c_str(), -1);
 	} catch (ImageNotFound&) {
@@ -126,9 +126,9 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 		return;
 	}
 	shpnum = static_cast<Uint32>(pc::imagepool->size());
-	pc::imagepool->push_back(shpimage);        
+	pc::imagepool->push_back(shpimage);
 	shpnum <<= 16;
-	 
+
 	for( i = 0; i < numlayers; i++ )
 	{
 		// get layer offsets from inifile
@@ -165,7 +165,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 	{
 		is_infantry = true;
 	}
-		    
+
 	tmpspeed = unitini->readInt(tname, "speed");
 	if (is_infantry)
 	{
@@ -286,24 +286,25 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 		deploytype = p::uspool->getStructureTypeByName(deploytarget);
 	}
 	pipcolour = unitini->readInt(tname, "pipcolour", 0);
-	miscnames = unitini->readString(tname, "armour");
-	if (miscnames == NULL)
+
+	// Read the armor
+	char* charArmor = unitini->readString(tname, "Armour");
+	if (charArmor == 0)
 		armour = AC_none;
 	else
 	{
-		if (strncasecmp(miscnames, "none", 4) == 0)
+		if (string(charArmor) == "none")
 			armour = AC_none;
-		else if (strncasecmp(miscnames, "wood", 4) == 0)
+		else if (string(charArmor) == "wood")
 			armour = AC_wood;
-		else if (strncasecmp(miscnames, "light", 5) == 0)
+		else if (string(charArmor) == "light")
 			armour = AC_light;
-		else if (strncasecmp(miscnames, "heavy", 5) == 0)
+		else if (string(charArmor) == "heavy")
 			armour = AC_heavy;
-		else if (strncasecmp(miscnames, "concrete", 8) == 0)
+		else if (string(charArmor) == "concrete")
 			armour = AC_concrete;
-
-		delete[] miscnames;
 	}
+	delete[] charArmor;
 	valid = true;
 
 #ifdef LOOPEND_TURN
@@ -319,8 +320,8 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 	animinfo.sectype = unitini->readInt(tname, "sectype", 0);
 
 	animinfo.dmgoff = unitini->readInt(tname, "dmgoff", ((shptnum[0]-1)>>1));
-#endif	
-	
+#endif
+
 	// Read the C4 caract
 	if (string(unitini->readString(tname, "C4", "no")) == "yes")
 	{
@@ -328,7 +329,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 	} else {
 		c4 = false;
 	}
-	
+
 	// Read the Infiltrate caracteristic
 	if (string(unitini->readString(tname, "Infiltrate", "no")) == "yes" ||
 		string(unitini->readString(tname, "Infiltrate", "no")) == "Yes")
@@ -336,7 +337,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 		infiltrate = true;
 	} else {
 		infiltrate = false;
-	}		
+	}
 }
 
 /**
@@ -409,22 +410,22 @@ bool UnitType::isDoubleOwned()
 	return false;
 }
 
-Uint32 *UnitType::getSHPNums() 
+Uint32 *UnitType::getSHPNums()
 {
 	return shpnums;
 }
 
-Uint8 UnitType::getNumLayers() const 
+Uint8 UnitType::getNumLayers() const
 {
 	return numlayers;
 }
 
-Uint16* UnitType::getSHPTNum() 
+Uint16* UnitType::getSHPTNum()
 {
         return shptnum;
 }
 
-const char* UnitType::getTName() const 
+const char* UnitType::getTName() const
 {
         return tname;
 }
@@ -434,32 +435,32 @@ const char* UnitType::getName() const
 	return name;
 }
 
-vector<char*> UnitType::getOwners() const 
+vector<char*> UnitType::getOwners() const
 {
 	return owners;
 }
 
-Uint8 UnitType::getOffset() const 
+Uint8 UnitType::getOffset() const
 {
         return offset;
 }
-    
-Uint8 UnitType::getROT() const 
+
+Uint8 UnitType::getROT() const
 {
 	return turnspeed;
 }
-    
-Sint8 UnitType::getMoveMod() const 
+
+Sint8 UnitType::getMoveMod() const
 {
 	return movemod;
 }
-    
-Uint8 UnitType::getTurnMod() const 
+
+Uint8 UnitType::getTurnMod() const
 {
 	return turnmod;
 }
 
-Uint8 UnitType::getTurnspeed() const 
+Uint8 UnitType::getTurnspeed() const
 {
 	return turnspeed;
 }

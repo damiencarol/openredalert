@@ -1851,16 +1851,17 @@ void CnCMap::advancedSections(INIFile *inifile)
 	logger->note("Shadow images loaded...\n");
 
 	// load the smudge marks and the tiberium to the imagepool
-	if (strncasecmp(missionData->theater, "INT", 3) != 0)
+	if (string(missionData->theater).substr(0,3) != "INT")
 	{
 		logger->note("smudge marks and the tiberium loading...\n");
 
 		string sname;
-		if (maptype == GAME_TD)
-		{
-			sname = "TI1";
-		}
-		else if (maptype == GAME_RA)
+		//if (maptype == GAME_TD)
+		//{
+		//	sname = "TI1";
+		//}
+		//else
+		if (maptype == GAME_RA)
 		{
 			sname = "GOLD01";
 		}

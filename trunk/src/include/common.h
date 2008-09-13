@@ -47,13 +47,6 @@ void CleanConfig (void);
 
 #include "config.h"
 
-/*
-#ifdef _MSC_VER
-#define strcasecmp(str1, str2) _stricmp((str1), (str2))
-#define strncasecmp(str1, str2, count) _strnicmp((str1), (str2), (count))
-#endif
-*/
-
 using std::max;
 using std::min;
 using std::string;
