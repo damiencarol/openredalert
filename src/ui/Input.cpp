@@ -489,7 +489,7 @@ void Input::handle()
             break;
         }
     }
-    
+
     sdir = CnCMap::s_none;
     keystate = SDL_GetKeyState(NULL);
     if (keystate[SDLK_LEFT])
@@ -518,9 +518,9 @@ void Input::handle()
 
     // Update the mouse position at screen
     updateMousePos();
-    
+
     // Get the stat of the radar
-    radarstat = p::ppool->statRadar();    
+    radarstat = p::ppool->statRadar();
     switch (radarstat) {
     case 0: // do nothing
         break;
@@ -544,7 +544,7 @@ void Input::handle()
         break;
     }
 
-    
+
 
     if( p::ppool->hasWon() || p::ppool->hasLost() ) {
         ++donecount;
@@ -563,7 +563,7 @@ void Input::handle()
     }
 }
 
-/** 
+/**
  * Check the position of the mousepointer and scroll if we are
  *  less than 10 pixels from an edge.
  */
@@ -598,7 +598,7 @@ void Input::updateMousePos()
     SDL_GetMouseState(&mx, &my);
 
     // set cursor to the default one when drawing
-    if( drawing ) { 
+    if( drawing ) {
         if( mx < maparea->x )
             markrect.w = maparea->x;
         else if( mx >= maparea->x+maparea->w )
@@ -716,11 +716,11 @@ void Input::clickMap(int mx, int my)
 	//
 	if (selected->numbUnits() == 1)
 	{
-		if (strcmp ((char*)selected->getUnit(0)->getType()->getTName(), "MEDI") == 0 && 
-				selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum() && 
+		if (strcmp ((char*)selected->getUnit(0)->getType()->getTName(), "MEDI") == 0 &&
+				selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum() &&
 				p::uspool->getUnitAt(pos) != NULL)
 		{
-			if (p::uspool->getUnitAt(pos)->getType()->isInfantry() && 
+			if (p::uspool->getUnitAt(pos)->getType()->isInfantry() &&
 				p::uspool->getUnitAt(pos)->getHealth() < p::uspool->getUnitAt(pos)->getType()->getMaxHealth())
 			{
 				//printf ("%s line %i: I am here\n", __FILE__, __LINE__);
@@ -729,8 +729,8 @@ void Input::clickMap(int mx, int my)
 			}
 		}
 
-		if (selected->getUnit(0)->getHealth() <  selected->getUnit(0)->getType()->getMaxHealth() && 
-			p::uspool->getStructureAt(pos)!=NULL && 
+		if (selected->getUnit(0)->getHealth() <  selected->getUnit(0)->getType()->getMaxHealth() &&
+			p::uspool->getStructureAt(pos)!=NULL &&
 			selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum())
 		{
 			if (strcmp ((char*)p::uspool->getStructureAt(pos)->getType()->getTName(), "FIX") == 0 ){
@@ -741,7 +741,7 @@ void Input::clickMap(int mx, int my)
 		}
 
 		// Check  if we need to harvest!!
-		if (selected->getUnit(0)->IsHarvester() && 
+		if (selected->getUnit(0)->IsHarvester() &&
 			selected->getUnit(0)->getOwner() == p::ppool->getLPlayerNum())
 		{
 			selected->getUnit(0)->Harvest(pos, 0);
@@ -755,11 +755,11 @@ void Input::clickMap(int mx, int my)
 					return;
 				}
 			}
-			
+
 		}
-		
-		
-		
+
+
+
 		// Check if this unit can infiltrate
 		if (selected->getUnit(0)->getType()->isInfiltrate() == true)
 		{
@@ -1004,7 +1004,7 @@ void Input::clickMap(int mx, int my)
 				selected->moveUnits(pos);
 				new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
 					static_cast<Uint8>(5), 0, 0);
-			
+
 			}
 		}
 		else if( selected->canMove() && p::ccmap->getCost(pos) < 0xfff0)
@@ -1014,9 +1014,9 @@ void Input::clickMap(int mx, int my)
                 sndplayed = true;
             }
             selected->moveUnits(pos);
-           // Uint32 numImageFlash = 
+           // Uint32 numImageFlash =
             new ExplosionAnim(1, pos, p::ccmap->getMoveFlashNum(),
-                    static_cast<Uint8>(5), 0, 0);              
+                    static_cast<Uint8>(5), 0, 0);
         }
     }
 }
@@ -1399,8 +1399,9 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
     placename[4]=0; placename[5]=0;
     pc::sidebar->ClickButton(butclick, placename, &createmode);
 
-
-    if (CM_INVALID == createmode || (strncasecmp("xxxx",placename,4) == 0)) {
+	// If the command is invalid and placename was not changed
+    if (CM_INVALID == createmode || (string(placename) == "xxxx"))
+    {
         currentaction = a_none;
         return;
     }
@@ -1474,7 +1475,7 @@ Uint16 Input::checkPlace(int mx, int my)
 
     // Is the cursor in the map?
     if (my < maparea->y || my >= maparea->y+maparea->h ||
-            mx < maparea->x || mx >= maparea->x+maparea->w) 
+            mx < maparea->x || mx >= maparea->x+maparea->w)
     {
         pc::cursor->setCursor(CUR_STANDARD, CUR_NOANIM);
         pc::cursor->setXY(mx, my);
