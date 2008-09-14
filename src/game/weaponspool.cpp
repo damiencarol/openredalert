@@ -38,19 +38,30 @@
 using std::map;
 using std::string;
 
+/**
+ *
+ */
 WeaponsPool::WeaponsPool()
 {
-	// Load weapons file 
+	// Load weapons file
+	#ifdef __MORPHOS__
+		// "./ra/" path cause trouble in morphos. Maybe we could apply this modification to all plateforms since VFS find the good path ?
+	weapini = GetConfig("weapons.ini");
+	#else
 	weapini = GetConfig("./ra/weapons.ini");
+	#endif
 	// @todo weapini = VFSUtils::VFS_Open("rules.ini");
 }
 
+/**
+ *
+ */
 WeaponsPool::~WeaponsPool()
 {
 	map<string, Weapon*>::const_iterator wpclear;
 	map<string, Warhead*>::const_iterator whpclear;
 	map<string, Projectile*>::const_iterator ppclear;
-	
+
 	wpclear = weaponspool.begin();
 	whpclear = warheadpool.begin();
 	ppclear = projectilepool.begin();
@@ -77,7 +88,7 @@ Weapon *WeaponsPool::getWeapon(const char *wname)
 	map<string, Weapon*>::iterator weapentry;
 	Weapon *weap;
 	string weapname;
-	
+
 	weapname = (string)wname;
 	// @todo DEBUG
 	//transform(weapname.begin(), weapname.end(), weapname.begin(), toupper);
