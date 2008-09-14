@@ -72,13 +72,14 @@ void Renderer::InitializeScreen()
 	width = config.width;
 	height = config.height;
 
+#ifndef __MORPHOS__
 	// Set the caption icon
 	icon = SDL_LoadBMP("data/gfx/icon.bmp");
 	if (icon != 0)
 	{
 		SDL_WM_SetIcon(icon, 0);
 	}
-
+#endif
 	// Setup the screen
 	screen = SDL_SetVideoMode(width, height, config.bpp, config.videoflags);
 	if (screen == 0)
