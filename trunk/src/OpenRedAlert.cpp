@@ -21,6 +21,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <locale.h>
+
 #include "SDL/SDL.h"
 
 #include "audio/SoundEngine.h"
@@ -64,6 +66,9 @@ int main(int argc, char** argv) {
     atexit(cleanup);
     set_terminate(fcnc_terminate_handler);
     
+    // Correct the way that floats are readed
+    setlocale(LC_ALL, "C");
+
     // Loads arguments
     if ((argc > 1) && ( (strcasecmp(argv[1], "-help")==0) || 
 						(strcasecmp(argv[1], "--help")==0)||
@@ -224,7 +229,7 @@ int main(int argc, char** argv) {
 void fcnc_terminate_handler() {
     cleanup();
     
-#if __GNUC__ == 3 && __GNUC_MINOR__ >= 1
+#if __GNUC__ == 3 && __GNUC_MINOR__ >= 1 && ! defined (__MORPHOS__)
     // GCC 3.1+ feature, and is turned on by default for 3.4.
     using __gnu_cxx::__verbose_terminate_handler;
     __verbose_terminate_handler();
