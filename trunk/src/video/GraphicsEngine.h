@@ -49,6 +49,7 @@ public:
     void drawVQAFrame(SDL_Surface *frame);
     void clearBuffer();
     void clearScreen();
+	void swapMiniMapZoomFactor();
 
     void renderLoading(const string& buff, SDL_Surface* logo);
 

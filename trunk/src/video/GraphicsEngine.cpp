@@ -259,9 +259,9 @@ void GraphicsEngine::setupCurrentGame()
     p::ccmap->prepMiniClip(pc::sidebar->getTabLocation()->w,pc::sidebar->getTabLocation()->h);
     minizoom.normal = (tilewidth*pc::sidebar->getTabLocation()->w)/max(maparea.w, maparea.h);
     minizoom.max    = max(1,tilewidth*pc::sidebar->getTabLocation()->w / max(
-                p::ccmap->getWidth()*tilewidth, p::ccmap->getHeight()*tilewidth));
-//    mz = &minizoom.max;
-	mz = &minizoom.normal;
+                p::ccmap->getWidth()*tilewidth, p::ccmap->getHeight()*tilewidth))+1;
+    mz = &minizoom.max;
+//	mz = &minizoom.normal;
 //printf ("Minizoom = %i\n", *mz);
     playercolours.resize(SHPBase::numPalettes());
     for (Uint8 i = 0; i < playercolours.size() ; ++i) {
@@ -2039,4 +2039,9 @@ SDL_Rect* GraphicsEngine::getMapArea()
 Uint16 GraphicsEngine::getHeight()
 {
 	return height;
+}
+
+void GraphicsEngine::swapMiniMapZoomFactor()
+{
+	this->mz = ( this->mz == &minizoom.max ? &minizoom.normal : &minizoom.max );
 }
