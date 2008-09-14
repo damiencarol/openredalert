@@ -32,6 +32,10 @@ namespace pc {
 	extern GraphicsEngine * gfxeng;
 }
 
+#ifdef __MORPHOS__
+double round(double x) { return (x > 0) ? floor(x + 0.5) : ceil(x - 0.5); }
+#endif
+
 
 RA_ProgressBar::RA_ProgressBar()
 {
