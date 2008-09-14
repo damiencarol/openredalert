@@ -56,7 +56,7 @@ VQA::VQAMovie::VQAMovie(const char* filename) : vqafile(0), CBF_LookUp(0),
 {
     string fname(filename);
 
-    
+
     if (toupper(filename[0]) != 'X') {
         fname += ".VQA";
         vqafile = VFSUtils::VFS_Open(fname.c_str());
@@ -131,7 +131,7 @@ VQA::VQAMovie::VQAMovie(const char* filename) : vqafile(0), CBF_LookUp(0),
 }
 
 /**
- * 
+ *
  */
 VQA::VQAMovie::~VQAMovie()
 {
@@ -139,7 +139,7 @@ VQA::VQAMovie::~VQAMovie()
     delete[] CBP_LookUp;
     delete[] VPT_Table;
     delete[] offsets;
-    
+
     /// Close the Virtual file
     VFSUtils::VFS_Close(vqafile);
 
@@ -154,16 +154,21 @@ VQA::VQAMovie::~VQAMovie()
  */
 void VQA::VQAMovie::play()
 {
+#ifdef __MORPHOS__
+    printf("Sorry we skip videos due to a bug in Morphos SDL_Mixer\n");
+    return;
+#endif
+
     if (vqafile == 0){
         return;
     }
-    
+
     if (pc::sfxeng->NoSound()) {
         return;
     }
-    
- 
-    
+
+
+
     SDL_Surface* frame;
     SDL_Surface* cframe;
     SDL_Rect dest;
@@ -191,7 +196,7 @@ void VQA::VQAMovie::play()
     if (scaleVideo){
         scaler.initVideoScale(frame, videoScaleQuality);
     }
-    
+
     Uint32 jumplen;
     Uint32 sndlen = DecodeSNDChunk(sndbufEnd);
     sndbufEnd += sndlen;
@@ -259,6 +264,9 @@ void VQA::VQAMovie::play()
     }
 }
 
+/**
+ *
+ */
 bool VQA::VQAMovie::ReadChunk()
 {
 	//printf ("%s line %i: ***Read Chunk***\n", __FILE__, __LINE__);
@@ -266,16 +274,16 @@ bool VQA::VQAMovie::ReadChunk()
 
 	Uint8 chunkid[4];
 	vqafile->readByte(chunkid, 4);
-	
+
 	// We have read the PINF chunk...
 	Uint32 len;
 	//Uint8  byte;
 	vqafile->readDWord(&len, 1);
 	len = ((((Uint8*)(&len))[0] << 24) |
 		   (((Uint8*)(&len))[1] << 16) |
-		   (((Uint8*)(&len))[2] << 8) | 
+		   (((Uint8*)(&len))[2] << 8) |
 		   ((Uint8*)(&len))[3]);
-	
+
 	//len = SDL_Swap32(len);
 	printf ("Length = %i\n", (int)len);
 	vqafile->seekSet(vqafile->tell() + len);
@@ -288,6 +296,9 @@ bool VQA::VQAMovie::ReadChunk()
 	return true;
 }
 
+/**
+ *
+ */
 bool VQA::VQAMovie::DecodeFORMChunk()
 {
     char chunkid[4];
@@ -360,6 +371,9 @@ bool VQA::VQAMovie::DecodeFORMChunk()
     return true;
 }
 
+/**
+ *
+ */
 bool VQA::VQAMovie::DecodeFINFChunk()
 {
 	Uint8 chunkid[4];
@@ -406,9 +420,9 @@ bool VQA::VQAMovie::DecodeFINFChunk()
 	return true;
 }
 
-/** 
+/**
  * Decodes SND Chunk
- * 
+ *
  * @param pointer to store the decoded chunk
  * @return length of chunk
  */
@@ -478,9 +492,9 @@ Uint32 VQA::VQAMovie::DecodeSNDChunk(Uint8 *outbuf)
     return chunklen;
 }
 
-/** 
+/**
  * Decodes VQFR Chunk into one frame(?)
- * 
+ *
  * @param pointer to decoded frame
  * @param Current Frame to decode
  */
@@ -538,7 +552,7 @@ bool VQA::VQAMovie::DecodeVQFRChunk(SDL_Surface *frame)
         }
     }
 
-    // Optimise me harder
+    // Optimize me harder
     cpixel = 0;
     fpixel = 0;
 	//printf ("%s line %i: Height = %i, Width = %i, BlockH = %i, BlockW = %i\n", __FILE__, __LINE__, header.Height, header.Width, header.BlockH, header.BlockW);
@@ -573,6 +587,10 @@ bool VQA::VQAMovie::DecodeVQFRChunk(SDL_Surface *frame)
     }
     return true;
 }
+
+/**
+ *
+ */
 inline void VQA::VQAMovie::DecodeCBPChunk()
 {
     Uint32 chunklen;
@@ -584,6 +602,10 @@ inline void VQA::VQAMovie::DecodeCBPChunk()
     CBPOffset += chunklen;
     CBPChunks++;
 }
+
+/**
+ *
+ */
 inline void VQA::VQAMovie::DecodeVPTChunk(Uint8 Compressed)
 {
     Uint32 chunklen;
@@ -601,6 +623,10 @@ inline void VQA::VQAMovie::DecodeVPTChunk(Uint8 Compressed)
         vqafile->readByte(VPT_Table, chunklen);
     }
 }
+
+/**
+ *
+ */
 inline void VQA::VQAMovie::DecodeCBFChunk(Uint8 Compressed)
 {
     Uint32 chunklen;
@@ -618,6 +644,10 @@ inline void VQA::VQAMovie::DecodeCBFChunk(Uint8 Compressed)
         vqafile->readByte(CBF_LookUp, chunklen);
     }
 }
+
+/**
+ *
+ */
 inline void VQA::VQAMovie::DecodeCPLChunk(SDL_Color *palette)
 {
     Uint32 chunklen;
@@ -633,6 +663,10 @@ inline void VQA::VQAMovie::DecodeCPLChunk(SDL_Color *palette)
         palette[i].b <<= 2;
     }
 }
+
+/**
+ *
+ */
 inline void VQA::VQAMovie::DecodeUnknownChunk()
 {
     Uint32 chunklen;
@@ -643,6 +677,10 @@ inline void VQA::VQAMovie::DecodeUnknownChunk()
 
     vqafile->seekCur(chunklen);
 }
+
+/**
+ *
+ */
 void VQA::VQAMovie::AudioHook(void* udata, Uint8* stream, int len)
 {
     VQAMovie* vqa = (VQAMovie* )udata;
