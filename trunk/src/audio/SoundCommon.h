@@ -55,11 +55,6 @@ namespace {
     Uint8 tmpbuff[SOUND_MAX_UNCOMPRESSED_SIZE * 4];
 }
 
-namespace Sound {
-    void IMADecode(Uint8 *output, Uint8 *input, Uint16 compressed_size, Sint32& sample, Sint32& index);
-    void WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_size, Uint16 uncompressed_size);
-}
-
 namespace {
 
 struct SoundCacheCleaner : public std::unary_function<SoundCache::value_type, void>
