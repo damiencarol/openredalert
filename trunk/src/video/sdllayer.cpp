@@ -19,22 +19,19 @@
 
 #include "include/Logger.h"
 
-
 //#define _15BIT(r,g,b) (((r&248)<<7) + ((g&248)<<2) + (b>>3))
 //#define _16BIT(r,g,b) (((r&248)<<8) + ((g&252)<<3) + (b>>3))
 
 extern Logger * logger;
 
-
-/** 
+/**
  * Get a pixel from a SDL surface
- * 
+ *
  * @param Surface the sdl surface to get the pixel from.
  * @param color the color gotten from the sdl surface
  * @param x x-pos in the picture to get the pixel color form
  * @param y y-pos in the picture to get the pixel color form
- * @returns void
-**/
+ */
 void SDLLayer::get_pixel ( SDL_Surface* Surface, Uint32 &color, Uint32 x, Uint32 y )
 {
 	//Uint32	color = 0;
@@ -44,7 +41,7 @@ void SDLLayer::get_pixel ( SDL_Surface* Surface, Uint32 &color, Uint32 x, Uint32
 
 	color = 0;
 
-	/* How we draw the pixel depends on the bitdepth */
+	// How we draw the pixel depends on the bitdepth
 	switch(Surface->format->BytesPerPixel)
 	{
 		case 1:
@@ -90,15 +87,14 @@ void SDLLayer::get_pixel ( SDL_Surface* Surface, Uint32 &color, Uint32 x, Uint32
 //	return color;
 }
 
-/** 
+/**
  * Get a pixel from a SDL surface
- * 
+ *
  * @param Surface the sdl surface to get the pixel from.
  * @param RGBcolor the color gotten from the sdl surface
  * @param x x-pos in the picture to get the pixel color form
  * @param y y-pos in the picture to get the pixel color form
- * @returns void
-**/
+ */
 void SDLLayer::get_pixel ( SDL_Surface* Surface, SDL_Color &RGBcolor, Uint32 x, Uint32 y )
 {
 	Uint32	color = 0;
@@ -107,15 +103,15 @@ void SDLLayer::get_pixel ( SDL_Surface* Surface, SDL_Color &RGBcolor, Uint32 x, 
 	SDL_GetRGB( color, Surface->format, &RGBcolor.r, &RGBcolor.g, &RGBcolor.b );
 }
 
-/** 
+/**
  * Set a pixel to a color in a sdl surface
- * 
+ *
  * @param Surface the sdl surface to get the pixel from.
  * @param color the color gotten from the sdl surface (Uint32 color)
  * @param x x-pos in the picture to get the pixel color form
  * @param y y-pos in the picture to get the pixel color form
  * @returns void
-**/
+ */
 void SDLLayer::set_pixel ( SDL_Surface* Surface, Uint32 color, Uint32 x, Uint32 y )
 {
 	SDL_Rect DestRect;
@@ -128,15 +124,14 @@ void SDLLayer::set_pixel ( SDL_Surface* Surface, Uint32 color, Uint32 x, Uint32 
 	SDL_FillRect (Surface, &DestRect, color);
 }
 
-/** 
+/**
  * Set a pixel to a color in a sdl surface
- * 
+ *
  * @param Surface the sdl surface to get the pixel from.
  * @param RGBcolor the color gotten from the sdl surface (SDL_Color color)
  * @param x x-pos in the picture to get the pixel color form
  * @param y y-pos in the picture to get the pixel color form
- * @returns void
-**/
+ */
 void SDLLayer::set_pixel ( SDL_Surface* Surface, SDL_Color RGBcolor, Uint32 x, Uint32 y )
 {
 	Uint32 color = SDL_MapRGB( Surface->format, RGBcolor.r, RGBcolor.g, RGBcolor.b );
@@ -144,7 +139,9 @@ void SDLLayer::set_pixel ( SDL_Surface* Surface, SDL_Color RGBcolor, Uint32 x, U
 }
 
 
-/** @Draw a rectangle outline on a sdl surface
+/**
+ * Draw a rectangle outline on a sdl surface
+ *
  * @param Surface the sdl surface to draw the rectangle on.
  * @param color the color of the rectangle to draw
  * @param x x-pos of the rectangle to draw
@@ -152,14 +149,15 @@ void SDLLayer::set_pixel ( SDL_Surface* Surface, SDL_Color RGBcolor, Uint32 x, U
  * @param wdith the width of the rectangle to draw
  * @param height the heigth of the rectangle to draw
  * @param lnpx the line weigth of the square to draw
- * @returns void
-**/
-void SDLLayer::draw_rectangle ( SDL_Surface* Surface, Uint32 color, Uint16 x, Uint16 y, Uint16 width, Uint16 height, Uint8 lnpx )
+ */
+void SDLLayer::draw_rectangle(SDL_Surface* Surface, Uint32 color, Uint16 x, Uint16 y, Uint16 width, Uint16 height, Uint8 lnpx )
 {
-SDL_Rect DestRect;
+	SDL_Rect DestRect;
 
-	if (Surface == NULL)
+	if (Surface == 0)
+	{
 		return;
+	}
 
 	// Draw the top line
 	DestRect.x = x;
@@ -184,7 +182,9 @@ SDL_Rect DestRect;
 	SDL_FillRect (Surface, &DestRect, color);
 }
 
-/** @Draw a rectangle outline on a sdl surface
+/**
+ * Draw a rectangle outline on a sdl surface
+ *
  * @param Surface the sdl surface to draw the rectangle on.
  * @param RGBcolor the color of the rectangle to draw
  * @param x x-pos of the rectangle to draw
@@ -192,29 +192,30 @@ SDL_Rect DestRect;
  * @param wdith the width of the rectangle to draw
  * @param height the heigth of the rectangle to draw
  * @param lnpx the line weigth of the square to draw
- * @returns void
-**/
+ * @return void
+ */
 void SDLLayer::draw_rectangle ( SDL_Surface* Surface, SDL_Color RGBcolor, Uint16 x, Uint16 y, Uint16 width, Uint16 height, Uint8 lnpx )
 {
 	Uint32 color = SDL_MapRGB( Surface->format, RGBcolor.r, RGBcolor.g, RGBcolor.b );
 	draw_rectangle ( Surface, color, x, y, width, height, lnpx );
 }
 
-
-/** @Draw a solid rectangle on a sdl surface
+/**
+ * Draw a solid rectangle on a sdl surface
+ *
  * @param Surface the sdl surface to draw the rectangle on.
  * @param color the color of the rectangle to draw
  * @param x x-pos of the rectangle to draw
  * @param y y-pos of the rectangle to draw
  * @param wdith the width of the rectangle to draw
  * @param height the heigth of the rectangle to draw
- * @returns void
-**/
+ * @return void
+ */
 void SDLLayer::draw_solidrectangle ( SDL_Surface* Surface, Uint32 color, Uint16 x, Uint16 y, Uint16 width, Uint16 height )
 {
-SDL_Rect DestRect;
+	SDL_Rect DestRect;
 
-	if (Surface == NULL)
+	if (Surface == 0)
 		return;
 
 	DestRect.x = x;
@@ -225,61 +226,67 @@ SDL_Rect DestRect;
 	SDL_FillRect (Surface, &DestRect, color);
 }
 
-/** @Draw a solid rectangle on a sdl surface
+/**
+ * Draw a solid rectangle on a sdl surface
+ *
  * @param Surface the sdl surface to draw the rectangle on.
  * @param RGBcolor the color of the rectangle to draw
  * @param x x-pos of the rectangle to draw
  * @param y y-pos of the rectangle to draw
  * @param wdith the width of the rectangle to draw
  * @param height the heigth of the rectangle to draw
- * @returns void
-**/
+ * @return void
+ */
 void SDLLayer::draw_solidrectangle ( SDL_Surface* Surface, SDL_Color RGBcolor, Uint16 x, Uint16 y, Uint16 width, Uint16 height )
 {
 	Uint32 color = SDL_MapRGB( Surface->format, RGBcolor.r, RGBcolor.g, RGBcolor.b );
 	draw_solidrectangle ( Surface, color, x, y, width, height );
 }
 
-/** @Draw a horizontal line on a sdl surface
+/**
+ * Draw a horizontal line on a sdl surface
+ *
  * @param Surface the sdl surface to draw the rectangle on.
  * @param RGBcolor the color of the rectangle to draw
  * @param x x-pos of the rectangle to draw
  * @param y y-pos of the rectangle to draw
  * @param length the heigth of the rectangle to draw
  * @param wdith the width of the rectangle to draw
- * @returns void
-**/
+ * @return void
+ */
 void SDLLayer::draw_h_line ( SDL_Surface* Surface, SDL_Color RGBcolor, Uint16 x, Uint16 y, Uint16 length, Uint16 pt )
 {
 	draw_solidrectangle ( Surface, RGBcolor, x, y, length, pt );
 }
 
-/** 
+/**
  * Draw a vertical line on a sdl surface
- * 
+ *
  * @param Surface the sdl surface to draw the rectangle on.
  * @param RGBcolor the color of the rectangle to draw
  * @param x x-pos of the rectangle to draw
  * @param y y-pos of the rectangle to draw
  * @param wdith the width of the rectangle to draw
  * @param height the heigth of the rectangle to draw
- * @returns void
-**/
+ * @return void
+ */
 void SDLLayer::draw_v_line ( SDL_Surface* Surface, SDL_Color RGBcolor, Uint16 x, Uint16 y, Uint16 length, Uint16 pt )
 {
 	draw_solidrectangle ( Surface, RGBcolor, x, y, length, pt );
 }
 
 #if 0
-/** @Draw a random straight line (doesn't have to be horizontal or vertical)
+/**
+ * Draw a random straight line (doesn't have to be horizontal or vertical)
+ *
  * @param startx starting x postition for the line
  * @param starty starting y postition for the line
  * @param stopx ending x postition for the line
  * @param stopy ending y postition for the line
  * @param wdith the width of the line
  * @param colour the line color
- * @returns void
-**/
+ * @return void
+ */
 void draw_line(Sint16 startx, Sint16 starty, Sint16 stopx, Sint16 stopy, Uint16 width, Uint32 colour)
 {
     float xmod, ymod, length, xpos, ypos;
@@ -306,18 +313,21 @@ void draw_line(Sint16 startx, Sint16 starty, Sint16 stopx, Sint16 stopy, Uint16 
     }
 }
 
-/** @Draw a random straight line (doesn't have to be horizontal or vertical)
+/**
+ * Draw a random straight line (doesn't have to be horizontal or vertical)
+ *
  * @param startx starting x postition for the line
  * @param starty starting y postition for the line
  * @param stopx ending x postition for the line
  * @param stopy ending y postition for the line
  * @param wdith the width of the line
  * @param colour the line color
- * @returns void
-**/
+ * @return void
+ */
 void draw_line(Sint16 startx, Sint16 starty, Sint16 stopx, Sint16 stopy, Uint16 width, SDL_Color RGBcolor)
 {
 	Uint32 color = SDL_MapRGB( Surface->format, RGBcolor.r, RGBcolor.g, RGBcolor.b );
 	draw_line( startx, starty, stopx, stopy, width, color );
 }
+
 #endif
