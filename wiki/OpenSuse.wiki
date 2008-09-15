@@ -1,0 +1,30 @@
+#summary Details who to install and run the game in OpenSuse.
+#labels Phase-Support,Featured
+
+= Installation =
+
+The package form Packman is VERY WELL Formed.
+Go here to get and install it : 
+
+`http://packman.links2linux.org/package/openredalert/70182`
+
+It's the packman page, you can install with one click.
+
+After that you MUST get the 2 .mix files and copy it to the folder :
+
+`/usr/share/games/openredalert/data/mix`
+
+and not
+
+`~/openredalert/data/mix`
+
+
+= Details =
+
+Mix files can be found from original CD here :
+
+(English Version) : `http://www.ea.com/redalert/news-detail.jsp?id=62`
+
+Or the demo file
+
+(Demo File) : `ftp://ftp.westwood.com/pub/redalert/previews/demo/ra95demo.zip`
