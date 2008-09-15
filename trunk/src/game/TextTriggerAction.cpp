@@ -25,26 +25,13 @@
 using std::string;
 
 /**
- * Execute the action
- * 
- * For this TextTriggerAction this methode post the saved message 
- * 
- * @see MessagePool::postMessage()
- */
-void TextTriggerAction::execute()
-{
-	// Post the message in the pool
-	this->pool->postMessage(this->message);
-}
-
-/**
- * Build a TextTriggerAction with a message in string 
+ * Build a TextTriggerAction with a message in string
  * and a ref to the Message Pool
- * 
+ *
  * @param message Message to show
  * @param pool The MessagePool to use
  */
-TextTriggerAction::TextTriggerAction(string message, MessagePool* pool) : 
+TextTriggerAction::TextTriggerAction(string message, MessagePool* pool) :
 	TriggerAction(TriggerAction::TEXT)
 {
 	// Set the message
@@ -53,3 +40,15 @@ TextTriggerAction::TextTriggerAction(string message, MessagePool* pool) :
 	this->pool = pool;
 }
 
+/**
+ * Execute the action
+ *
+ * For this TextTriggerAction this method post the saved message
+ *
+ * @see MessagePool::postMessage()
+ */
+void TextTriggerAction::execute()
+{
+	// Post the message in the pool
+	this->pool->postMessage(this->message);
+}
