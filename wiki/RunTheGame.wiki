@@ -3,7 +3,7 @@
 
 = Run the game =
 
-Copy the folder '/data/' from a compiled archive and to the folder of the programme.
+Copy the folder '/data/' from a compiled archive to the folder of the programme.
 
 Copy the REDALERT.mix and MAIN.mix files from original archives of the game into the folder '/data/mix'
 
