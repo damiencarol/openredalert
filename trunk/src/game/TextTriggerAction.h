@@ -31,19 +31,18 @@ using std::string;
  * @author Damien Carol (OpenRedAlert)
  * @version 1.0
  */
-class TextTriggerAction : public TriggerAction 
-{
-public:    
-	/** Build a TextTriggerAction with a specified message and a messagepool */
-    TextTriggerAction(string message, MessagePool* pool);    
+class TextTriggerAction: public TriggerAction {
+public:
+	/** Build a TextTriggerAction with a specified message and a MessagePool */
+	TextTriggerAction(string message, MessagePool* pool);
 
-    /** Execute this Action */
-    void execute();
+	/** Execute this Action */
+	void execute();
 private:
-    /** Message to display */
-    string message;
-    /** Message Pool */
-    MessagePool* pool;
+	/** Message to display */
+	string message;
+	/** Message Pool */
+	MessagePool* pool;
 };
 
 #endif //TEXTTRIGGERACTION_H
