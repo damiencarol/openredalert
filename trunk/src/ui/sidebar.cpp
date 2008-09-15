@@ -38,6 +38,7 @@
 #include "video/ImageCache.h"
 #include "video/ImageCacheEntry.h"
 #include "audio/SoundEngine.h"
+#include "video/GraphicsEngine.h"
 #include "include/sdllayer.h"
 #include "sidebarop.h"
 #include "video/ImageNotFound.h"
@@ -71,6 +72,7 @@ namespace pc {
 	//extern ConfigType Config;
 	extern ImageCache* imgcache;
 	extern SoundEngine* sfxeng;
+	extern GraphicsEngine* gfxeng;
 	extern Cursor* cursor;
 }
 namespace p {
@@ -800,6 +802,8 @@ void Sidebar::setSpecialButtonState(Uint8 Button, Uint8 State)
 				sell_but_state = State;
 			break;
 		case 3:
+			if (State == 0 || State == 2) // only if button is lifted or pressed not mouseover
+                pc::gfxeng->swapMiniMapZoomFactor(); // two zoom levels for really small or really big minimap
 			if (State < 3)
 				map_but_state = State;
 			break;
