@@ -60,64 +60,72 @@ PlayerPool::~PlayerPool()
 	}
 }
 
-const int PlayerPool::MultiColourStringToNumb(const char* colour)
+/**
+ * @param colour Color
+ * @return Number of the color
+ */
+const int PlayerPool::MultiColourStringToNumb(const string& colour)
 {
-	if (strcasecmp(colour, "yellow") == 0)
-		{
-			return 0;
-		}
-		else if (strcasecmp(colour, "blue") == 0)
-		{
-			return 1;
-		}
-		else if (strcasecmp(colour, "red") == 0)
-		{
-			return 2;
-		}
-		else if (strcasecmp(colour, "green") == 0)
-		{
-			return 3;
-		}
-		else if (strcasecmp(colour, "yellow") == 0)
-		{
-			return 4;
-		}
-		else if (strcasecmp(colour, "orange") == 0)
-		{
-			return 5;
-		}
-		else if (strcasecmp(colour, "gray") == 0)
-		{
-			return 6;
-		}
-		else if (strcasecmp(colour, "turquoise") == 0)
-		{
-			return 7;
-		}
-		else if (strcasecmp(colour, "darkred") == 0)
-		{
-			return 8;
-	} else {
-		// Error @todo -> do something better than this :)
-		return 1;
-	}
+    if (colour == "yellow")
+    {
+        return 0;
+    }
+    else if (colour == "blue")
+    {
+        return 1;
+    }
+    else if (colour == "red")
+    {
+        return 2;
+    }
+    else if (colour == "green")
+    {
+        return 3;
+    }
+    else if (colour == "yellow")
+    {
+        return 4;
+    }
+    else if (colour == "orange")
+    {
+        return 5;
+    }
+    else if (colour  == "gray")
+    {
+        return 6;
+    }
+    else if (colour == "turquoise")
+    {
+        return 7;
+    }
+    else if (colour == "darkred")
+    {
+        return 8;
+    }
+    else
+    {
+        // Error
+        // @todo do something better than this :)
+        return 1;
+    }
 }
 
-void PlayerPool::setLPlayer(const char* pname)
+void PlayerPool::setLPlayer(const string& pname)
 {
-	Uint8 i;
-	for (i = 0; i < playerpool.size(); i++)
-	{
-		if ( !strcasecmp(playerpool[i]->getName(), pname) )
-		{
-			localPlayer = i;
-			return;
-		}
-	}
-	//logger->warning("Tried to set local player to non-existing player \"%s\"\n", pname);
-	playerpool.push_back(new Player(pname, mapini));
-	localPlayer = static_cast<Uint8>(playerpool.size()-1);
-	playerpool[localPlayer]->setPlayerNum(localPlayer);
+    int i;
+    for (i = 0; i < playerpool.size(); i++)
+    {
+        if (string(playerpool.at(i)->getName()) != pname)
+        {
+            localPlayer = i;
+            return;
+        }
+    }
+    
+    logger->warning("Tried to set local player to non-existing player '%s'\n", pname.c_str());
+    playerpool.push_back(new Player(pname.c_str(), mapini));
+    localPlayer = static_cast<Uint8>(playerpool.size()-1);
+    playerpool[localPlayer]->setPlayerNum(localPlayer);
 }
 
 void PlayerPool::setLPlayer(Uint8 number, const char* nick, const char* colour,
@@ -160,23 +168,20 @@ void PlayerPool::setPlayer(Uint8 number, const char* nick, const int colour,
 	 */
 }
 
-Uint8 PlayerPool::getPlayerNum(const char *pname)
+int PlayerPool::getPlayerNum(const string& pname)
 {
-	Uint8 i;
-	
-	
-	
-	for (i = 0; i < playerpool.size(); i++)
-	{
-		if ( !strcasecmp(playerpool[i]->getName(), pname) )
-		{
-			return i;
-		}
-	}
-	//logger->error("%s line %i: Create new player: %s\n", __FILE__, __LINE__, pname);
-	playerpool.push_back(new Player(pname, mapini));
-	playerpool[playerpool.size()-1]->setPlayerNum(static_cast<Uint8>(playerpool.size()-1));
-	return static_cast<Uint8>(playerpool.size()-1);
+    for (int i = 0; i < playerpool.size(); i++)
+    {
+        if (string(playerpool.at(i)->getName()) == pname)
+        {
+            return i;
+        }
+    }
+
+    logger->error("%s line %i: Create new player: %s\n", __FILE__, __LINE__, pname.c_str());
+    playerpool.push_back(new Player(pname.c_str(), mapini));
+    playerpool[playerpool.size() - 1]->setPlayerNum(playerpool.size() - 1);
+    return playerpool.size() - 1;
 }
 
 char RA_house[20][10] =
@@ -185,40 +190,49 @@ char RA_house[20][10] =
 		"Multi2", "Multi3", "Multi4", "Multi5", "Multi6", "Multi7", "Multi8" 
 };
 
-int PlayerPool::getPlayerNumByHouseNum(Uint8 House)
+/**
+ */
+int PlayerPool::getPlayerNumByHouseNum(int House) const
 {
-	Uint8 i;
+    // Check if num <19 (because their are only 20 houses)
+    if (House > 19 || House < 0)
+    {
+        return -1;
+    }
 
-	// Check if num <19 (because their are only 20 houses)
-	if (House > 19)
-	{
-		return -1;
-	}
-
-	for (i = 0; i < playerpool.size(); i++)
-	{
-		if ( !strcasecmp(playerpool[i]->getName(), RA_house[House]) )
-		{
-			return i;
-		}
-	}
-	return -1;
+    for (int i = 0; i < playerpool.size(); i++)
+    {
+        if (string(playerpool[i]->getName()) == RA_house[House])
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
-int PlayerPool::getHouseNumByPlayerNum(Uint8 Player)
+/**
+ * @param playerNumber number of the player
+ */
+int PlayerPool::getHouseNumByPlayerNum(int playerNumber) const
 {
-	Uint8 i;
-	if (Player >= playerpool.size())
-		return -1;
+    // If the player is not in the pool
+    if (playerNumber >= playerpool.size())
+    {
+        // Return -1 (WRONG)
+        return -1;
+    }
 
-	for (i = 0; i < 19; i++)
-	{
-		if ( !strcasecmp(playerpool[Player]->getName(), RA_house[i]) )
-		{
-			return i;
-		}
-	}
-	return -1;
+    // Parse the vector
+    for (int i = 0; i < playerpool.size(); i++)
+    {
+        if (string(playerpool[playerNumber]->getName()) == RA_house[i])
+        {
+            return i;
+        }
+    }
+
+    // Return -1 (WRONG)
+    return -1;
 }
 
 Player* PlayerPool::getPlayerByName(const char* pname)

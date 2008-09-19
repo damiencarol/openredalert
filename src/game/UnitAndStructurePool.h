@@ -208,7 +208,7 @@ private:
 
     multimap<StructureType*, std::vector<StructureType*>* > struct_prereqs;
     multimap<UnitType*, vector<StructureType*>* > unit_prereqs;
-    void splitORPreReqs(const char* prereqs, vector<StructureType*> * type_prereqs);
+    void splitORPreReqs(const string& prereqs, vector<StructureType*> * type_prereqs);
 
     map<string, Talkback*> talkbackpool;
 

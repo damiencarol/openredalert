@@ -75,19 +75,27 @@ void Talkback::load(string talkback, INIFile *tbini)
     }
 
     try {
-        for (keynum=0;;++keynum) {
+        for (keynum=0;;++keynum)
+        {
             // Still @todo: stringify rest of code
             char* first;
             key=tbini->readKeyValue(talkback.c_str(), keynum);
             first = stripNumbers(key->first.c_str());
-            if (strcasecmp(first,"include") == 0) {
-                if (strcasecmp(key->second.c_str(),talkback.c_str()) != 0) {
+            if (string(first) == "include")
+            {
+                if (key->second != talkback)
+                {
                     merge(p::uspool->getTalkback(key->second.c_str()));
-                } else {
+                } 
+                else
+                {
                     logger->warning("skipping self-referential include in %s\n",talkback.c_str());
                 }
-            } else {
-                if (strcasecmp(first,"delete") == 0) {
+            } 
+            else
+            {
+                if (string(first) == "delete")
+                {
                     TalkbackType tbt = getTypeNum(key->second);
                     if (tbt == TB_invalid) {
                         continue;
@@ -143,6 +151,8 @@ vector<string>& Talkback::getTypeVector(TalkbackType type)
 	return ret->second;
 }
 
+/**
+ */
 void Talkback::merge(Talkback *mergee)
 {
     typedef map<string, TalkbackType>::iterator TBI;

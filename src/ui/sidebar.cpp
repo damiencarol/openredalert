@@ -39,6 +39,7 @@
 #include "video/ImageCacheEntry.h"
 #include "audio/SoundEngine.h"
 #include "video/GraphicsEngine.h"
+#include "include/common.h"
 #include "include/sdllayer.h"
 #include "sidebarop.h"
 #include "video/ImageNotFound.h"
@@ -459,7 +460,7 @@ char* Sidebar::getButtonName(Uint8 index)
 
 	if ( (unsigned)(*vecptr).size() > ((unsigned)(*offptr)+VecPtrIndex - 1) )
 	{
-		res = strdup((*vecptr)[(*offptr+VecPtrIndex-1)]);
+		res = cppstrdup((*vecptr)[(*offptr+VecPtrIndex-1)]);
 	} else {
 		// Out of range
 		return 0;

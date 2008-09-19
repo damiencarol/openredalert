@@ -33,6 +33,7 @@
 #include "ActionEventQueue.h"
 #include "CnCMap.h"
 
+#include "include/common.h"
 #include "include/Logger.h"
 #include "audio/SoundEngine.h"
 #include "video/ImageNotFound.h"

@@ -1790,7 +1790,8 @@ void UnitAndStructurePool::addPrerequisites(UnitType* unittype)
         logger->warning("No prerequisites for unit \"%s\"\n",unittype->getTName());
         return;
     }
-    if (strcasecmp((prereqs[0]), ("none")) == 0) {
+    if (string(prereqs[0]) == "none")
+    {
         return;
     }
     for (Uint16 x=0;x<prereqs.size();++x) {
@@ -1815,9 +1816,13 @@ void UnitAndStructurePool::addPrerequisites(StructureType* structtype)
                         "Use \"none\" if this intended.\n",structtype->getTName());
         return;
     }
-    if (strcasecmp((prereqs[0]), ("none")) == 0) {
+
+    // If prerequiste are none we skip it
+    if (string(prereqs[0]) == "none")
+    {
         return;
     }
+
     for (Uint16 x=0;x<prereqs.size();++x) {
         type_prereqs = new vector<StructureType*>;
         splitORPreReqs(prereqs[x],type_prereqs);
@@ -2036,18 +2041,16 @@ vector<const char*> UnitAndStructurePool::getBuildableStructures(Player* pl)
             {
                 int playerSide;
                 int curside;
-                char* tmpname;
+                string tmpname;
                 playerSide = pl->getSide()&~PS_MULTI;
                 for (y=0;y<stype->getOwners().size();++y)
                 {
                     tmpname = stype->getOwners()[y];
                     // note: should avoid hardcoded side names
-                    if (strcasecmp((tmpname), ("gdi")) == 0 ||
-                    		strcasecmp((tmpname), ("GDI")) == 0) 
+                    if (tmpname == "gdi" || tmpname == "GDI") 
                     {
                         curside = PS_GOOD;
-                    } else if (strcasecmp((tmpname), ("nod")) == 0 ||
-                    		strcasecmp((tmpname), ("NOD")) == 0) 
+                    } else if (tmpname == "nod" || tmpname == "NOD")
                     {
                         curside = PS_BAD;
                     } else {
@@ -2265,13 +2268,16 @@ Talkback* UnitAndStructurePool::getTalkback(const char* talkback)
 /**
  * 
  */
-void UnitAndStructurePool::splitORPreReqs(const char* prereqs, vector<StructureType*>* type_prereqs)
-{
-    char tmp[16];
-    Uint32 i, i2;
-    if (strcasecmp(("none"), (prereqs)) == 0) {
+void UnitAndStructurePool::splitORPreReqs(const string& prereqs, vector<StructureType*>* type_prereqs)
+{     
+    // If prerequiste are "none" we skip it
+    if (prereqs == "none")
+    {
         return;
     }
+    
+    char tmp[16];
+    Uint32 i, i2;  
     memset(tmp,0,16);
     for (i=0,i2=0;prereqs[i]!=0x0;++i) {
         if ( (i2>=1024) || (tmp != 0 && (prereqs[i] == '|')) ) {
