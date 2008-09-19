@@ -34,6 +34,8 @@
 #include "video/Dune2Image.h"
 #include "misc/StringTableFile.h"
 
+#define VERSION "439"
+
 namespace p {
 	extern PlayerPool* ppool;
 }
@@ -45,39 +47,39 @@ namespace pc {
 extern Logger * logger;
 
 /**
- * 
+ *
  */
 PauseMenu::PauseMenu()
 {
 	StringTableFile* stringFile = 0; // File to load located string
-	
+
 	// Load strings
 	stringFile = new StringTableFile("conquer.eng");
-	
+
 	// Create the window
 	PauseWindow = new RaWindow();
 	// Setup the first popup window
 	PauseWindow->SetupWindow(130, 90, 430, 250);
 
-	
+
     // Create "Option" button
     OptionsButton = new Button();
 	// Create "Exit" button
 	ExitButton = new Button();
 	// Create "continue" button
 	ContinueButton = new Button();
-	
+
 	// Draw the buttons on the new window..
     OptionsButton->SetDrawingWindow(PauseWindow);
     // String 47 = "game options"
-    OptionsButton->CreateSurface(stringFile->getString(47), 120, 110, 180, 22);	
+    OptionsButton->CreateSurface(stringFile->getString(47), 120, 110, 180, 22);
 	ExitButton->SetDrawingWindow(PauseWindow);
 	// String 45 = "abort Mission"
-	ExitButton->CreateSurface(stringFile->getString(45), 120, 145, 180, 22);	
+	ExitButton->CreateSurface(stringFile->getString(45), 120, 145, 180, 22);
 	ContinueButton->SetDrawingWindow(PauseWindow);
 	// String 43 = "Resume Mission"
 	ContinueButton->CreateSurface(stringFile->getString(43), 35, 200, 180, 22);
-			
+
 	// Setup the font color
 	Font_color.r = 255;
 	Font_color.g = 255;
@@ -98,17 +100,17 @@ PauseMenu::PauseMenu()
 	MenuLabel = new RA_Label();
 	// set drawing params
 	MenuLabel->Draw("Options", PauseWindow->GetWindowSurface(), Font_color, 175, 30) ;
-	
+
 	// Create the version Label
 	VersionLabel = new RA_Label();
 	// set drawing params
-	VersionLabel->Draw(VERSION.c_str(), PauseWindow->GetWindowSurface(), Font_color, 290, 210) ;
+	VersionLabel->Draw(VERSION, PauseWindow->GetWindowSurface(), Font_color, 290, 210) ;
 
 	// ???
 	for (int x = 177; x < 243; x++){
 		SDLLayer::set_pixel(PauseWindow->GetWindowSurface(), 0xffffff, x, 45);
     }
-	
+
 	// Free string file
 	delete stringFile;
 }
@@ -118,20 +120,20 @@ PauseMenu::PauseMenu()
 PauseMenu::~PauseMenu()
 {
 	// Free "Option" button
-	delete OptionsButton;	
+	delete OptionsButton;
 	// Free "Exit" button
 	delete ExitButton;
 	// Free "continue" button
 	delete ContinueButton;
-	
+
 	// Free the menu Label
 	delete MenuLabel;
 	// Free the version Label
 	delete VersionLabel;
-	
+
 	// Free the windows
 	delete PauseWindow;
-	
+
 	// Free the cursor surface
 	if (my_cursor != NULL){
 		SDL_FreeSurface(my_cursor);
@@ -147,8 +149,8 @@ int PauseMenu::HandleMenu()
 	int old_mx = 0;
 	int old_my = 100;
 	string		TmpString;
-	TCheckBox	CheckBox;	
-	
+	TCheckBox	CheckBox;
+
 	// Stop all sounds
 	pc::sfxeng->PauseLoopedSound(-1);
 
