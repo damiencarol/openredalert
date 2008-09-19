@@ -53,7 +53,7 @@ void VFSUtils::VFS_PreInit(const char* binpath)
  */
 void VFSUtils::VFS_Init(const std::string& binpath)
 {
-    if (".", binpath != ".")
+    if (binpath != ".")
     {
         externals->loadArchive("./");
     }
@@ -73,7 +73,7 @@ void VFSUtils::VFS_Init(const std::string& binpath)
     }
     for (Uint32 pathnum = 1;; ++pathnum)
     {
-		INIKey key;
+    INIKey key;
 		try
 		{
 			key = filesini->readIndexedKeyValue("GENERAL", pathnum, "PATH");
@@ -83,34 +83,34 @@ void VFSUtils::VFS_Init(const std::string& binpath)
 			//logger->error("Unenable to read [GENERAL]-PATH\n");
 			break;
 		}
-		string defpath = key->second;
+    string defpath = key->second;
 		if (defpath[defpath.length()-1] != '/' && defpath[defpath.length()-1] != '\\')
 		{
-			defpath += "/";
-		}
-		externals->loadArchive(defpath.c_str());
+        defpath += "/";
+    }
+    externals->loadArchive(defpath.c_str());
 	}
 
-	// Create Mix file loader
-	mixfiles = new MIXFiles();
-
+    // Create Mix file loader
+    mixfiles = new MIXFiles();
+    
 	for (Uint32 gamenum = 1;; ++gamenum)
-	{
-		INIKey key;
+    {
+        INIKey key;
 		try
 		{
-			key = filesini->readIndexedKeyValue("GENERAL", gamenum, "GAME");
+            key = filesini->readIndexedKeyValue("GENERAL", gamenum, "GAME");
 		}
 		catch(...)
 		{
-			logger->error("Unenable to read [GENERAL]-GAME\n");
-			break;
-		}
-		logger->note("Trying to load \"%s\"...\n", key->second.c_str());
-                
-                // Get the number of files
-                int numKeys = filesini->getNumberOfKeysInSection("REQUIRED");
-                int keynum;		
+            logger->error("Unenable to read [GENERAL]-GAME\n");
+            break;
+        }
+        logger->note("Trying to load \"%s\"...\n", key->second.c_str());
+
+        // Get the number of files
+        int numKeys = filesini->getNumberOfKeysInSection("REQUIRED");
+        int keynum;
 		try
         {
             // First check we have all the required mixfiles.
