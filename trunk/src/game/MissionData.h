@@ -18,7 +18,11 @@
 #ifndef MISSIONDATA_H
 #define MISSIONDATA_H
 
+#include <string>
+
 #include "SDL/SDL_types.h"
+
+using std::string;
 
 /**
  * Represent all information contains in the [Base] section of the inifile of the map
@@ -29,9 +33,9 @@ public:
 	MissionData();
 	~MissionData();
 
-	/** the name of the map */
-	char* mapname;
-	/** movie played after failed mission */
+    /** the name of the map */
+    string mapname;
+   	/** movie played after failed mission */
 	char* losemov;
 	/** movie played after completed mission */
 	char* winmov;

@@ -90,7 +90,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
         return;
     }
 
-	tname = strdup(typeName);
+	tname = cppstrdup(typeName);
 
 
 	name = unitini->readString(tname, "name");

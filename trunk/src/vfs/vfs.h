@@ -19,13 +19,15 @@
 #define VFSUTILS_H
 
 #include <vector>
+#include <string>
 
 #include "SDL/SDL_types.h"
 
 #include "vfs/archive.h"
 #include "misc/gametypes.h"
 
-using std::vector;
+using std::vector; 
+using std::string;
 
 class ExternalFiles;
 class MIXFiles;
@@ -35,7 +37,7 @@ class VFSUtils
 public:
 	/** Sets up externals so that the logger can work */
 	static void VFS_PreInit(const char* binpath);
-	static void VFS_Init(const char *binpath);
+	static void VFS_Init(const string& binpath);
 	static void VFS_Destroy();
 	/** Try to load all archive of a specific game */
 	static void VFS_LoadGame(gametypes gt);

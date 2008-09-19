@@ -37,6 +37,8 @@
 #include "ProjectileAnim.h"
 #include "RedAlertDataLoader.h"
 
+#include "include/common.h"
+
 using std::vector;
 
 namespace p
@@ -175,7 +177,7 @@ Weapon::Weapon(const char* wname)
 		soundWeap += string(".aud");
 		transform(soundWeap.begin(), soundWeap.begin(), soundWeap.end(), tolower);
 		//logger->debug("Report = %s\n", soundWeap.c_str());
-		report = strdup(soundWeap.c_str());	
+		report = cppstrdup(soundWeap.c_str());	
 		pc::sfxeng->LoadSound(report);
 	}
 	reloadsound = weapini->readString(wname, "reloadsound");

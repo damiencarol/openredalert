@@ -70,12 +70,11 @@ int main(int argc, char** argv) {
     setlocale(LC_ALL, "C");
 
     // Loads arguments
-    if ((argc > 1) && ( (strcasecmp(argv[1], "-help")==0) || 
-						(strcasecmp(argv[1], "--help")==0)||
-						(strcasecmp(argv[1], "-?")==0)))
-	{
+    if ((argc > 1) && ( string(argv[1]) == "-help" || 
+            string(argv[1]) == "--help" || string(argv[1]) == "-?"))
+    {
         PrintUsage();
-        return 1;
+        return EXIT_SUCCESS;
     }
     
     const string& binpath = determineBinaryLocation(argv[0]);

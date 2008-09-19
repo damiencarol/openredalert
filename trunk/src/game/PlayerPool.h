@@ -19,6 +19,7 @@
 #define PLAYERPOOL_H
 
 #include <vector>
+#include <string>
 
 #include "SDL/SDL_types.h"
 #include "misc/INIFile.h"
@@ -26,6 +27,7 @@
 class Player;
 
 using std::vector;
+using std::string;
 
 /** 
  * @todo Currently the player starts are shuffled randomly without 
@@ -36,19 +38,21 @@ class PlayerPool
 public:
     explicit PlayerPool(INIFile *inifile, Uint8 gamemode);
     ~PlayerPool();
-    const int MultiColourStringToNumb(const char* colour);
+    /** Get the number of a color in string */
+    const int MultiColourStringToNumb(const string& colour);
+
     Uint8 getNumPlayers() const ;
     Uint8 getLPlayerNum() const ;
     Player *getLPlayer();
-    void setLPlayer(const char *pname);
+    void setLPlayer(const string& pname);
     void setLPlayer(Uint8 number, const char* nick, const char* colour, const char* mside);
     void setPlayer(Uint8 number, const char* nick, const int colour, const char* mside);
     Player *getPlayer(Uint8 player);
-    Uint8 getPlayerNum(const char *pname);
+    int getPlayerNum(const string& pname);
     Player* getPlayerByName(const char* pname);
 
-    int getPlayerNumByHouseNum(Uint8 House);
-    int getHouseNumByPlayerNum(Uint8 Player);
+    int getPlayerNumByHouseNum(int House) const;
+    int getHouseNumByPlayerNum(int Player) const;
 
     Uint8 getUnitpalNum(Uint8 player) const ;
     Uint8 getStructpalNum(Uint8 player) const ;

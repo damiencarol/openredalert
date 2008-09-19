@@ -243,7 +243,7 @@ CnCMap::~CnCMap()
 void CnCMap::loadMap(const char* mapname, LoadingScreen* lscreen)
 {
 	// Copy the map name
-	missionData->mapname = strdup(mapname);
+	missionData->mapname = string(mapname);
 
 	string message = "Reading ";
 	message += mapname;
@@ -2320,7 +2320,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 				triggers.name = key->first;
 				transform(triggers.name.begin(),triggers.name.end(), triggers.name.begin(), toupper);
 				// Split the line
-				vector<char*> triggsData = splitList(strdup(key->second.c_str()), ',');
+				vector<char*> triggsData = splitList(cppstrdup(key->second.c_str()), ',');
 				// check that the line had 18 param
 				if (triggsData.size()!=18) {
 					logger->warning("error in reading trigger [%s]\n", key->first.c_str());
@@ -3249,7 +3249,7 @@ void CnCMap::loadTeamTypes(INIFile* fileIni)
 
             //We should start reading the commands from std::string temp here :)
             //printf("temp = %s\n", temp.c_str());
-            string temp3 = string(splitList(strdup(temp.c_str()), ',')[0]);
+            string temp3 = string(splitList(cppstrdup(temp.c_str()), ',')[0]);
             //printf("temp3 = %s\n", temp3.c_str());
             pos = temp.find(",", 0);
             string temp2 = temp.substr(pos + 1, temp.size());
@@ -3263,8 +3263,8 @@ void CnCMap::loadTeamTypes(INIFile* fileIni)
             {
                 int id;
                 int wayp;
-                sscanf(splitList(strdup(temp2.c_str()), ':')[0], "%i", &id);
-                sscanf(splitList(strdup(temp2.c_str()), ':')[1], "%i", &wayp);
+                sscanf(splitList(cppstrdup(temp2.c_str()), ':')[0], "%i", &id);
+                sscanf(splitList(cppstrdup(temp2.c_str()), ':')[1], "%i", &wayp);
                 AiCommand* aiCom = new AiCommand();
                 aiCom->setId(id);
                 aiCom->setWaypoint(wayp);
