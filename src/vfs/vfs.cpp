@@ -17,6 +17,7 @@
 
 #include "vfs.h"
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <cstring>
@@ -34,6 +35,7 @@
 using std::string;
 using std::vector;
 using std::runtime_error;
+using std::stringstream;
 
 extern Logger * logger;
 
@@ -48,7 +50,7 @@ void VFSUtils::VFS_PreInit(const char* binpath)
     externals->loadArchive("data/settings/");
 }
 
-/** 
+/**
  * @todo install prefix
  */
 void VFSUtils::VFS_Init(const std::string& binpath)
@@ -71,7 +73,8 @@ void VFSUtils::VFS_Init(const std::string& binpath)
         logger->error("Unable to locate files.ini.\n");
         return;
     }
-    for (Uint32 pathnum = 1;; ++pathnum)
+    //for (Uint32 pathnum = 1;; ++pathnum)
+    int pathnum =1;
     {
     INIKey key;
 		try
@@ -81,7 +84,7 @@ void VFSUtils::VFS_Init(const std::string& binpath)
 		catch(...)
 		{
 			//logger->error("Unenable to read [GENERAL]-PATH\n");
-			break;
+			//break;
 		}
     string defpath = key->second;
 		if (defpath[defpath.length()-1] != '/' && defpath[defpath.length()-1] != '\\')
@@ -93,8 +96,9 @@ void VFSUtils::VFS_Init(const std::string& binpath)
 
     // Create Mix file loader
     mixfiles = new MIXFiles();
-    
-	for (Uint32 gamenum = 1;; ++gamenum)
+
+    int gamenum = 1;
+	//for (Uint32 gamenum = 1;; ++gamenum)
     {
         INIKey key;
 		try
@@ -104,12 +108,12 @@ void VFSUtils::VFS_Init(const std::string& binpath)
 		catch(...)
 		{
             logger->error("Unenable to read [GENERAL]-GAME\n");
-            break;
+            //break;
         }
         logger->note("Trying to load \"%s\"...\n", key->second.c_str());
 
         // Get the number of files
-        int numKeys = filesini->getNumberOfKeysInSection("REQUIRED");
+        int numKeys = filesini->getNumberOfKeysInSection("RedAlert");
         int keynum;
 		try
         {
@@ -139,23 +143,21 @@ void VFSUtils::VFS_Init(const std::string& binpath)
         catch (...)
         {
             mixfiles->unloadArchives();
-            continue;
+            //continue;
         }
         // Now load as many of the optional mixfiles as we can.
-        for (keynum = 1;; keynum++)
+        int maxOpti = filesini->getNumberOfKeysInSection("RedAlert");
+        for (keynum = 1; keynum < maxOpti; keynum++)
         {
-            INIKey key2;
-            try
-            {
-                key2 = filesini->readIndexedKeyValue(key->second.c_str(), keynum,
-                                                     "OPTIONAL");
-            }
-            catch (...)
-            {
-                //logger->error("Unenable to read [%s]-OPTIONAL%d\n", key->second.c_str(), keynum);
-                break;
-            }
-            mixfiles->loadArchive(key2->second.c_str());
+        	stringstream deco;
+        	deco << keynum;
+        	string keyName = "optional" + deco.str();
+
+        	if (filesini->isSection(keyName))
+        	{
+        		string mixFileName = filesini->readString("RedAlert", keyName.c_str());
+        		mixfiles->loadArchive(mixFileName.c_str());
+        	}
         }
         return;
     }
