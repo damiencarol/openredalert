@@ -46,6 +46,8 @@
 #include "ImageCacheEntry.h"
 #include "Dune2Image.h"
 
+#define VERSION "439"
+
 using std::string;
 using std::runtime_error;
 
@@ -58,7 +60,7 @@ namespace pc {
     extern Sidebar* sidebar;
 }
 extern Logger * logger;
-extern const string VERSION;
+
 
 /**
  * Constructor, inits the sdl graphics and prepares to render maps and

@@ -36,6 +36,8 @@
 #include "video/WSAMovie.h"
 #include "video/WSAError.h"
 
+#define VERSION "439"
+
 using std::abort;
 using std::map;
 using std::set_terminate;
@@ -65,22 +67,22 @@ using VQA::VQAMovie;
 int main(int argc, char** argv) {
     atexit(cleanup);
     set_terminate(fcnc_terminate_handler);
-    
+
     // Correct the way that floats are readed
     setlocale(LC_ALL, "C");
 
     // Loads arguments
-    if ((argc > 1) && ( string(argv[1]) == "-help" || 
+    if ((argc > 1) && ( string(argv[1]) == "-help" ||
             string(argv[1]) == "--help" || string(argv[1]) == "-?"))
     {
         PrintUsage();
         return EXIT_SUCCESS;
     }
-    
+
     const string& binpath = determineBinaryLocation(argv[0]);
     string lf(binpath);
     lf += "/debug.log";
-    
+
     VFSUtils::VFS_PreInit(binpath.c_str());
     // Log level is so that only errors are shown on stdout by default
     logger = new Logger(lf.c_str(), 0);
@@ -88,25 +90,25 @@ int main(int argc, char** argv) {
         return 1;
     }
     pc::Config = getConfig();
-    
+
     pc::Config.binpath = binpath;
     //printf ("Binpath = %s\n",pc::Config.binpath.c_str());
-    
+
     // Init with the path of the binaries
     VFSUtils::VFS_Init(binpath.c_str());
     VFSUtils::VFS_LoadGame(pc::Config.gamenum);
     // Log success of loading RA gmae
     logger->note(".MIX archives loading ok\n");
-    
+
     // Load the start
-    logger->note("Please wait, OpenRedAlert %s is starting\n", VERSION.c_str());
-    
+    logger->note("Please wait, OpenRedAlert %s is starting\n", VERSION);
+
     try {
         if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_TIMER) < 0) {
             logger->error("Couldn't initialize SDL: %s\n", SDL_GetError());
             exit(1);
         }
-        
+
         if (pc::Config.debug) {
             // Don't hide if we're debugging as the lag when running inside
             // valgrind is really irritating.
@@ -116,7 +118,7 @@ int main(int argc, char** argv) {
             // Hide the cursor since we have our own.
             SDL_ShowCursor(0);
         }
-        
+
         // Initialise Video
         try {
             logger->note("Initialising the graphics engine...");
@@ -127,12 +129,12 @@ int main(int argc, char** argv) {
             logger->note("failed.  %s \n", ex.what());
             throw runtime_error("Unable to initialise the graphics engine");
         }
-        
+
         // Initialise Sound
         logger->note("Initialising the sound engine...");
         pc::sfxeng = new SoundEngine(pc::Config.nosound);
         logger->note("done\n");
-        
+
         // "Standalone" VQA Player
         if (pc::Config.playvqa) {
             logger->note("Now playing %s\n", pc::Config.vqamovie.c_str());
@@ -144,7 +146,7 @@ int main(int argc, char** argv) {
                 logger->note("%s line %i: Failed to play movie: %s\n", __FILE__, __LINE__, pc::Config.vqamovie.c_str());
             }
         }
-        
+
         // Play the intro if requested
         if (pc::Config.intro) {
             logger->note("Now playing the Introduction movie");
@@ -154,7 +156,7 @@ int main(int argc, char** argv) {
             }
             catch (runtime_error&) {
             }
-            
+
             try {
                 WSAMovie* choose = new WSAMovie("choose.wsa");
                 choose->animate(pc::gfxeng);
@@ -162,7 +164,7 @@ int main(int argc, char** argv) {
             catch (WSAError&) {
             }
         }
-        
+
         // "Standalone" VQA Player
         if (pc::Config.gamenum == GAME_RA) {
             //logger->note("Now playing %s\n", pc::Config.vqamovie.c_str());
@@ -182,20 +184,20 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        
+
         // Init the rand functions
         srand(static_cast<unsigned int>(time(0)));
-        
+
         // Stop all the music
         pc::sfxeng->StopMusic();
         pc::sfxeng->StopLoopedSound(-1);
-        
+
         // Clean the graphics engine
         if (pc::gfxeng != 0) {
             delete pc::gfxeng;
         }
         pc::gfxeng = 0;
-        
+
         try {
             // Initialise game engine
             logger->note("Initialising game engine:\n");
@@ -211,7 +213,7 @@ int main(int argc, char** argv) {
             // Log it
             logger->error("Error during game\n");
         }
-        
+
     }
     catch (runtime_error& e) {
         logger->error("%s\n", e.what());
@@ -227,7 +229,7 @@ int main(int argc, char** argv) {
  */
 void fcnc_terminate_handler() {
     cleanup();
-    
+
 #if __GNUC__ == 3 && __GNUC_MINOR__ >= 1 && ! defined (__MORPHOS__)
     // GCC 3.1+ feature, and is turned on by default for 3.4.
     using __gnu_cxx::__verbose_terminate_handler;
@@ -245,7 +247,7 @@ void cleanup() {
         delete logger;
     }
     logger = NULL;
-    
+
     VFSUtils::VFS_Destroy();
     SDL_Quit();
 }

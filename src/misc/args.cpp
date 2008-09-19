@@ -26,6 +26,8 @@
 #include "misc/INIFile.h"
 #include "include/Logger.h"
 
+#define VERSION "438"
+
 using std::runtime_error;
 
 
@@ -38,12 +40,12 @@ namespace pc {
 extern Logger * logger;
 
 
-/** 
+/**
  * Print the help message
  */
 void PrintUsage()
 {
-    printf("OpenRedAlert - %s\n\n", VERSION.c_str());
+    printf("OpenRedAlert - %s\n\n", VERSION);
     printf("Usage: OpenRedAlert [OPTIONS]\n");
     printf("  -map mapname       - Name of mission to load\n");
     printf("  -w width           - Width of screen\n");
@@ -70,9 +72,9 @@ const ConfigType& getConfig()
     return config;
 }
 
-/** 
+/**
  * Function to parse command line arguments
- * 
+ *
  * @param number of arguments
  * @param pointer to array of arguments
  * @returns true on success, false if user entered invalid parameters
