@@ -35,14 +35,14 @@ using std::list;
 
 /**
  * Parses inifiles.
- * 
+ *
  */
 class INIFile
 {
 public:
     explicit INIFile(const char* filename);
-    ~INIFile(); 
-    
+    ~INIFile();
+
     /// @todo Would be nice if there was a version that returned a non-copy.
     char* readString(const char* section, const char* value);
     char* readString(const char* section, const char* value, const char* deflt);
@@ -58,13 +58,15 @@ public:
     string readSection(Uint32 secnum);
 
     int readYesNo(const char* section, const char* value, const char* defaut);
-        
+
     /** Function to test if a section is in the inifile */
     bool isSection(string section);
-    
+    /** Function to test if a key is in a section in the inifile */
+    bool isKeyInSection(const string& section, const string& keyString);
+
     /** Function to get number of key/value per section */
     int getNumberOfKeysInSection(string section);
-    
+
 private:
     /** Internal data */
     map<string, INISection> Inidata;
