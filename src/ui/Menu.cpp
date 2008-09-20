@@ -75,8 +75,11 @@ Menu::Menu() : StartNewGameButton()
 	dos_logo	= 0;
 	SDLlogo 	= 0;
 	cursorimg	= 0;
-	isDone		= false;
 	MenuState	= 1;
+
+	done = false;
+	quit = false;
+	prolog = false;
 
 	display = pc::gfxeng->get_SDL_ScreenSurface();
 
@@ -128,13 +131,13 @@ Menu::Menu() : StartNewGameButton()
 
 	my_cursor = cursorimg->getImage(0);
 
-	if (my_cursor == NULL)
+	if (my_cursor == 0)
 	{
 		logger->error("Couldn't get cursor sld surface\n");
 	}
 
 	// Free cursorimg
-	if (cursorimg != NULL){
+	if (cursorimg != 0){
 		delete cursorimg;
 	}
 	cursorimg = NULL;
@@ -475,7 +478,7 @@ void Menu::DrawMainMenuButtons()
 
 /**
  * Called every frame !!!!!!!!!!!!!!
- * DON'T METTRE DES TRUCS LOURDS !!!
+ * don't override with heavy call !!!
  */
 void Menu::HandleInput()
 {
@@ -490,7 +493,7 @@ void Menu::HandleInput()
  //       if ( !isDone && SDL_WaitEvent(&event)  ) {
 			if (!isDone){
 #else
-	if ( !isDone && SDL_WaitEvent(&event)  ) {
+	if ( !done && SDL_WaitEvent(&event)  ) {
 		do {
 #endif
 		// Handle the buttons for the different menus
@@ -578,7 +581,7 @@ void Menu::HandleInput()
 								MenuState = 2;
 								//isDone=true;
 							}else if (ExitGameButton.MouseOver()){
-								isDone=true;
+								done=true;
 								this->quit = true;
 							}else if (MultiplayerGameButton.MouseOver()){
 								MenuState = 3;
@@ -586,12 +589,14 @@ void Menu::HandleInput()
 								Cancel.SetDrawingWindow (&MultiPlayerMenu);
 							}else if (IntroAndSneakPeekButton->MouseOver())
 							{
-								try
+								/*try
 								{
 									VQAMovie mov("PROLOG");
 									mov.play();
 								} catch (...)
-								{}
+								{}*/
+								done = true;
+								this->prolog = true;
 							}
 							break;
 						case 2:
@@ -606,7 +611,7 @@ void Menu::HandleInput()
 								pc::Config.side_colour	= "red";
 								pc::Config.pause = false;
 								pc::Config.quit_mission = false;
-								isDone=true;
+								done=true;
 							}else if (AlliesMissionButton.MouseOver()){
 								printf ("AlliesMission selected\n");
 								pc::Config.UseFogOfWar	= true;
@@ -618,7 +623,7 @@ void Menu::HandleInput()
 								pc::Config.side_colour = "yellow";
 								pc::Config.pause = false;
 								pc::Config.quit_mission = false;
-								isDone = true;
+								done = true;
 							}
 							break;
 						case 3:
@@ -657,7 +662,7 @@ void Menu::HandleInput()
 								pc::Config.quit_mission		= false;
 								pc::Config.totalplayers		= 1 + numb_ai_players;
 								//pc::Config.numb_ai_players	= 2;
-								isDone=true;
+								done=true;
 								printf ("Mapname = %s\n", pc::Config.mapname.c_str());
 
 								if (ButtonColGreece.getButtonState () == 2){
@@ -690,7 +695,7 @@ void Menu::HandleInput()
 						if (MenuState == 2 || MenuState == 3){
 							MenuState = 1;
 						}else{
-							isDone=true;
+							done = true;
 							this->quit = true;
 						}
 						break;
@@ -700,7 +705,7 @@ void Menu::HandleInput()
 				break;
 		}
 
-	} while ( !isDone && SDL_PollEvent(&event) );
+	} while ( !done && SDL_PollEvent(&event) );
 	}
 }
 
@@ -736,10 +741,13 @@ int Menu::HandleMenu()
     delete strFile;
 
     // Start with no done
-    isDone = false;
+    done = false;
+
+    quit = false;
+    prolog = false;
 
     //
-	while( !isDone )
+	while( !done )
 	{
 		// get mouse coords
 		SDL_GetMouseState(&mx, &my);
@@ -842,10 +850,25 @@ void Menu::ResetSideColorButtonStates()
 }
 
 /**
- * Return true if the user want qui the game
+ * @return <code>true</code> if the user selected an option
  */
-bool Menu::isQuit()
+bool Menu::isDone() const
+{
+	return done;
+}
+
+/**
+ * @return <code>true</code> if the user want quit the game
+ */
+bool Menu::isQuit() const
 {
 	return quit;
 }
 
+/**
+ * @return <code>true</code> if the user want to see the introduction movie the game
+ */
+bool Menu::isProlog() const
+{
+	return prolog;
+}
