@@ -55,44 +55,50 @@ class Menu {
 public:
 	Menu();
 	~Menu();
-	
+
 	void DrawMenuBackground();
 	void DrawMousePointer();
 	void DrawMainMenuButtons();
 	void HandleInput();
 	int HandleMenu();
 
-	/** Return true if the user want qui the game */
-	bool isQuit();
+	/** Return true if the user selected an option */
+	bool isDone() const;
+
+	/** Return true if the user want exit the game */
+	bool isQuit() const;
+
+	/** Return true if the user want to see introduction movie of the game */
+	bool isProlog() const;
 
 private:
 	void loadPal(const string& paln, SDL_Color *palette);
 	void ResetSideColorButtonStates();
-	
+
 	/** List of mission in archives */
 	MissionMapsClass* missionList;
-	
+
 	/** MultiPlayer maps list */
 	MultiPlayerMaps* multiPlayerMaps;
 
 	/** Button "new game" for the main menu */
 	Button StartNewGameButton;
-	
-	/** Button "internet game" for the main menu */	
+
+	/** Button "internet game" for the main menu */
 	Button InternetGameButton;
-	
+
 	/** Button "load game" for the main menu */
 	Button LoadMissionButton;
-	
+
 	/** Button "multiplayer game" for the main menu */
 	Button MultiplayerGameButton;
-	
+
 	/** Button "review intro video" for the main menu */
 	Button* IntroAndSneakPeekButton;
-	
+
 	/** Button "exit" for the main menu */
 	Button ExitGameButton;
-	
+
 	Button ButtonColGreece;
 	Button ButtonColUssr;
 	Button ButtonColUk;
@@ -129,7 +135,7 @@ private:
 	/** Buttons for the multiplayer menu */
 	Button Oke;
 	Button Cancel;
-	
+
 	/** Listbox that contains multi-player missions map */
 	ListboxClass* listBox;
 
@@ -143,23 +149,25 @@ private:
 	SDL_Surface* my_cursor;
 	SDL_Surface* display;
 	/** Exit the menu if this var is true */
-	bool isDone;
+	bool done;
 
 	Uint8 numb_ai_players;
 
 	RA_Label Labeltest;
-	
-	/** 
-	 * State that indicates witch menus to draw/use 
+
+	/**
+	 * State that indicates witch menus to draw/use
 	 * 1 = IntroMenu
 	 * 2 = Single Player Campaign
 	 * 3 = MultiPlayerGame
 	 */
 	int MenuState;
 	int MultiplayerMapnr;
-	
-	/** Is true if the user want qui the game */
+
+	/** Is true if the user want quit the game */
 	bool quit;
+	/** Is true if the user want see introduction/preview movie */
+	bool prolog;
 };
 
 #endif //MENU_H
