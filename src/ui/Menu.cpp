@@ -49,23 +49,23 @@ namespace pc {
 extern Logger * logger;
 
 /**
- * 
+ *
  * @bug the constructor of menu make some bugs in map drawing
- */ 
+ */
 Menu::Menu() : StartNewGameButton()
 {
 	SDL_Color	palette[256];
 	SDL_Color	Fcolor;
 	Uint16		Ypos;
 	StringTableFile* strFile = NULL;
-	
+
 	// Use located strings
 	strFile = new StringTableFile("conquer.eng");
-		
+
 	// Use the red backgound for the multiplayer menu and the mission menu
 	this->MultiPlayerMenu.setPalette(9);
 	MissionMenu1.setPalette(9);
-	
+
 	// Setup the font color
 	Fcolor.r = 205;
 	Fcolor.g = 0;
@@ -132,13 +132,13 @@ Menu::Menu() : StartNewGameButton()
 	{
 		logger->error("Couldn't get cursor sld surface\n");
 	}
-	
+
 	// Free cursorimg
 	if (cursorimg != NULL){
 		delete cursorimg;
 	}
 	cursorimg = NULL;
-	
+
 	SDL_SetColors(my_cursor, SHPBase::getPalette(0), 0, 256);
 	SDL_SetColorKey(my_cursor, SDL_SRCCOLORKEY, 0);
 
@@ -154,26 +154,26 @@ Menu::Menu() : StartNewGameButton()
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
-	
+
 	// Set pos and label (the string 479 is "internet game" but located)
 	InternetGameButton.CreateSurface(strFile->getString(479), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
-	
+
 	// (the string 35 is "Load game" but located)
 	LoadMissionButton.CreateSurface(strFile->getString(35), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;;
 
-	
+
 	// Set pos and label (the string 154 is "multiplayer game" but located)
 	// Set pos and label (the string 482 is "Escamouche game" but located)
 	MultiplayerGameButton.CreateSurface(strFile->getString(482), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
-	
+
 	// Create the "Intro & Sneak Peek" button
 	IntroAndSneakPeekButton = new Button();
 	// (the string 18 is "Intro & Sneak Peek" but located)
@@ -181,11 +181,11 @@ Menu::Menu() : StartNewGameButton()
 	// Add a space
 	ButtonYpos += button_height + button_space;
 
-	
+
 	// (the string 46 is "quit game" but located)
 	ExitGameButton.CreateSurface(strFile->getString(46), ButtonXpos, ButtonYpos, button_width, button_height);
 
-	
+
 
 	//
 	// Setup the first popup window
@@ -246,7 +246,7 @@ Menu::Menu() : StartNewGameButton()
 	RussianMissionButton.CreateSurface(strFile->getString(474), ButtonXpos, ButtonYpos, 90, 25 );
 
 	Oke.SetDrawingWindow (&MultiPlayerMenu);
-	Oke.CreateSurface(strFile->getString(23), 50, 350, 90, 25);		
+	Oke.CreateSurface(strFile->getString(23), 50, 350, 90, 25);
 	//Oke.CreateSurface("Oke", 50, 350, 90, 25);
 	Cancel.SetDrawingWindow (&MultiPlayerMenu);
 	Cancel.CreateSurface(strFile->getString(19), 500, 350, 90, 25);
@@ -368,19 +368,19 @@ Menu::Menu() : StartNewGameButton()
 
 	// Load mission maps data
 	missionList = new MissionMapsClass();
-	
+
 	// Load multiPlayer maps
 	multiPlayerMaps = new MultiPlayerMaps();
-	
+
 	// Build Lisbox with mission multi
 	listBox = new ListboxClass();
-	
+
 	// Set that the user don't want quit the game
 	this->quit = false;
 }
 
 /**
- * 
+ *
  */
 Menu::~Menu()
 {
@@ -394,10 +394,10 @@ Menu::~Menu()
 	if (my_cursor != NULL){
 		SDL_FreeSurface(my_cursor);
 	}
-	
+
 	// Free List of missions (not needed)
 	//delete missionList;
-	
+
 	// Free Listbox component that contains list of multi-player missions
 	delete listBox;
 }
@@ -433,7 +433,7 @@ void Menu::DrawMousePointer()
 	int mx;
 	int my;
 	SDL_Rect dest;
-	
+
 	// Get real coordinates
 	SDL_GetMouseState(&mx, &my);
 
@@ -481,7 +481,7 @@ void Menu::HandleInput()
 {
 	SDL_Event	event;
 	string		SelectedMap;
-	
+
 #if 0
 //	if (MenuState == MENUSTATE_MULTIPLAYER_1)
 		while ( !SDL_PollEvent(&event) && !isDone ) {
@@ -584,9 +584,14 @@ void Menu::HandleInput()
 								MenuState = 3;
 								Oke.SetDrawingWindow (&MultiPlayerMenu);
 								Cancel.SetDrawingWindow (&MultiPlayerMenu);
-							}else if (IntroAndSneakPeekButton->MouseOver()){
-								VQAMovie mov("prolog");
-								mov.play();
+							}else if (IntroAndSneakPeekButton->MouseOver())
+							{
+								try
+								{
+									VQAMovie mov("PROLOG");
+									mov.play();
+								} catch (...)
+								{}
 							}
 							break;
 						case 2:
@@ -613,7 +618,7 @@ void Menu::HandleInput()
 								pc::Config.side_colour = "yellow";
 								pc::Config.pause = false;
 								pc::Config.quit_mission = false;
-								isDone = true;	
+								isDone = true;
 							}
 							break;
 						case 3:
@@ -698,9 +703,9 @@ void Menu::HandleInput()
 	} while ( !isDone && SDL_PollEvent(&event) );
 	}
 }
-			
+
 int Menu::HandleMenu()
-{	
+{
 	int	mx; // Mouse X coords
 	int my; // Mouse Y coords
 	int old_mx = 0;
@@ -729,12 +734,12 @@ int Menu::HandleMenu()
 
     // Free strings
     delete strFile;
-    
+
     // Start with no done
     isDone = false;
-    
+
     //
-	while( !isDone ) 
+	while( !isDone )
 	{
 		// get mouse coords
 		SDL_GetMouseState(&mx, &my);
@@ -819,8 +824,8 @@ void Menu::loadPal(const string& paln, SDL_Color *palette)
 		palette[i].g <<= 2;
 		palette[i].b <<= 2;
 	}
-	
-	
+
+
 	VFSUtils::VFS_Close(palfile);
 }
 
@@ -836,7 +841,7 @@ void Menu::ResetSideColorButtonStates()
 	ButtonColTurkey.setButtonState (1);
 }
 
-/** 
+/**
  * Return true if the user want qui the game
  */
 bool Menu::isQuit()

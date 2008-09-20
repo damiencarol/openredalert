@@ -76,22 +76,22 @@ void VFSUtils::VFS_Init(const std::string& binpath)
     //for (Uint32 pathnum = 1;; ++pathnum)
     int pathnum =1;
     {
-    INIKey key;
+		INIKey key;
 		try
 		{
 			key = filesini->readIndexedKeyValue("GENERAL", pathnum, "PATH");
-		}
-		catch(...)
+		} catch (...)
 		{
 			//logger->error("Unenable to read [GENERAL]-PATH\n");
 			//break;
 		}
-    string defpath = key->second;
-		if (defpath[defpath.length()-1] != '/' && defpath[defpath.length()-1] != '\\')
+		string defpath = key->second;
+		if (defpath[defpath.length() - 1] != '/' && defpath[defpath.length()
+				- 1] != '\\')
 		{
-        defpath += "/";
-    }
-    externals->loadArchive(defpath.c_str());
+			defpath += "/";
+		}
+		externals->loadArchive(defpath.c_str());
 	}
 
     // Create Mix file loader
@@ -153,7 +153,7 @@ void VFSUtils::VFS_Init(const std::string& binpath)
         	deco << keynum;
         	string keyName = "optional" + deco.str();
 
-        	if (filesini->isSection(keyName))
+        	if (filesini->isKeyInSection(string("RedAlert"), keyName) == true)
         	{
         		string mixFileName = filesini->readString("RedAlert", keyName.c_str());
         		mixfiles->loadArchive(mixFileName.c_str());
@@ -182,7 +182,7 @@ void VFSUtils::VFS_Destroy()
     mixfiles = 0;
 
     // Free externals files
-    if (externals != NULL)
+    if (externals != 0)
     {
         delete externals;
     }
@@ -193,6 +193,7 @@ void VFSUtils::VFS_Destroy()
  */
 VFile * VFSUtils::VFS_Open(const char *fname)
 {
+	// By default open in "read only + binary" mode
     return VFS_Open(fname, "rb");
 }
 
@@ -200,7 +201,7 @@ VFile * VFSUtils::VFS_Open(const char *fname)
  */
 VFile * VFSUtils::VFS_Open(const char *fname, const char* mode)
 {
-    Uint32 fnum; // id of the loaded file
+    unsigned int fnum; // id of the loaded file
 
     // Try to get the file
     fnum = externals->getFile(fname, mode);
@@ -219,7 +220,7 @@ VFile * VFSUtils::VFS_Open(const char *fname, const char* mode)
     if (mixfiles != 0)
     {
         fnum = mixfiles->getFile(fname);
-        if (fnum != (Uint32) - 1)
+        if (fnum != -1)
         {
             return new VFile(fnum, mixfiles);
         }

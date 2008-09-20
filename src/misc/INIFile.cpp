@@ -45,7 +45,8 @@ extern Logger * logger;
  *
  * @param filename the name of the inifile to open.
  */
-INIFile::INIFile(const char* filename) {
+INIFile::INIFile(const char* filename)
+{
 	char line[1024];
 	char key[1024];
 	char value[1024];
@@ -485,6 +486,52 @@ bool INIFile::isSection(string section) {
 		return true;
 	}
 
+}
+
+/**
+ * @param section Section to check
+ * @param keyString Key to check
+ * @return <code>true</code> if the key exist in the section else return <code>false</code>
+ */
+bool INIFile::isKeyInSection(const string& section, const string& keyString)
+{
+	// Upper version of the section
+	string s = section;
+	// Upper the section string
+	transform(s.begin(), s.end(), s.begin(), toupper);
+
+	// Try to get the section
+	map<string, INISection>::iterator sec = Inidata.find(s);
+
+	// If the section was not found
+	if (sec == Inidata.end())
+	{
+		// Return false
+		return false;
+	}
+	else
+	{
+		// Upper version of the key string
+		string k = keyString;
+		// Upper the key string
+		transform(k.begin(), k.end(), k.begin(), toupper);
+
+		// Get an iterator
+		INIKey sec_key = sec->second.begin();
+		while (sec_key!=sec->second.end())
+		{
+			// If the Key was found
+			if (sec_key->first == k)
+			{
+				// Return true
+				return true;
+			}
+			// Continue
+			sec_key++;
+		}
+	}
+	// Nothing found, return false
+	return false;
 }
 
 int INIFile::readYesNo(const char* section, const char* value,
