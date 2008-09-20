@@ -901,7 +901,7 @@ void Input::clickMap(int mx, int my)
             else {
                 selected->addUnit(curunit, false);
                 if (!sndplayed) {
-                    pc::sfxeng->PlaySound(((UnitType *)curunit->getType())->getRandTalk(TB_report));
+                    pc::sfxeng->PlaySound(dynamic_cast<UnitType*>(curunit->getType())->getRandTalk(TB_report));
                     sndplayed = true;
                 }
             }
