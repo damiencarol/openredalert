@@ -31,13 +31,13 @@ class Compression
 {
 public:
 	/** Decompress format 80 compressed data. */
-	static int decode80(const Uint8 image_in[], Uint8 image_out[]);
+	static int decode80(const unsigned char image_in[], unsigned char image_out[]);
 	/** Decompress format 40 compressed data. */
-	static int decode40(const Uint8 image_in[], Uint8 image_out[]);
+	static int decode40(const unsigned char image_in[], unsigned char image_out[]);
 	/** Decompress format 40 compressed data. */
-	static int decode20(const Uint8* s, Uint8* d, int cb_s);
+	static int decode20(const unsigned char* s, unsigned char* d, int cb_s);
 	/** Decodes base64 data */
-	static int dec_base64(const Uint8* src, Uint8* target, size_t length);
+	static int dec_base64(const unsigned char* src, unsigned char* target, size_t length);
 };
 
 #endif //COMPRESSION_H
