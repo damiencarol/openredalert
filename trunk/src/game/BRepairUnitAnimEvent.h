@@ -25,15 +25,11 @@ class Structure;
 /**
  * Defines the repair a structure logic (needed for the surface depot "FIX")
  */
-class BRepairUnitAnimEvent : public BuildingAnimEvent 
+class BRepairUnitAnimEvent : public BuildingAnimEvent
 {
 public:
-    /**
-     * @param p the priority of this event
-     * @param str the attacking structure
-     * @param target the unit or structure to be attacked
-     */
-    BRepairUnitAnimEvent(Uint32 p, Structure* str);
+    /** Constructor */
+    BRepairUnitAnimEvent(uint32_t p, Structure* str);
     ~BRepairUnitAnimEvent();
 
     void run();
@@ -43,11 +39,11 @@ public:
 
 private:
     Structure* strct;
-    Uint8 frame;
+    uint8_t frame;
     bool done;
     /** Total cost of damage remaining */
-	Uint16 dmg_cost;
-    Uint16 StartFrame;
+	uint16_t dmg_cost;
+    uint16_t StartFrame;
 };
 
 #endif //BREPAIRUNITANIMEVENT_H
