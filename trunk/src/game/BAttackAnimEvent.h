@@ -24,7 +24,7 @@ struct anim_nfo;
 class Structure;
 class UnitOrStructure;
 
-/** 
+/**
  * Defines the attack logic
  *
  * This animation is different to the others as it overrides
@@ -34,25 +34,22 @@ class UnitOrStructure;
  * @version 1.0
  * @since r377
  */
-class BAttackAnimEvent : public BuildingAnimEvent 
+class BAttackAnimEvent : public BuildingAnimEvent
 {
 public:
-    /**
-     * @param p the priority of this event
-     * @param str the attacking structure
-     * @param target the unit or structure to be attacked
-     */
+    /** Constructor */
     BAttackAnimEvent(Uint32 p, Structure* str);
     ~BAttackAnimEvent();
-    
+
     void run();
     void stop();
     void anim_func(anim_nfo* data);
     void update();
-    
+
 private:
-    Uint8 frame;
+    uint8_t frame;
     Structure* strct;
+    /** the unit or structure to be attacked */
     UnitOrStructure* target;
     bool done;
     bool NeedToCharge;

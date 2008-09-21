@@ -42,7 +42,10 @@ namespace pc {
 }
 extern Logger * logger;
 
-
+/**
+ * @param p the priority of this event
+ * @param str the attacking structure
+ */
 BAttackAnimEvent::BAttackAnimEvent(Uint32 p, Structure *str) :
 	BuildingAnimEvent(p, str, 8)
 {
@@ -68,7 +71,7 @@ BAttackAnimEvent::~BAttackAnimEvent()
 
 	target->unrefer();
 	strct->unrefer();
-	strct->attackAnim = NULL;
+	strct->attackAnim = 0;
 }
 
 void BAttackAnimEvent::run()
@@ -105,7 +108,7 @@ void BAttackAnimEvent::run()
 
 	xtiles = strct->getPos() % mwid - atkpos % mwid;
 	ytiles = strct->getPos() / mwid - atkpos / mwid;
-	
+
 	// @todo modify calculs
 	//distance = abs()>abs(ytiles)?abs(xtiles):abs(ytiles);
 	double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
@@ -150,7 +153,7 @@ void BAttackAnimEvent::run()
 		}
 	}
 	facing = (40-(Sint8)(alpha*16/M_PI))&0x1f;
-	
+
 	//
 	// turn to face target first if this building have turret
 	//
