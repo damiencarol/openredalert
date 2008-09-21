@@ -42,7 +42,8 @@ namespace pc {
 extern Logger * logger;
 
 /**
- * gfhdhf
+ * @param p the priority of this event
+ * @param str the structure which repair
  */
 BRepairUnitAnimEvent::BRepairUnitAnimEvent(Uint32 p, Structure *str) : BuildingAnimEvent(p,str,8)
 {
