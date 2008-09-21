@@ -21,6 +21,7 @@
 #include <stdexcept>
 #include <string>
 
+#include <ctime>
 #include <locale.h>
 
 #include "SDL/SDL.h"
