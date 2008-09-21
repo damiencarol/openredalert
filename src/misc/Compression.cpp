@@ -285,7 +285,7 @@ won't work. (But I'm sure you'll be able to fix it).
 
  *
  */
-int Compression::decode80(const Uint8 image_in[], Uint8 image_out[])
+int Compression::decode80(const unsigned char image_in[], unsigned char image_out[])
 {
     /*
     0 copy 0cccpppp p
@@ -563,7 +563,7 @@ As before here's some code :
 
  *
  */
-int Compression::decode40(const Uint8 image_in[], Uint8 image_out[])
+int Compression::decode40(const unsigned char image_in[], unsigned char image_out[])
 {
     /*
     0 fill 00000000 c v
@@ -650,7 +650,7 @@ int Compression::decode40(const Uint8 image_in[], Uint8 image_out[])
  * @param cb_s size of compressed data?
  * @return size of uncompressed data?
  */
-int Compression::decode20(const Uint8* s, Uint8* d, int cb_s)
+int Compression::decode20(const unsigned char* s, unsigned char* d, int cb_s)
 {
     const Uint8* r = s;
     const Uint8* r_end = s + cb_s;
