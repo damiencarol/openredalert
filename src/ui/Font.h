@@ -31,7 +31,7 @@ class FontOptions;
 
 using std::vector;
 
-/** 
+/**
  * The font class
  *
  * Possible fonts for ra...
@@ -57,14 +57,17 @@ using std::vector;
  * help.fnt
  * scorefnt.fnt
  *
- * 
+ *
  */
-class Font : SHPBase {
+class Font : SHPBase
+{
 public:
 	Font(const string& fontname);
 	~Font();
-	
-	Uint32 getHeight() const;
+
+	/** Get Height of the Font */
+	unsigned int getHeight() const;
+
 	Uint32 calcTextWidth(const string& text) const;
 	bool GetFontColor(SDL_Color FColor, SDL_Color OrgFntColor,
 			SDL_Color &FntColor);
@@ -80,9 +83,10 @@ public:
 	void underline(bool status);
 	void double_underline(bool status);
 
+	/** Load the specific font */
 	void Load(string FontName);
 	void reload();
-	
+
 private:
 	SDL_Color FontPal[15];
 	SDL_Surface *fontimg;

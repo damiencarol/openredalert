@@ -25,11 +25,14 @@
 class GraphicsEngine;
 class CPSImage;
 
-class LoadingScreen {
+using std::string;
+
+class LoadingScreen
+{
 public:
     LoadingScreen();
     ~LoadingScreen();
-    void setCurrentTask(const std::string& task);
+    void setCurrentTask(const string& task);
     const std::string& getCurrentTask() const ;
 private:
     // Non-copyable
@@ -45,4 +48,4 @@ private:
     Uint32 oldwidth;
 };
 
-#endif /* LOADINGSCREEN_H */
+#endif //LOADINGSCREEN_H

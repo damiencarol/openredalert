@@ -57,13 +57,13 @@ struct TileList
 };
 
 
-class RA_TeamUnits 
+class RA_TeamUnits
 {
 public:
 	/** type name of the unit */
     string	tname;
     /** Number of units of this type */
-    int     numb;        	
+    int     numb;
 };
 
 class RA_Teamtype
@@ -81,7 +81,7 @@ public:
     /** Number of unit in the team */
     int                     numb_teamtypes;
     vector<RA_TeamUnits>	Units;
-    
+
     /** List of command during Ai management */
     vector<AiCommand*> aiCommandList;
 };
@@ -115,7 +115,7 @@ struct TemplateTilePair {
 	/** Template for Theater */
     TemplateImage *theater;
     /** Tile number in this Theater */
-    Uint8 tile; 
+    Uint8 tile;
 };
 
 typedef std::map<std::string, TemplateImage*> TemplateCache;
@@ -196,8 +196,8 @@ public:
 
     void decreaseResource(Uint32 pos, Uint8 amount);
 
-    /** 
-     * @return the resource data in a form best understood 
+    /**
+     * @return the resource data in a form best understood
      * by the imagecache/renderer
      */
     Uint32 getResourceFrame(Uint32 pos) const ;
@@ -227,7 +227,7 @@ public:
     Uint16 getYScroll() const ;
     Uint16 getXTileScroll() const ;
     Uint16 getYTileScroll() const ;
-    
+
     SDL_Surface* getMiniMap(Uint8 pixside);
     void prepMiniClip(Uint16 sidew, Uint16 sideh) ;
     const MiniMapClipping& getMiniMapClipping() const ;
@@ -235,9 +235,9 @@ public:
     bool toScroll() ;
     void storeLocation(Uint8 loc);
     void restoreLocation(Uint8 loc);
-    
+
     Uint32 getWaypoint(Uint8 pointnr);
-    
+
     void setWaypoint (Uint8 pointnr, Uint32 mappos);
     SHPImage* getPips() ;
     Uint32 getPipsNum() const ;
@@ -257,15 +257,15 @@ public:
     /** Converts a WW coord into a more flexible coord */
     Uint32 normaliseCoord(Uint16 tx, Uint16 ty) const;
     void translateCoord(Uint32 linenum, Uint16* tx, Uint16* ty) const;
-    
+
     /** Return the number with string of a COMMAND */
     Uint8 UnitActionToNr(const string action);
-    
+
     /** Return true if it's the last mission of the game */
     bool isEndOfGame();
 private:
     enum {
-    	HAS_OVERLAY=0x100, 
+    	HAS_OVERLAY=0x100,
     	HAS_TERRAIN=0x200
     };
 #if _MSC_VER && _MSC_VER < 1300
@@ -274,10 +274,10 @@ private:
     static const Uint8 NUMMARKS=5;
 #endif
     MissionData* missionData;
-    
+
     /** Load the ini part of the map */
     void loadIni();
-    
+
     /** The map section of the ini */
     void simpleSections(INIFile *inifile);
 
@@ -295,23 +295,23 @@ private:
 
     /** Extract RA overlay data*/
     void unOverlayPack(INIFile *inifile);
-    
+
     /** Load RA TeamTypes */
     void loadTeamTypes(INIFile* fileIni);
 
     /**
      * load the palette
-     * 
+     *
      * The only thing map specific about this function is the
      *  theatre (whose palette is then loaded into SHPBase).
      */
-    void loadPal(const std::string& paln, SDL_Color *palette);
+    void loadPal(const string& paln, SDL_Color *palette);
 
     /** Parse the BIN part of the map (RA or TD)*/
     void parseBin(TileList *bindata);
 
-    /** Parse the overlay part of the map (RA or TD)*/
-    void parseOverlay(const Uint32& linenum, const std::string& name);
+    /** Parse the overlay part of the map */
+    void parseOverlay(const Uint32& linenum, const string& name);
 
     /** load a specified tile*/
     SDL_Surface *loadTile(INIFile *templini, Uint16 templ, Uint8 tile,
@@ -397,7 +397,7 @@ private:
 
     /** RA ->  translate_64 = false
      * TD -> translate_64 = true
-     * When converting WW style linenum values, do we use 64 or 128 
+     * When converting WW style linenum values, do we use 64 or 128
      * as our modulus/divisor? */
     bool translate_64;
 

@@ -472,8 +472,9 @@ void CnCMap::doscroll()
 	scrollpos.curytileoffs = ytile;
 
 	++scrollvec.t;
-	/* scrolling continues at current rate for scrolltime
-	 * passes then decays quickly */
+
+	// scrolling continues at current rate for scrolltime
+	// passes then decays quickly
 	if (scrollvec.t >= scrolltime)
 	{
 		scrollvec.x /=2;
@@ -485,8 +486,8 @@ void CnCMap::doscroll()
 /**
  * Sets the maximum value the scroll can take on.
  *
- * @param the maximum x scroll.
- * @param the maximum y scroll.
+ * @param x the maximum x scroll.
+ * @param y the maximum y scroll.
  */
 void CnCMap::setMaxScroll(Uint32 x, Uint32 y, Uint32 xtile, Uint32 ytile,
 		Uint32 tilew)
@@ -553,6 +554,9 @@ void CnCMap::setMaxScroll(Uint32 x, Uint32 y, Uint32 xtile, Uint32 ytile,
 	setValidScroll();
 }
 
+/**
+ *
+ */
 void CnCMap::setValidScroll()
 {
 	Uint8 temp = s_all;
@@ -577,6 +581,11 @@ void CnCMap::setValidScroll()
 	valscroll = temp;
 }
 
+/**
+ * Test if a unit can spawn at a position
+ *
+ * @param pos Position in the map
+ */
 bool CnCMap::canSpawnAt(Uint16 pos) const
 {
 	//    UnitOrStructure* uos = 0;
@@ -1078,7 +1087,11 @@ Uint32 CnCMap::setTiberium(Uint32 pos, Uint8 value)
 	return (overlaymatrix[pos] |= value);
 }
 
-void CnCMap::setTriggerByName(std::string TriggerName, RA_Tiggers *Trig)
+/**
+ * @param TriggerName Name of the trigger
+ * @param Trig Pointer to the data of the trigger
+ */
+void CnCMap::setTriggerByName(string TriggerName, RA_Tiggers *Trig)
 {
 	for (unsigned int i = 0; i < RaTriggers.size(); i++)
 	{
@@ -1098,6 +1111,12 @@ void CnCMap::setTriggerByName(std::string TriggerName, RA_Tiggers *Trig)
 	}
 }
 
+/**
+ * Set a waypoint to a position in the map
+ *
+ * @param pointnr Number of the waypoint
+ * @param mappos position of the waypoint in the map
+ */
 void CnCMap::setWaypoint(Uint8 pointnr, Uint32 mappos)
 {
 	if (pointnr > 99){
@@ -1256,19 +1275,23 @@ RA_Teamtype *CnCMap::getTeamtypeByNumb(unsigned int TeamNumb)
 	return &RaTeamtypes[TeamNumb];
 }
 
-RA_Teamtype *CnCMap::getTeamtypeByName(std::string TeamName)
+/**
+ * @param teamNameString Name of the team
+ * @return Data type of the team
+ */
+RA_Teamtype* CnCMap::getTeamtypeByName(string teamNameString)
 {
 	for (unsigned int i = 0; i < RaTeamtypes.size(); i++)
 	{
-		if (TeamName.size() != RaTeamtypes[i].tname.size())
+		if (teamNameString.size() != RaTeamtypes[i].tname.size())
 			continue;
 		unsigned int j;
-		for (j = 0; j < TeamName.size(); j++)
+		for (j = 0; j < teamNameString.size(); j++)
 		{
-			if (toupper(TeamName[j]) != toupper(RaTeamtypes[i].tname[j]))
+			if (toupper(teamNameString[j]) != toupper(RaTeamtypes[i].tname[j]))
 				break;
 		}
-		if (j == TeamName.size())
+		if (j == teamNameString.size())
 		{
 			return &RaTeamtypes[i];
 		}
@@ -2899,6 +2922,8 @@ void CnCMap::unOverlayPack(INIFile *inifile)
 	}
 }
 
+/**
+ */
 void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 {
 	Uint8 type, frame;

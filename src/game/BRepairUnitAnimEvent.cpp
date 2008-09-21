@@ -76,11 +76,14 @@ BRepairUnitAnimEvent::BRepairUnitAnimEvent(Uint32 p, Structure *str) : BuildingA
 
     setDelay(1);
 }
+
 BRepairUnitAnimEvent::~BRepairUnitAnimEvent()
 {
 	strct->setImageNum(StartFrame,0);
-	strct->repairunitAnim	= NULL;
+	// Set repairunitAnim of the structure to NULL
+	strct->repairunitAnim = 0;
 }
+
 void BRepairUnitAnimEvent::run()
 {
 	Unit* UnitToFix = 0;
@@ -124,18 +127,22 @@ void BRepairUnitAnimEvent::run()
 	}else{
 		frame = 0;
 	}
-	
+
 	if (strct->getNumbImages (0) > frame){
 		strct->setImageNum(frame,0);
 	}else{
 		logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, frame);
 	}
-	
+
 	setDelay(3);
 	p::aequeue->scheduleEvent(this);
 }
 
-void BRepairUnitAnimEvent::stop(){
+/**
+ *
+ */
+void BRepairUnitAnimEvent::stop()
+{
 	done = true;
 }
 
