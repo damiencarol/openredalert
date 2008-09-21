@@ -57,6 +57,7 @@
 
 using std::vector;
 using std::string;
+using std::stringstream;
 using std::map;
 using std::runtime_error;
 using std::ostringstream;
@@ -2869,43 +2870,44 @@ const char	* RAOverlayNames[] =
 
 void CnCMap::unOverlayPack(INIFile *inifile)
 {
-	Uint32 curpos, tilepos;
-	Uint8 xtile, ytile;
-	Uint32 keynum;
-	INIKey key;
-	Uint8 mapdata[16384]; // 16k
-	Uint8 temp[16384];
-
-
 	// Check that the section is ok
 	//if (inifile->isSection("OverlayPack")==false) {
-	if (inifile->isSection("OVERLAYPACK")==false) {
-		// Logg it
+	if (inifile->isSection("OVERLAYPACK") == false)
+	{
+		// Log it
 		logger->warning("No \"OverlayPack\" section found for this map.\n");
 		// zap the overlay loading
 		return;
 	}
 
-	// read packed data into array
+	unsigned char mapdata[16384]; // 16k
+	// Fill first with null
 	mapdata[0] = 0;
-	try
+
+	// Get number of keys in OverlayPack Section
+	int numKeys = inifile->getNumberOfKeysInSection("OVERLAYPACK");
+	// read packed data into array
+	for (int keynum = 1; keynum < numKeys+1; keynum++)
 	{
-		for (keynum = 1;;++keynum)
+		stringstream tempStrS;
+		tempStrS << keynum;
+		if (inifile->isKeyInSection("OVERLAYPACK", tempStrS.str()) == true)
 		{
-			key = inifile->readIndexedKeyValue("OverlayPack", keynum);
-			strcat(((char*)mapdata), key->second.c_str());
+			string stringReaded = inifile->readString("OVERLAYPACK", tempStrS.str().c_str());
+			// Copy data in mapdata
+			strcat((char*)mapdata, stringReaded.c_str());
 		}
 	}
-	catch(...)
-	{}
 
 
+	// buffer for decoded data
+	unsigned char temp[16384]; // 16k
 	// Decode data read with Compression class
-	Compression::dec_base64(mapdata, temp, strlen(((char*)mapdata)));
+	Compression::dec_base64(mapdata, temp, strlen((char*)mapdata));
 
 
 	// decode the format80 coded data (2 chunks)
-	curpos = 0;
+	int curpos = 0;
 	for (int tmpval = 0; tmpval < 2; tmpval++)
 	{
 		if (Compression::decode80((Uint8 *)temp+4+curpos, mapdata+8192*tmpval)
@@ -2917,16 +2919,21 @@ void CnCMap::unOverlayPack(INIFile *inifile)
 				+ (temp[curpos+2]<<16);
 	}
 
-	for (ytile = y; ytile <= y+height; ++ytile)
+
+	for (Uint16 ytile = y; ytile <= y+height; ++ytile)
 	{
-		for (xtile = x; xtile <= x+width; ++xtile)
+		for (Uint16 xtile = x; xtile <= x+width; ++xtile)
 		{
-			curpos = xtile+ytile*128;
-			tilepos = xtile-x+(ytile-y)*width;
+			Uint32 curpos = xtile+ytile*128;
+			Uint32 tilepos = xtile-x+(ytile-y)*width;
+
 			if (mapdata[curpos] == 0xff) // No overlay
 				continue;
+
 			if (mapdata[curpos] > 0x17) // Unknown overlay type
 				continue;
+
+			// Parse the overlay detected
 			parseOverlay(tilepos, RAOverlayNames[mapdata[curpos]]);
 		}
 	}
