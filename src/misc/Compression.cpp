@@ -45,7 +45,7 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, con
     int bits_to_skip = 0;
     unsigned int varLength = length;
 
-    for( i = length-1; src[i] == '='; i-- ) {
+    for( i = varLength-1; src[i] == '='; i-- ) {
         bits_to_skip += 2;
         varLength--;
     }
@@ -71,7 +71,7 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, con
     dtable[(unsigned char)'=']= 0;
 
 
-    while (length >= 4) {
+    while (varLength >= 4) {
         a = dtable[src[0]];
         b = dtable[src[1]];
         c = dtable[src[2]];
@@ -87,13 +87,15 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, con
         varLength-=4;
         src += 4;
     }
-    if( length > 0 ) {
-        if( bits_to_skip == 4 && length == 2 ) {
+
+    if( varLength > 0 )
+    {
+        if( bits_to_skip == 4 && varLength == 2 ) {
             a = dtable[src[0]];
             b = dtable[src[1]];
 
             target[0] = a << 2 | b >> 4;
-        } else if( bits_to_skip == 2 && length == 3 ) {
+        } else if( bits_to_skip == 2 && varLength == 3 ) {
             a = dtable[src[0]];
             b = dtable[src[1]];
             c = dtable[src[2]];
@@ -102,7 +104,7 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, con
             target[1] = b << 4 | c >> 2;
         } else {
             logger->warning("Error in base64. #bits to skip doesn't match length\n");
-            logger->warning("skip %d bits, %d chars left\n\"%s\"\n", bits_to_skip, (Uint32)length, src);
+            logger->warning("skip %d bits, %d chars left\n\"%s\"\n", bits_to_skip, varLength, src);
             return -1;
         }
     }
