@@ -116,185 +116,183 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, con
  * @param image_in compressed data.
  * @param image_out pointer to output uncompressed data.
  * @return size of uncompressed data.
- *
- *
-----------
- Format80
-----------
-
-There are several different commands, with different sizes : form 1 to 5
-bytes.
-The positions mentioned below always refer to the destination buffer (i.e.
-the uncompressed image). The relative positions are relative to the current
-position in the destination buffer, which is one byte beyond the last written
-byte.
-
-I will give some sample code at the end.
-
-(1) 1 byte
-      +---+---+---+---+---+---+---+---+
-      | 1 | 0 |   |   |   |   |   |   |
-      +---+---+---+---+---+---+---+---+
-              \_______________________/
-                         |
-                       Count
-
-      This one means : copy next Count bytes as is from Source to Dest.
-
-(2) 2 bytes
-  +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
-  | 0 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-  +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
-      \___________/\__________________________________________________/
-            |                             |
-         Count-3                    Relative Pos.
-
-  This means copy Count bytes from Dest at Current Pos.-Rel. Pos. to
-  Current position.
-  Note that you have to add 3 to the number you find in the bits 4-6 of the
-  first byte to obtain the Count.
-  Note that if the Rel. Pos. is 1, that means repeat Count times the previous
-  byte.
-
-(3) 3 bytes
-  +---+---+---+---+---+---+---+---+   +---------------+---------------+
-  | 1 | 1 |   |   |   |   |   |   |   |               |               |
-  +---+---+---+---+---+---+---+---+   +---------------+---------------+
-          \_______________________/                  Pos
-                     |
-                 Count-3
-
-  Copy Count bytes from Pos, where Pos is absolute from the start of the
-  destination buffer. (Pos is a word, that means that the images can't be
-  larger than 64K)
-
-(4) 4 bytes
-  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+
-  | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 |   |       |       |  |       |
-  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+
-                                            Count          Color
-
-  Write Color Count times.
-  (Count is a word, color is a byte)
-
-(5) 5 bytes
-  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+-------+
-  | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |   |       |       |  |       |       |
-  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+-------+
-                                            Count               Pos
-
-  Copy Count bytes from Dest. starting at Pos. Pos is absolute from the start
-  of the Destination buffer.
-  Both Count and Pos are words.
-
-These are all the commands I found out. Maybe there are other ones, but I
-haven't seen them yet.
-
-All the images end with a 80h command.
-
-To make things more clearer here's a piece of code that will uncompress the
-image.
-
-  DP = destination pointer
-  SP = source pointer
-  Source and Dest are the two buffers
-
-
-  SP:=0;
-  DP:=0;
-  repeat
-    Com:=Source[SP];
-    inc(SP);
-    b7:=Com shr 7;  {b7 is bit 7 of Com}
-    case b7 of
-      0 : begin  {copy command (2)}
-            {Count is bits 4-6 + 3}
-            Count:=(Com and $7F) shr 4 + 3;
-            {Position is bits 0-3, with bits 0-7 of next byte}
-            Posit:=(Com and $0F) shl 8+Source[SP];
-            Inc(SP);
-            {Starting pos=Cur pos. - calculated value}
-            Posit:=DP-Posit;
-            for i:=Posit to Posit+Count-1 do
-            begin
-              Dest[DP]:=Dest[i];
-              Inc(DP);
-            end;
-          end;
-      1 : begin
-            {Check bit 6 of Com}
-            b6:=(Com and $40) shr 6;
-            case b6 of
-              0 : begin  {Copy as is command (1)}
-                    Count:=Com and $3F;  {mask 2 topmost bits}
-                    if Count=0 then break; {EOF marker}
-                    for i:=1 to Count do
-                    begin
-                      Dest[DP]:=Source[SP];
-                      Inc(DP);
-                      Inc(SP);
-                    end;
-                  end;
-              1 : begin  {large copy, very large copy and fill commands}
-                    {Count = (bits 0-5 of Com) +3}
-                    {if Com=FEh then fill, if Com=FFh then very large copy}
-                    Count:=Com and $3F;
-                    if Count<$3E then {large copy (3)}
-                    begin
-                      Inc(Count,3);
-                      {Next word = pos. from start of image}
-                      Posit:=Word(Source[SP]);
-                      Inc(SP,2);
-                      for i:=Posit to Posit+Count-1 do
-                      begin
-                        Dest[DP]:=Dest[i];
-                        Inc(DP);
-                      end;
-                    end
-                    else if Count=$3F then   {very large copy (5)}
-                    begin
-                      {next 2 words are Count and Pos}
-                      Count:=Word(Source[SP]);
-                      Posit:=Word(Source[SP+2]);
-                      Inc(SP,4);
-                      for i:=Posit to Posit+Count-1 do
-                      begin
-                        Dest[DP]:=Dest[i];
-                        Inc(DP);
-                      end;
-                    end else
-                    begin   {Count=$3E, fill (4)}
-                      {Next word is count, the byte after is color}
-                      Count:=Word(Source[SP]);
-                      Inc(SP,2);
-                      b:=Source[SP];
-                      Inc(SP);
-                      for i:=0 to Count-1 do
-                      begin
-                        Dest[DP]:=b;
-                        inc(DP);
-                      end;
-                    end;
-                  end;
-            end;
-          end;
-    end;
-  until false;
-
-Note that you won't be able to compile this code, because the typecasting
-won't work. (But I'm sure you'll be able to fix it).
-
- *
  */
 int Compression::decode80(const unsigned char image_in[], unsigned char image_out[])
 {
-    /*
-    0 copy 0cccpppp p
-    1 copy 10cccccc
-    2 copy 11cccccc p p
-    3 fill 11111110 c c v
-    4 copy 11111111 c c p p
-    */
+	//----------
+	// Format80
+	//----------
+	//
+	//There are several different commands, with different sizes : form 1 to 5
+	//bytes.
+	//The positions mentioned below always refer to the destination buffer (i.e.
+	//the uncompressed image). The relative positions are relative to the current
+	//position in the destination buffer, which is one byte beyond the last written
+	//byte.
+	//
+	//I will give some sample code at the end.
+	//
+	//(1) 1 byte
+	//      +---+---+---+---+---+---+---+---+
+	//      | 1 | 0 |   |   |   |   |   |   |
+	//      +---+---+---+---+---+---+---+---+
+	//              \_______________________/
+	//                         |
+	//                       Count
+	//
+	//      This one means : copy next Count bytes as is from Source to Dest.
+	//
+	//(2) 2 bytes
+	//  +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+	//  | 0 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+	//  +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+	//      \___________/\__________________________________________________/
+	//            |                             |
+	//         Count-3                    Relative Pos.
+	//
+	//  This means copy Count bytes from Dest at Current Pos.-Rel. Pos. to
+	//  Current position.
+	//  Note that you have to add 3 to the number you find in the bits 4-6 of the
+	//  first byte to obtain the Count.
+	//  Note that if the Rel. Pos. is 1, that means repeat Count times the previous
+	//  byte.
+	//
+	//(3) 3 bytes
+	//  +---+---+---+---+---+---+---+---+   +---------------+---------------+
+	//  | 1 | 1 |   |   |   |   |   |   |   |               |               |
+	//  +---+---+---+---+---+---+---+---+   +---------------+---------------+
+	//          \_______________________/                  Pos
+	//                     |
+	//                 Count-3
+	//
+	//  Copy Count bytes from Pos, where Pos is absolute from the start of the
+	//  destination buffer. (Pos is a word, that means that the images can't be
+	//  larger than 64K)
+	//
+	//(4) 4 bytes
+	//  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+
+	//  | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 |   |       |       |  |       |
+	//  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+
+	//                                            Count          Color
+	//
+	//  Write Color Count times.
+	//  (Count is a word, color is a byte)
+	//
+	//(5) 5 bytes
+	//  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+-------+
+	//  | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |   |       |       |  |       |       |
+	//  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+-------+
+	//                                            Count               Pos
+	//
+	//  Copy Count bytes from Dest. starting at Pos. Pos is absolute from the start
+	//  of the Destination buffer.
+	//  Both Count and Pos are words.
+	//
+	//These are all the commands I found out. Maybe there are other ones, but I
+	//haven't seen them yet.
+	//
+	//All the images end with a 80h command.
+	//
+	//To make things more clearer here's a piece of code that will uncompress the
+	//image.
+	//
+	//  DP = destination pointer
+	//  SP = source pointer
+	//  Source and Dest are the two buffers
+	//
+	//
+	//  SP:=0;
+	//  DP:=0;
+	//  repeat
+	//    Com:=Source[SP];
+	//    inc(SP);
+	//    b7:=Com shr 7;  {b7 is bit 7 of Com}
+	//    case b7 of
+	//      0 : begin  {copy command (2)}
+	//            {Count is bits 4-6 + 3}
+	//            Count:=(Com and $7F) shr 4 + 3;
+	//            {Position is bits 0-3, with bits 0-7 of next byte}
+	//            Posit:=(Com and $0F) shl 8+Source[SP];
+	//            Inc(SP);
+	//            {Starting pos=Cur pos. - calculated value}
+	//            Posit:=DP-Posit;
+	//            for i:=Posit to Posit+Count-1 do
+	//            begin
+	//              Dest[DP]:=Dest[i];
+	//              Inc(DP);
+	//            end;
+	//          end;
+	//      1 : begin
+	//            {Check bit 6 of Com}
+	//            b6:=(Com and $40) shr 6;
+	//            case b6 of
+	//              0 : begin  {Copy as is command (1)}
+	//                    Count:=Com and $3F;  {mask 2 topmost bits}
+	//                    if Count=0 then break; {EOF marker}
+	//                    for i:=1 to Count do
+	//                    begin
+	//                      Dest[DP]:=Source[SP];
+	//                      Inc(DP);
+	//                      Inc(SP);
+	//                    end;
+	//                  end;
+	//              1 : begin  {large copy, very large copy and fill commands}
+	//                    {Count = (bits 0-5 of Com) +3}
+	//                    {if Com=FEh then fill, if Com=FFh then very large copy}
+	//                    Count:=Com and $3F;
+	//                    if Count<$3E then {large copy (3)}
+	//                    begin
+	//                      Inc(Count,3);
+	//                      {Next word = pos. from start of image}
+	//                      Posit:=Word(Source[SP]);
+	//                      Inc(SP,2);
+	//                      for i:=Posit to Posit+Count-1 do
+	//                      begin
+	//                        Dest[DP]:=Dest[i];
+	//                        Inc(DP);
+	//                      end;
+	//                    end
+	//                    else if Count=$3F then   {very large copy (5)}
+	//                    begin
+	//                      {next 2 words are Count and Pos}
+	//                      Count:=Word(Source[SP]);
+	//                      Posit:=Word(Source[SP+2]);
+	//                      Inc(SP,4);
+	//                      for i:=Posit to Posit+Count-1 do
+	//                      begin
+	//                        Dest[DP]:=Dest[i];
+	//                        Inc(DP);
+	//                      end;
+	//                    end else
+	//                    begin   {Count=$3E, fill (4)}
+	//                      {Next word is count, the byte after is color}
+	//                      Count:=Word(Source[SP]);
+	//                      Inc(SP,2);
+	//                      b:=Source[SP];
+	//                      Inc(SP);
+	//                      for i:=0 to Count-1 do
+	//                      begin
+	//                        Dest[DP]:=b;
+	//                        inc(DP);
+	//                      end;
+	//                    end;
+	//                  end;
+	//            end;
+	//          end;
+	//    end;
+	//  until false;
+	//
+	//Note that you won't be able to compile this code, because the typecasting
+	//won't work. (But I'm sure you'll be able to fix it).
+
+
+	// To resume :
+	//    0 copy 0cccpppp p
+	//    1 copy 10cccccc
+	//    2 copy 11cccccc p p
+	//    3 fill 11111110 c c v
+	//    4 copy 11111111 c c p p
+
 
     const unsigned char* copyp;
     const unsigned char* readp = image_in;
@@ -303,7 +301,7 @@ int Compression::decode80(const unsigned char image_in[], unsigned char image_ou
     Uint32 count;
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 
-    Uint16 bigend; /* temporary big endian var */
+    Uint16 bigend; // temporary big endian var
 #endif
 
     while (1) {
