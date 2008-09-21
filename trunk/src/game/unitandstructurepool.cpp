@@ -1047,23 +1047,30 @@ Unit* UnitAndStructurePool::getGroundUnitAt( Uint32 cell, Uint8 subcell)
  * @returns a pointer to the UnitOrStructure at cell.
  * @param cell The cell to be examined.
  * @param subcell The subposition of the cell to be examined (only valid for infantry).  Bitwise or with 128 to get the nearest infantry unit to that subpos.
- * @param wall Whether or not to check for walls as well.
+ * @return pointer to the Unit which is at the cell position
  */
-Unit* UnitAndStructurePool::getFlyingAt ( Uint32 cell, Uint8 subcell )
+Unit* UnitAndStructurePool::getFlyingAt(Uint32 cell, Uint8 subcell)
 {
-	Unit* un = 0;
-
+	// Test if the cell is in the map
 	if (cell >= p::ccmap->getSize())
+	{
+		// If not return NULL
 		return 0;
+	}
 
-	if (unitandstructmat[cell].flags & US_IS_AIRUNIT) {
-		un = getUnit(unitandstructmat[cell].airunitnumb);
-		if(un != 0){
-    		if( ((UnitType *)un->getType())->isInfantry() )
+	if (unitandstructmat[cell].flags & US_IS_AIRUNIT)
+	{
+		Unit* un = getUnit(unitandstructmat[cell].airunitnumb);
+		if (un != 0)
+		{
+			// If it's infantry return the Unit at the sub position
+    		if(dynamic_cast<UnitType *>(un->getType())->isInfantry())
         		return un->getInfantryGroup()->UnitAt(subcell);
 			return (un);
 		}
 	}
+
+	// Return NULL if not found
 	return 0;
 }
 
@@ -1165,11 +1172,14 @@ Uint16 UnitAndStructurePool::getSelected(Uint32 pos)
 /**
  * Called by MoveAnimEvent before moving to set up the unitandstructure matrix
  *
+ * @note If there are no Unit in the destination cell the BlockingUnit pointer is NULL
+ *
  * @param un the unit about to move
  * @param dir the direction in which the unit is to move
  * @param xmod the modifier used to adjust the xoffset (set in this function)
  * @param ymod the modifier used to adjust the yoffset (set in this function)
- * @returns the cell of the new position
+ * @param BlockingUnit pointer to the blocking unit (The methods update the pointer to the Unit which is in the destination cell)
+ * @return the cell of the new position
  */
 Uint16 UnitAndStructurePool::preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ymod, Unit **BlockingUnit)
 {
@@ -2388,7 +2398,7 @@ void UnitAndStructurePool::updateWalls(Structure* st, bool add, CnCMap* theMap)
 }
 
 /**
- * Simple constructor is private to avoid creation by default
+ * @note Simple constructor is private to avoid creation by default
  */
 UnitAndStructurePool::UnitAndStructurePool()
 {
