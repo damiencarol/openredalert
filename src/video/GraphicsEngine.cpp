@@ -279,16 +279,18 @@ void GraphicsEngine::setupCurrentGame()
 
 /**
  * Render a scene complete with map, sidebar and cursor.
+ *
+ * @param flipscreen true if flip screen function will be call
  */
 void GraphicsEngine::renderScene(bool flipscreen)
 {
 	SDL_Surface *curimg = 0;
-	SDL_Rect dest;
-	SDL_Rect src;
-	SDL_Rect udest;
+	SDL_Rect dest = {0, 0, 0, 0};
+	SDL_Rect src = {0, 0, 0, 0};
+	SDL_Rect udest = {0, 0, 0, 0};
 
 	// remove the old mousecursor
-	SDL_FillRect(screen, &oldmouse, blackpix);
+//	SDL_FillRect(screen, &oldmouse, blackpix);
 
 	// draw the side bar, between 0.001 and 0.000 sec
 	drawSidebar();
@@ -334,17 +336,16 @@ void GraphicsEngine::renderScene(bool flipscreen)
 	}
 
 #ifdef _WIN32
-	SDL_FillRect(screen, &oldmouse, blackpix);
+//	SDL_FillRect(screen, &oldmouse, blackpix);
 #endif
 }
 
 /**
  * Draw a VQA frame to the screen.
  *
- * @param the vqaframe.
- * @param where to draw the frame.
+ * @param frame the vqa frame.
  */
-void GraphicsEngine::drawVQAFrame(SDL_Surface *frame)
+void GraphicsEngine::drawVQAFrame(SDL_Surface* frame)
 {
     SDL_Rect dest;
     dest.w = frame->w;
