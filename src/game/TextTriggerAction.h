@@ -31,10 +31,13 @@ using std::string;
  * @author Damien Carol (OpenRedAlert)
  * @version 1.0
  */
-class TextTriggerAction: public TriggerAction {
+class TextTriggerAction: public TriggerAction
+{
 public:
 	/** Build a TextTriggerAction with a specified message and a MessagePool */
-	TextTriggerAction(string message, MessagePool* pool);
+	TextTriggerAction(const string& message, MessagePool* pool);
+	/** Destructor */
+	virtual ~TextTriggerAction();
 
 	/** Execute this Action */
 	void execute();
