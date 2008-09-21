@@ -18,13 +18,17 @@
 #include "TriggerAction.h"
 
 /**
- * Build 
- * 
- * @param action 
+ * Build
+ *
+ * @param action Number of the action
  */
 TriggerAction::TriggerAction(int action)
 {
 	this->action = action;
+}
+
+TriggerAction::~TriggerAction()
+{
 }
 
 int TriggerAction::getAction()

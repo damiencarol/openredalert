@@ -26,18 +26,27 @@ using std::string;
 
 /**
  * Build a TextTriggerAction with a message in string
- * and a ref to the Message Pool
+ * and a reference to the Message Pool
  *
  * @param message Message to show
  * @param pool The MessagePool to use
  */
-TextTriggerAction::TextTriggerAction(string message, MessagePool* pool) :
+TextTriggerAction::TextTriggerAction(const string& message, MessagePool* pool) :
 	TriggerAction(TriggerAction::TEXT)
 {
 	// Set the message
 	this->message = message;
 	// Set the pool to use
 	this->pool = pool;
+}
+
+/**
+ * Destructor
+ */
+TextTriggerAction::~TextTriggerAction()
+{
+	// Set pointer to NULL
+	this->pool = 0;
 }
 
 /**

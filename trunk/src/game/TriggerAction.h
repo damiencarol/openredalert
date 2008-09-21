@@ -75,10 +75,14 @@ public:
 	/** Return the number of the type of the action */
 	int getAction();
 
+	/** Destructor */
+	virtual ~TriggerAction();
+
 protected:
 	/** Create a TriggerAction with a specified type */
 	TriggerAction(int action);
 
+	/** Type of ActionTrigger enumeration */
 	enum TRIGGER_TYPE {
 		NO_ACTION = 0,
 		WINNER_IS = 1,
