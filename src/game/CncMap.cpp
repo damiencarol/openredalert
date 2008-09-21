@@ -36,7 +36,7 @@
 #include "GlobalClearTriggerAction.h"
 #include "TextTriggerAction.h"
 #include "RawTriggerAction.h"
-#include "misc/Compression.h"
+#include "misc/Compression.hpp"
 #include "misc/KeyNotFound.h"
 #include "misc/INIFile.h"
 #include "misc/StringTableFile.h"
@@ -2621,6 +2621,9 @@ void CnCMap::loadBin()
 	mapdata = NULL;
 }*/
 
+/**
+ * @param inifile Inifile to decode [MapPack] section
+ */
 void CnCMap::unMapPack(INIFile *inifile)
 {
 	int tmpval;
@@ -2645,8 +2648,10 @@ void CnCMap::unMapPack(INIFile *inifile)
 	catch(...)
 	{}
 
+	unsigned int lengthToDecode = strlen(((char*)mapdata1));
+
 	// Decompress base 64 data
-	Compression::dec_base64(mapdata1, mapdata2, strlen(((char*)mapdata1)));
+	Compression::dec_base64(mapdata1, mapdata2, lengthToDecode);
 
 	// decode the format80 coded data (6 chunks)
 	curpos = 0;
@@ -2662,9 +2667,11 @@ void CnCMap::unMapPack(INIFile *inifile)
 		curpos = curpos + 4 + mapdata2[curpos] + (mapdata2[curpos+1]<<8)
 				+ (mapdata2[curpos+2]<<16);
 	}
-	if (mapdata2 != NULL)
+
+	// Free mapdata2
+	if (mapdata2 != 0)
 		delete[] mapdata2;
-	mapdata2 = NULL;
+	mapdata2 = 0;
 
 	// 128*128 16-bit template number
 	// followed by
@@ -2690,11 +2697,14 @@ void CnCMap::unMapPack(INIFile *inifile)
 	if (mapdata1 != NULL)
 		delete[] mapdata1;
 	mapdata1 = NULL;
+
+	// Parse Binary Data
 	parseBin(bindata);
 
-	if (bindata != NULL)
+	// Free bindata
+	if (bindata != 0)
 		delete[] bindata;
-	bindata = NULL;
+	bindata = 0;
 }
 
 void CnCMap::parseBin(TileList* bindata)
