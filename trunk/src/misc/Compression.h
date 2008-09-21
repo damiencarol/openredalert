@@ -20,19 +20,23 @@
 
 #include "SDL/SDL_types.h"
 
-/** 
- * Various decompression routines for format80, format40, and 
+/**
+ * Various decompression routines for format80, format40, and
  * format20 type graphics
- * 
+ *
  * @author Olaf van der spek (XCC mixer)
  * @author Kareem Dana (FreeCNC)
  */
 class Compression
 {
 public:
+	/** Decompress format 80 compressed data. */
 	static int decode80(const Uint8 image_in[], Uint8 image_out[]);
+	/** Decompress format 40 compressed data. */
 	static int decode40(const Uint8 image_in[], Uint8 image_out[]);
+	/** Decompress format 40 compressed data. */
 	static int decode20(const Uint8* s, Uint8* d, int cb_s);
+	/** Decodes base64 data */
 	static int dec_base64(const Uint8* src, Uint8* target, size_t length);
 };
 
