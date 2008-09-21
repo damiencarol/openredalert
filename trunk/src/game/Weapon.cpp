@@ -40,6 +40,7 @@
 #include "include/common.h"
 
 using std::vector;
+using std::for_each;
 
 namespace p
 {
@@ -50,7 +51,7 @@ namespace p
 namespace pc
 {
 	extern SoundEngine * sfxeng;
-	extern std::vector<SHPImage *> * imagepool;	
+	extern std::vector<SHPImage *> * imagepool;
 }
 extern Logger * logger;
 
@@ -68,23 +69,19 @@ Weapon::Weapon(const char* wname)
 	//Uint8 i;
 	string projname, warheadname;
 	string weapname;
-	string::iterator p;
-	
+
 	INIFile* rules = 0;
-		
+
 	name = string(wname);
-	
+
 	rules = new INIFile("rules.ini");
 
 	weapini = p::weappool->getWeaponsINI();
 	weapname = (string)wname;
 
-	// UPPER the strin 'weapname'
-	p = weapname.begin();
-	while (p!=weapname.end())
-	{
-		*p++ = toupper(*p);
-	}
+	// UPPER the string 'weapname'
+	for_each(weapname.begin(), weapname.end(), toupper);
+
 
 	pname = weapini->readString(wname, "projectile");
 	if (pname == NULL)
@@ -96,19 +93,16 @@ Weapon::Weapon(const char* wname)
 	}
 	projname = (string)pname;
 
-	// UPPER the strin 'projname'
-	p = projname.begin();
-	while (p!=projname.end())
-	{
-		*p++ = toupper(*p);
-	}
+	// UPPER the string 'projname'
+	for_each(projname.begin(), projname.end(), toupper);
+
 
 	projentry = p::weappool->projectilepool.find(projname);
 	if (projentry == p::weappool->projectilepool.end() )
 	{
 		try
 		{
-			projectile = new Projectile(string(pname), 
+			projectile = new Projectile(string(pname),
 					p::raLoader->lnkProjectileDataList,
 					pc::imagepool);
 		}
@@ -177,7 +171,7 @@ Weapon::Weapon(const char* wname)
 		soundWeap += string(".aud");
 		transform(soundWeap.begin(), soundWeap.begin(), soundWeap.end(), tolower);
 		//logger->debug("Report = %s\n", soundWeap.c_str());
-		report = cppstrdup(soundWeap.c_str());	
+		report = cppstrdup(soundWeap.c_str());
 		pc::sfxeng->LoadSound(report);
 	}
 	reloadsound = weapini->readString(wname, "reloadsound");
@@ -193,7 +187,7 @@ Weapon::Weapon(const char* wname)
 
 	// @todo Implemente Anim in [Weapon]
 	/*
-	fireimage = pc::imagepool->size()<<16;	
+	fireimage = pc::imagepool->size()<<16;
 	faname = weapini->readString(wname, "fireimage", "none");
 	//printf ("%s line %i: Weapon = %s, fireimage = %s\n", __FILE__, __LINE__, wname, faname);
 	if (strcmp((faname), ("none")) == 0)
@@ -266,7 +260,7 @@ Weapon::Weapon(const char* wname)
 		}
 		delete[] faname;
 	}*/
-	
+
 	// Free rules.ini
 	delete rules;
 }
@@ -279,13 +273,14 @@ Weapon::~Weapon()
 		// delete it
 		delete[] report;
 	}
-	
-	if (reloadsound != NULL)
+
+	// If Reload sound exist
+	if (reloadsound != 0)
 	{
 		delete[] reloadsound;
 	}
-	
-	// @todo Implemente Anim in [Weapon]		
+
+	// @todo Implemente Anim in [Weapon]
 	//if (fireimage != 0)
 	//{
 	//	delete[] fireimages;
@@ -340,7 +335,7 @@ void Weapon::fire(UnitOrStructure* owner, Uint16 target, Uint8 subtarget)
 		// Play the sound
 		pc::sfxeng->PlaySound(report);
 	}
-	
+
 	// @todo implemente Anim in [Weapon]
 	/*if (fireimage != 0)
 	{
@@ -366,10 +361,10 @@ void Weapon::fire(UnitOrStructure* owner, Uint16 target, Uint8 subtarget)
 //		new ExplosionAnim(1, owner->getPos(),fireimages[facing],
 //				(Uint8)length,/*owner->getXoffset()+*/InfantryGroup::GetUnitOffsets()[owner->getSubpos()],
 //				/*owner->getYoffset()+*/InfantryGroup::GetUnitOffsets()[owner->getSubpos()]);
-	
-		
+
+
 	//}
-	
+
 	ProjectileAnim* proj = new ProjectileAnim(0, this, owner, target, subtarget);
 	p::aequeue->scheduleEvent(proj);
 
