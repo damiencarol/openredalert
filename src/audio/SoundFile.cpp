@@ -20,6 +20,7 @@
 #include <cassert>
 #include <limits>
 #include <memory>
+#include <string>
 
 #include "SDL/SDL_audio.h"
 
@@ -32,6 +33,7 @@
 
 extern Logger * logger;
 
+using std::string;
 
 /**
  */
@@ -56,7 +58,10 @@ SoundFile::~SoundFile(){
     Close();
 }
 
-bool SoundFile::Open(const std::string& filename){
+/**
+ *
+ */
+bool SoundFile::Open(const string& filename){
     Close();
 
     // Open file
@@ -102,8 +107,14 @@ bool SoundFile::Open(const std::string& filename){
     return true;
 }
 
-void SoundFile::Close(){
-    if (fileOpened) {
+/**
+ *
+ */
+void SoundFile::Close()
+{
+    if (fileOpened)
+    {
+    	/// Close the file in the VFS
     	VFSUtils::VFS_Close(file);
         fileOpened = false;
     }
@@ -111,9 +122,12 @@ void SoundFile::Close(){
 
 /**
  */
-Uint32 SoundFile::Decode(SampleBuffer& buffer, Uint32 length){
+Uint32 SoundFile::Decode(SampleBuffer& buffer, Uint32 length)
+{
     if (!initconv || !fileOpened)
+    {
         return SOUND_DECODE_ERROR;
+    }
 
     assert(buffer.empty());
 
