@@ -32,8 +32,8 @@ ActionEventQueue::ActionEventQueue()
     starttick = SDL_GetTicks();
 }
 
-/** 
- * Destructor, removes the timer and empties the ActionEventQueue 
+/**
+ * Destructor, removes the timer and empties the ActionEventQueue
  */
 ActionEventQueue::~ActionEventQueue()
 {
@@ -48,24 +48,26 @@ ActionEventQueue::~ActionEventQueue()
     }
 }
 
-/** 
+/**
  * Schedules  event for later execution.
- * 
- * @param a class containing the action to run.
+ *
+ * @param event ActionEvent object to run.
  */
-void ActionEventQueue::scheduleEvent(ActionEvent *ev)
+void ActionEventQueue::scheduleEvent(ActionEvent* event)
 {
-    ev->addCurtick(getCurtick());
-    eventqueue.push(ev);
+
+	event->addCurtick(getCurtick());
+
+    eventqueue.push(event);
 }
 
-/** 
+/**
  * Run all events in the actionqueue.
  */
 void ActionEventQueue::runEvents()
 {
     Uint32 curtick = getCurtick();
-    
+
     // run all events in the queue with a prio lower than curtick
     while( !eventqueue.empty() && eventqueue.top()->getPrio() <= curtick ) {
         eventqueue.top()->run();

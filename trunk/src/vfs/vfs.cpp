@@ -52,8 +52,10 @@ void VFSUtils::VFS_PreInit(const char* binpath)
 
 /**
  * @todo install prefix
+ *
+ * @param binpath Directory to parse the files
  */
-void VFSUtils::VFS_Init(const std::string& binpath)
+void VFSUtils::VFS_Init(const string& binpath)
 {
     if (binpath != ".")
     {

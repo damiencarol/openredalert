@@ -45,7 +45,7 @@ namespace pc {
 DropDownListBox::DropDownListBox()
 {
 	List.empty();
-	
+
 	ListBoxSurface	= 0;
 	DisplaySurface	= 0;
 	WindowToDrawOn	= 0;
@@ -98,7 +98,7 @@ bool DropDownListBox::need_redraw(void)
 	return Recreate;
 }
 
-/** 
+/**
  * Set the surface (window) to draw the button on
  */
 void DropDownListBox::SetDrawingWindow(RaWindow* window)
@@ -236,16 +236,16 @@ if (ArrowDownImage != NULL){
 // Fill the surface with the correct color
 //ArrowDownImage = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, SizeAndPosition.w, SizeAndPosition.h, 16, 0, 0, 0, 0);
 }
-	
-/** 
+
+/**
  * Set the surface (window) to draw the button on
  */
-void DropDownListBox::AddEntry(std::string Entry)
+void DropDownListBox::AddEntry(string Entry)
 {
 	List.push_back(Entry);
 }
 
-bool DropDownListBox::MouseOver(void)
+bool DropDownListBox::MouseOver()
 {
 	int mx, my;
 	int WinXpos = 0;
@@ -327,7 +327,10 @@ Uint32 DropDownListBox::MouseOver_entry()
 	return 0;
 }
 
-Uint32 DropDownListBox::selected(void)
+/**
+ * @return Selected index in the DropDownListBox
+ */
+unsigned int DropDownListBox::getSelected() const
 {
 	return SelectedIndex;
 }

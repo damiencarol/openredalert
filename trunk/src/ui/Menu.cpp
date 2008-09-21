@@ -650,7 +650,7 @@ void Menu::HandleInput()
 								pc::Config.playernum	= 1;	// Local player player number
 								pc::Config.gamemode 	= 1;	// Skermisch
 								pc::Config.totalplayers = 2;
-								if (SideSelection.selected() == 0 || SideSelection.selected() == 2)
+								if (SideSelection.getSelected() == 0 || SideSelection.getSelected() == 2)
 									pc::Config.mside	= "nod";
 								else
 									pc::Config.mside	= "gdi";

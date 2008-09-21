@@ -120,9 +120,12 @@ void Font::reload()
 	this->Load(this->fontname);
 }
 
-Uint32 Font::getHeight() const 
+/**
+ * @return height of the font
+ */
+unsigned int Font::getHeight() const
 {
-    return chrdest[0].h;
+    return (unsigned  int)chrdest[0].h;
 }
 
 /**
@@ -180,8 +183,11 @@ bool Font::GetFontColor(SDL_Color FColor, SDL_Color OrgFntColor, SDL_Color &FntC
 
 
 /**
- * Draw a colored text to a surface
- * DEBUGGING FUNCTION
+ * Draw a colored character to a surface
+ *
+ * @note it's a DEBUGGING FUNCTION
+ *
+ * @param Character caractere to draw
  */
 void Font::drawCHAR(const char Character)
 {
@@ -234,10 +240,10 @@ Uint32 Font::Font(const std::string& text) const {
  * Draw a colored text to a surface
  *
  * This function gets the background color from the dest surface so
- * this function will not work if you draw over the same text each 
+ * this function will not work if you draw over the same text each
  * time without clearing the background !!!
  *
- * I think this functions works correctly with the following fonts 
+ * I think this functions works correctly with the following fonts
  * (don't really know about the rest):
  * type.fnt
  * scorefnt.fnt
@@ -258,8 +264,8 @@ void Font::drawText(const string& text, SDL_Surface *SrcSurf, Uint32 SrcStartx, 
 	destr.y = DestStarty;
 	SDL_Color OrgColor, FontColor, BGcolor;
 	SDL_Rect* src_rect;
-	
-	
+
+
 	for( i = 0; text[i] != '\0'; i++ )
 	{
 		// We check if it's <0 to keep special chars
@@ -268,7 +274,7 @@ void Font::drawText(const string& text, SDL_Surface *SrcSurf, Uint32 SrcStartx, 
 		src_rect = const_cast<SDL_Rect*>(&chrdest[index]);
 		// original
 		//src_rect = const_cast<SDL_Rect*>(&chrdest[text[i]]);
-		
+
 		for (int x = 0; x < src_rect->w; x++){
 			for (Uint32 y = 0; y < chrdest[0].h; y++){
 				// Get the pixel from our source surface
@@ -309,6 +315,9 @@ void Font::drawText(const string& text, SDL_Surface *SrcSurf, Uint32 SrcStartx, 
 	}
 }
 
+/**
+ * @param FontName Name of the font to load
+ */
 void Font::Load(string FontName)
 {
 	VFile* fontfile;
@@ -427,7 +436,7 @@ void Font::Load(string FontName)
 	VFSUtils::VFS_Close(fontfile);
 }
 
-Uint32 Font::calcTextWidth(const string& text) const 
+Uint32 Font::calcTextWidth(const string& text) const
 {
     Uint32 wdt = 0;
     Uint32 i;
