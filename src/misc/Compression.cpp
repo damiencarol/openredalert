@@ -29,12 +29,12 @@
 
 extern Logger * logger;
 
-/** 
+/**
  * Decodes base64 data
- * 
- *  @param compressed data
- *  @param pointer to put uncompressed data
- *  @param size of compressed data
+ *
+ *  @param src compressed data
+ *  @param target pointer to put uncompressed data
+ *  @param length size of compressed data
  *  @return -1 if error
  */
 int Compression::dec_base64(const unsigned char* src, unsigned char* target, size_t length)
@@ -108,14 +108,15 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, siz
 
     return 0;
 }
-/** 
+
+/**
  * Decompress format 80 compressed data.
- * 
- * @param compressed data.
- * @param pointer to output uncompressed data.
+ *
+ * @param image_in compressed data.
+ * @param image_out pointer to output uncompressed data.
  * @return size of uncompressed data.
- * 
- * 
+ *
+ *
 ----------
  Format80
 ----------
@@ -282,7 +283,7 @@ image.
 Note that you won't be able to compile this code, because the typecasting
 won't work. (But I'm sure you'll be able to fix it).
 
- * 
+ *
  */
 int Compression::decode80(const Uint8 image_in[], Uint8 image_out[])
 {
@@ -387,14 +388,14 @@ int Compression::decode80(const Uint8 image_in[], Uint8 image_out[])
 
     return (writep - image_out);
 }
-/** 
+/**
  * Decompress format 40 compressed data.
- * 
- * @param compressed data.
- * @param pointer to pu uncompressed data in.
- * @returns size of uncompressed data.
- * 
- * 
+ *
+ * @param image_in compressed data.
+ * @param image_out pointer to pu uncompressed data in.
+ * @return size of uncompressed data.
+ *
+ *
 ----------
  Format40
 ----------
@@ -560,7 +561,7 @@ As before here's some code :
     end;
   until false;
 
- * 
+ *
  */
 int Compression::decode40(const Uint8 image_in[], Uint8 image_out[])
 {
@@ -640,29 +641,33 @@ int Compression::decode40(const Uint8 image_in[], Uint8 image_out[])
     }
     return (writep - image_out);
 }
-/** 
+
+/**
  * Decompress format 20 compressed data.
- * 
- * @param compressed data.
- * @param pointer to pu uncompressed data in.
- * @param size of compressed data?
- * @returns size of uncompressed data?
+ *
+ * @param s compressed data.
+ * @param d pointer to pu uncompressed data in.
+ * @param cb_s size of compressed data?
+ * @return size of uncompressed data?
  */
 int Compression::decode20(const Uint8* s, Uint8* d, int cb_s)
 {
     const Uint8* r = s;
     const Uint8* r_end = s + cb_s;
     Uint8* w = d;
-    while (r < r_end) {
+    while (r < r_end)
+    {
         int v = *r++;
         if (v)
+        {
             *w++ = v;
-        else {
+        }
+        else
+        {
             v = *r++;
             memset(w, 0, v);
             w += v;
         }
     }
     return w - d;
-
 }
