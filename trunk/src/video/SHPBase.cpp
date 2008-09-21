@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "misc/Compression.h"
+#include "misc/Compression.hpp"
 #include "include/fcnc_endian.h"
 #include "include/imageproc.h"
 #include "misc/INIFile.h"

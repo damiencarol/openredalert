@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "Compression.h"
+#include "Compression.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -37,16 +37,17 @@ extern Logger * logger;
  *  @param length size of compressed data
  *  @return -1 if error
  */
-int Compression::dec_base64(const unsigned char* src, unsigned char* target, size_t length)
+int Compression::dec_base64(const unsigned char* src, unsigned char* target, const unsigned int length)
 {
     int i;
     unsigned char a, b, c, d;
     static unsigned char dtable[256];
     int bits_to_skip = 0;
+    unsigned int varLength = length;
 
     for( i = length-1; src[i] == '='; i-- ) {
         bits_to_skip += 2;
-        length--;
+        varLength--;
     }
     if( bits_to_skip >= 6 ) {
         logger->warning("Error in base64 (too many '=')\n");
@@ -65,9 +66,9 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, siz
     for(i= '0';i<='9';i++) {
         dtable[i]= 52+(i-'0');
     }
-    dtable[(Uint8)'+']= 62;
-    dtable[(Uint8)'/']= 63;
-    dtable[(Uint8)'=']= 0;
+    dtable[(unsigned char)'+']= 62;
+    dtable[(unsigned char)'/']= 63;
+    dtable[(unsigned char)'=']= 0;
 
 
     while (length >= 4) {
@@ -83,7 +84,7 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, siz
         target[1] = b << 4 | c >> 2;
         target[2] = c << 6 | d;
         target+=3;
-        length-=4;
+        varLength-=4;
         src += 4;
     }
     if( length > 0 ) {
@@ -295,9 +296,9 @@ int Compression::decode80(const unsigned char image_in[], unsigned char image_ou
     4 copy 11111111 c c p p
     */
 
-    const Uint8* copyp;
-    const Uint8* readp = image_in;
-    Uint8* writep = image_out;
+    const unsigned char* copyp;
+    const unsigned char* readp = image_in;
+    unsigned char* writep = image_out;
     Uint32 code;
     Uint32 count;
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
@@ -652,9 +653,10 @@ int Compression::decode40(const unsigned char image_in[], unsigned char image_ou
  */
 int Compression::decode20(const unsigned char* s, unsigned char* d, int cb_s)
 {
-    const Uint8* r = s;
-    const Uint8* r_end = s + cb_s;
-    Uint8* w = d;
+    const unsigned char* r = s;
+    const unsigned char* r_end = s + cb_s;
+    unsigned char* w = d;
+
     while (r < r_end)
     {
         int v = *r++;
@@ -669,5 +671,6 @@ int Compression::decode20(const unsigned char* s, unsigned char* d, int cb_s)
             w += v;
         }
     }
+
     return w - d;
 }

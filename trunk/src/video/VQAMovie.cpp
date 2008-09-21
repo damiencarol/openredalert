@@ -27,7 +27,7 @@
 #include "SDL/SDL_mutex.h"
 
 #include "include/config.h"
-#include "misc/Compression.h"
+#include "misc/Compression.hpp"
 #include "include/fcnc_endian.h"
 #include "video/GraphicsEngine.h"
 #include "include/imageproc.h"

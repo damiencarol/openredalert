@@ -1,5 +1,5 @@
-// Compression.h
-// 1.0
+// Compression.hpp
+// 2.0
 
 //    This file is part of OpenRedAlert.
 //
@@ -18,8 +18,6 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
 
-#include "SDL/SDL_types.h"
-
 /**
  * Various decompression routines for format80, format40, and
  * format20 type graphics
@@ -37,7 +35,7 @@ public:
 	/** Decompress format 40 compressed data. */
 	static int decode20(const unsigned char* s, unsigned char* d, int cb_s);
 	/** Decodes base64 data */
-	static int dec_base64(const unsigned char* src, unsigned char* target, size_t length);
+	static int dec_base64(const unsigned char* src, unsigned char* target, const unsigned int length);
 };
 
 #endif //COMPRESSION_H

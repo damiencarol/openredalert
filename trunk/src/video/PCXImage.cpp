@@ -20,7 +20,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "misc/Compression.h"
+#include "misc/Compression.hpp"
 #include "include/fcnc_endian.h"
 #include "misc/INIFile.h"
 #include "vfs/vfs.h"
