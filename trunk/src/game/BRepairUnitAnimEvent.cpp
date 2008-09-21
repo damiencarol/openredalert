@@ -45,7 +45,7 @@ extern Logger * logger;
  * @param p the priority of this event
  * @param str the structure which repair
  */
-BRepairUnitAnimEvent::BRepairUnitAnimEvent(Uint32 p, Structure *str) : BuildingAnimEvent(p,str,8)
+BRepairUnitAnimEvent::BRepairUnitAnimEvent(uint32_t p, Structure *str) : BuildingAnimEvent(p,str,8)
 {
     int		un_cost;
     Sint16	health;
@@ -61,7 +61,8 @@ BRepairUnitAnimEvent::BRepairUnitAnimEvent(Uint32 p, Structure *str) : BuildingA
 
 	UnitToFix = p::uspool->getUnitAt(strct->UnitToRepairPos);
 
-	if (UnitToFix == NULL){
+	if (UnitToFix == 0)
+	{
 		logger->error ("%s line %i: Structure anim unit not found\n", __FILE__, __LINE__);
 		stop();
 		return;
@@ -80,7 +81,7 @@ BRepairUnitAnimEvent::BRepairUnitAnimEvent(Uint32 p, Structure *str) : BuildingA
 
 BRepairUnitAnimEvent::~BRepairUnitAnimEvent()
 {
-	strct->setImageNum(StartFrame,0);
+	strct->setImageNum(StartFrame, 0);
 	// Set repairunitAnim of the structure to NULL
 	strct->repairunitAnim = 0;
 }
@@ -89,7 +90,7 @@ void BRepairUnitAnimEvent::run()
 {
 	Unit* UnitToFix = 0;
 	Sint16 health;
-	Uint16 cost;
+	uint16_t cost;
 
 //	updateDamaged();
 
@@ -151,4 +152,7 @@ void BRepairUnitAnimEvent::update()
 {
 	logger->error ("%s line %i: Structure anim update\n", __FILE__, __LINE__);
 }
-void BRepairUnitAnimEvent::anim_func(anim_nfo* data) {}
+
+void BRepairUnitAnimEvent::anim_func(anim_nfo* data)
+{
+}
