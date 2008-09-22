@@ -489,9 +489,11 @@ void CnCMap::doscroll()
  *
  * @param x the maximum x scroll.
  * @param y the maximum y scroll.
+ * @param xtile number of xtile ?
+ * @param ytile number of ytile ?
+ * @param tilew tile wieght ?
  */
-void CnCMap::setMaxScroll(Uint32 x, Uint32 y, Uint32 xtile, Uint32 ytile,
-		Uint32 tilew)
+void CnCMap::setMaxScroll(Uint32 x, Uint32 y, Uint32 xtile, Uint32 ytile, Uint32 tilew)
 {
 	scrollpos.maxx = 0;
 	scrollpos.maxy = 0;
