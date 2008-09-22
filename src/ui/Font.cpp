@@ -237,8 +237,6 @@ Uint32 Font::Font(const std::string& text) const {
 }*/
 
 /**
- * Draw a colored text to a surface
- *
  * This function gets the background color from the dest surface so
  * this function will not work if you draw over the same text each
  * time without clearing the background !!!
@@ -250,11 +248,13 @@ Uint32 Font::Font(const std::string& text) const {
  * grad6fnt.fnt
  *
  * @param text is the text to draw to the surface.
- * @param dest is the destination surface
+ * @param SrcSurf source surface
+ * @param SrcStartx X origin of drawing
+ * @param SrcStarty Y origin of drawing
  * @param FGcolor is the font color
- * @param BGcolor is the background of the text
- * @param startx is the xpos on the surface where the text will be drawn
- * @param starty is the ypos on the surface where the text will be drawn
+ * @param DestSurf Destination surface
+ * @param DestStartx is the xpos on the surface where the text will be drawn
+ * @param DestStarty is the ypos on the surface where the text will be drawn
  */
 void Font::drawText(const string& text, SDL_Surface *SrcSurf, Uint32 SrcStartx, Uint32 SrcStarty, SDL_Surface *DestSurf, SDL_Color FGcolor, Uint32 DestStartx, Uint32 DestStarty)
 {
