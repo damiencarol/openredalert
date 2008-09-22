@@ -386,194 +386,193 @@ int Compression::decode80(const unsigned char image_in[], unsigned char image_ou
             }
         }
     }
-
     return (writep - image_out);
 }
+
 /**
  * Decompress format 40 compressed data.
  *
  * @param image_in compressed data.
  * @param image_out pointer to pu uncompressed data in.
  * @return size of uncompressed data.
- *
- *
-----------
- Format40
-----------
-
-As I said before the images in Format40 must be xor-ed over a previous image,
-or against a black screen (as in the .WSA format).
-It is used when there are only minor changes between an image and a following
-one.
-
-Here I'll assume that the old image is in Dest, and that the Dest pointer is
-set to the beginning of that buffer.
-
-As for the Format80, there are many commands :
-
-
-(1) 1 byte
-               byte
-  +---+---+---+---+---+---+---+---+
-  | 1 |   |   |   |   |   |   |   |
-  +---+---+---+---+---+---+---+---+
-      \___________________________/
-                   |
-                 Count
-
-  Skip count bytes in Dest (move the pointer forward).
-
-(2) 3 bytes
-              byte                           word
-  +---+---+---+---+---+---+---+---+  +---+-----+-------+
-  | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  | 0 | ... |       |
-  +---+---+---+---+---+---+---+---+  +---+-----+-------+
-                                         \_____________/
-                                                |
-                                              Count
-
-  Skip count bytes.
-
-(3) 3 bytes
-                byte                              word
-  +---+---+---+---+---+---+---+---+  +---+---+-----+-------+
-  | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  | 1 | 0 | ... |       |
-  +---+---+---+---+---+---+---+---+  +---+---+-----+-------+
-                                             \_____________/
-                                                   |
-                                                 Count
-
- Xor next count bytes. That means xor count bytes from Source with bytes
- in Dest.
-
-(4) 4 bytes
-              byte                               word           byte
-  +---+---+---+---+---+---+---+---+  +---+---+-----+-------+  +-------+
-  | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  | 1 | 1 | ... |       |  |       |
-  +---+---+---+---+---+---+---+---+  +---+---+-----+-------+  +-------+
-                                             \_____________/    value
-                                                   |
-                                                 Count
-
-  Xor next count bytes in Dest with value.
-
-5) 1 byte
-               byte
-  +---+---+---+---+---+---+---+---+
-  | 0 |   |   |   |   |   |   |   |
-  +---+---+---+---+---+---+---+---+
-      \___________________________/
-                   |
-                 Count
-
-  Xor next count bytes from source with dest.
-
-6) 3 bytes
-              byte                     byte       byte
-  +---+---+---+---+---+---+---+---+  +-------+  +-------+
-  | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  |       |  |       |
-  +---+---+---+---+---+---+---+---+  +-------+  +-------+
-                                       Count      Value
-
-  Xor next count bytes with value.
-
-
-All images end with a 80h 00h 00h command.
-
-I think these are all the commands, but there might be some other.
-If you find anything new, please e-mail me.
-
-As before here's some code :
-
-  DP = destination pointer
-  SP = source pointer
-  Source is buffer containing the Format40 data
-  Dest   is the buffer containing the image over which the second has
-         to be xor-ed
-
-
-  SP:=0;
-  DP:=0;
-  repeat
-    Com:=Source[SP];
-    Inc(SP);
-
-    if (Com and $80)<>0 then {if bit 7 set}
-    begin
-      if Com<>$80 then  {small skip command (1)}
-      begin
-        Count:=Com and $7F;
-        Inc(DP,Count);
-      end
-      else  {Big commands}
-      begin
-        Count:=Word(Source[SP]);
-        if Count=0 then break;
-        Inc(SP,2);
-
-        Tc:=(Count and $C000) shr 14;  {Tc=two topmost bits of count}
-
-        case Tc of
-          0,1 : begin  {Big skip (2)}
-                  Inc(DP,Count);
-                end;
-          2 : begin {big xor (3)}
-                Count:=Count and $3FFF;
-                for i:=1 to Count do
-                begin
-                  Dest[DP]:=Dest[DP] xor Source[SP];
-                  Inc(DP);
-                  Inc(SP);
-                end;
-              end;
-          3 : begin  {big repeated xor (4)}
-                Count:=Count and $3FFF;
-                b:=Source[SP];
-                Inc(SP);
-                for i:=1 to Count do
-                begin
-                  Dest[DP]:=Dest[DP] xor b;
-                  Inc(DP);
-                end;
-              end;
-        end;
-      end;
-    end else  {xor command}
-    begin
-      Count:=Com;
-      if Count=0 then
-      begin {repeated xor (6)}
-        Count:=Source[SP];
-        Inc(SP);
-        b:=Source[SP];
-        Inc(SP);
-        for i:=1 to Count do
-        begin
-          Dest[DP]:=Dest[DP] xor b;
-          Inc(DP);
-        end;
-      end else  {copy xor (5)}
-        for i:=1 to Count do
-        begin
-          Dest[DP]:=Dest[DP] xor Source[SP];
-          Inc(DP);
-          Inc(SP);
-        end;
-    end;
-  until false;
-
- *
  */
 int Compression::decode40(const unsigned char image_in[], unsigned char image_out[])
 {
-    /*
-    0 fill 00000000 c v
-    1 copy 0ccccccc
-    2 skip 10000000 c 0ccccccc
-    3 copy 10000000 c 10cccccc
-    4 fill 10000000 c 11cccccc v
-    5 skip 1ccccccc
-    */
+	//
+	//----------
+	// Format40
+	//----------
+	//
+	//As I said before the images in Format40 must be xor-ed over a previous image,
+	//or against a black screen (as in the .WSA format).
+	//It is used when there are only minor changes between an image and a following
+	//one.
+	//
+	//Here I'll assume that the old image is in Dest, and that the Dest pointer is
+	//set to the beginning of that buffer.
+	//
+	//As for the Format80, there are many commands :
+	//
+	//
+	//(1) 1 byte
+	//               byte
+	//  +---+---+---+---+---+---+---+---+
+	//  | 1 |   |   |   |   |   |   |   |
+	//  +---+---+---+---+---+---+---+---+
+	//      \___________________________/
+	//                   |
+	//                 Count
+	//
+	//  Skip count bytes in Dest (move the pointer forward).
+	//
+	//(2) 3 bytes
+	//              byte                           word
+	//  +---+---+---+---+---+---+---+---+  +---+-----+-------+
+	//  | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  | 0 | ... |       |
+	//  +---+---+---+---+---+---+---+---+  +---+-----+-------+
+	//                                         \_____________/
+	//                                                |
+	//                                              Count
+	//
+	//  Skip count bytes.
+	//
+	//(3) 3 bytes
+	//                byte                              word
+	//  +---+---+---+---+---+---+---+---+  +---+---+-----+-------+
+	//  | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  | 1 | 0 | ... |       |
+	//  +---+---+---+---+---+---+---+---+  +---+---+-----+-------+
+	//                                             \_____________/
+	//                                                   |
+	//                                                 Count
+	//
+	// Xor next count bytes. That means xor count bytes from Source with bytes
+	// in Dest.
+	//
+	//(4) 4 bytes
+	//              byte                               word           byte
+	//  +---+---+---+---+---+---+---+---+  +---+---+-----+-------+  +-------+
+	//  | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  | 1 | 1 | ... |       |  |       |
+	//  +---+---+---+---+---+---+---+---+  +---+---+-----+-------+  +-------+
+	//                                             \_____________/    value
+	//                                                   |
+	//                                                 Count
+	//
+	//  Xor next count bytes in Dest with value.
+	//
+	//5) 1 byte
+	//               byte
+	//  +---+---+---+---+---+---+---+---+
+	//  | 0 |   |   |   |   |   |   |   |
+	//  +---+---+---+---+---+---+---+---+
+	//      \___________________________/
+	//                   |
+	//                 Count
+	//
+	//  Xor next count bytes from source with dest.
+	//
+	//6) 3 bytes
+	//              byte                     byte       byte
+	//  +---+---+---+---+---+---+---+---+  +-------+  +-------+
+	//  | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  |       |  |       |
+	//  +---+---+---+---+---+---+---+---+  +-------+  +-------+
+	//                                       Count      Value
+	//
+	//  Xor next count bytes with value.
+	//
+	//
+	//All images end with a 80h 00h 00h command.
+	//
+	//I think these are all the commands, but there might be some other.
+	//If you find anything new, please e-mail me.
+	//
+	//As before here's some code :
+	//
+	//  DP = destination pointer
+	//  SP = source pointer
+	//  Source is buffer containing the Format40 data
+	//  Dest   is the buffer containing the image over which the second has
+	//         to be xor-ed
+	//
+	//
+	//  SP:=0;
+	//  DP:=0;
+	//  repeat
+	//    Com:=Source[SP];
+	//    Inc(SP);
+	//
+	//    if (Com and $80)<>0 then {if bit 7 set}
+	//    begin
+	//      if Com<>$80 then  {small skip command (1)}
+	//      begin
+	//        Count:=Com and $7F;
+	//        Inc(DP,Count);
+	//      end
+	//      else  {Big commands}
+	//      begin
+	//        Count:=Word(Source[SP]);
+	//        if Count=0 then break;
+	//        Inc(SP,2);
+	//
+	//        Tc:=(Count and $C000) shr 14;  {Tc=two topmost bits of count}
+	//
+	//        case Tc of
+	//          0,1 : begin  {Big skip (2)}
+	//                  Inc(DP,Count);
+	//                end;
+	//          2 : begin {big xor (3)}
+	//                Count:=Count and $3FFF;
+	//                for i:=1 to Count do
+	//                begin
+	//                  Dest[DP]:=Dest[DP] xor Source[SP];
+	//                  Inc(DP);
+	//                  Inc(SP);
+	//                end;
+	//              end;
+	//          3 : begin  {big repeated xor (4)}
+	//                Count:=Count and $3FFF;
+	//                b:=Source[SP];
+	//                Inc(SP);
+	//                for i:=1 to Count do
+	//                begin
+	//                  Dest[DP]:=Dest[DP] xor b;
+	//                  Inc(DP);
+	//                end;
+	//              end;
+	//        end;
+	//      end;
+	//    end else  {xor command}
+	//    begin
+	//      Count:=Com;
+	//      if Count=0 then
+	//      begin {repeated xor (6)}
+	//        Count:=Source[SP];
+	//        Inc(SP);
+	//        b:=Source[SP];
+	//        Inc(SP);
+	//        for i:=1 to Count do
+	//        begin
+	//          Dest[DP]:=Dest[DP] xor b;
+	//          Inc(DP);
+	//        end;
+	//      end else  {copy xor (5)}
+	//        for i:=1 to Count do
+	//        begin
+	//          Dest[DP]:=Dest[DP] xor Source[SP];
+	//          Inc(DP);
+	//          Inc(SP);
+	//        end;
+	//    end;
+	//  until false;
+	//
+
+	// To Resume :
+	//    0 fill 00000000 c v
+	//    1 copy 0ccccccc
+	//    2 skip 10000000 c 0ccccccc
+	//    3 copy 10000000 c 10cccccc
+	//    4 fill 10000000 c 11cccccc v
+	//    5 skip 1ccccccc
+
 
     const Uint8* readp = image_in;
     Uint8* writep = image_out;
