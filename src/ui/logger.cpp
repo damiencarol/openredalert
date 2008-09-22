@@ -166,9 +166,9 @@ void Logger::gameMsg(const char *txt, ...)
         char msgstring[64];
         va_start(ap, txt);
         #ifdef _MSC_VER
-        //_vsnprintf(msgstring, 64, txt, ap);
+        _vsnprintf(msgstring, 64, txt, ap);
         #else
-        //vsnprintf(msgstring, 64, txt, ap);
+        vsnprintf(msgstring, 64, txt, ap);
         #endif
         va_end(ap);
         pc::msg->postMessage(msgstring);
