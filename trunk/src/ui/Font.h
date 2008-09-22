@@ -75,6 +75,7 @@ public:
 			SDL_Color OrgFntColor, SDL_Color &FntColor);
 	void drawCHAR(const char Character);
 
+	/** Draw a colored text to a surface */
 	void drawText(const string& text, SDL_Surface* SrcSurf,
 			Uint32 SrcStartx, Uint32 SrcStarty, SDL_Surface* DestSurf,
 			SDL_Color FGcolor, Uint32 DestStartx, Uint32 DestStarty);
