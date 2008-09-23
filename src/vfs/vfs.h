@@ -43,6 +43,10 @@ public:
 	static void VFS_LoadGame(gametypes gt);
 	/** Most code just uses the VFS for reading, so this default to reading */
 	static VFile *VFS_Open(const char *fname);
+	/**
+	 * tries to read file with specified name. first as external file, if not found then from the mixfiles
+	 * returns 0 if no file found with this name
+	*/
 	static VFile *VFS_Open(const char *fname, const char* mode);
 	/** Close a VFile */
 	static void VFS_Close(VFile *file);
