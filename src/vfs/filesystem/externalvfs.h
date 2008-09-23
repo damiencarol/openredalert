@@ -39,8 +39,12 @@ public:
 	
 	const char *getArchiveType() const;
 	bool loadArchive(const char *fname);
-	/** Can't use default argument as we need exact type signature for inheritence. */
+	/** 
+	* Can't use default argument as we need exact type signature for inheritence. 
+	* try to load a file. if not found, return -1 else return the filedescriptor(?)
+	*/
 	Uint32 getFile(const char* fname);
+	///see other overload for details
 	Uint32 getFile(const char *fname, const char* mode);
 	void releaseFile(Uint32 file);
 
@@ -48,7 +52,10 @@ public:
 	Uint32 readWord(Uint32 file, Uint16 *databuf, Uint32 numWords);
 	Uint32 readThree(Uint32 file, Uint32 *databuf, Uint32 numThrees);
 	Uint32 readDWord(Uint32 file, Uint32 *databuf, Uint32 numDWords);
-	char *readLine(Uint32 file, char *databuf, Uint32 buflen);
+	 /** 
+	 * Read a line of file. 
+	 */
+	char* readLine(Uint32 file, char *databuf, Uint32 buflen);
 
 	Uint32 writeByte(Uint32 file, const Uint8 *databuf, Uint32 numBytes);
 	Uint32 writeWord(Uint32 file, const Uint16 *databuf, Uint32 numWords);
@@ -64,6 +71,8 @@ public:
 	Uint32 getPos(Uint32 file) const;
 	Uint32 getSize(Uint32 file) const;
 	const char* getPath(Uint32 file) const;
+
+	static const int ErrorLoadingFile = (Uint32)-1;			///<returned in case file could not be loaded
 
 private:
 	string defpath;
