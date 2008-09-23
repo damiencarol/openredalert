@@ -23,6 +23,7 @@
 #include <string>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
+//why is lean_mean needed???
 #include <windows.h>
 #else
 // #include <unistd.h>   // <-- Is this really needed ?
@@ -131,7 +132,8 @@ Uint32 ExternalFiles::getFile(const char *fname, const char* mode)
             return fnum;
         } // Error condition hanled at end of function
     }
-    for (i = 0; i < path.size(); ++i) {
+    for (i = 0; i < path.size(); ++i)				//try to load the file at several different paths
+	{
         filename = path[i] + fname;
         f = fcaseopen(&filename, mode, path[i].length());
         if (f != NULL) {
@@ -148,7 +150,7 @@ Uint32 ExternalFiles::getFile(const char *fname, const char* mode)
         }
     }
 
-    return (Uint32)-1;
+    return this->ErrorLoadingFile;
 }
 
 /**
@@ -225,9 +227,10 @@ Uint32 ExternalFiles::readDWord(Uint32 file, Uint32 *databuf, Uint32 numDWords)
     return numRead;
 }
 
-char *ExternalFiles::readLine(Uint32 file, char *databuf, Uint32 buflen)
+char*  ExternalFiles::readLine(Uint32 file, char *databuf, Uint32 buflen)	
 {
-    return fgets(databuf, buflen, openfiles[file].file);
+	
+	return fgets(databuf, buflen, openfiles[file].file);
 }
 
 Uint32 ExternalFiles::writeByte(Uint32 file, const Uint8* databuf, Uint32 numBytes)
@@ -321,7 +324,7 @@ void ExternalFiles::writeLine(Uint32 file, const char *databuf)
 int ExternalFiles::vfs_printf(Uint32 file, const char* fmt, va_list ap)
 {
     int ret;
-    ret = vfprintf(openfiles[file].file, fmt, ap);
+	ret = vfprintf(openfiles[file].file, fmt, ap);
     return ret;
 }
 
