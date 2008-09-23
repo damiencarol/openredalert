@@ -36,7 +36,7 @@ BuildAnimEvent::BuildAnimEvent(Uint32 p, Structure* str, bool sell) :
 {
 	updateDamaged();
 	this->sell = sell;
-	framend = getaniminfo().makenum;
+	framend = (Uint16)getaniminfo().makenum;
 	frame = (sell?(framend-1):1);
 	structure = str;
 

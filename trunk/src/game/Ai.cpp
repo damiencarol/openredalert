@@ -648,7 +648,11 @@ Uint32 Ai::getDist(Uint32 pos1, Uint32 pos2)
     xdiff = abs(x-nx);
     ydiff = abs(y-ny);
 //    return min(xdiff,ydiff)+abs(xdiff-ydiff);
-    return (Uint32) sqrt (xdiff*xdiff+ydiff*ydiff);
+#ifdef _WIN32
+	return sqrt ( ((double) ((long)xdiff*xdiff+ydiff*ydiff))  );		//performance?
+#else
+	return (Uint32) sqrt (((long)xdiff*xdiff+ydiff*ydiff));
+#endif
 }
 
 
@@ -1314,7 +1318,7 @@ void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
 		return;
 	}
 
-	PreferLastStructures	= (bool) ((double)2*rand()/(RAND_MAX));
+	PreferLastStructures	= ((double)2*rand()/(RAND_MAX)) != 0;
 
 	// Handle unit vars
 	NumbUnits		= Player->getNumUnits();

@@ -64,7 +64,7 @@ BAttackAnimEvent::~BAttackAnimEvent()
 {
 	if (strct->getType()->Charges())
 	{
-		frame = StartFrame;
+		frame = (Uint8) StartFrame;				//intended conversion?
 		if (strct->getNumbImages(0) > frame)
 			strct->setImageNum(frame, 0);
 	}
@@ -111,8 +111,10 @@ void BAttackAnimEvent::run()
 
 	// @todo modify calculs
 	//distance = abs()>abs(ytiles)?abs(xtiles):abs(ytiles);
-	double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
 
+
+
+	double distance = sqrt(((double)xtiles*xtiles + ytiles*ytiles));		
 	if (distance > strct->getType()->getWeapon()->getRange())
 	{
 		// Since buildings can not move, give up for now.
@@ -137,11 +139,11 @@ void BAttackAnimEvent::run()
 	{
 		if( ytiles < 0 )
 		{
-			alpha = -M_PI_2;
+			alpha = (float)-M_PI_2;
 		}
 		else
 		{
-			alpha = M_PI_2;
+			alpha = (float)M_PI_2;
 		}
 	}
 	else
@@ -149,7 +151,7 @@ void BAttackAnimEvent::run()
 		alpha = atan((float)ytiles/(float)xtiles);
 		if( xtiles < 0 )
 		{
-			alpha = M_PI+alpha;
+			alpha = (float)M_PI+alpha;
 		}
 	}
 	facing = (40-(Sint8)(alpha*16/M_PI))&0x1f;
@@ -175,7 +177,7 @@ void BAttackAnimEvent::run()
 		{
 			if (NeedToCharge)
 			{
-				frame = StartFrame;
+				frame = (Uint8) StartFrame;				//desired conversion?
 				char* Snd = 0;
 				Snd = strct->getType()->getWeapon()->getChargingSound();
 				if (Snd != 0){
@@ -199,7 +201,7 @@ void BAttackAnimEvent::run()
 			p::aequeue->scheduleEvent(this);
 			return;
 		}
-		frame = StartFrame;
+		frame = (Uint8) StartFrame;						//desired conversion?
 		if (strct->getNumbImages (0)> frame)
 		{
 			strct->setImageNum(frame,0);
