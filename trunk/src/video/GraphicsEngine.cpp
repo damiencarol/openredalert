@@ -31,7 +31,7 @@
 #include "game/CnCMap.h"
 #include "game/PlayerPool.h"
 #include "game/Player.h"
-#include "game/Unit.h"
+#include "game/Unit.hpp"
 #include "game/UnitAndStructurePool.h"
 #include "audio/SoundEngine.h"
 #include "include/sdllayer.h"
