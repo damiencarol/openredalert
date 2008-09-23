@@ -47,7 +47,8 @@ string MissionMapsClass::getGdiMissionMap(Uint32 missionNumber)
 string MissionMapsClass::getNodMissionMap(Uint32 missionNumber)
 {
 	//
-	if (missionNumber < NodMissionMaps.size()) {
+	if (missionNumber < NodMissionMaps.size()) 
+	{
 		return NodMissionMaps[missionNumber];
 	}
 	return NULL;
@@ -77,20 +78,39 @@ void MissionMapsClass::readMissionData()
 	}
 	
 	// Parse all line of the file
-	while (MapFile->getLine(Line, sizeof (Line))) 
+	int linesize = sizeof (Line);
+	while (MapFile->getLine(Line, linesize )) 
 	{
 		// Get the string
 		tmpString = Line;
 
+		if (tmpString.empty())
+			continue;
 		//memset (Line, '\0', sizeof (Line));
 
-		int i = 0;
-		while (tmpString[i] != '\0') {
-			if (tmpString[i] == '[' || tmpString[i] == ']') {
-				tmpString.erase(i, i+1);
-			}
-			i++;
+		int index = string::npos;
+		while (tmpString.find('[') != -1 || tmpString.find(']') != -1)
+		{
+			 index = tmpString.find('[');
+			 if (index != string::npos)
+				 tmpString.replace(index, 1, "");
+			 index = tmpString.find(']');
+			 if (index != string::npos)
+			 {
+				 tmpString.replace(index, 1, "");
+			 //HACK: can we cut everything after this ']'? in windows there will be these special chars that seem to disturb... but more important would be to find the source for those strange chars and get em out
+
+				 //debug these strange chars:
+			//	 char one = tmpString[index];
+			//	 char two = tmpString[index+1];
+
+				tmpString = tmpString.substr(0, index);
+			 }
+
 		}
+
+		/*		OUTCOMMENCTED:	//VS runtime checks wont like if you check on something that position.... it will trigger an assert		while (tmpString[i] != '\0')	{			if (tmpString[i] == '[' || tmpString[i] == ']') 			{				tmpString.erase(i, i+1);			} 			i++;		}		*/
+
 		// Check if the mission is availlable
 		VFile* tmp = VFSUtils::VFS_Open(tmpString.c_str());
 		
@@ -112,10 +132,10 @@ void MissionMapsClass::readMissionData()
 				if ((pos = tmpString.find("SCU", 0)) != (Uint32)string::npos)
 				{
 					// Add the mission in Allies Mission list
-					NodMissionMaps.push_back(tmpString);
+					NodMissionMaps.push_back(tmpString);			//they are in format like ex "SCU06EA"
 				} else {
 					// Add the mission in Soviets Mission list
-					GdiMissionMaps.push_back(tmpString);
+					GdiMissionMaps.push_back(tmpString);			//they are in format like ex "SCG01EA"
 				}
 			}
 		}
