@@ -21,6 +21,7 @@
 #include <cctype>
 #include <vector>
 
+#include "include/common.h"
 #include "Projectile.h"
 #include "UnitOrStructure.h"
 #include "Warhead.h"
@@ -69,7 +70,8 @@ Weapon::Weapon(const char* wname)
 	//Uint8 i;
 	string projname, warheadname;
 	string weapname;
-
+	//string::iterator p;
+	
 	INIFile* rules = 0;
 
 	name = string(wname);
@@ -79,8 +81,10 @@ Weapon::Weapon(const char* wname)
 	weapini = p::weappool->getWeaponsINI();
 	weapname = (string)wname;
 
-	// UPPER the string 'weapname'
-	for_each(weapname.begin(), weapname.end(), toupper);
+	// UPPER the strin 'weapname'
+	//p = weapname.begin();while (p!=weapname.end())	{*p++ = toupper(*p);}	//no good in VC
+	strUpper(weapname);	//for (int i = 0; i < weapname.size(); i++)	{		weapname[i]= toupper(weapname[i]);	}
+	
 
 
 	pname = weapini->readString(wname, "projectile");
@@ -93,8 +97,8 @@ Weapon::Weapon(const char* wname)
 	}
 	projname = (string)pname;
 
-	// UPPER the string 'projname'
-	for_each(projname.begin(), projname.end(), toupper);
+	// UPPER the strin 'projname'
+	strUpper(weapname);
 
 
 	projentry = p::weappool->projectilepool.find(projname);
