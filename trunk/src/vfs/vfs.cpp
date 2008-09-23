@@ -203,33 +203,33 @@ VFile * VFSUtils::VFS_Open(const char *fname)
  */
 VFile * VFSUtils::VFS_Open(const char *fname, const char* mode)
 {
-    unsigned int fnum; // id of the loaded file
-
-    // Try to get the file
-    fnum = externals->getFile(fname, mode);
-    if (fnum != (Uint32) - 1)
-    {
-        // return the new file created
-        return new VFile(fnum, externals);
-    }
-    // Won't attempt to write/create files in real archives
-    if (mode[0] != 'r')
-    {
-        // return NULL
-        return 0;
-    }
-
-    if (mixfiles != 0)
-    {
-        fnum = mixfiles->getFile(fname);
-        if (fnum != -1)
-        {
-            return new VFile(fnum, mixfiles);
-        }
-    }
-
-    // No file found for this name
-    return 0;
+	Uint32 fnum; // id of the loaded file
+	
+	// Try to get the file
+	fnum = externals->getFile(fname, mode);
+	if (fnum != ExternalFiles::ErrorLoadingFile)
+	{
+		// return the new file created
+		return new VFile(fnum, externals);
+	}
+	// Won't attempt to write/create files in real archives
+	if (mode[0] != 'r')
+	{
+		// return NULL
+		return 0;
+	}
+	
+	if (VFSUtils::mixfiles != NULL)			//if original mix files found, fetch the ini from the mix file
+	{
+		fnum = mixfiles->getFile(fname);
+		if (fnum != ExternalFiles::ErrorLoadingFile)
+		{
+			return new VFile(fnum, mixfiles);
+		}
+	}
+	
+	// No file found for this name
+	return 0;
 }
 
 /**
