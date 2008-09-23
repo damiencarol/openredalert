@@ -70,6 +70,9 @@ public:
 private:
     /** Internal data */
     map<string, INISection> Inidata;
+#ifdef _DEBUG
+	std::string filename;				///<for debugging purposes, in debugmode store which file this instance represents
+#endif
 };
 
 #endif //INIFILE_H
