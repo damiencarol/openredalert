@@ -43,6 +43,7 @@ extern Logger * logger;
 /**
  * Constructor, opens the file
  *
+ * files beginning with ";" are ignored, tabs & spaces at beginning are ignored
  * @param filename the name of the inifile to open.
  */
 INIFile::INIFile(const char* filename)
@@ -50,7 +51,7 @@ INIFile::INIFile(const char* filename)
 	char line[1024];
 	char key[1024];
 	char value[1024];
-	Uint32 i;
+//	Uint32 i;
 	char* str;
 
 	VFile* inifile;
@@ -92,35 +93,19 @@ INIFile::INIFile(const char* filename)
 				//                cursection.clear();
 				newSection.clear();
 			}
-			for (i = 0; key[i] != '\0'; i++) {
-				key[i] = toupper(key[i]);
-			}
+			strUpper(key);
 			cursectionName = key;
-		} else if (cursectionName != "" && sscanf(str, "%[^=]=%[^\r\n;]", key,
-				value) == 2) {
-			for (i = 0; key[i] != '\0'; i++) {
-				key[i] = toupper(key[i]);
-			}
-			if (strlen(key) > 0) {
-				str = key + strlen(key) - 1;
-				while ((*str) == ' ' || (*str) == '\t') {
-					(*str) = '\0';
-					if (str == key) {
-						break;
-					}
-					str--;
-				}
-			}
-			if (strlen(value) > 0) {
-				str = value + strlen(value) - 1;
-				while ((*str) == ' ' || (*str) == '\t') {
-					(*str) = '\0';
-					if (str == value) {
-						break;
-					}
-					str--;
-				}
-			}
+		}
+		else if (cursectionName != "" && sscanf(str, "%[^=]=%[^\r\n;]", key,
+				value) == 2)
+		{
+			strUpper(key);
+
+			if (strlen(key) > 0)
+				strStripWhiteSpace(key);
+			if (strlen(value) > 0)
+				strStripWhiteSpace(key);
+
 			str = value;
 			while ((*str) == ' ' || (*str) == '\t') {
 				str++;
@@ -139,6 +124,10 @@ INIFile::INIFile(const char* filename)
 		//        cursection.clear();
 		newSection.clear();
 	}
+
+#ifdef _DEBUG
+	this->filename = filename;
+#endif
 
 	// Close the file
 	VFSUtils::VFS_Close(inifile);
@@ -361,7 +350,8 @@ int INIFile::getNumberOfKeysInSection(string section) {
 	transform(s.begin(), s.end(), s.begin(), toupper);
 
 	sec_new = Inidata.find(s);
-	if (sec_new == Inidata.end()) {
+	if (sec_new == Inidata.end()) 
+	{	//TODO: is this intened NOT to throw here?
 		//throw KeyNotFound("Section [" + string(section) + "] not found in .ini file.");
 		return 0;
 	}
