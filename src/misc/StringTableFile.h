@@ -21,34 +21,31 @@
 #include <string>
 #include <vector>
 
-#include "SDL/SDL_types.h"
-
 using std::string;
 using std::vector;
 
 /**
  * Utility Class to read located strings in the original mix archives files
- * 
- * @author Damien Carol
+ *
+ * @author Damien Carol (OpenRedAlert)
  * @version 1.0
  */
-class StringTableFile {
+class StringTableFile
+{
 public:
-	/** Create a StringTableFile object and load all strings in the file specified */
-    StringTableFile(string filename);
     /** Create a StringTableFile object and load all strings in the file specified */
-    StringTableFile(const char * filename);
+    StringTableFile(const string& filename);
     /** Destructor */
-    ~StringTableFile();    
-    
+    ~StringTableFile();
+
     /** Get the string by this id number */
-    string getString(Uint32 id);    
+    string getString(unsigned int id) const;
 private:
-	/** Load all strings in a file from mix archive */
-	void loadStringFile(const char* filename);	
-	
-	/** List of string loaded from the file */
-    vector <string> data;
+    /** Load all strings in a file from mix archive */
+    void loadStringFile(const char* filename);
+
+    /** List of string loaded from the file */
+    vector<string> data;
 };
 
 #endif //STRINGTABLEFILE_H
