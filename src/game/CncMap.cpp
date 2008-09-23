@@ -27,7 +27,7 @@
 #include "UnitAndStructurePool.h"
 #include "MissionData.h"
 #include "CellTrigger.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "LoadMapError.h"
 #include "GameMode.h"
 #include "TriggerAction.h"

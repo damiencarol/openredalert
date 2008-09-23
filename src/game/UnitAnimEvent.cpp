@@ -22,8 +22,7 @@
 #include "SDL/SDL_types.h"
 #include "UnitOrStructure.h"
 #include "ActionEventQueue.h"
-#include "game/Unit.h"
-#include "Unit.h"
+#include "Unit.hpp"
 
 namespace p {
 	extern ActionEventQueue * aequeue;

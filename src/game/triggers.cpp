@@ -26,7 +26,7 @@
 #include "audio/SoundEngine.h"
 #include "CnCMap.h"
 #include "UnitAndStructurePool.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "PlayerPool.h"
 #include "RA_Tigger.h"
 #include "Player.h"

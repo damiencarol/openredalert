@@ -28,7 +28,7 @@
 #include "triggers.h"
 #include "video/SHPImage.h"
 #include "game/MiniMapClipping.h"
-#include "game/Unit.h"
+#include "game/Unit.hpp"
 #include "misc/INIFile.h"
 #include "misc/gametypes.h"
 

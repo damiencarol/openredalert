@@ -36,7 +36,7 @@
 #include "Structure.h"
 #include "ConStatus.h"
 #include "pside.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "PowerInfo.h"
 
 #include "misc/INIFile.h"

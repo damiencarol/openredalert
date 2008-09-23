@@ -27,7 +27,7 @@
 #include "PlayerPool.h"
 #include "UnitOrStructure.h"
 #include "unittypes.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "ActionEventQueue.h"
 
 namespace p {

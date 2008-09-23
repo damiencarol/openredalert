@@ -29,10 +29,9 @@
 #include "Projectile.h"
 #include "Weapon.h"
 #include "PlayerPool.h"
-#include "game/Unit.h"
 #include "CnCMap.h"
 #include "include/Logger.h"
-#include "Unit.h"
+#include "Unit.hpp"
 
 namespace p {
 	extern PlayerPool* ppool;

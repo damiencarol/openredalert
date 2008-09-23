@@ -22,7 +22,7 @@
 
 #include "SDL/SDL_types.h"
 #include "UnitOrStructure.h"
-#include "Unit.h"
+#include "Unit.hpp"
 
 using std::vector;
 

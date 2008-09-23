@@ -26,7 +26,7 @@
 
 #include "ConStatus.h"
 #include "UnitOrStructureType.h"
-#include "Unit.h"
+#include "Unit.hpp"
 
 class MoneyCounter;
 class Structure;

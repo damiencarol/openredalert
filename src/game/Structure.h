@@ -27,7 +27,7 @@
 #include "StructureType.h"
 #include "Weapon.h"
 #include "UnitType.h"
-#include "Unit.h"
+#include "Unit.hpp"
 
 using std::string;
 
