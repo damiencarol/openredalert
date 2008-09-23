@@ -98,9 +98,11 @@ void MultiPlayerMaps::readMapData()
 		// Copy the line
 		tmpString = Line; 
 
-		int i = 0;
-		while (tmpString[i] != '\0'){
-			if (tmpString[i] == '[' || tmpString[i] == ']'){
+		//int i = 0;		while (tmpString[i] != '\0')	//VS runtime checks wont like if you check on something that position.... it will trigger an assert
+		for (unsigned int i = 0 ; i < tmpString.size(); i++)
+		{
+			if (tmpString[i] == '[' || tmpString[i] == ']')
+			{
 				tmpString.erase(i,i+1);
 			}
 			i++;
