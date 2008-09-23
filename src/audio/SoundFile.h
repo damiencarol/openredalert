@@ -31,6 +31,10 @@ using std::string;
 
 /**
  * Audio file
+
+ * @author Damien Carol (OpenRedAlert)
+ * @version 1.1
+ * @since r???
  */
 class SoundFile
 {
@@ -50,7 +54,7 @@ private:
     string filename;
     /** Reference to the file */
     VFile* file;
-    //Uint32 offset;
+    /** true if file is opened */
     bool fileOpened;
 
     // Header information
@@ -60,11 +64,12 @@ private:
     Uint8 flags;
     Uint8 type;
 
-    // IMADecode state
+    /** IMADecode info */
     Sint32 imaSample;
+    /** IMADecode info */
     Sint32 imaIndex;
 
-
+    /** Audio converter filter */
     SDL_AudioCVT* conv;
 };
 
