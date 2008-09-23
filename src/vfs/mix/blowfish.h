@@ -29,7 +29,7 @@ typedef Uint32 t_bf_s[4][256];
  * Modified slightly for FreeCNC use by Kareem Dana
  * Special Thanks to Olaf van der Spek (xcc.ra2mods.com) for the original
  *
- *
+ * this is needed so we can read the MIX files
  */
 class Cblowfish
 {
