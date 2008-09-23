@@ -387,12 +387,12 @@ Uint32 MIXFiles::readDWord(Uint32 file, Uint32 *databuf, Uint32 numDWords)
     return numRead;
 }
 
-char *MIXFiles::readLine(Uint32 file, char *databuf, Uint32 buflen)
+char* MIXFiles::readLine(Uint32 file, char *databuf, Uint32 buflen)
 {
     Uint32 numRead;
     Uint32 id, pos;
     MIXEntry me;
-    char *retval;
+    char* retval;
 
     id = openfiles[file].id;
     pos = openfiles[file].pos;
@@ -403,10 +403,10 @@ char *MIXFiles::readLine(Uint32 file, char *databuf, Uint32 buflen)
 
     numRead = min(buflen-1, me.size-pos);
     if( numRead == 0 ) {
-        return NULL;
+        return NULL;			
     }
     retval = mixfiles[me.filenum]->getLine(databuf, numRead+1);
-    openfiles[file].pos += (Uint32)strlen(databuf);
+    openfiles[file].pos += strlen(databuf);
     return retval;
 }
 
