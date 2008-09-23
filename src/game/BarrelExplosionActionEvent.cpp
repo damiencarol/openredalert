@@ -76,8 +76,9 @@ void BarrelExplosionActionEvent::run() {
 			
 			xtiles = position % p::ccmap->getWidth() - curpos % p::ccmap->getWidth();
 			ytiles = position / p::ccmap->getWidth() - curpos / p::ccmap->getWidth();
+
+		double distance = sqrt(((double)xtiles*xtiles + ytiles*ytiles));		
 			
-			double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
 			double realDamage = 256;
 			for (unsigned int m = 0; m<distance; m++)
 			{
