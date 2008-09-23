@@ -229,9 +229,12 @@ void SoundEngine::SetMusicVolume(int volume)
     Mix_VolumeMusic(volume);
 }
 
+/**
+ */
 void SoundEngine::PlayMusic()
 {
-    if (nosound){
+    if (nosound)
+    {
         return;
     }
     if (!Mix_PlayingMusic()) {
@@ -243,50 +246,68 @@ void SoundEngine::PlayMusic()
     }
 }
 
+/**
+ */
 void SoundEngine::PauseMusic()
 {
-    if (nosound){
-        return;
+    if (nosound)
+    {
+        return;        
     }
     Mix_PauseMusic();
 }
 
+/**
+ */
 void SoundEngine::StopMusic()
 {
     if (nosound)
+    {
         return;
-
+	}
     Mix_HookMusic(NULL, NULL);
     musicDecoder.Close();
 }
 
-
+/**
+ * @param sound The soundtrack to play
+ */
 void SoundEngine::PlayTrack(const string& sound)
 {
-    if (nosound)
+    if (nosound == true)
+    {
         return;
-
+    }
+    
     StopMusic();
 
-    if (sound == "No theme") {
+    if (sound == "No theme")
+    {
         PlayMusic();
         return;
     }
 
-    if (musicDecoder.Open(sound)) {
+    if (musicDecoder.Open(sound))
+    {
         musicFinished = false;
         Mix_HookMusic(MusicHook, reinterpret_cast<void*>(&musicFinished));
     }
 }
 
+/**
+ */
 void SoundEngine::NextTrack()
 {
     if (nosound)
+    {
         return;
-
+    }
+    
     if (++currentTrack == playlist.end())
+    {
         currentTrack = playlist.begin();
-
+    }
+    
     PlayTrack(*currentTrack);
 }
 
@@ -295,12 +316,16 @@ void SoundEngine::NextTrack()
 void SoundEngine::PrevTrack()
 {
     if (nosound)
+    {
         return;
-
+    }
+    
     if (currentTrack == playlist.begin())
+    {
         currentTrack = playlist.end();
-
-    PlayTrack(*(--currentTrack));
+    }
+    --currentTrack;
+    PlayTrack(*currentTrack);
 }
 
 /**

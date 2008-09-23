@@ -61,7 +61,8 @@ SoundFile::~SoundFile(){
 /**
  *
  */
-bool SoundFile::Open(const string& filename){
+bool SoundFile::Open(const string& filename)
+{
     Close();
 
     // Open file
