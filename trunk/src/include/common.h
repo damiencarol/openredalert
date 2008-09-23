@@ -100,7 +100,9 @@ inline bool isRelativePath(const char *p) {
 /// @todo Stringify this funciton
 std::vector<char*> splitList(char* line, char delim);
 
+#ifdef _MSC_VER
 int round(double a);
+#endif
 void strUpper(std::string& stringToUpper);
 void strUpper(char* stringToUpper);
 void strStripWhiteSpace(char* stringToRemoveWhitespaces);		///<removes all occurences of spaces or \t from the end

@@ -26,11 +26,7 @@
 #include "CnCMap.h"
 #include "PlayerPool.h"
 #include "UnitAndStructurePool.h"
-//#include "Weaponspool.h"
-#include "audio/SoundEngine.h"
 #include "Dispatcher.h"
-#include "video/Renderer.h"
-#include "misc/INIFile.h"
 #include "GameMode.h"
 #include "UnitOrStructure.h"
 #include "Structure.h"
@@ -40,6 +36,9 @@
 #include "Unit.hpp"
 #include "include/Logger.h"
 #include "include/config.h"
+#include "misc/INIFile.h"
+#include "audio/SoundEngine.h"
+#include "video/Renderer.h"
 
 #define DEBUG_AI
 
@@ -75,7 +74,7 @@ Ai::Ai()
 		UnitBuildMultiplexer.push_back(0);
 	}
 //  AiDifficultyTimer.Start();
-	
+
 	// Create Rules
 	Rules = new AiRules();
 
@@ -193,9 +192,9 @@ void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 		if (!lUnit->canAttack() || lUnit->IsAttacking() || lUnit->IsMoving ()){
 			continue;
 		}
-		
+
 		lEnemyUnit = EnemyUnitInRange (pPlayerNumb, lUnit );
-		
+
 		if (lEnemyUnit != NULL && lUnit->canAttack()){
 
 			// Don't distract units on a AI mission (only abort the mission if we see a harvester)
@@ -292,8 +291,8 @@ void Ai::DefendComputerPlayerUnitUnderAttack (Player *Player, int PlayerNumb, Un
 	vector<Unit*>	unitpool;
 	Unit* lUnit = 0;
 	int	Distance, SightRange, UnitUnderAttackPos;
-	
-	
+
+
 
 	if ( Enemy == NULL || UnitUnderAttack == NULL)
 		return;
@@ -396,7 +395,7 @@ void Ai::handle()
 		if (PlayerNumb == HumanPlayerNumb){
 			continue;
 		}
-		
+
 		if ((SDL_GetTicks() - LastHarvestTickCount[PlayerNumb]) > 1000){
 			LastHarvestTickCount[PlayerNumb] = SDL_GetTicks();
 			this->Harvest (CurPlayer, PlayerNumb);
@@ -430,7 +429,7 @@ void Ai::handle()
 	}
 }
 
-void Ai::guideAttack (Player *Player, int PlayerNumb) 
+void Ai::guideAttack (Player *Player, int PlayerNumb)
 {
     int NumbUnits;
     int NumbStructures;
@@ -634,7 +633,7 @@ void Ai::guideAttack (Player *Player, int PlayerNumb)
 }
 
 /**
- * 
+ *
  */
 Uint32 Ai::getDist(Uint32 pos1, Uint32 pos2)
 {
@@ -647,7 +646,7 @@ Uint32 Ai::getDist(Uint32 pos1, Uint32 pos2)
     xdiff = abs(x-nx);
     ydiff = abs(y-ny);
 //    return min(xdiff,ydiff)+abs(xdiff-ydiff);
-#ifdef _WIN32
+#ifdef _MSC_VER
 	return sqrt ( ((double) ((long)xdiff*xdiff+ydiff*ydiff))  );		//performance?
 #else
 	return (Uint32) sqrt (((long)xdiff*xdiff+ydiff*ydiff));
@@ -699,7 +698,7 @@ bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
 }
 
 /**
- * 
+ *
  */
 bool Ai::BuildStructure (Player *Player, int PlayerNumb, const char *structname, Uint32 ConstYardPos)
 {
@@ -755,7 +754,7 @@ bool Ai::BuildStructure (Player *Player, int PlayerNumb, const char *structname,
 }
 
 /**
- * 
+ *
  */
 unsigned int Ai::FindClosesedTiberium(Unit *Unit)
 {
@@ -1222,7 +1221,7 @@ Structure* Ai::EnemyStructureInRange (int MyPlayerNumb, Unit* MyUnit, int Attack
 	std::vector<Structure*>	Enemystructurepool;
 	Structure*  EnemyStructure;
 
-	
+
 	if (MyUnit == NULL)
 		return NULL;
 
@@ -1388,22 +1387,3 @@ void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
 		}
 	}
 }
-
-// AI destructor
-
-
-
-
-
-
-//
-//	Actually this function attacks enemy units and structures in range :)
-//
-
-
-// Send all units to defend if our base is under attack
-
-
-// Help a computer player unit under attack
-
-
