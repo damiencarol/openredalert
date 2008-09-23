@@ -102,6 +102,42 @@ void CleanConfig()
 	p::Setting.clear();
 }
 
+int round(double a)
+{
+return int(a + 0.5);
+}
+
+void strUpper(std::string& stringToUpper)
+{
+	for (int i = 0; i < stringToUpper.size(); i++)
+	{
+		stringToUpper[i]= toupper(stringToUpper[i]);
+	}	
+	//or could use something like "transform(warheadname.begin(), warheadname.end(), warheadname.begin(),			toupper);?"
+}
+
+void strUpper(char* stringToUpper)
+{
+	for (int i = 0; stringToUpper[i] != '\0'; i++)
+	{
+		stringToUpper[i] = toupper(stringToUpper[i]);
+	}
+}
+
+void strStripWhiteSpace(char* key)
+{
+	char* tmp = key+strlen(key)-1;
+	while ((*tmp) == ' ' || (*tmp) == '\t')
+	{
+		(*tmp) = '\0';
+		if (tmp == key)
+		{
+			return;
+		}
+		tmp--;
+	}
+}
+
 
 /** 
  * Client only
