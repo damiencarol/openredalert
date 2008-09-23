@@ -100,7 +100,7 @@ Warhead::~Warhead()
 
 bool Warhead::getWall()
 {
-	return this->lnkWarheadData->getWall();
+	return this->lnkWarheadData->getWall() != 0;
 }
 
 WarheadData* Warhead::getType()

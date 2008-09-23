@@ -20,7 +20,7 @@
 #include <cmath>
 
 #include "SDL/SDL_types.h"
-
+#include "include/common.h"
 #include "UnitOrStructure.h"
 #include "ExplosionAnim.h"
 #include "L2Overlay.h"

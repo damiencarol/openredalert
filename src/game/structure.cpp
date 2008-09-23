@@ -761,7 +761,7 @@ Uint32 Structure::getExitCell() const
 {
     return cellpos+(type->getYsize()*p::ccmap->getWidth());
 }
-bool Structure::checkdamage()
+bool Structure::checkdamage()			//TODO: is this intended to be boolean???
 {
     ratio = ((double)health)/((double)type->getMaxHealth());
     if (type->isWall()) {
