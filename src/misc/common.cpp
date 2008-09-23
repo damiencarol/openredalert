@@ -31,8 +31,8 @@
 #include "include/Logger.h"
 #include "game/Dispatcher.h"
 
-using std::cout; 
-using std::map; 
+using std::cout;
+using std::map;
 using std::string;
 
 typedef struct TiniFile
@@ -66,13 +66,13 @@ namespace p {
 	RedAlertDataLoader * raLoader;
 }
 
-/** 
+/**
  * Check if a inifile was already loaded in the p::Setting list
- * 
+ *
  * if not this function loads it in the list
  * We pass by value because we could copy anyway
  */
-INIFile* GetConfig(string name) 
+INIFile* GetConfig(string name)
 {
 	TiniFile TempIniFile;
 
@@ -95,30 +95,32 @@ INIFile* GetConfig(string name)
 
 void CleanConfig()
 {
-	
+
 	for (Uint32 i = 0; i < p::Setting.size(); i++){
 		delete p::Setting[i].inifile;
 	}
 	p::Setting.clear();
 }
 
+#ifdef _MSC_VER
 int round(double a)
 {
-return int(a + 0.5);
+	return (a + 0.5);
 }
+#endif
 
 void strUpper(std::string& stringToUpper)
 {
-	for (int i = 0; i < stringToUpper.size(); i++)
+	for (unsigned int i = 0; i < stringToUpper.size(); i++)
 	{
 		stringToUpper[i]= toupper(stringToUpper[i]);
-	}	
+	}
 	//or could use something like "transform(warheadname.begin(), warheadname.end(), warheadname.begin(),			toupper);?"
 }
 
 void strUpper(char* stringToUpper)
 {
-	for (int i = 0; stringToUpper[i] != '\0'; i++)
+	for (unsigned int i = 0; stringToUpper[i] != '\0'; i++)
 	{
 		stringToUpper[i] = toupper(stringToUpper[i]);
 	}
@@ -139,7 +141,7 @@ void strStripWhiteSpace(char* key)
 }
 
 
-/** 
+/**
  * Client only
  */
 namespace pc {
@@ -156,7 +158,7 @@ namespace pc {
 	//MissionMapsClass	*MissionsMapdata = 0;
 	bool 			quit = false;
 	ConfigType		Config;
-	Ai				*ai;	
+	Ai				*ai;
 }
 
 // Server only

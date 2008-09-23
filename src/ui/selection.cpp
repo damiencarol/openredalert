@@ -30,7 +30,7 @@
 #include "game/weaponspool.h"
 #include "game/UnitOrStructure.h"
 #include "game/Structure.h"
-#include "game/Unit.h"
+#include "game/Unit.hpp"
 
 namespace p {
 	extern Dispatcher* dispatcher;
