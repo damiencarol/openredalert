@@ -17,6 +17,12 @@
 
 #include "MessagePool.h"
 
+
+#ifdef _WIN32
+#include <algorithm>
+#endif
+
+
 #include <list>
 #include <functional>
 #include <algorithm>
