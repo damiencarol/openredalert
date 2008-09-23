@@ -28,7 +28,7 @@
 #include "Warhead.h"
 #include "WarheadData.h"
 #include "Projectile.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "UnitAndStructurePool.h"
 #include "ActionEventQueue.h"
 #include "CnCMap.h"

@@ -28,7 +28,7 @@
 #include "TurnAnimEvent.h"
 #include "UAttackAnimEvent.h"
 #include "Path.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "UnitType.h"
 #include "ActionEventQueue.h"
 #include "animinfo_t.h"

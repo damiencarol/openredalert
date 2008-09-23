@@ -25,7 +25,7 @@
 #include "include/config.h"
 #include "include/Logger.h"
 #include "PlayerPool.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "UnitAndStructurePool.h"
 #include "vfs/vfs.h"
 #include "StructureType.h"

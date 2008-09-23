@@ -30,7 +30,7 @@
 #include "Player.h"
 #include "PlayerPool.h"
 #include "include/Logger.h"
-#include "Unit.h"
+#include "Unit.hpp"
 
 namespace p {
 	extern ActionEventQueue * aequeue;

@@ -49,7 +49,7 @@
 #include "unittypes.h"
 #include "Projectile.h"
 #include "Weapon.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "InfantryGroup.h"
 #include "include/config.h"
 #include "ActionEventQueue.h"

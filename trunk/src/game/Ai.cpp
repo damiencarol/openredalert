@@ -25,7 +25,6 @@
 #include "ActionEventQueue.h"
 #include "CnCMap.h"
 #include "PlayerPool.h"
-#include "game/Unit.h"
 #include "UnitAndStructurePool.h"
 //#include "Weaponspool.h"
 #include "audio/SoundEngine.h"
@@ -38,7 +37,7 @@
 #include "pside.h"
 #include "Player.h"
 #include "AiRules.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "include/Logger.h"
 #include "include/config.h"
 

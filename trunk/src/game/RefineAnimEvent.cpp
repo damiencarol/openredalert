@@ -23,7 +23,7 @@
 #include "PlayerPool.h"
 #include "ProjectileAnim.h"
 #include "audio/SoundEngine.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "Player.h"
 #include "anim_nfo.h"
 #include "Structure.h"

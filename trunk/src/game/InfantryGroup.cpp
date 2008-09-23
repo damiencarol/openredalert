@@ -31,7 +31,7 @@
 #include "PlayerPool.h"
 #include "audio/SoundEngine.h"
 #include "UnitAndStructurePool.h"
-#include "Unit.h"
+#include "Unit.hpp"
 
 using std::string;
 using std::vector;

@@ -28,7 +28,7 @@
 #include "WalkAnimEvent.h"
 #include "ActionEventQueue.h"
 #include "UnitAndStructurePool.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "InfantryGroup.h"
 
 namespace p {

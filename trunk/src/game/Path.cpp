@@ -25,7 +25,7 @@
 #include "KeyComp.h"
 #include "FibHeapEntry.h"
 #include "TileRef.h"
-#include "Unit.h"
+#include "Unit.hpp"
 using std::min;
 
 namespace p 

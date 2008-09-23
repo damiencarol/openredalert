@@ -24,7 +24,7 @@
 #include "MoveAnimEvent.h"
 #include "Structure.h"
 #include "UnitAndStructurePool.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "ActionEventQueue.h"
 
 namespace p {

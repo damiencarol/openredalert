@@ -21,7 +21,7 @@
 #include "SDL/SDL_types.h"
 
 #include "UnitAnimEvent.h"
-#include "Unit.h"
+#include "Unit.hpp"
 
 class WalkAnimEvent : public UnitAnimEvent
 {

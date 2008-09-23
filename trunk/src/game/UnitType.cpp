@@ -29,7 +29,7 @@
 #include "include/Logger.h"
 #include "PlayerPool.h"
 #include "audio/SoundEngine.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "UnitAndStructurePool.h"
 #include "ui/Sidebar.h"
 #include "video/ImageNotFound.h"

@@ -25,7 +25,7 @@
 #include "PlayerPool.h"
 #include "ProjectileAnim.h"
 #include "audio/SoundEngine.h"
-#include "Unit.h"
+#include "Unit.hpp"
 #include "UnitAndStructurePool.h"
 #include "weaponspool.h"
 #include "anim_nfo.h"
