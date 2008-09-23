@@ -17,6 +17,10 @@
 
 #include "Sidebar.h"
 
+#ifdef _WIN32
+#include <algorithm>
+#include <functional>
+#endif
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
