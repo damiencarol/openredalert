@@ -15,7 +15,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "Unit.h"
+#include "Unit.hpp"
 
 #include <cstdlib>
 #include <cstring>
@@ -63,7 +63,7 @@ using std::string;
 using std::vector;
 
 
-/** 
+/**
  * @note to self, pass owner, cellpos, facing and health to this (maybe subcellpos)
  */
 Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
@@ -95,12 +95,12 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
     l2o = 0;
     xoffset = 0;
     yoffset = 0;
-    
+
     ratio = (double)rhealth/256.0f;
     Uint16 newHealth = (Uint16)(ratio * type->getMaxHealth());
     // Set the Health
     setHealth((Uint16)newHealth);
-    
+
     infgrp = group;
 
     if (infgrp != 0)
@@ -123,7 +123,7 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
     {
 	   this->Harvest(0, 0);
     }
-    
+
     AI_Mission = 1;
 
 	TriggerName = trigger_name;
@@ -133,7 +133,7 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
 
 	// Init last damage tick var
 	LastDamageTick = SDL_GetTicks();
-	
+
 	// Initialisation
 	infianim = 0;
 }
@@ -168,9 +168,9 @@ Unit::~Unit()
 			//printf ("%s line %i: Numb infantry not 0\n", __FILE__, __LINE__);
 //        }
     }
-    
+
     if (deployed) {
-        // @todo This is a client thing. Will dispatch a 
+        // @todo This is a client thing. Will dispatch a
     	// "play these sounds" event when the time comes.
 		if (this->getOwner() == p::ppool->getLPlayerNum()){
 			pc::sfxeng->PlaySound(pc::Config.UnitDeployed);
@@ -218,7 +218,7 @@ void Unit::setInfantryGroup(InfantryGroup *ig)
 	infgrp = ig;
 }
 
-Uint32 Unit::getImageNum(Uint8 layer) const 
+Uint32 Unit::getImageNum(Uint8 layer) const
 {
 	return type->getSHPNums()[layer]+imagenumbers[layer];
 }
@@ -258,8 +258,8 @@ Sint8 Unit::getXoffset() const
 }
 
 Sint8 Unit::getYoffset() const
-{ 
-	return yoffset; 
+{
+	return yoffset;
 }
 
 void Unit::setXoffset(Sint8 xo)
@@ -272,8 +272,8 @@ void Unit::setXoffset(Sint8 xo)
 }
 
 void Unit::setYoffset(Sint8 yo)
-{ 
-	this->yoffset = yo; 
+{
+	this->yoffset = yo;
 }
 
 UnitType* Unit::getType()
@@ -309,7 +309,7 @@ void Unit::setUnitnum(Uint32 unum)
 void Unit::ChangeHealth(Sint16 amount)
 {
 	Uint16 oldHealth = getHealth();
-	
+
 	if (oldHealth + amount > type->getMaxHealth()){
 		setHealth(type->getMaxHealth());
 	} else if (oldHealth + amount < 0){
@@ -339,7 +339,7 @@ void Unit::move(Uint16 dest, bool needStop)
 	if (needStop && harvestanim != NULL){
 		harvestanim->stop();
 	}
-	
+
 	if (needStop && infianim != 0){
 		infianim->stop();
 	}
@@ -519,7 +519,7 @@ void Unit::stop()
     }
 }
 
-Uint8 Unit::getOwner() const 
+Uint8 Unit::getOwner() const
 {
 	return owner;
 }
@@ -529,7 +529,7 @@ void Unit::setOwner(Uint8 newowner)
 	owner = newowner;
 }
 
-void Unit::remove() 
+void Unit::remove()
 {
     p::ppool->getPlayer(owner)->lostUnit(this, deployed);
     UnitOrStructure::remove();
@@ -562,23 +562,23 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 	if (weap != 0){
 		amount = (Sint16)((double)amount * weap->getVersus(type->getArmor()));
 	}
-	
-    if ((getHealth()-amount) <= 0) 
+
+    if ((getHealth()-amount) <= 0)
     {
     	// Throw the event
     	logger->debug("TRIGGER_EVENT_DESTROYED unit\n");
     	// (-1 means nothing)
     	HandleTriggers((UnitOrStructure*)this, TRIGGER_EVENT_DESTROYED, -1);
-        
+
 		doRandTalk(TB_die);
 
         // Add a death for stats
         if (attacker != 0){
         	p::ppool->getPlayer(attacker->getOwner())->addUnitKill();
         }
-        
+
         // todo: add infantry death animation here
-                
+
         // remove the unit
         p::uspool->removeUnit(this);
         return;
@@ -598,7 +598,7 @@ void Unit::updateDamaged()
 /**
  * @return <code>true</code> if the unit is an harvester else return <code>false</code>
  */
-bool Unit::IsHarvester() 
+bool Unit::IsHarvester()
 {
 	if (string(type->getTName()) == "HARV")
 	{
@@ -607,7 +607,7 @@ bool Unit::IsHarvester()
 	return false;
 }
 
-bool Unit::IsHarvesting() 
+bool Unit::IsHarvesting()
 {
 	if (harvestanim != 0)
 	{
@@ -629,10 +629,10 @@ Uint32 Unit::FindTiberium()
 	Uint32 ClosesedExpensiveDistance = 0;
 	bool FirstFound = false;
 	bool FirstExpensiveFound = false;
-	
+
 	Uint8 typeNumber;
 	Uint8 amount;
-	
+
 	//getUnitAt(Uint32 cell, Uint8 subcell);
 
 	for (unsigned int pos =0; pos < p::ccmap->getSize(); pos++)
@@ -686,7 +686,7 @@ Uint32 Unit::FindTiberium()
 
 void Unit::Harvest (Uint32 pos, Structure *Struct)
 {
-	if (harvestanim == NULL) 
+	if (harvestanim == NULL)
 	{
 		harvestanim = new UHarvestEvent(0, this);
 		p::aequeue->scheduleEvent(harvestanim);
@@ -718,7 +718,7 @@ bool Unit::Repair(Structure *str)
 	if (strcmp ((char*)str->getType()->getTName(), "FIX") != 0 ){
 		return false;
 	}
-	
+
 	// Get coordinates
 	p::ccmap->translateFromPos(str->getPos(), &xpos, &ypos);
 
@@ -759,8 +759,8 @@ void Unit::doRandTalk(TalkbackType ttype)
 bool Unit::deploy()
 {
 	// error catching
-    //if (canDeploy()) 
-    { 
+    //if (canDeploy())
+    {
         if (type->getDeployTarget() != 0)
         {
             deployed = true;
@@ -795,7 +795,7 @@ bool Unit::canDeploy(CnCMap* theMap)
  * @param theMap The map to deploy in
  * @param pos Position to check
  * @return <code>true</code> if the Unit can deploy
- */ 
+ */
 bool Unit::checkDeployTarget(CnCMap* theMap, Uint32 pos)
 {
     Uint8 placexpos;
@@ -803,36 +803,36 @@ bool Unit::checkDeployTarget(CnCMap* theMap, Uint32 pos)
     Uint32 curpos;
     Uint8 typewidth;
     Uint8 typeheight;
-    
+
     if (pos == (Uint32)(-1))
     {
         return false;
     }
-    if (type->getDeployType() == 0) 
+    if (type->getDeployType() == 0)
     {
         return false;
     }
-    
+
     typewidth = type->getDeployType()->getXsize();
     typeheight = type->getDeployType()->getYsize();
-    
-    if ((pos%theMap->getWidth())+typewidth > theMap->getWidth()) 
+
+    if ((pos%theMap->getWidth())+typewidth > theMap->getWidth())
     {
         return false;
     }
-    if ((pos/theMap->getWidth())+typeheight > theMap->getHeight()) 
+    if ((pos/theMap->getWidth())+typeheight > theMap->getHeight())
     {
         return false;
     }
-    
+
     for( placeypos = 0; placeypos < typeheight; ++placeypos)
     {
         for( placexpos = 0; placexpos < typewidth; ++placexpos)
         {
             curpos = pos + placeypos*theMap->getWidth() + placexpos;
-            if( type->getDeployType()->isBlocked(placeypos*typewidth+placexpos) ) 
+            if( type->getDeployType()->isBlocked(placeypos*typewidth+placexpos) )
             {
-                if (!p::ccmap->isBuildableAt(this->getOwner(), curpos,this)) 
+                if (!p::ccmap->isBuildableAt(this->getOwner(), curpos,this))
                 {
                     return false;
                 }
@@ -911,7 +911,7 @@ Uint32 Unit::getExitCell() const
 	return calcDeployPos();
 }
 
-double Unit::getRatio() const 
+double Unit::getRatio() const
 {
 	return ratio;
 }
@@ -947,7 +947,7 @@ void Unit::SetBaseRefinery (Structure *Bref)
 {
 	printf ("Set base refinery\n");
 	BaseRefinery = Bref;
-	if (harvestanim == 0) 
+	if (harvestanim == 0)
 	{
 		harvestanim = new UHarvestEvent(0, this);
 		p::aequeue->scheduleEvent(harvestanim);
@@ -982,7 +982,7 @@ bool Unit::GetResourceType (Uint8 Numb, Uint8 *Type)
 	return false;
 }
 
-bool Unit::is(const char *Name) 
+bool Unit::is(const char *Name)
 {
 	if (strcmp (getType()->getTName(), Name) == 0)
 		return true;
@@ -1001,7 +1001,7 @@ Uint16 Unit::GetFixPos()
 
 bool Unit::IsAirBound()
 {
-	if (type->getType() == UN_PLANE || 
+	if (type->getType() == UN_PLANE ||
 		type->getType() == UN_HELICOPTER)
 	{
 		return true;
@@ -1031,13 +1031,13 @@ void Unit::setInfianim(UInfiltrateAnimEvent* anim)
 	this->infianim = infianim;
 }
 
-/** 
+/**
  * @param target Structure to infiltrate
  */
 void Unit::Infiltrate(Structure* target)
 {
 	this->target = target;
-	
+
 	this->infianim = new UInfiltrateAnimEvent(0, this);
 	p::aequeue->scheduleEvent(infianim);
 }
