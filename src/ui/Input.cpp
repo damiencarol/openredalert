@@ -32,7 +32,7 @@
 #include "include/Logger.h"
 #include "game/PlayerPool.h"
 #include "audio/SoundEngine.h"
-#include "game/Unit.h"
+#include "game/Unit.hpp"
 #include "game/StructureType.h"
 #include "game/ExplosionAnim.h"
 #include "game/InfantryGroup.h"

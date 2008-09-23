@@ -116,7 +116,7 @@ Menu::Menu() : StartNewGameButton()
 	scale_factor = (1.0 * display->w / unscaled_logo->w < 1.0 * display->h / unscaled_logo->h ? 1.0 * display->w / unscaled_logo->w : 1.0 * display->h / unscaled_logo->h);
 
 	ImageProc scaler;
-	scale_factor = (1.0 * display->w / unscaled_logo->w < 1.0 * display->h / unscaled_logo->h ? 1.0 * display->w / unscaled_logo->w : 1.0 * display->h / unscaled_logo->h);
+	scale_factor = (float) (1.0 * display->w / unscaled_logo->w < 1.0 * display->h / unscaled_logo->h ? 1.0 * display->w / unscaled_logo->w : 1.0 * display->h / unscaled_logo->h);
 	SDLlogo = scaler.scale(unscaled_logo, display->w, display->h*unscaled_logo->h/480);
 
 	/// The unscaled_logo image should not be freed (as it is cached and eventually freed by the pcx image class)

@@ -80,11 +80,11 @@ void Logger::error(const char *txt, ...)
         logfile->vfs_vprintf(txt, aq);
         logfile->flush();
     }
-#if !defined _WIN32
+//#if !defined _WIN32
     printf("%sERROR: ", indentString);
     vprintf(txt, ap);
     fflush(stdout);
-#endif
+//#endif
     va_end(aq);
     va_end(ap);
 }

@@ -17,12 +17,17 @@
 
 #include "RA_ProgressBar.h"
 
+#ifdef _WIN32
+#include <conio.h>  
+#endif
 #include <math.h>
 #include <string>
+
 
 #include "SDL/SDL_mouse.h"
 #include "SDL/SDL_video.h"
 
+#include "include/common.h"
 #include "video/GraphicsEngine.h"
 #include "RaWindow.h"
 
@@ -138,7 +143,7 @@ bool RA_ProgressBar::HandleMouseClick(void)
 		// Cacl the percentage
 		perc = mx * 100 / _sizeAndPosition.w;
 	}else{
-		_curStep = (Uint32) round ( (double)mx * (double)_maxSteps / (double)_sizeAndPosition.w);
+		_curStep = round ( (double)mx * (double)_maxSteps / (double)_sizeAndPosition.w);
 		//printf ("Step = %i\n", Step);
 		perc = _curStep * 100 / _maxSteps;
 		//printf ("perc = %i\n", perc);
