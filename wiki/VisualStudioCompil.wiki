@@ -3,12 +3,50 @@
 
 = Introduction =
 
-Add your content here.
+This page should help you setup visual studio for compilation of openredalert
 
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+I assume you have a working copy of Visual Studio (Express) 2008 with C++ installed on your machine. If not, do so now. 
+
+You will need two additional components to compile:
+
+ - SDL and SDL_mixer
+
+To obtain SDL for Visual studio go to 
+
+http://www.libsdl.org/download-1.2.php
+
+now: 
+
+ * download SDL-devel-1.2.13-VC8.zip. thats at least the version i am using.
+note that this version is supposed vor visual studio 2005, but don't worry it seems to be working fine. 
+ * extract the contents of the zip to a folder of your choice. 
+ 
+ * now obtain SDL_mixer by going to 
+
+http://www.libsdl.org/projects/SDL_mixer/
+
+now:
+
+ * download SDL_mixer-devel-1.2.8-VC8.zip or later. at least it is working for me with that version.
+ * extract the contents of the zip to the _same folder you extracted the SDL to_.
+
+ * now you will have to do some manual copying in order to correspond to the include policy in openredalert. 
+
+   suppose you extracted both archives to
+   E:\CppLibs\SDL-1.2.13\
+
+   then go to that directory and rename the folder
+   E:\CppLibs\SDL-1.2.13\include 
+   to 
+   E:\CppLibs\SDL-1.2.13\SDL
+
+ * now you will have to add the directories of the SDL to visual studio. i suppose you know how to do that. 
+
+ * assuming you already have got the svn sources of openredalert, go to the openredalert folder and open up "openredalert.svn", (which isnt part of the repository at the moment but should become so soon.)
+
+ * try to compile - and everything will work! 
+
+ * happy coding! :)
