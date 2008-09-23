@@ -43,9 +43,9 @@ now:
    to 
    E:\CppLibs\SDL-1.2.13\SDL
 
- * now you will have to add the directories of the SDL to visual studio. i suppose you know how to do that. 
+ * now you will have to add the directory (in my case E:\CppLibs\SDL-1.2.13\) to visual studio. i suppose you know how to do that. 
 
- * assuming you already have got the svn sources of openredalert, go to the openredalert folder and open up "openredalert.svn", (which isnt part of the repository at the moment but should become so soon.)
+ * assuming you already have got the svn sources of openredalert, go to the openredalert folder and open up "openredalert.svn"
 
  * try to compile - and everything will work! 
 
