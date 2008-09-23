@@ -175,7 +175,11 @@ void UAttackAnimEvent::run()
     
     // @todo modify calculs
     //distance = abs()>abs(ytiles)?abs(xtiles):abs(ytiles);
-    double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
+#ifdef _WIN32
+	double distance = sqrt(((double)xtiles*xtiles + ytiles*ytiles));
+#else
+	double distance = sqrt(xtiles*xtiles + ytiles*ytiles);
+#endif
     
     if( distance > un->type->getWeapon(UsePrimaryWeapon)->getRange() /* weapons range */ ) {
         setDelay(0);
@@ -188,9 +192,9 @@ void UAttackAnimEvent::run()
     //Make sure we're facing the right way
     if( xtiles == 0 ) {
         if( ytiles < 0 ) {
-            alpha = -1.57079632679489661923;
+            alpha = (float)-1.57079632679489661923;
         } else {
-            alpha = 1.57079632679489661923;
+            alpha = (float)1.57079632679489661923;
         }
     } else {
         alpha = atan((float)ytiles/(float)xtiles);
