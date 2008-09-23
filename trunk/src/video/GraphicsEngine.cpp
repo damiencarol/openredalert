@@ -279,15 +279,20 @@ void GraphicsEngine::setupCurrentGame()
 
 /**
  * Render a scene complete with map, sidebar and cursor.
- *
+ * this is drawing the screen on each game cycle isnt it?
  * @param flipscreen true if flip screen function will be call
  */
 void GraphicsEngine::renderScene(bool flipscreen)
 {
+	
 	SDL_Surface *curimg = 0;
 	SDL_Rect dest = {0, 0, 0, 0};
 	SDL_Rect src = {0, 0, 0, 0};
 	SDL_Rect udest = {0, 0, 0, 0};
+
+	//VS will cry if you try to use these variables that were not initialized
+	dest.h = dest.w = src.h = src.w = udest.h = udest.w = 0;
+	dest.x = dest.y = src.x = src.y = udest.x = udest.y = 0;
 
 	// remove the old mousecursor
 //	SDL_FillRect(screen, &oldmouse, blackpix);
@@ -593,7 +598,7 @@ void GraphicsEngine::DrawMinimap()
         bool blocked;
 
         // Need the exact dimensions in tiles
-        // @todo Positioning needs tweaking
+        // @TODO Positioning needs tweaking
         SDL_Surface *minimap = p::ccmap->getMiniMap(minizoom);
         // Draw black under minimap if haven't previously drawn (or was drawn,
         // then disabled, then reenabled).
@@ -624,21 +629,26 @@ void GraphicsEngine::DrawMinimap()
         cury = min(curpos/mapwidth, mapheight - clip.tileh);
         curpos = minx+cury*mapwidth;
         for (ypos = 0; ypos < clip.tileh ; ++ypos) {
-            for (xpos = 0 ; xpos < clip.tilew ; ++xpos) {
-                if (mapvis[curpos]) {
- 			float width, height;
-			Uint8 igroup, owner, pcol;
-			Uint32 cellpos;
+            for (xpos = 0 ; xpos < clip.tilew ; ++xpos) 
+			{
+                if (mapvis[curpos])			//here an VS assert is triggered of std::vector/std::iterator: a mapvis of size 1216 is written out of bounds!
+				{
+ 					float width, height;
+					Uint8 igroup, owner, pcol;
+					Uint32 cellpos;
 
 			// This is needed to prevent buildings/units be drawn outside the radar area
-			if (xpos < clip.tilew && ypos < clip.tileh){
+			if (xpos < clip.tilew && ypos < clip.tileh)
+			{
 				// Rather than make the graphics engine depend on the
 				// UnitOrStructureType, just pull what we need from the
 				// USPool.
 				if (p::uspool->getUnitOrStructureLimAt(curpos, &width,
-					&height, &cellpos, &igroup, &owner, &pcol, &blocked)) {
+					&height, &cellpos, &igroup, &owner, &pcol, &blocked)) 
+				{
 					/// @todo drawing infanty groups as smaller pixels
-					if (blocked) {
+					if (blocked) 
+					{
 						dest.x = maparea.x+maparea.w+clip.x+xpos*minizoom;
 						dest.y = maparea.y+clip.y+ypos*minizoom;
 						dest.w = (Uint16)ceil(width*minizoom);
