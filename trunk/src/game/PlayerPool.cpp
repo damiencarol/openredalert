@@ -112,8 +112,7 @@ const int PlayerPool::MultiColourStringToNumb(const string& colour)
 
 void PlayerPool::setLPlayer(const string& pname)
 {
-    int i;
-    for (i = 0; i < playerpool.size(); i++)
+    for (unsigned i = 0; i < playerpool.size(); i++)
     {
         if (string(playerpool.at(i)->getName()) != pname)
         {
@@ -121,7 +120,7 @@ void PlayerPool::setLPlayer(const string& pname)
             return;
         }
     }
-    
+
     logger->warning("Tried to set local player to non-existing player '%s'\n", pname.c_str());
     playerpool.push_back(new Player(pname.c_str(), mapini));
     localPlayer = static_cast<Uint8>(playerpool.size()-1);
@@ -131,8 +130,7 @@ void PlayerPool::setLPlayer(const string& pname)
 void PlayerPool::setLPlayer(Uint8 number, const char* nick, const char* colour,
 		const char* mside)
 {
-	Uint8 i;
-	for (i = 0; i < playerpool.size(); i++)
+	for (unsigned i = 0; i < playerpool.size(); i++)
 	{
 		if (playerpool[i]->getMSide() == number)
 		{
@@ -170,7 +168,7 @@ void PlayerPool::setPlayer(Uint8 number, const char* nick, const int colour,
 
 int PlayerPool::getPlayerNum(const string& pname)
 {
-    for (int i = 0; i < playerpool.size(); i++)
+    for (unsigned int i = 0; i < playerpool.size(); i++)
     {
         if (string(playerpool.at(i)->getName()) == pname)
         {
@@ -187,7 +185,7 @@ int PlayerPool::getPlayerNum(const string& pname)
 char RA_house[20][10] =
 { "Spain", "Greece", "Ussr", "England", "Ukraine", "Germany", "France",
 		"Turkey", "Goodguy", "Badguy", "Special", "Neutral", "Multi1",
-		"Multi2", "Multi3", "Multi4", "Multi5", "Multi6", "Multi7", "Multi8" 
+		"Multi2", "Multi3", "Multi4", "Multi5", "Multi6", "Multi7", "Multi8"
 };
 
 /**
@@ -200,7 +198,7 @@ int PlayerPool::getPlayerNumByHouseNum(int House) const
         return -1;
     }
 
-    for (int i = 0; i < playerpool.size(); i++)
+    for (unsigned int i = 0; i < playerpool.size(); i++)
     {
         if (string(playerpool[i]->getName()) == RA_house[House])
         {
@@ -213,7 +211,7 @@ int PlayerPool::getPlayerNumByHouseNum(int House) const
 /**
  * @param playerNumber number of the player
  */
-int PlayerPool::getHouseNumByPlayerNum(int playerNumber) const
+int PlayerPool::getHouseNumByPlayerNum(unsigned int playerNumber) const
 {
     // If the player is not in the pool
     if (playerNumber >= playerpool.size())
@@ -223,7 +221,7 @@ int PlayerPool::getHouseNumByPlayerNum(int playerNumber) const
     }
 
     // Parse the vector
-    for (int i = 0; i < playerpool.size(); i++)
+    for (unsigned int i = 0; i < playerpool.size(); i++)
     {
         if (string(playerpool[playerNumber]->getName()) == RA_house[i])
         {
@@ -289,8 +287,8 @@ void PlayerPool::playerDefeated(Player *pl)
 			won = true;
 		}
 	}
-	
-	
+
+
 	// If it's not single player mission
 	if (gamemode == GAME_MODE_SKIRMISH ||
 		gamemode == GAME_MODE_MULTI_PLAYER)
@@ -325,7 +323,7 @@ void PlayerPool::playerUndefeated(Player* pl)
 }
 
 /**
- * 
+ *
  */
 void PlayerPool::playerVictorious(Player* pl)
 {
@@ -340,7 +338,7 @@ void PlayerPool::playerVictorious(Player* pl)
 			break;
 		}
 	}
-	
+
 	if (gamemode == 0)//GAME_MODE_SINGLE_PLAYER)
 	{
 		if (i == localPlayer)
@@ -431,12 +429,12 @@ void PlayerPool::updateSidebar()
 
 /**
  * Get the current status of the radar
- * 
+ *
  * case 0: // do nothing
  * case 1: // got radar
  * case 2: // lost radar
  * case 3: // radar powered down
- */ 
+ */
 Uint8 PlayerPool::statRadar()
 {
 	static Uint32 old_numRadarLocalPlayer = 0;
@@ -444,7 +442,7 @@ Uint8 PlayerPool::statRadar()
 	Player* localPlayer = 0;
 	Uint8 res;
 	bool powerOk;
-	
+
 	// Get the localPlayer
 	localPlayer = getLPlayer();
 
@@ -453,12 +451,12 @@ Uint8 PlayerPool::statRadar()
 
 	// by default
 	res = 0;
-	
+
 	// If same number of radars
-	if (old_numRadarLocalPlayer == localPlayer->getNumberRadars()) 
+	if (old_numRadarLocalPlayer == localPlayer->getNumberRadars())
 	{
 		// if old their was radars
-		if (old_numRadarLocalPlayer >0) 
+		if (old_numRadarLocalPlayer >0)
 		{
 			if (powerOk == false && old_powerOk == true)
 			{
@@ -474,15 +472,15 @@ Uint8 PlayerPool::statRadar()
 	if (localPlayer->getNumberRadars() > old_numRadarLocalPlayer)
 	{
 		// if old their was no radars
-		if (old_numRadarLocalPlayer == 0) 
-		{			
+		if (old_numRadarLocalPlayer == 0)
+		{
 			if (powerOk == true)
 			{
 				res = 1;
 			} else {
 				res = 3;
 			}
-			
+
 		}
 	}
 	else
@@ -490,26 +488,26 @@ Uint8 PlayerPool::statRadar()
 	if (localPlayer->getNumberRadars() < old_numRadarLocalPlayer)
 	{
 		// if there are no radar
-		if (localPlayer->getNumberRadars() == 0) 
+		if (localPlayer->getNumberRadars() == 0)
 		{
 			res = 2;
-		} 
-		else 
+		}
+		else
 		{
 			if (powerOk == true && old_powerOk == false)
 			{
 				res = 1;
-			} else if (powerOk == false && old_powerOk == true) 
+			} else if (powerOk == false && old_powerOk == true)
 			{
-				res = 2;			
+				res = 2;
 			}
 		}
 	}
-	
+
 	// Save olds
 	old_numRadarLocalPlayer = localPlayer->getNumberRadars();
 	old_powerOk = powerOk;
-		
+
 	// Return result
 	return res;
 }

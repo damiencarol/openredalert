@@ -29,8 +29,8 @@ class Player;
 using std::vector;
 using std::string;
 
-/** 
- * @todo Currently the player starts are shuffled randomly without 
+/**
+ * @todo Currently the player starts are shuffled randomly without
  * any way of accepting a preshuffled list.
  */
 class PlayerPool
@@ -52,7 +52,7 @@ public:
     Player* getPlayerByName(const char* pname);
 
     int getPlayerNumByHouseNum(int House) const;
-    int getHouseNumByPlayerNum(int Player) const;
+    int getHouseNumByPlayerNum(unsigned int Player) const;
 
     Uint8 getUnitpalNum(Uint8 player) const ;
     Uint8 getStructpalNum(Uint8 player) const ;
@@ -87,7 +87,7 @@ private:
 
     vector< Player *> playerpool;
     vector< Uint16 > player_starts;
-    
+
     Uint8 localPlayer;
     Uint8 gamemode;
     bool won;
