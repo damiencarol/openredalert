@@ -30,14 +30,14 @@ using std::string;
 
 extern Logger * logger;
 
-MissionMapsClass::MissionMapsClass() 
+MissionMapsClass::MissionMapsClass()
 {
 	readMissionData();
 }
 
 string MissionMapsClass::getGdiMissionMap(Uint32 missionNumber)
 {
-	// If the index required is < 
+	// If the index required is <
 	if (missionNumber < GdiMissionMaps.size()) {
 		return GdiMissionMaps[missionNumber];
 	}
@@ -47,14 +47,14 @@ string MissionMapsClass::getGdiMissionMap(Uint32 missionNumber)
 string MissionMapsClass::getNodMissionMap(Uint32 missionNumber)
 {
 	//
-	if (missionNumber < NodMissionMaps.size()) 
+	if (missionNumber < NodMissionMaps.size())
 	{
 		return NodMissionMaps[missionNumber];
 	}
 	return NULL;
 }
 
-void MissionMapsClass::readMissionData() 
+void MissionMapsClass::readMissionData()
 {
 	VFile *MapFile;
 	char Line[255];
@@ -66,20 +66,20 @@ void MissionMapsClass::readMissionData()
 	if (getConfig().gamenum != GAME_RA) {
 		return;
 	}
-	// get the offset and size of the binfile along with a 
+	// get the offset and size of the binfile along with a
 	// pointer to it
 	//binfile = mixes->getOffsetAndSize(binname, &offset, &size);
 	MapFile = VFSUtils::VFS_Open("mission.ini");
-	
+
 	// Check if the file exist
 	if (MapFile == 0) {
 		logger->error("Unable to locate mission.ini file!\n");
 		return;
 	}
-	
+
 	// Parse all line of the file
 	int linesize = sizeof (Line);
-	while (MapFile->getLine(Line, linesize )) 
+	while (MapFile->getLine(Line, linesize ))
 	{
 		// Get the string
 		tmpString = Line;
@@ -88,7 +88,7 @@ void MissionMapsClass::readMissionData()
 			continue;
 		//memset (Line, '\0', sizeof (Line));
 
-		int index = string::npos;
+		unsigned int index = string::npos;
 		while (tmpString.find('[') != -1 || tmpString.find(']') != -1)
 		{
 			 index = tmpString.find('[');
@@ -113,21 +113,21 @@ void MissionMapsClass::readMissionData()
 
 		// Check if the mission is availlable
 		VFile* tmp = VFSUtils::VFS_Open(tmpString.c_str());
-		
+
 		// Does it exist ?
 		if (tmp != 0)
 		{
 			// Close the file
 			VFSUtils::VFS_Close(tmp);
-		
+
 			// For now we don't support the mission objective strings
 			if (((pos = tmpString.find(".INI", 0)) != (Uint32)string::npos)
-					&& 
-				((pos2 = tmpString.find("A", 0)) != (Uint32)string::npos)) 
+					&&
+				((pos2 = tmpString.find("A", 0)) != (Uint32)string::npos))
 			{
 				// remove ".ini" at the end of the string
 				tmpString.erase(pos, pos+4);
-				
+
 				// If it's soviets mission
 				if ((pos = tmpString.find("SCU", 0)) != (Uint32)string::npos)
 				{
