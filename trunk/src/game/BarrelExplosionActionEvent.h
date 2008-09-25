@@ -22,27 +22,23 @@
 
 /**
  * Animation of the barrels explosion
+ *
  * @author Damien Carol (OpenRedAlert)
  * @version 1.2
- * @since r388 
+ * @since r388
  */
 class BarrelExplosionActionEvent : public ActionEvent
 {
 public:
-	/**
-	 * @param p the priority of this event
-	 * @param pos The position of the explosion
-	 */
-	BarrelExplosionActionEvent(Uint32 p, Uint32 pos);
-	
+	/** Constructor */
+	BarrelExplosionActionEvent(unsigned int p, unsigned int pos);
+
     /** */
     virtual void run();
-private:
 
-    /**
-     * Position of the animation in the map 
-     */
-	Uint32 position;
+private:
+    /** Position of the animation in the map */
+	unsigned int position;
 };
 
 #endif //BARRELEXPLOSIONANIMEVENT_H
