@@ -41,10 +41,12 @@ public:
     virtual Uint32 readWord(Uint32 file, Uint16 *databuf, Uint32 numWords) = 0;
     virtual Uint32 readThree(Uint32 file, Uint32 *databuf, Uint32 numThrees) = 0;
     virtual Uint32 readDWord(Uint32 file, Uint32 *databuf, Uint32 numDWords) = 0;
-    
-	 /** 
-	 * Read a line of file. 
+
+	 /**
+	 * Read a line of file.
+	 * \param file id of the file in archive
 	 * \param databuf will contain the read  line
+	 * \param buflen size of the buffer
 	 */
 	virtual char* readLine(Uint32 file, char *databuf, Uint32 buflen) = 0;
 
