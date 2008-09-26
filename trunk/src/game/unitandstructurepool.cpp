@@ -2317,7 +2317,7 @@ void UnitAndStructurePool::updateWalls(Structure* st, bool add, CnCMap* theMap)
     int cellpos;
 
     cellpos = st->getPos();
-    type = ((StructureType*)st->getType());
+    type = dynamic_cast<StructureType*>(st->getType());
     // left
     if (cellpos % theMap->getWidth() > 0)
     {
