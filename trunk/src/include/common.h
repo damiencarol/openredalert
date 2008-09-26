@@ -14,7 +14,6 @@ class CnCMap;
 class UnitAndStructurePool;
 class WeaponsPool;
 class Dispatcher;
-class SoundEngine;
 class INIFile;
 class MessagePool;
 class SHPImage;
