@@ -204,7 +204,8 @@ char* INIFile::readString(const char* section, const char* value,
 /**
  *
  */
-int INIFile::readInt(const char* section, const char* value, Uint32 deflt) {
+int INIFile::readInt(const char* section, const char* value, int deflt) const
+{
 	try {
 		// Try to return the value
 		return readInt(section, value);
@@ -231,9 +232,10 @@ int INIFile::readInt(const char* section, const char* value, Uint32 deflt) {
  * @param value the name of the value to extract.
  * @return the value.
  */
-int INIFile::readInt(const char* section, const char* value) {
+int INIFile::readInt(const char* section, const char* value) const
+{
 	int retval;
-	map<string, INISection>::iterator sec;
+	map<string, INISection>::const_iterator sec;
 	INIKey key;
 
 	string s = section;
@@ -350,7 +352,7 @@ int INIFile::getNumberOfKeysInSection(string section) {
 	transform(s.begin(), s.end(), s.begin(), toupper);
 
 	sec_new = Inidata.find(s);
-	if (sec_new == Inidata.end()) 
+	if (sec_new == Inidata.end())
 	{	//TODO: is this intened NOT to throw here?
 		//throw KeyNotFound("Section [" + string(section) + "] not found in .ini file.");
 		return 0;
