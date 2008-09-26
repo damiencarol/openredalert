@@ -55,7 +55,20 @@ void SoundUtils::IMADecode(Uint8 *output, Uint8 *input, Uint16 compressed_size, 
     int  Delta;
     Uint8 *InP;
     Sint16 *OutP;
-    Uint16 uncompressed_size = compressed_size * 2;
+    Uint16 uncompressed_size;
+
+    // Data used in IMA Decoding algorithm
+    static int Steps[89] = {
+        7,8,9,10,11,12,13,14,16,17,19,21,23,25,28,31,
+        34,37,41,45,50,55,60,66,73,80,88,97,107,118,130,143,
+        157,173,190,209,230,253,279,307,337,371,408,449,494,544,598,658,
+        724,796,876,963,1060,1166,1282,1411,1552,1707,1878,2066,2272,2499,
+        2749,3024,3327,3660,4026,4428,4871,5358,5894,6484,7132,7845,8630,
+        9493,10442,11487,12635,13899,15289,16818,18500,20350,22385,24623,
+        27086,29794,32767
+    };
+
+    uncompressed_size = compressed_size * 2;
 
     if (compressed_size==0)
         return;
@@ -74,12 +87,12 @@ void SoundUtils::IMADecode(Uint8 *output, Uint8 *input, Uint16 compressed_size, 
 
         Delta=0;
         if ((Code & 0x04)!=0)
-            Delta+=Sound::Steps[index];
+            Delta += Steps[index];
         if ((Code & 0x02)!=0)
-            Delta+=Sound::Steps[index]>>1;
+            Delta += Steps[index]>>1;
         if ((Code & 0x01)!=0)
-            Delta+=Sound::Steps[index]>>2;
-        Delta+=Sound::Steps[index]>>3;
+            Delta += Steps[index]>>2;
+        Delta += Steps[index]>>3;
 
         if (Sign)
             Delta=-Delta;
@@ -118,10 +131,18 @@ void SoundUtils::WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_s
     Uint16 i;
     Uint16 shifted_input;
 
-    if (compressed_size==uncompressed_size) 
+    // This data are used in this decoding algorithm
+    static int WSTable2bit[4] = {-2,-1,0,1};
+    static int WSTable4bit[16] = {
+        -9, -8, -6, -5, -4, -3, -2, -1,
+         0,  1,  2,  3,  4,  5,  6,  8
+    };
+
+
+    if (compressed_size==uncompressed_size)
     {
     	copy(input, input+uncompressed_size, output);
-    	return;    
+    	return;
     }
 
     CurSample=0x80;
@@ -161,9 +182,9 @@ void SoundUtils::WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_s
         case 1: // ADPCM 8-bit -> 4-bit
             for (count++;count>0;count--) { // decode (count+1) bytes
                 code=input[i++];
-                CurSample+=Sound::WSTable4bit[(code & 0x0F)]; // lower nibble
+                CurSample+= WSTable4bit[(code & 0x0F)]; // lower nibble
                 *output++ = Clip(CurSample);
-                CurSample+=Sound::WSTable4bit[(code >> 4)]; // higher nibble
+                CurSample+= WSTable4bit[(code >> 4)]; // higher nibble
                 *output++ = Clip(CurSample);
                 bytes_left-=2; // two bytes added to output
             }
@@ -171,13 +192,13 @@ void SoundUtils::WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_s
         case 0: // ADPCM 8-bit -> 2-bit
             for (count++;count>0;count--) { // decode (count+1) bytes
                 code=input[i++];
-                CurSample+=Sound::WSTable2bit[(code & 0x03)]; // lower 2 bits
+                CurSample+= WSTable2bit[(code & 0x03)]; // lower 2 bits
                 *output++ = Clip(CurSample);
-                CurSample+=Sound::WSTable2bit[((code>>2) & 0x03)]; // lower middle 2 bits
+                CurSample+= WSTable2bit[((code>>2) & 0x03)]; // lower middle 2 bits
                 *output++ = Clip(CurSample);
-                CurSample+=Sound::WSTable2bit[((code>>4) & 0x03)]; // higher middle 2 bits
+                CurSample+= WSTable2bit[((code>>4) & 0x03)]; // higher middle 2 bits
                 *output++ = Clip(CurSample);
-                CurSample+=Sound::WSTable2bit[((code>>6) & 0x03)]; // higher 2 bits
+                CurSample+= WSTable2bit[((code>>6) & 0x03)]; // higher 2 bits
                 *output++ = Clip(CurSample);
                 bytes_left-=4; // 4 bytes sent to output
             }

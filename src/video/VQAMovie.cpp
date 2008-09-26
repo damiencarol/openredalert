@@ -44,7 +44,7 @@ using std::string;
 
 namespace pc {
 	extern GraphicsEngine * gfxeng;
-	extern SoundEngine * sfxeng;
+	extern Sound::SoundEngine* sfxeng;
 }
 extern Logger * logger;
 

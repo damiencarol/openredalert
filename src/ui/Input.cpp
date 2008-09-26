@@ -63,7 +63,7 @@ namespace pc {
     extern MessagePool* msg;
     extern Sidebar* sidebar;
     extern ImageCache* imgcache;
-    extern SoundEngine* sfxeng;
+    extern Sound::SoundEngine* sfxeng;
 }
 extern Logger * logger;
 extern bool GlobalVar[100];

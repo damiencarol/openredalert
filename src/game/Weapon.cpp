@@ -51,7 +51,7 @@ namespace p
 }
 namespace pc
 {
-	extern SoundEngine * sfxeng;
+	extern Sound::SoundEngine* sfxeng;
 	extern std::vector<SHPImage *> * imagepool;
 }
 extern Logger * logger;

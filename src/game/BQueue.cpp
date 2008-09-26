@@ -36,7 +36,7 @@
 #include "include/config.h"
 
 namespace pc {
-	extern SoundEngine* sfxeng;
+	extern Sound::SoundEngine* sfxeng;
 	extern ConfigType Config;
 }
 namespace p {

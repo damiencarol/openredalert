@@ -41,7 +41,7 @@ namespace p {
 }
 namespace pc {
     extern ConfigType Config;
-    extern SoundEngine* sfxeng;
+    extern Sound::SoundEngine* sfxeng;
 }
 extern Logger * logger;
 

@@ -34,7 +34,7 @@ extern Logger *logger;
 namespace pc {
 	extern ConfigType Config;
 	extern CnCMap* ccmap;
-	extern SoundEngine* sfxeng;
+	extern Sound::SoundEngine* sfxeng;
 }
 namespace p {
 	extern ActionEventQueue* aequeue;
