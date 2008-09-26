@@ -93,7 +93,7 @@ public:
 	vector<char*> getPrereqs() const;
 
 	/** Return the technology level required to build this [-1 means can't build] (def=-1)*/
-	Sint32 getTechLevel() const;
+	int getTechLevel() const;
 
 	/** Cost to build object (in credits).*/
 	Uint16 getCost() const;
@@ -121,7 +121,7 @@ protected:
 	Uint8 speed;
 	Uint16 cost;
 	/** Technology level required to build this [-1 means can't build] (default = -1) */
-	Sint32 techLevel;
+	int techLevel;
 	vector<char*> prereqs;
 	Uint8 ptype;
 	bool valid;

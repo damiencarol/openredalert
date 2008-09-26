@@ -26,7 +26,7 @@ using std::vector;
 using std::string;
 
 UnitOrStructureType::UnitOrStructureType() :
-	ptype(0), 
+	ptype(0),
 	valid(false),
 	techLevel(-1)
 {
@@ -56,7 +56,10 @@ vector < char *> UnitOrStructureType::getPrereqs() const
 	return prereqs;
 }
 
-Sint32 UnitOrStructureType::getTechLevel() const
+/**
+ * @return Technology level
+ */
+int UnitOrStructureType::getTechLevel() const
 {
 	return techLevel;
 }
