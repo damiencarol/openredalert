@@ -253,33 +253,33 @@ public:
     int                 repeatable;
     /** which country trigger applies to */
     int                 country;
-    /** 
-     * When to activate trigger 
+    /**
+     * When to activate trigger
      * 0 = Only trigger event 1 must be true
      * 1 = Triggger event one and two must be true
      * 2 = Either the first or the second trigger event
-     *      must be true (activate all associated action on trigger1 
+     *      must be true (activate all associated action on trigger1
      *      or trigger2)
-     * 3 = Either the first or the second trigger event must be true 
-     *      (activate action 1 for trigger1, activate action2 for 
+     * 3 = Either the first or the second trigger event must be true
+     *      (activate action 1 for trigger1, activate action2 for
      *      trigger2)
      */
     int                 activate;
-    /** which actions are triggered, 
-     * 0 == only one trigger action, 
+    /** which actions are triggered,
+     * 0 == only one trigger action,
      * 1 == both trigger actions are activated
      */
     int                 actions;
     /** first trigger */
     RA_Tigger           trigger1;
     /** second trigger */
-    RA_Tigger           trigger2;       
+    RA_Tigger           trigger2;
     /** first trigger action */
-    TriggerAction*    action1;  
-    /** second trigger action,  If this trigger has more than 
-     * one trigger action associated with an event, then the 
+    TriggerAction*    action1;
+    /** second trigger action,  If this trigger has more than
+     * one trigger action associated with an event, then the
      * second trigger action is held here.*/
-    TriggerAction*    action2;     
+    TriggerAction*    action2;
     /** var to remember if the trigger has already been exectured */
 	bool				hasexecuted;
 };
@@ -292,10 +292,10 @@ public:
 void PrintTrigger ( RA_Tiggers Trigger );
 void HandleTriggers ( UnitOrStructure *UnitOrStructure, int Event, int param = 0 );
 void HandleGlobalTrigger ( int Event, int param );
-void CheckCellTriggers ( Uint32 pos );
+void CheckCellTriggers(unsigned int pos);
 //void ExecuteTriggerAction ( unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigger );
 
 void ExecuteTriggerAction(TriggerAction* action);
 string getTriggerEventNameByNumber(Uint8 number);
 
-#endif //TRIGGERS_H_
+#endif //TRIGGERS_H
