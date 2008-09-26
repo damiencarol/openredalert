@@ -342,13 +342,13 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 
 /**
  */
-UnitType(const UnitType& x)
+UnitType::UnitType(const UnitType& x)
 {
 }
 
 /**
  */
-UnitType& operator=(const UnitType& x)
+UnitType& UnitType::operator=(const UnitType& x)
 {
 }
 
