@@ -28,7 +28,12 @@ class Unit;
 using std::list;
 
 /**
- * Selectino of Units and structure in the game
+ * Selection of Units and structure in the game
+ *
+ * @todo Some stuff still uses the "for (i = begin; i != end; ++i)" pattern.
+ * @todo Some of the functions in the namespace can be replaced by further STL magic.
+ * @todo Rename function names.
+ * @todo (Later) Rewrite Selection to be as close to the STL Container concept as useful
  */
 class Selection
 {
@@ -69,7 +74,7 @@ public:
     Unit* getRandomUnit();
     bool getWall() const;
     void stop();
-    
+
 private:
     list<Unit*> sel_units;
     list<Structure*> sel_structs;
