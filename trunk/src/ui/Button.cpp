@@ -118,7 +118,7 @@ void Button::SetDrawingSurface(SDL_Surface *Surface)
 {
 	if (Surface != 0){
 		DisplaySurface = Surface;
-	}	
+	}
 }
 
 void Button::SetDrawingWindow(RaWindow *Window)
@@ -153,7 +153,7 @@ void Button::setcolor(Uint8 red, Uint8 green, Uint8 blue)
 	ButtonColor.g = green;
 	ButtonColor.b = blue;
 	color = SDL_MapRGB(DisplaySurface->format, red, green, blue);
-	LightColor = SDL_MapRGB(DisplaySurface->format, (char) (red*1.3), (char) (green*1.3), (char) (blue*1.3));
+	LightColor = SDL_MapRGB(DisplaySurface->format, static_cast<char>(red*1.3), (char) (green*1.3), (char) (blue*1.3));
 	DarkColor = SDL_MapRGB(DisplaySurface->format, (char) (red*0.7), (char) (green*0.7), (char) (blue*0.7));
 }
 
@@ -405,7 +405,7 @@ void Button::CreateSurface()
 	if (this->ButtonImg_over != NULL){
 		SDL_FreeSurface(this->ButtonImg_over);
 	}
-	
+
 	ButtonImg_over = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, SizeAndPosition.w, SizeAndPosition.h, 16, 0, 0, 0, 0);
 
 	tmp = SDL_DisplayFormat(ButtonImg_over);
