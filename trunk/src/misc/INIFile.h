@@ -47,8 +47,8 @@ public:
     char* readString(const char* section, const char* value);
     char* readString(const char* section, const char* value, const char* deflt);
 
-    int readInt(const char* section, const char* value, Uint32 deflt);
-    int readInt(const char* section, const char* value);
+    int readInt(const char* section, const char* value, int deflt) const;
+    int readInt(const char* section, const char* value) const;
 
     float readFloat(const char* section, const char* value);
     float readFloat(const char* section, const char* value, float deflt);
