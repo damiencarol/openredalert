@@ -42,7 +42,9 @@ public:
     SoundFile();
     ~SoundFile();
 
+    /** Load a file */
     bool Open(const string& filename);
+    /** Close the file */
     void Close();
 
     // Length is the max size in bytes of the uncompressed sample, returned
