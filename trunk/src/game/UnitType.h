@@ -75,7 +75,7 @@ public:
 
 	/** Returns the primary Weapon of this type of Unit */
 	Weapon* getWeapon() const;
-	/** Returns the primary Weapon of this type of Unit if 
+	/** Returns the primary Weapon of this type of Unit if
 	 * primary is true else returns the secondary Weapon */
 	Weapon* getWeapon(bool primary) const;
 
@@ -101,6 +101,13 @@ public:
 	void setInfiltrate(bool infiltrate);
 
 private:
+	/** Avoid copy */
+	UnitType(const UnitType& x);
+	/** Avoid implicit copy */
+	UnitType& operator=(const UnitType& x);
+
+
+
 	Uint32 *shpnums;
 	Uint16 *shptnum;
 	/** In multi player both sides can use this unit */
@@ -138,13 +145,13 @@ private:
 	/** matches the unit's type name.*/
 	vector<UnitType*> specificTypeAllow;
 
-	/** 
-	 * C4 = Equipped with building sabotage explosives 
-	 * [presumes Infiltrate is true] (def=no)? 
+	/**
+	 * C4 = Equipped with building sabotage explosives
+	 * [presumes Infiltrate is true] (def=no)?
 	 */
 	bool c4;
 
-	/** 
+	/**
 	 * Infiltrate = Can it enter a building like a spy or thief (def=no)?
 	 */
 	bool infiltrate;
