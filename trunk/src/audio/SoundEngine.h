@@ -32,9 +32,12 @@ class SoundBuffer;
 using std::vector;
 using std::string;
 
+namespace Sound
+{
+
 /**
  * Manager of all sounds in OpenRedAlert
- * 
+ *
  * This object provide function to load/start/stop all music/sounds in the game
  */
 class SoundEngine
@@ -90,5 +93,7 @@ private:
     Playlist playlist;
     Playlist::iterator currentTrack;
 };
+
+}
 
 #endif //SOUNDENGINE_H

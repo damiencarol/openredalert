@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "SoundCacheCleaner.hpp"
 #include "SoundCommon.h"
 #include "SOUND_DECODE_STATE.h"
 #include "include/Logger.h"
@@ -30,20 +31,24 @@ namespace pc {
 extern Logger * logger;
 
 using std::string;
+using OpenRedAlert::Sound::SoundCacheCleaner;
+
+namespace Sound
+{
 
 /**
  */
-SoundEngine::SoundEngine(bool disableSound) : 
-	nosound(disableSound), 
-	mutesound(false), 
-	musicFinished(true), 
+SoundEngine::SoundEngine(bool disableSound) :
+	nosound(disableSound),
+	mutesound(false),
+	musicFinished(true),
 	currentTrack(playlist.begin())
 {
     if (nosound){
         return;
     }
-    
-    
+
+
 	// Warning the Mix_OpenAudio uses libmikmod witch seems to create the music.raw file
     if (Mix_OpenAudio(SOUND_FREQUENCY, SOUND_FORMAT, SOUND_CHANNELS, 1024 /*4096*/) < 0) {
         logger->error("%s line %i: Unable to open sound: %s\n", __FILE__, __LINE__, Mix_GetError());
@@ -59,14 +64,15 @@ SoundEngine::SoundEngine(bool disableSound) :
  */
 SoundEngine::~SoundEngine()
 {
-    if (nosound){
+    if (nosound)
+    {
         return;
     }
 
     // Stop all playback
     Mix_HaltChannel(-1);
-    Mix_HookMusic(NULL, NULL);
-    
+    Mix_HookMusic(0, 0);
+
     // Clean up the sound cache
     for_each(soundCache.begin(), soundCache.end(), SoundCacheCleaner());
 
@@ -81,10 +87,10 @@ bool SoundEngine::CreatePlaylist()
 	if (nosound){
 		return true;
 	}
-	
+
 	// Clear the list
 	playlist.clear();
-	
+
 	// Create the amazing playlist
 	playlist.push_back("bigf226m.aud");
 	playlist.push_back("crus226m.aud");
@@ -105,10 +111,10 @@ bool SoundEngine::CreatePlaylist()
 	playlist.push_back("twin.aud");
 	playlist.push_back("vector1a.aud");
 	playlist.push_back("smsh226m.aud");
-		
+
 	// Set the current track to the first track
 	currentTrack = playlist.begin();
-			
+
 	// Return true to indicate success in playlist loading
 	return true;
 }
@@ -121,19 +127,19 @@ void SoundEngine::SetSoundVolume(int volume)
     if (nosound){
         return;
     }
-    
+
     // standard control
-    // if the sound volume asked is > to the sound volume MAX 
+    // if the sound volume asked is > to the sound volume MAX
     // from the SDL_mixer constantes then the sound is set to max :)
     if (volume > MIX_MAX_VOLUME) {
     	volume = MIX_MAX_VOLUME;
     } else if (volume < 0) {
     	volume = 0;
     }
-    
+
     // Set the volume of all channel (-1)
     Mix_Volume(-1, volume);
-    
+
     soundVolume = volume;
     mutesound = volume == 0;
 }
@@ -184,7 +190,7 @@ void SoundEngine::StopLoopedSound(int id)
     if (nosound){
         return;
     }
-    
+
     Mix_HaltChannel(id);
 }
 
@@ -196,7 +202,7 @@ void SoundEngine::PauseLoopedSound(int id)
     {
         return;
     }
-    
+
     Mix_Pause(id);
 }
 
@@ -208,7 +214,7 @@ void SoundEngine::ResumeLoopedSound(int id)
     {
         return;
     }
-    
+
     Mix_Resume(id);
 }
 
@@ -220,11 +226,11 @@ void SoundEngine::SetMusicVolume(int volume)
     }
 
     // standard control
-    // if the sound volume asked is > to the sound volume MAX 
+    // if the sound volume asked is > to the sound volume MAX
     // from the SDL_mixer constantes then the sound is set to max :)
     if (volume > MIX_MAX_VOLUME) {
     	volume = MIX_MAX_VOLUME;
-    }  
+    }
 
     Mix_VolumeMusic(volume);
 }
@@ -252,7 +258,7 @@ void SoundEngine::PauseMusic()
 {
     if (nosound)
     {
-        return;        
+        return;
     }
     Mix_PauseMusic();
 }
@@ -278,7 +284,7 @@ void SoundEngine::PlayTrack(const string& sound)
     {
         return;
     }
-    
+
     StopMusic();
 
     if (sound == "No theme")
@@ -302,12 +308,12 @@ void SoundEngine::NextTrack()
     {
         return;
     }
-    
+
     if (++currentTrack == playlist.end())
     {
         currentTrack = playlist.begin();
     }
-    
+
     PlayTrack(*currentTrack);
 }
 
@@ -319,7 +325,7 @@ void SoundEngine::PrevTrack()
     {
         return;
     }
-    
+
     if (currentTrack == playlist.begin())
     {
         currentTrack = playlist.end();
@@ -392,4 +398,6 @@ SoundBuffer* SoundEngine::LoadSoundImpl(const string& sound)
 bool SoundEngine::NoSound() const
 {
 	return nosound;
+}
+
 }

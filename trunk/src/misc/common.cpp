@@ -30,6 +30,7 @@
 #include "game/RedAlertDataLoader.h"
 #include "include/Logger.h"
 #include "game/Dispatcher.h"
+#include "audio/SoundEngine.h"
 
 using std::cout;
 using std::map;
@@ -147,7 +148,7 @@ void strStripWhiteSpace(char* key)
 namespace pc {
 	Renderer		*renderer;
 	/** SoundEngine of the game */
-	SoundEngine		*sfxeng = 0;
+	Sound::SoundEngine		*sfxeng = 0;
 	GraphicsEngine	*gfxeng = 0;
 	MessagePool		*msg = 0;
 	vector<SHPImage *>	*imagepool = 0;

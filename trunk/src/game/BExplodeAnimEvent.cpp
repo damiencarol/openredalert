@@ -29,7 +29,7 @@
 namespace pc
 {
 	extern ConfigType Config;
-	extern SoundEngine* sfxeng;
+	extern Sound::SoundEngine* sfxeng;
 }
 namespace p
 {

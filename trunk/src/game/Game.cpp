@@ -76,7 +76,7 @@ namespace pc
 	extern ImageCache* imgcache;
 	extern Input* input;
 	extern Sidebar* sidebar;
-	extern SoundEngine* sfxeng;
+	extern Sound::SoundEngine* sfxeng;
 }
 extern MIXFiles * mixfiles;
 
@@ -237,24 +237,24 @@ void Game::InitializeGameClasses()
 	catch (VideoError& ex)
 	{
 		logger->note("failed.  %s \n", ex.what());
-		throw runtime_error("Unable to initialise the graphics engine");
+		throw runtime_error("Unable to initialize the graphics engine");
 	}
 
-	/// Initialise Sound
+	/// Initialize Sound
 	try
 	{
-		logger->note("Initialising the sound engine...");
-		pc::sfxeng = new SoundEngine(pc::Config.nosound);
+		logger->note("Initializing the sound engine...");
+		pc::sfxeng = new Sound::SoundEngine(pc::Config.nosound);
 		logger->note("done\n");
 	}
 	catch (SoundError& error)
 	{
 		logger->error("%s\n", error.what());
 		logger->note("failed.  exiting\n");
-		throw runtime_error("Unable to initialise the sound engine");
+		throw runtime_error("Unable to initialize the sound engine");
 	}
 
-	/// Initialise the VFS file system
+	/// Initialize the VFS file system
 	VFSUtils::VFS_PreInit(pc::Config.binpath.c_str());
 	VFSUtils::VFS_Init(pc::Config.binpath.c_str());
 	VFSUtils::VFS_LoadGame(pc::Config.gamenum);
@@ -262,16 +262,16 @@ void Game::InitializeGameClasses()
 	// Get the mission maps
 	//pc::MissionsMapdata = new MissionMapsClass();
 
-	// Init the image cache
+	// Initialize the image cache
 	pc::imagepool = new std::vector<SHPImage*>();
 	pc::imgcache->setImagePool(pc::imagepool);
 	//pc::imgcache->setImagePool(new std::vector<SHPImage*>());
 
 
-	/// Init the Data Loader
+	/// Initialize the Data Loader
 	try
 	{
-		logger->note("Initialising the RA Data loader...");
+		logger->note("Initializing the RA Data loader...");
 		p::raLoader = new RedAlertDataLoader();
 		p::raLoader->load();
 		logger->note("done\n");

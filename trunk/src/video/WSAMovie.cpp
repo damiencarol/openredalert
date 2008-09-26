@@ -44,7 +44,7 @@ using std::runtime_error;
 
 namespace pc {
 	/** SoundEngine of the game */
-	extern SoundEngine* sfxeng;
+	extern Sound::SoundEngine* sfxeng;
 }
 extern Logger * logger;
 

@@ -38,7 +38,7 @@ namespace p {
 	extern ActionEventQueue * aequeue;
 }
 namespace pc {
-	extern SoundEngine* sfxeng;
+	extern Sound::SoundEngine* sfxeng;
 }
 extern Logger * logger;
 
@@ -114,7 +114,7 @@ void BAttackAnimEvent::run()
 
 
 
-	double distance = sqrt(((double)xtiles*xtiles + ytiles*ytiles));		
+	double distance = sqrt(((double)xtiles*xtiles + ytiles*ytiles));
 	if (distance > strct->getType()->getWeapon()->getRange())
 	{
 		// Since buildings can not move, give up for now.
