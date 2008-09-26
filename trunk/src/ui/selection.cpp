@@ -47,14 +47,8 @@ using std::unary_function;
 using std::find_if;
 using std::find;
 
-/** @todo Some stuff still uses the "for (i = begin; i != end; ++i)" pattern.
- * @todo Some of the functions in the namespace can be replaced by further STL
- * magic.
- * @todo Rename function names.
- * @todo (Later) Rewrite Selection to be as close to the STL Container concept as useful
- */
-
-namespace {
+namespace
+{
 
 //std::mem_fun_t<void, UnitOrStructure> unref = mem_fun(&UnitOrStructure::unrefer);
 //std::mem_fun_t<void, UnitOrStructure> unsel = mem_fun(&UnitOrStructure::unSelect);
