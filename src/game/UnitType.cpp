@@ -341,6 +341,18 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 }
 
 /**
+ */
+UnitType(const UnitType& x)
+{
+}
+
+/**
+ */
+UnitType& operator=(const UnitType& x)
+{
+}
+
+/**
  * Destructor
  */
 UnitType::~UnitType()
