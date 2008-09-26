@@ -215,9 +215,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	shptnum = new Uint16[numshps];
 
 	// Read the Tech level
-	// @todo : refactor this !!!!!!!
-	//techLevel = structini->readInt(tname,"TechLevel", -1);
-	techLevel = (Sint32)structini->readInt(tname, "techlevel", (Sint32)-1);
+	techLevel = structini->readInt(tname, "techlevel", -1);
 
 	powerinfo.power = structini->readInt(tname, "power", 0);
 	powerinfo.drain = structini->readInt(tname, "drain", 0);
@@ -345,7 +343,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 			animinfo.makenum = makeimage->getNumImg();
 
 			makeimg = pc::imagepool->size();
-			pc::imagepool->push_back(makeimage); // Store make image			
+			pc::imagepool->push_back(makeimage); // Store make image
 		}
 		catch (ImageNotFound&)
 		{
@@ -433,7 +431,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	// Read the Adjacent
 	this->adjacent = rulesIni->readInt(tname, "Adjacent", 1);
 
-	// Read the Sight	
+	// Read the Sight
 	this->sight = rulesIni->readInt(tname, "Sight", 1);
 
 	// Free rules.ini
@@ -575,7 +573,7 @@ bool StructureType::isPowered()
 
 /**
  * Return the Primary weapon
- * 
+ *
  * @return Reference to the primary weapon
  * @see Weapon
  */
@@ -587,7 +585,7 @@ Weapon * StructureType::getWeapon() const
 
 /**
  * Return the weapon of the structure wanted
- * 
+ *
  * @param primary if true select the primary weapon else return the secondary
  * @return Reference to the selected weapon
  * @see Weapon
