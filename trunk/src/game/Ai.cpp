@@ -140,33 +140,41 @@ Ai::Ai()
 		Rules->AARatio		=.14;
 		Rules->AALimit		= 10;
 		Rules->TeslaRatio	= .16;
-		Rules->TeslaLimit	= 10;
-		Rules->HelipadRatio	= .12;
-		Rules->HelipadLimit	= 5;
-		Rules->AirstripRatio	= .12;
-		Rules->AirstripLimit	= 5;
-		Rules->CompEasyBonus	= true;
-		Rules->Paranoid		= true;
-		Rules->PowerEmergency	= 75;
+		Rules->TeslaLimit = 10;
+		Rules->HelipadRatio = .12;
+		Rules->HelipadLimit = 5;
+		Rules->AirstripRatio = .12;
+		Rules->AirstripLimit = 5;
+		Rules->CompEasyBonus = true;
+		Rules->Paranoid = true;
+		Rules->PowerEmergency = 75;
 	}
 
 	Rules->AlwaysAlly = true;
 }
 
+/**
+ */
 Ai::~Ai()
 {
 	// Free ai rules
 	delete Rules;
 }
 
-void Ai::SetDifficulty(int Diff)
+/**
+ * @param diff Difficulty
+ */
+void Ai::SetDifficulty(int diff)
 {
-	if (Diff > 0 && Diff <= 4)
+	if (diff > 0 && diff <= 4)
 	{
-		this->Difficulty = Diff;
+		this->Difficulty = diff;
 	}
 }
 
+/**
+ *
+ */
 void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 {
 	UnitOrStructure     *lEnemy = NULL;
@@ -1042,7 +1050,8 @@ Uint16				xpos,
 	}
 
 	// Build soldier
-	if (NumbBarracks > 0 && ((unsigned)Player->getMoney() > Rules->InfantryReserve || (unsigned) (NumbStructures * Rules->InfantryBaseMult) > NumbOfInfantry)){
+	if (NumbBarracks > 0 && ((unsigned)Player->getMoney() > Rules->InfantryReserve || (unsigned) (NumbStructures * Rules->InfantryBaseMult) > NumbOfInfantry))
+	{
 		UnitType* type;
 		switch (UnitBuildMultiplexer[PlayerNumb]){
 			case 0:
@@ -1156,64 +1165,63 @@ Unit*                   EnemyUnit;
 }
 
 /**
- * Returns a enemy **unit** if one is in range of our **structure**
+ * Returns a enemy Unit if one is in range of our Structure
  */
 Unit* Ai::EnemyUnitInRange (int MyPlayerNumb, Structure* MyStructure, int AttackRange )
 {
-Player              *EnemyPlayer, *MyPlayer;
-int                 EnemyNumbUnits;
-std::vector<Unit*>	Enemyunitpool;
-Unit*               EnemyUnit;
+	int                 EnemyNumbUnits;
+	std::vector<Unit*>	Enemyunitpool;
 
-	if (MyStructure == NULL)
-		return NULL;
+	if (MyStructure == 0)
+		return 0;
 
 	if (!MyStructure->canAttack())
-		return NULL;
+		return 0;
 
 	if (AttackRange == -1)
 		AttackRange = MyStructure->getType()->getWeapon(true)->getRange();
 
-	for (int i = 0; i < this->NumbPlayers; i++){
-
+	for (int i = 0; i < this->NumbPlayers; i++)
+	{
 		// Don't defend against my own units
 		if (MyPlayerNumb == i)
 			continue;
 
-		EnemyPlayer = p::ppool->getPlayer(i);
+		Player* enemyPlayer = p::ppool->getPlayer(i);
 
-		MyPlayer = p::ppool->getPlayer(MyPlayerNumb);
+		Player* myPlayer = p::ppool->getPlayer(MyPlayerNumb);
 
-		// Check to see if these are both ai players and if ai players are allied
-		if (!MyPlayer->isLPlayer() && !EnemyPlayer->isLPlayer() && Rules->AlwaysAlly)
+		// Check to see if these are both AI players and if AI players are allied
+		if (!myPlayer->isLPlayer() && !enemyPlayer->isLPlayer() && Rules->AlwaysAlly)
 			continue;
 
-		// Check if the Enemy player is a allie ;)
-		if (EnemyPlayer->isAllied(MyPlayer))
+		// Check if the Enemy player is a ally ;)
+		if (enemyPlayer->isAllied(myPlayer))
 			continue;
 
-		EnemyNumbUnits = EnemyPlayer->getNumUnits();
+		EnemyNumbUnits = enemyPlayer->getNumUnits();
 
-		Enemyunitpool = EnemyPlayer->getUnits();
+		Enemyunitpool = enemyPlayer->getUnits();
 
 		// For each unit from this player
-		for (int UnitNumb = 0; UnitNumb < EnemyNumbUnits; UnitNumb++){
-			EnemyUnit = Enemyunitpool[UnitNumb];
+		for (int UnitNumb = 0; UnitNumb < EnemyNumbUnits; UnitNumb++)
+		{
+			Unit* enemyUnit = Enemyunitpool[UnitNumb];
 //			int distance = MyStructure->getDist(EnemyUnit->getPos());
-			int distance = EnemyUnit->getDist(MyStructure->getPos());
-			if (distance <= AttackRange  && EnemyPlayer->getSide() != PS_NEUTRAL){
-				return EnemyUnit;
+			int distance = enemyUnit->getDist(MyStructure->getPos());
+			if (distance <= AttackRange  && enemyPlayer->getSide() != PS_NEUTRAL){
+				return enemyUnit;
 			}
 
 		}
 	}
-	return NULL;
+	return 0;
 }
 
 /**
- * Returns a enemy **structure** if one is in range of our **unit**
+ * @return a enemy Structure if one is in range of our Unit
  */
-Structure* Ai::EnemyStructureInRange (int MyPlayerNumb, Unit* MyUnit, int AttackRange )
+Structure* Ai::EnemyStructureInRange (int MyPlayerNumb, Unit* MyUnit, int AttackRange)
 {
 	Player*		EnemyPlayer;
 	Player*		MyPlayer;
@@ -1222,11 +1230,13 @@ Structure* Ai::EnemyStructureInRange (int MyPlayerNumb, Unit* MyUnit, int Attack
 	Structure*  EnemyStructure;
 
 
-	if (MyUnit == NULL)
-		return NULL;
+	if (MyUnit == 0)
+	{
+		return 0;
+	}
 
     if (!MyUnit->canAttack())
-        return NULL;
+        return 0;
 
     if (AttackRange == -1)
         AttackRange = MyUnit->getType()->getWeapon()->getRange();  //MyUnit->getType()->getSight();
@@ -1261,40 +1271,43 @@ Structure* Ai::EnemyStructureInRange (int MyPlayerNumb, Unit* MyUnit, int Attack
             }
         }
     }
-    return NULL;
+    return 0;
 }
+
 /**
  * Assign tasks to the units
+ *
+ * @param PlayerNumb number of the player
  */
-void Ai::Harvest (Player *Player, int PlayerNumb)
+void Ai::Harvest(Player *Player, int PlayerNumb)
 {
-int                         NumbUnits;
-std::vector<Unit*>          unitpool;
-Unit                        *Unit;
-
 	// don't try to control for the human player
-	if (PlayerNumb == this->HumanPlayerNumb){
+	if (PlayerNumb == this->HumanPlayerNumb)
+	{
 		return;
 	}
 
 	// Handle unit vars
-	NumbUnits		= Player->getNumUnits();
-	unitpool		= Player->getUnits();
+	int NumbUnits = Player->getNumUnits();
+	vector<Unit*> unitpool = Player->getUnits();
 
-
-	for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++){
-		Unit = unitpool[UnitNumb];
-		if (Unit->is("HARV")){
-			if (!Unit->IsHarvesting()){
-				Unit->Harvest(0, NULL);
+	// Parse all Units to find harvester (HARV -> code for harvester)
+	for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++)
+	{
+		Unit* theUnit = unitpool[UnitNumb];
+		if (theUnit->is("HARV"))
+		{
+			if (!theUnit->IsHarvesting())
+			{
+				// Command the unit to harvest with no parameters (NULL, NULL)
+				theUnit->Harvest(0, 0);
 			}
 		}
 	}
 }
 
-
 /**
- * For now the ai assumes that all non local players are computer players
+ * For now the AI assumes that all non local players are computer players
  * This means no support for multiplayer with computer players mix.
  */
 void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
