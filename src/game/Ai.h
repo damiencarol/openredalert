@@ -21,11 +21,6 @@
 #include <vector>
 
 #include "SDL/SDL_types.h"
-#include "UnitOrStructure.h"
-#include "Unit.hpp"
-
-using std::vector;
-
 
 #define DIFFICUTY_EASY		1
 #define DIFFICUTY_MEDIUM	2
@@ -40,16 +35,21 @@ using std::vector;
 class Player;
 class Structure;
 class AiRules;
+class Unit;
+class UnitOrStructure;
+
+using std::vector;
 
 /**
  * Artificial Intelligence that manage Units of a Player during game
  */
-class Ai 
+class Ai
 {
 public:
     Ai();
     ~Ai();
-    
+
+    /** Set the difficulty of the AI */
     void SetDifficulty(int Diff);
     void DefendUnits(Player* Player, int PlayerNumb);
     void DefendComputerPlayerBaseUnderAttack(Player* Player, int PlayerNumb, UnitOrStructure * Enimy, Structure* StructureUnderAttack);
