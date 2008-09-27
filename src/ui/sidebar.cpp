@@ -17,8 +17,7 @@
 
 #include "Sidebar.h"
 
-#ifdef _WIN32
-#include <algorithm>
+#ifdef _MSC_VER
 #include <functional>
 #endif
 #include <cstdlib>
@@ -76,7 +75,7 @@ extern Logger * logger;
 namespace pc {
 	//extern ConfigType Config;
 	extern ImageCache* imgcache;
-	extern SoundEngine* sfxeng;
+	extern Sound::SoundEngine* sfxeng;
 	extern GraphicsEngine* gfxeng;
 	extern Cursor* cursor;
 }
