@@ -45,6 +45,7 @@ and run the programme.
 
 After that compilation the folder will be like that.
 
+{{{
 openredalert/
 |
 |_Debug/
@@ -74,3 +75,4 @@ openredalert/
 |  |_openredalert (BINARY COMPILED TO GET)
 |
 |_Makefile (used with 'make' command)
+}}}
