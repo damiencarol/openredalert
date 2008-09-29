@@ -6,7 +6,7 @@
 Add your content here.
 
 
-= Get the source =
+== Get the source ==
 
 You can get the entire sources at Google code page of the project.
 
@@ -17,14 +17,26 @@ Use this command to anonymously check out the latest project source code:
 svn checkout http://openredalert.googlecode.com/svn/trunk/ openredalert-read-only
 }}}
 
-= Compil =
+== Compilation with GCC ==
+
+Go to the new folder and type :
+{{{
+$>make
+}}}
+
+the program wil be generated in the `openredalert-read-only/obj` folder.
+
+copy it to the Debug folder
+{{{
+$>mv ./obj/openredalert ./Debug/openredalert
+}}}
 
 Use GCC with 
 
 SDL - library
 SDL_mixer - library
 
-= Run the game =
+== Run the game ==
 
 Copy the folder '/data/' from a compiled archive and copy it in the folder of the programme.
 Copy the REDALERT.mix and MAIN.mix files from original archives of the game into the folder '/data/mix'
