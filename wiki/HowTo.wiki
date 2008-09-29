@@ -38,7 +38,42 @@ SDL_mixer - library
 
 == Run the game ==
 
-Copy the folder '/data/' from a compiled archive and copy it in the folder of the programme.
-Copy the REDALERT.mix and MAIN.mix files from original archives of the game into the folder '/data/mix'
+Copy the REDALERT.mix and MAIN.mix files from original archives of the game into the folder '/data/mix' (if your programm is in the same folder)
 
 and run the programme.
+
+== You files ==
+
+After that compilation the folder will be like that.
+
+openredalert/
+|
+|_Debug/
+|  |
+|  |_data/
+|  |  |
+|  |  |_settings/ (many files don't touch !!!)
+|  |  |
+|  |  |_mix/
+|  |    |
+|  |    |_redalert.mix
+|  |    |
+|  |    |_main.mix
+|  |
+|  |_openredalert (the executable copied)
+|
+|_src/
+|  |
+|  |_... (many file - sources *.hpp and *.cpp)
+|  |_...
+|
+|_obj/ (folder of the generated object)
+|  |
+|  |_... (many file - *.o)
+|  |_...
+|  |
+|  |_openredalert (BINARY COMPILED TO GET)
+|
+|_Makefile (used with 'make' command)
+
+
