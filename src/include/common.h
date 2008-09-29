@@ -114,4 +114,4 @@ const std::string& determineBinaryLocation(const std::string& launchcmd);
 const std::string& getBinaryLocation();
 
 
-#endif /* COMMON_H */
+#endif //COMMON_H

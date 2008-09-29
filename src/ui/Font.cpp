@@ -449,14 +449,18 @@ Uint32 Font::calcTextWidth(const string& text) const
     return wdt;
 }
 
+/**
+ * @param fontname Name of the font
+ */
 Font::Font(const string& fontname) : SHPBase(fontname), fontimg(0)
 {
-	// Set the image pointer to NULL
-	fontimg = 0;
+    // Set the image pointer to NULL
+    fontimg = 0;
 
-	lnkOptions.use_anitaliasing	= true;
-	lnkOptions.underline		= false;
-	lnkOptions.double_underline	= false;
+    lnkOptions.use_anitaliasing = true;
+    lnkOptions.underline = false;
+    lnkOptions.double_underline = false;
 
-	this->Load(fontname);
+    // Load the font
+    this->Load(fontname);
 }

@@ -118,4 +118,3 @@ INIFile *WeaponsPool::getWeaponsINI()
 {
 	return weapini;
 }
-
