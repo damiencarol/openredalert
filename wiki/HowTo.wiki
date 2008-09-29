@@ -13,7 +13,9 @@ You can get the entire sources at Google code page of the project.
 Use this command to anonymously check out the latest project source code:
 
 # Non-members may check out a read-only working copy anonymously over HTTP.
+{{{
 svn checkout http://openredalert.googlecode.com/svn/trunk/ openredalert-read-only
+}}}
 
 = Compil =
 
