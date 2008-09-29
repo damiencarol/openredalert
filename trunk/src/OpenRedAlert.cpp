@@ -45,6 +45,8 @@ using std::set_terminate;
 using std::string;
 using std::runtime_error;
 
+using Sound::SoundEngine;
+
 /** Logger for the application */
 Logger *logger;
 
@@ -120,20 +122,20 @@ int main(int argc, char** argv) {
             SDL_ShowCursor(0);
         }
 
-        // Initialize Video
+        // Initialise Video
         try {
-            logger->note("Initializing the graphics engine...");
+            logger->note("Initialising the graphics engine...");
             pc::gfxeng = new GraphicsEngine();
             logger->note("done\n");
         }
         catch (VideoError& ex) {
             logger->note("failed.  %s \n", ex.what());
-            throw runtime_error("Unable to initialize the graphics engine");
+            throw runtime_error("Unable to initialise the graphics engine");
         }
 
-        // Initialize Sound
-        logger->note("Initializing the sound engine...");
-        pc::sfxeng = new Sound::SoundEngine(pc::Config.nosound);
+        // Initialise Sound
+        logger->note("Initialising the sound engine...");
+        pc::sfxeng = new SoundEngine(pc::Config.nosound);
         logger->note("done\n");
 
         // "Standalone" VQA Player
@@ -214,7 +216,7 @@ int main(int argc, char** argv) {
             // Log it
             logger->error("Error during game\n");
         }
-
+       
     }
     catch (runtime_error& e) {
         logger->error("%s\n", e.what());
