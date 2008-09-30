@@ -13,13 +13,14 @@ Use this command to anonymously check out the latest project source code:
 
 # Non-members may check out a read-only working copy anonymously over HTTP.
 {{{
-svn checkout http://openredalert.googlecode.com/svn/trunk/ openredalert-read-only
+svn checkout http://openredalert.googlecode.com/svn/trunk/ openredalert
 }}}
 
 == Compilation with GCC ==
 
 Go to the new folder and type :
 {{{
+$>cd openredalert
 $>make
 }}}
 
