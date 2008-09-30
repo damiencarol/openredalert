@@ -177,14 +177,12 @@ void BAttackAnimEvent::run()
 		{
 			if (NeedToCharge)
 			{
-				frame = (Uint8) StartFrame;				//desired conversion?
-				char* Snd = 0;
-				Snd = strct->getType()->getWeapon()->getChargingSound();
-				if (Snd != 0){
+				frame = StartFrame;
+				string Snd = strct->getType()->getWeapon()->getChargingSound();
+				if (Snd.size() > 0)
+                                {
 					pc::sfxeng->PlaySound(Snd);
-					delete Snd;
 				}
-				Snd = 0;
 				NeedToCharge = false;
 			}
 			if (strct->getNumbImages (0)> frame)
