@@ -52,6 +52,7 @@ private:
     /** the unit or structure to be attacked */
     UnitOrStructure* target;
     bool done;
+    /** True if the building must charge this weapon before attack (like for tesla coil) */
     bool NeedToCharge;
     Uint16 StartFrame;
 };
