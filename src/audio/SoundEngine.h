@@ -34,7 +34,7 @@ using std::string;
 namespace Sound
 {
 
-class SoundBuffer;
+//class SoundBuffer;
 
 
 /**
