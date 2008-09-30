@@ -31,7 +31,6 @@
 #include "include/imageproc.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
-#include "audio/SoundEngine.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "WSAError.h"
@@ -42,10 +41,6 @@
 using std::string;
 using std::runtime_error;
 
-namespace pc {
-	/** SoundEngine of the game */
-	extern Sound::SoundEngine* sfxeng;
-}
 extern Logger * logger;
 
 /**
@@ -55,7 +50,6 @@ WSAMovie::~WSAMovie()
     delete[] wsadata;
     delete[] header.offsets;
     delete[] framedata;
-    delete[] sndfile;
 }
 
 /**
@@ -79,77 +73,67 @@ void WSAMovie::animate(GraphicsEngine* grafEngine)
     fps = static_cast<float>((1024.0 / (float) header.delta) * 1024.0);
     delay = static_cast<float>((1.0 / fps) * 1000.0);
 
+    // Clear the screen
     grafEngine->clearScreen();
-    // queue sound first, regardless of whats in the buffer already
+    
+    // check 
     if (header.NumFrames == 0) {
         return;
     }
     
-    // Play sound if present
-    if (sndfile != 0){
-        pc::sfxeng->PlaySound(sndfile);
-    }
-    
-    for (i = 0; i < header.NumFrames; i++) {
-        /* FIXME: fill buffer a little before zero to prevent
-         * slight audio pause? what value to use?
-         */
-        // if (pc::sfxeng->getBufferLen() == 0 && sndfile != NULL) {
-            pc::sfxeng->PlaySound(sndfile);
-        // }
+   
+    // For every frame: decode it, draw it and wait the delay 
+    for (i = 0; i < header.NumFrames; i++)
+    {
+        // Decode the frame
         frame = decodeFrame(i);
+        // Draw it to the screen
         grafEngine->drawVQAFrame(scaler.scale(frame,1));
+        // Wait a delay
         SDL_Delay((unsigned int)delay);
     }
     SDL_FreeSurface(frame);
-
-    /* Perhaps an emptyBuffer function to empty any left over sound
-     * in the buffer after the wsa finishes?
-     */
 }
 
-SDL_Surface* WSAMovie::decodeFrame(Uint16 framenum)
+/**
+ * @param framenum Number of the frame to decode in surface
+ * @return Surface decoded
+ */
+SDL_Surface* WSAMovie::decodeFrame(unsigned int framenum)
 {
-    Uint32 frameLength;
-    Uint8 *image40;
-    Uint8 *image80;
-    SDL_Surface *tempframe;
-    SDL_Surface *frame;
-
     // Get length of specific frame
-    frameLength = header.offsets[framenum+1] - header.offsets[framenum];
-    image80 = new Uint8[frameLength];
-    image40 = new Uint8[64000]; /* Max space. We dont know how big
-                                               decompressed image will be */
+    Uint32 frameLength = header.offsets[framenum+1] - header.offsets[framenum];
+    Uint8* image80 = new Uint8[frameLength];
+    Uint8* image40 = new Uint8[64000]; // Max space. We dont know how big decompressed image will be
 
     memcpy(image80, wsadata + header.offsets[framenum], frameLength);
     Compression::decode80(image80, image40);
     Compression::decode40(image40, framedata);
 
-    tempframe = SDL_CreateRGBSurfaceFrom(framedata, header.width, header.height, 8, header.width, 0, 0, 0, 0);
+    SDL_Surface* tempframe = SDL_CreateRGBSurfaceFrom(framedata, header.width, header.height, 8, header.width, 0, 0, 0, 0);
     SDL_SetColors(tempframe, palette, 0, 256);
 
     delete[] image40;
     delete[] image80;
 
-    frame = SDL_DisplayFormat(tempframe);
+    SDL_Surface* frame = SDL_DisplayFormat(tempframe);
 
     SDL_FreeSurface(tempframe);
 
+    // Return the frame decoded
     return frame;
 }
 
-WSAMovie::WSAMovie(string fname)
+/**
+ * @param fname File name of the WSA movie
+ */
+WSAMovie::WSAMovie(const string& fname)
 {
-    int i;
-    int j;
-    INIFile* wsa_ini = 0;
-    VFile* wfile = 0;
-
     // Load the animation file from mix archives
-    wfile = VFSUtils::VFS_Open(fname.c_str());
+    VFile* wfile = VFSUtils::VFS_Open(fname.c_str());
     // Test if their no file
-    if( wfile == 0 ) {
+    if (wfile == 0)
+    {
     	// Throw a WSA error
         throw WSAError("WSA Animation file not found");
     }
@@ -162,16 +146,18 @@ WSAMovie::WSAMovie(string fname)
 
 
     // Read which sound needs to be played
+    // @todo change that
+    INIFile* wsa_ini = 0;
     try {
         wsa_ini = GetConfig("wsa.ini");
     } catch(runtime_error&) {
         throw WSAError("wsa.ini not found.");
     }
 
-    sndfile = wsa_ini->readString(fname.c_str(), "sound");
 
     // If there are data in this file
-    if (wsadata != 0) {
+    if (wsadata != 0) 
+    {
         // Lets get the header
         header.NumFrames = wsadata[0] + (wsadata[0+1] << 8);
         header.xpos = wsadata[2] + (wsadata[2+1] << 8);
@@ -181,20 +167,21 @@ WSAMovie::WSAMovie(string fname)
         header.delta = wsadata[10] + (wsadata[10+1] << 8) + (wsadata[10+2] << 16) + (wsadata[10+3] << 24);
         header.offsets = new Uint32[header.NumFrames + 2];
         memset(header.offsets, 0, (header.NumFrames + 2) * sizeof(Uint32));
-        j = 14; // start of offsets
-        for (i = 0; i < header.NumFrames + 2; i++) {
+        int j = 14; // start of offsets
+        for (int i = 0; i < header.NumFrames + 2; i++) {
             header.offsets[i] = wsadata[j] + (wsadata[j+1] << 8) + (wsadata[j+2] << 16) + (wsadata[j+3] << 24) + 0x300;
             j += 4;
         }
 
         // Read the palette
-        for (i = 0; i < 256; i++) {
-            palette[i].r = wsadata[j];
-            palette[i].g = wsadata[j+1];
-            palette[i].b = wsadata[j+2];
-            palette[i].r <<= 2;
-            palette[i].g <<= 2;
-            palette[i].b <<= 2;
+        for (int k = 0; k < 256; k++)
+        {
+            palette[k].r = wsadata[j];
+            palette[k].g = wsadata[j + 1];
+            palette[k].b = wsadata[j + 2];
+            palette[k].r <<= 2;
+            palette[k].g <<= 2;
+            palette[k].b <<= 2;
             j += 3;
         }
 
@@ -204,11 +191,12 @@ WSAMovie::WSAMovie(string fname)
         framedata = new Uint8[header.height * header.width];
         memset(framedata, 0, header.height * header.width);
 
-        if (header.offsets[header.NumFrames + 1] - 0x300) {
-            loop = 1;
+        if (header.offsets[header.NumFrames + 1] - 0x300) 
+        {
+            loop = true;
             header.NumFrames += 1; // Add loop frame
         } else {
-            loop = 0;
+            loop = false;
         }
     } else {
     	// There are no data to load in this file
