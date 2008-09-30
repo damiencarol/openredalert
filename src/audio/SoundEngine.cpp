@@ -32,6 +32,7 @@ extern Logger * logger;
 
 using std::string;
 using OpenRedAlert::Sound::SoundCacheCleaner;
+//using Sound::SoundBuffer;
 
 namespace Sound
 {
@@ -342,7 +343,7 @@ void SoundEngine::MusicHook(void* userdata, Uint8* stream, int len)
     bool* musicFinishedPtr = reinterpret_cast<bool*>(userdata);
     if (!*musicFinishedPtr)
     {
-        SampleBuffer buffer;
+        vector<Uint8> buffer;
         Uint32 ret = musicDecoder.Decode(buffer, len);
         if (ret == SOUND_DECODE_COMPLETED) {
             musicDecoder.Close();
@@ -368,7 +369,7 @@ void SoundEngine::LoadSound(const string& sound)
     LoadSoundImpl(sound);
 }
 
-SoundBuffer* SoundEngine::LoadSoundImpl(const string& sound)
+Sound::SoundBuffer* SoundEngine::LoadSoundImpl(const string& sound)
 {
     SoundBuffer* buffer = 0;
 
