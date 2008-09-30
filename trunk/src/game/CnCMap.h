@@ -26,11 +26,11 @@
 #include "SDL/SDL_video.h"
 
 #include "triggers.h"
-#include "video/SHPImage.h"
-#include "game/MiniMapClipping.h"
-#include "game/Unit.hpp"
+#include "MiniMapClipping.h"
+#include "Unit.hpp"
 #include "misc/INIFile.h"
 #include "misc/gametypes.h"
+#include "video/SHPImage.h"
 
 class CellTrigger;
 class LoadingScreen;
@@ -173,7 +173,8 @@ public:
 	/** C/S: These functions are client only*/
 	Uint32 getTerrainOverlay( Uint32 pos ) ;
 
-    bool SnowTheme();
+    /** Return true if this map is in snow theme */
+    bool SnowTheme() const;
 
     SDL_Surface *getMapTile( Uint32 pos );
     SDL_Surface *getShadowTile(Uint8 shadownum);
@@ -253,10 +254,11 @@ public:
     /** Checks the WW coord is valid */
     bool validCoord(Uint16 tx, Uint16 ty) const;
     /** Converts a WW coord into a more flexible coord */
-    Uint32 normaliseCoord(Uint32 linenum) const;
+    unsigned int normaliseCoord(unsigned int linenum) const;
     /** Converts a WW coord into a more flexible coord */
-    Uint32 normaliseCoord(Uint16 tx, Uint16 ty) const;
-    void translateCoord(Uint32 linenum, Uint16* tx, Uint16* ty) const;
+    unsigned int normaliseCoord(unsigned int tx, unsigned int ty) const;
+    /** Translate coordinate */
+    void CnCMap::translateCoord(unsigned int linenum, unsigned int* tx, unsigned int* ty) const;
 
     /** Return the number with string of a COMMAND */
     Uint8 UnitActionToNr(const string action);
