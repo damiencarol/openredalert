@@ -369,7 +369,7 @@ void SoundEngine::LoadSound(const string& sound)
     LoadSoundImpl(sound);
 }
 
-Sound::SoundBuffer* SoundEngine::LoadSoundImpl(const string& sound)
+SoundBuffer* SoundEngine::LoadSoundImpl(const string& sound)
 {
     SoundBuffer* buffer = 0;
 
