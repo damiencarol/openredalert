@@ -21,24 +21,10 @@
  */
 MissionData::MissionData() 
 {
-    theater = 0;
-    brief = 0;
-    action = 0;
-    player = 0;
-    theme = 0;
-    winmov = 0;
-    losemov = 0;
 }
 
 /**
  */
 MissionData::~MissionData() 
 {
-    delete[] theater;
-    delete[] brief;
-    delete[] action;
-    delete[] player;
-    delete[] theme;
-    delete[] winmov;
-    delete[] losemov;
 }

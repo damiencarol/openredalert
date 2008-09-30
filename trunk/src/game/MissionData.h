@@ -20,8 +20,6 @@
 
 #include <string>
 
-#include "SDL/SDL_types.h"
-
 using std::string;
 
 /**
@@ -30,27 +28,27 @@ using std::string;
 class MissionData
 {
 public:
-	MissionData();
-	~MissionData();
+    MissionData();
+    ~MissionData();
 
     /** the name of the map */
     string mapname;
-   	/** movie played after failed mission */
-	char* losemov;
-	/** movie played after completed mission */
-	char* winmov;
-	/** Specific music to play for this mission.*/
-	char* theme;
-	/** The house of the player (Greece, USSR, England, etc) */
-	char* player;
-	/** the actionmovie */
-	char* action;
-	/** the briefing movie */
-	char* brief;
-	/** the theater of the map (can be "SNOW", "WINTER" or "INTERIOR") */
-	char* theater;
-	/** True if it's the last mission */
-	bool endOfGame;
+    /** movie played after failed mission */
+    string losemov;
+    /** movie played after completed mission */
+    string winmov;
+    /** Specific music to play for this mission.*/
+    string theme;
+    /** The house of the player (Greece, USSR, England, etc) */
+    string player;
+    /** the actionmovie */
+    string action;
+    /** the briefing movie */
+    string brief;
+    /** the theater of the map (can be "SNOW", "WINTER" or "INTERIOR") */
+    string theater;
+    /** True if it's the last mission */
+    bool endOfGame;
 };
 
 #endif //MISSIONDATA_H
