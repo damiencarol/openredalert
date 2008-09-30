@@ -20,9 +20,7 @@
 
 #include <string>
 
-#include "SDL/SDL_types.h"
-
-#include "misc/INIFile.h"
+class INIFile;
 
 
 using std::string;
@@ -39,84 +37,84 @@ public:
 
     void setAnim(string anim);
 
-    Uint32 getBurst();
+    int getBurst();
 
-    void setBurst(Uint32 burst);
+    void setBurst(int burst);
 
-    Uint32 getTurboBoost();
+    int getTurboBoost();
 
-    void setTurboBoost(Uint32 turboBoost);
+    void setTurboBoost(int turboBoost);
 
-    Uint32 getSupress();
+    int getSupress();
 
-    void setSupress(Uint32 supress);
+    void setSupress(int supress);
 
     string getWarhead();
 
     void setWarhead(string warhead);
 
-    Uint32 getSpeed();
+    int getSpeed();
 
-    void setSpeed(Uint32 speed);
+    void setSpeed(int speed);
 
     string getReport();
 
     void setReport(string report);
 
-    Uint32 getRange();
+    int getRange();
 
-    void setRange(Uint32 range);
+    void setRange(int range);
 
-    Uint32 getRof();
+    int getRof();
 
-    void setRof(Uint32 rof);
+    void setRof(int rof);
 
     string getProjectile();
 
     void setProjectile(string projectile);
 
-    Uint32 getDamage();
+    int getDamage();
 
-    void setDamage(Uint32 damage);
+    void setDamage(int damage);
 
-    Uint32 getCharges();
+    int getCharges();
 
-    void setCharges(Uint32 charges);
+    void setCharges(int charges);
 
-    Uint32 getCamera();
+    int getCamera();
 
-    void setCamera(Uint32 camera);
+    void setCamera(int camera);
 
-    static WeaponData* loadWeaponData(INIFile* file, string name);
+    static WeaponData* loadWeaponData(INIFile* file, const string& name);
     void print();
     	
 private:
-	/** animation to display as a firing effect*/
+	/** animation to display as a firing effect */
 	string anim;
 	/** number of rapid succession shots from this weapon (def=1)*/
-	Uint32 burst;
+	int burst;
 	/** Reveals area around firer (def=no)?*/
-	Uint32 camera;
+	int camera;
 	/** Does it have charge-up-before-firing logic (def=no)?*/
-	Uint32 charges;
+	int charges;
 	/** the amount of damage (unattenuated) dealt with every bullet*/
-	Uint32 damage;
-	/** projectile characteristic to use*/
+	int damage;
+	/** projectile characteristic to use */
 	string projectile;
-	/** delay between shots [15 = 1 second at middle speed setting]*/
-	Uint32 rof;
-	/** maximum cell range*/
-	Uint32 range;
-	/** sound to play when firing*/
+	/** delay between shots [15 = 1 second at middle speed setting] */
+	int rof;
+	/** maximum cell range */
+	int range;
+	/** sound to play when firing */
 	string report;
-	/** speed of projectile to target (100 is maximum)*/
-	Uint32 speed;
-	/** warhead to attach to projectile*/
+	/** speed of projectile to target (100 is maximum) */
+	int speed;
+	/** warhead to attach to projectile */
 	string warhead;
 	/** Should nearby friendly buildings be scanned for and if found, discourage firing on target (def=no)?*/
-	Uint32 supress;
-	/** Should the weapon get a boosted speed bonus when firing upon aircraft?*/
-	Uint32 turboBoost;
+	int supress;
+	/** Should the weapon get a boosted speed bonus when firing upon aircraft? */
+	int turboBoost;
 };
 
 #endif //WEAPONDATA_H
