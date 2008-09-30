@@ -20,17 +20,15 @@
 
 #include <string>
 
-#include "SDL/SDL_types.h"
-
 using std::string;
 
 class CellTrigger
 {
 public:
     string name;
-    Uint16 cellpos;
-    Uint16 x;
-    Uint16 y;
+    unsigned int cellpos;
+    unsigned int x;
+    unsigned int y;
 };
 
 #endif //CELLTRIGGER_H
