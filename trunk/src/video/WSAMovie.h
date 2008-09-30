@@ -19,8 +19,8 @@
 #define WSAMOVIE_H
 
 #include <string>
+#include <stdint.h>
 
-#include "SDL/SDL_types.h"
 #include "SDL/SDL_video.h"
 
 #include "WSAHeader.h"
@@ -44,22 +44,27 @@ using std::string;
 class WSAMovie
 {
 public:
-	WSAMovie(string fname);
-	~WSAMovie();
-	
-	void animate(GraphicsEngine* grafEngine);
+    /** Constructor */
+    WSAMovie(const string& fname);
+    ~WSAMovie();
+
+    /** Launch the animation rendering */
+    void animate(GraphicsEngine* grafEngine);
 
 private:
-	SDL_Surface *decodeFrame(Uint16 framenum);
-	Uint8 *wsadata;
-	Uint8 *framedata;
-	/** Palette of the video (for frame) */
-	SDL_Color palette[256];
-	/** Whether WSA loops or not */
-	Uint8 loop;
-	char *sndfile;
-	/** Header of the video */
-	WSAHeader header;
+    /** Decode one frame */
+    SDL_Surface* decodeFrame(unsigned int framenum);
+    
+    /** Internal Data */
+    Uint8* wsadata;
+    Uint8* framedata;
+    
+    /** Palette of the video (for frame) */
+    SDL_Color palette[256];
+    /** Whether WSA loops or not */
+    bool loop;
+    /** Header of the video */
+    WSAHeader header;
 };
 
 #endif //WSAMOVIE_H
