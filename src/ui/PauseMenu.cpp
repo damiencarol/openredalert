@@ -36,13 +36,16 @@
 
 #define VERSION "439"
 
+using Sound::SoundEngine;
+
 namespace p {
 	extern PlayerPool* ppool;
 }
 namespace pc {
 	extern ConfigType Config;
     extern GraphicsEngine * gfxeng;
-    extern Sound::SoundEngine* sfxeng;
+    extern SoundEngine* sfxeng;
+
 }
 extern Logger * logger;
 
