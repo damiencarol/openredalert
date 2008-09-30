@@ -24,7 +24,7 @@ $>cd openredalert
 $>make
 }}}
 
-the program wil be generated in the `openredalert-read-only/obj` folder.
+the program wil be generated in the `openredalert/obj` folder.
 
 copy it to the Debug folder
 {{{
