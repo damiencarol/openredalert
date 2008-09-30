@@ -20,18 +20,11 @@
 
 #include <map>
 #include <string>
-#include <vector>
-#include <list>
 
-#include "SDL/SDL_types.h"
-#include "IniEntry.h"
-#include "INIKey.h"
+#include "INISection.h"
 
 using std::string;
 using std::map;
-using std::vector;
-using std::list;
-
 
 /**
  * Parses inifiles.
@@ -43,36 +36,36 @@ public:
     explicit INIFile(const char* filename);
     ~INIFile();
 
-    /// @todo Would be nice if there was a version that returned a non-copy.
-    char* readString(const char* section, const char* value);
-    char* readString(const char* section, const char* value, const char* deflt);
+    /** Read a String */
+    string readString(const string& section, const string& key) const;
+    /** Read a string and return the default value if the key not exist */
+    string readString(const string& section, const string& key, const string& defaultValue) const;
 
-    int readInt(const char* section, const char* value, int deflt) const;
-    int readInt(const char* section, const char* value) const;
+    /** Read an integer */
+    int readInt(const string& section, const string& key) const;
+    /** Read an integer and return the default value if the key not exist */
+    int readInt(const string& section, const string& key, const int defaultValue) const;
+    
+    float readFloat(const string& section, const string& key);
+    float readFloat(const string& section, const string& key, const float defaultValue);
 
-    float readFloat(const char* section, const char* value);
-    float readFloat(const char* section, const char* value, float deflt);
+    INISection::const_iterator readKeyValue(const char* section, unsigned int keynum);
+    INISection::const_iterator readIndexedKeyValue(const char* section, unsigned int keynum, const char* prefix=0);
+    string readSection(unsigned int secnum);
 
-    INIKey readKeyValue(const char* section, Uint32 keynum);
-    INIKey readIndexedKeyValue(const char* section, Uint32 keynum, const char* prefix=0);
-    string readSection(Uint32 secnum);
-
-    int readYesNo(const char* section, const char* value, const char* defaut);
+    int readYesNo(const string& section, const string& value, const int defaultValue) const;
 
     /** Function to test if a section is in the inifile */
-    bool isSection(string section);
+    bool isSection(const string& section) const;
     /** Function to test if a key is in a section in the inifile */
-    bool isKeyInSection(const string& section, const string& keyString);
+    bool isKeyInSection(const string& section, const string& keyString) const;
 
     /** Function to get number of key/value per section */
-    int getNumberOfKeysInSection(string section);
+    int getNumberOfKeysInSection(const string& section) const;
 
 private:
     /** Internal data */
     map<string, INISection> Inidata;
-#ifdef _DEBUG
-	std::string filename;				///<for debugging purposes, in debugmode store which file this instance represents
-#endif
 };
 
 #endif //INIFILE_H
