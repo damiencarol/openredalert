@@ -44,6 +44,8 @@
 #include "game/BQueue.h"
 #include "game/UnitAndStructurePool.h"
 
+using Sound::SoundEngine;
+
 /* The defines were introduced in SDL 1.2.5, but should work with all
  * versions since mousewheel support was added.
  */
@@ -63,7 +65,8 @@ namespace pc {
     extern MessagePool* msg;
     extern Sidebar* sidebar;
     extern ImageCache* imgcache;
-    extern Sound::SoundEngine* sfxeng;
+    extern SoundEngine* sfxeng;
+
 }
 extern Logger * logger;
 extern bool GlobalVar[100];
