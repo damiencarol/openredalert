@@ -95,16 +95,8 @@ inline bool isRelativePath(const char *p) {
 #endif
 }
 
-//COMMON UTILITY FUNCTIONS
 /// @todo Stringify this funciton
-std::vector<char*> splitList(char* line, char delim);
-
-#ifdef _MSC_VER
-int round(double a);
-#endif
-void strUpper(std::string& stringToUpper);
-void strUpper(char* stringToUpper);
-void strStripWhiteSpace(char* stringToRemoveWhitespaces);		///<removes all occurences of spaces or \t from the end
+std::vector<char*> splitList(const string& line, char delim);
 
 /// @todo Stringify this funciton
 char* stripNumbers(const char* src);
@@ -114,4 +106,4 @@ const std::string& determineBinaryLocation(const std::string& launchcmd);
 const std::string& getBinaryLocation();
 
 
-#endif //COMMON_H
+#endif /* COMMON_H */
