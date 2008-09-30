@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <string>
 #include <stdexcept>
+#include <iostream>
 
 #include "include/sdllayer.h"
 
@@ -28,6 +29,8 @@
 
 #define VERSION "438"
 
+using std::cout;
+using std::endl;
 using std::runtime_error;
 
 
@@ -45,9 +48,8 @@ extern Logger * logger;
  */
 void PrintUsage()
 {
-    printf("OpenRedAlert - %s\n\n", VERSION);
+    cout << "OpenRedAlert - " << VERSION << endl;
     printf("Usage: OpenRedAlert [OPTIONS]\n");
-    printf("  -map mapname       - Name of mission to load\n");
     printf("  -w width           - Width of screen\n");
     printf("  -h height          - Height of screen\n");
     printf("  -bpp bpp           - Video Depth\n");
@@ -99,21 +101,14 @@ extern bool parse(int argc, char **argv)
     // Some of the "defaults" are in freecnc.ini
     config.videoflags = SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWPALETTE;
 
-    tmp = freecnc_ini->readString("Options", "Map");
-    if (tmp == 0) {
-        logger->error("Option \"Map\" missing in inifile\n");
-        return false;
-    }
-	config.pause = false;
-	config.demo = false;
-	config.quit_mission = false;
-    config.mapname = tmp;
-    delete[] tmp;
+    config.pause = false;
+    config.demo = false;
+    config.quit_mission = false;    
     config.width = freecnc_ini->readInt("Video", "Width", 640);
     config.height = freecnc_ini->readInt("Video", "Height", 480);
     config.bpp = freecnc_ini->readInt("Video", "Bpp", 16);
-    config.use_opengl = freecnc_ini->readInt("Video","OpenGL",0) != 0;		
-    fullscreen = 		freecnc_ini->readInt("Video","fullscreen",0) != 0;
+    config.use_opengl = freecnc_ini->readInt("Video","OpenGL",0);
+    fullscreen = freecnc_ini->readInt("Video","fullscreen",0);
     config.intro = freecnc_ini->readInt("Options", "PlayIntro", 1);
     config.gamenum = (gametypes)freecnc_ini->readInt("Options", "Game", GAME_TD);
     config.nosound = (freecnc_ini->readInt("Options", "Nosound",0) != 0);
@@ -244,14 +239,6 @@ extern bool parse(int argc, char **argv)
         }
         if (strcmp(argv[i], "-grab") == 0) {
             config.grabmode = SDL_GRAB_ON;
-            continue;
-        }
-        if ( strcmp(argv[i], "-map") == 0 ) {
-            if (argv[i+1]) {
-                config.mapname = argv[i+1];
-                std::transform(config.mapname.begin(), config.mapname.end(), config.mapname.begin(), toupper);
-                ++i;
-            }
             continue;
         }
 
