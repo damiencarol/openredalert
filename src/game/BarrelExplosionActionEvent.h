@@ -30,15 +30,15 @@
 class BarrelExplosionActionEvent : public ActionEvent
 {
 public:
-	/** Constructor */
-	BarrelExplosionActionEvent(unsigned int p, unsigned int pos);
+    /** Constructor */
+    BarrelExplosionActionEvent(unsigned int p, unsigned int pos);
 
     /** */
     virtual void run();
 
 private:
     /** Position of the animation in the map */
-	unsigned int position;
+    unsigned int position;
 };
 
 #endif //BARRELEXPLOSIONANIMEVENT_H
