@@ -258,7 +258,7 @@ public:
     /** Converts a WW coord into a more flexible coord */
     unsigned int normaliseCoord(unsigned int tx, unsigned int ty) const;
     /** Translate coordinate */
-    void CnCMap::translateCoord(unsigned int linenum, unsigned int* tx, unsigned int* ty) const;
+    void translateCoord(unsigned int linenum, unsigned int* tx, unsigned int* ty) const;
 
     /** Return the number with string of a COMMAND */
     Uint8 UnitActionToNr(const string action);

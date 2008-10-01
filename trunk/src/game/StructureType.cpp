@@ -1,6 +1,3 @@
-
-#include "misc\INIFile.h"
-
 // StructureType.cpp
 // 1.0
 
