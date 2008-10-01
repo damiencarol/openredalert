@@ -29,6 +29,7 @@ namespace UI
  */
 class MapAnimationMenu
 {
+public:
     /** Play the animation for a mission */
     void Play(GraphicsEngine& theGraphicEngine, const unsigned int mapNumber, const bool isAlly) const;
 };
