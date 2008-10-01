@@ -35,23 +35,23 @@ using std::priority_queue;
  * 
  * This object call ActionEvent with priority
  * 
- * @todo add methode start to backup the time and start from 0 the time elapsed (possible trigger bug)
+ * @todo add method start to backup the time and start from 0 the time elapsed (possible trigger bug)
  */
 class ActionEventQueue
 {
 public:
     ActionEventQueue();
     ~ActionEventQueue();
-    
+
     /** Schedule an ActionEvent in the queue */
     void scheduleEvent(ActionEvent * ev);
     void runEvents();
-    /** Get time elapsed beetween the creation of the queue and now */
+    /** Get time elapsed between the creation of the queue and now */
     Uint32 getElapsedTime();
     Uint32 getCurtick();
-    
+
 private:
-	/** First tick backup */
+    /** First tick backup */
     Uint32 starttick;
     /** Queue of all ActionEvent which waiting to be called by this ActionEventQueue */
     priority_queue<ActionEvent*, vector<ActionEvent*>, Comp> eventqueue;

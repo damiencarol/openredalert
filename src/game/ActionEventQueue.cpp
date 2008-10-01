@@ -28,7 +28,7 @@
  */
 ActionEventQueue::ActionEventQueue()
 {
-	// Save the current time
+    // Save the current time
     starttick = SDL_GetTicks();
 }
 
@@ -39,12 +39,13 @@ ActionEventQueue::~ActionEventQueue()
 {
     ActionEvent *ev;
     // Free all action event
-    while( !eventqueue.empty() ) {
+    while (!eventqueue.empty())
+    {
         ev = eventqueue.top();
         eventqueue.pop();
-		if (ev != NULL)
-			delete ev;
-		ev = NULL;
+        if (ev != 0)
+            delete ev;
+        ev = 0;
     }
 }
 
@@ -55,8 +56,14 @@ ActionEventQueue::~ActionEventQueue()
  */
 void ActionEventQueue::scheduleEvent(ActionEvent* event)
 {
+    // Check if event != NULL
+    if (event == 0)
+    {
+        // Return to avoid error
+        return
+    }
 
-	event->addCurtick(getCurtick());
+    event->addCurtick(getCurtick());
 
     eventqueue.push(event);
 }
@@ -69,7 +76,8 @@ void ActionEventQueue::runEvents()
     Uint32 curtick = getCurtick();
 
     // run all events in the queue with a prio lower than curtick
-    while( !eventqueue.empty() && eventqueue.top()->getPrio() <= curtick ) {
+    while( !eventqueue.empty() && eventqueue.top()->getPrio() <= curtick ) 
+    {
         eventqueue.top()->run();
         eventqueue.pop();
     }
