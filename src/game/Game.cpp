@@ -51,6 +51,7 @@
 #include "LoadMapError.h"
 #include "video/VideoError.h"
 #include "game/UnitAndStructurePool.h"
+#include "ui/MapAnimationMenu.hpp"
 
 using std::string;
 using std::runtime_error;
@@ -58,6 +59,7 @@ using VQA::VQAMovie;
 
 using Sound::SoundEngine;
 using OpenRedAlert::Sound::SoundError;
+using UI::MapAnimationMenu;
 
 extern Logger * logger;
 
@@ -602,6 +604,13 @@ void Game::play()
 			{
 				logger->note("%s line %i: Unknown mission type\n",__FILE__ , __LINE__);
 			}
+		}
+		
+		// Play Animation Map
+		if (pc::Config.gamemode == GAME_MODE_SINGLE_PLAYER)
+		{
+			MapAnimationMenu myAnimMenu;
+			myAnimMenu.Play(*(pc::gfxeng), MissionNr, true);
 		}
 
         // Initialize (load) the map
