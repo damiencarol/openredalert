@@ -49,7 +49,7 @@ public:
     ~WSAMovie();
 
     /** Launch the animation rendering */
-    void animate(GraphicsEngine* grafEngine);
+    void animate(GraphicsEngine& grafEngine);
 
 private:
     /** Decode one frame */
