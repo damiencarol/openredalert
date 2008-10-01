@@ -57,6 +57,7 @@ using std::runtime_error;
 using VQA::VQAMovie;
 
 using Sound::SoundEngine;
+using OpenRedAlert::Sound::SoundError;
 
 extern Logger * logger;
 
@@ -229,23 +230,23 @@ void Game::InitializeMap(string MapName)
  */
 void Game::InitializeGameClasses()
 {
-	/// Initialise the Graphics Engine
+	/// Initialize the Graphics Engine
 	try
 	{
-		logger->note("Initialising the graphics engine...");
+		logger->note("Initializing the graphics engine...");
 		pc::gfxeng = new GraphicsEngine();
 		logger->note("done\n");
 	}
 	catch (VideoError& ex)
 	{
 		logger->note("failed.  %s \n", ex.what());
-		throw runtime_error("Unable to initialise the graphics engine");
+		throw runtime_error("Unable to Initialize the graphics engine");
 	}
 
-	/// Initialise Sound
+	/// Initialize Sound
 	try
 	{
-		logger->note("Initialising the sound engine...");
+		logger->note("Initializing the sound engine...");
 		pc::sfxeng = new SoundEngine(pc::Config.nosound);
 		logger->note("done\n");
 	}
@@ -253,10 +254,10 @@ void Game::InitializeGameClasses()
 	{
 		logger->error("%s\n", error.what());
 		logger->note("failed.  exiting\n");
-		throw runtime_error("Unable to initialise the sound engine");
+		throw runtime_error("Unable to Initialize the sound engine");
 	}
 
-	/// Initialise the VFS file system
+	/// Initialize the VFS file system
 	VFSUtils::VFS_PreInit(pc::Config.binpath.c_str());
 	VFSUtils::VFS_Init(pc::Config.binpath.c_str());
 	VFSUtils::VFS_LoadGame(pc::Config.gamenum);
@@ -273,7 +274,7 @@ void Game::InitializeGameClasses()
 	/// Init the Data Loader
 	try
 	{
-		logger->note("Initialising the RA Data loader...");
+		logger->note("Initializing the RA Data loader...");
 		p::raLoader = new RedAlertDataLoader();
 		p::raLoader->load();
 		logger->note("done\n");
@@ -281,7 +282,7 @@ void Game::InitializeGameClasses()
 	catch (...)
 	{
 		logger->note("failed.  exiting\n");
-		throw runtime_error("Unable to initialise the RA Data loader");
+		throw runtime_error("Unable to Initialize the RA Data loader");
 	}
 
 	// Load the music files (for background music

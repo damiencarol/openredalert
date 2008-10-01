@@ -24,6 +24,12 @@
 using std::string;
 using std::runtime_error;
 
+namespace OpenRedAlert
+{
+
+namespace Sound
+{
+
 /**
  */
 class SoundError : public runtime_error
@@ -32,5 +38,9 @@ public:
 
     SoundError(const string& msg) ;
 };
+
+}
+
+}
 
 #endif //SOUNDERROR_H
