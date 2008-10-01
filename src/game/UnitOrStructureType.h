@@ -18,6 +18,7 @@
 #ifndef UNITORSTRUCTURETYPE_H
 #define UNITORSTRUCTURETYPE_H
 
+#include <string>
 #include <vector>
 
 #include "SDL/SDL_types.h"
@@ -28,6 +29,7 @@
 class Weapon;
 
 using std::vector;
+using std::string;
 
 /**
  * UnitOrStructureType is used when you can't or don't need to know whether you are dealing with a unit type or a structure
@@ -71,7 +73,7 @@ public:
 	virtual const char * getTName() const = 0;
 
 	/** Returns the external name, e.g. Minigunner */
-	virtual const char * getName() const = 0;
+	virtual const string getName() const = 0;
 
 	/** Returns the names of the sides that can build this */
 	virtual vector<char *> getOwners() const = 0;
