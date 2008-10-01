@@ -53,8 +53,9 @@ WSAMovie::~WSAMovie()
 }
 
 /**
+ * @param grafEngine Graphic engine to show WSA animation
  */
-void WSAMovie::animate(GraphicsEngine* grafEngine)
+void WSAMovie::animate(GraphicsEngine& grafEngine)
 {
     float fps, delay;
     SDL_Rect dest;
@@ -68,13 +69,13 @@ void WSAMovie::animate(GraphicsEngine* grafEngine)
     frame = 0;
     dest.w = header.width<<1;
     dest.h = header.height<<1;
-    dest.x = (grafEngine->getWidth()-(header.width<<1))>>1;
-    dest.y = (grafEngine->getHeight()-(header.height<<1))>>1;
+    dest.x = (grafEngine.getWidth()-(header.width<<1))>>1;
+    dest.y = (grafEngine.getHeight()-(header.height<<1))>>1;
     fps = static_cast<float>((1024.0 / (float) header.delta) * 1024.0);
     delay = static_cast<float>((1.0 / fps) * 1000.0);
 
     // Clear the screen
-    grafEngine->clearScreen();
+    grafEngine.clearScreen();
     
     // check 
     if (header.NumFrames == 0) {
@@ -88,10 +89,11 @@ void WSAMovie::animate(GraphicsEngine* grafEngine)
         // Decode the frame
         frame = decodeFrame(i);
         // Draw it to the screen
-        grafEngine->drawVQAFrame(scaler.scale(frame,1));
+        grafEngine.drawVQAFrame(scaler.scale(frame,1));
         // Wait a delay
         SDL_Delay((unsigned int)delay);
     }
+    // Release the surface
     SDL_FreeSurface(frame);
 }
 

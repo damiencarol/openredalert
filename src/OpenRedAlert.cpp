@@ -67,7 +67,8 @@ namespace pc {
 
 using VQA::VQAMovie;
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     atexit(cleanup);
     set_terminate(fcnc_terminate_handler);
 
@@ -162,7 +163,7 @@ int main(int argc, char** argv) {
 
             try {
                 WSAMovie* choose = new WSAMovie("choose.wsa");
-                choose->animate(pc::gfxeng);
+                choose->animate(*(pc::gfxeng));
             }
             catch (WSAError&) {
             }
@@ -243,14 +244,18 @@ void fcnc_terminate_handler() {
 }
 
 /**
- *
  */
-void cleanup() {
-    if (logger != NULL) {
+void cleanup()
+{
+    if (logger != 0)
+    {
         delete logger;
     }
-    logger = NULL;
+    logger = 0;
 
+    // Free VFS
     VFSUtils::VFS_Destroy();
+    
+    // Free SDL
     SDL_Quit();
 }
