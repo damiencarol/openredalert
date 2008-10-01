@@ -60,7 +60,7 @@ void ActionEventQueue::scheduleEvent(ActionEvent* event)
     if (event == 0)
     {
         // Return to avoid error
-        return
+        return;
     }
 
     event->addCurtick(getCurtick());
