@@ -192,7 +192,7 @@ void VQA::VQAMovie::play()
     // create the frame to store the image in.
     frame = SDL_CreateRGBSurface(SDL_SWSURFACE, header.Width, header.Height, 8, 0, 0, 0, 0);
 
-    // Initialise the scaler
+    // Initialize the scaler
     if (scaleVideo){
         scaler.initVideoScale(frame, videoScaleQuality);
     }
