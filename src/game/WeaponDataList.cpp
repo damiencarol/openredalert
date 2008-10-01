@@ -25,8 +25,6 @@
 #include "WarheadDataList.h"
 #include "WeaponData.h"
 
-#include "misc/INIFile.h"
-
 using std::string;
 using std::map;
 using std::iterator;
