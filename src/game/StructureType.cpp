@@ -1,3 +1,6 @@
+
+#include "misc\INIFile.h"
+
 // StructureType.cpp
 // 1.0
 
@@ -50,18 +53,16 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	SHPImage *shpimage;
 	SHPImage *makeimage;
 	Uint32 i = 0;
-	char shpname[13];
 	char imagename[8];
 	char* tmpCharges;
 	char* tmpWaterBound;
-	char* tmp;
 	char blocktest[128];
 	Uint32 size;
 	char* miscnames;
-	INIFile* rulesIni = 0;
+	
 
 	// Load the rules.ini file
-	rulesIni = new INIFile("rules.ini");
+	INIFile* rulesIni = new INIFile("rules.ini");
 
 	// Check if the section exist
 	if (structini->isSection(string(typeName)) == false)
@@ -83,7 +84,6 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 		shpnums = NULL;
 		blocked = NULL;
 		shptnum = NULL;
-		name = NULL;
 		return;
 	}
 
@@ -92,41 +92,37 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	memset(this->tname, 0x0, 8);
 	strncpy(this->tname, typeName, 8);
 	name = structini->readString(tname, "name");
-	//prereqs = structini->splitList(tname,"prerequisites",',');
-	tmp = structini->readString(tname, "prerequisites");
-	//	printf ("%s line %i: Structure: %s --> prereqs = %s\n", __FILE__, __LINE__, tname, tmp);
 
-	if (tmp != NULL)
-	{
-		prereqs = splitList(tmp, ',');
-		delete[] tmp;
-		tmp = NULL;
-	}
+    {
+        // Read prerequiste
+        string tmp = structini->readString(tname, "prerequisites", "");
+        //	printf ("%s line %i: Structure: %s --> prereqs = %s\n", __FILE__, __LINE__, tname, tmp);
+        if (tmp.size() > 0)
+        {
+            prereqs = splitList(tmp.c_str(), ',');
+        }
+    }
 #if 0
+        // FOR DEBUG ONLY
 	printf ("%s line %i: Structure: %s \n", __FILE__, __LINE__, tname);
 	for (unsigned int j = 0; j < prereqs.size(); j++)
 	{
 		printf ("prereq = %s\n", prereqs[j]);
 	}
 #endif
-	tmp = structini->readString(tname, "deploywith");
-
-	if (tmp != NULL)
+        
+	string tmp = structini->readString(tname, "deploywith");
+	if (tmp.size() > 0)
 	{
-		deploywith = splitList(tmp, ',');
-		delete[] tmp;
-		tmp = NULL;
+            deploywith = splitList(tmp.c_str(), ',');
 	}
 
 	// Get the owners
 	//owners = structini->splitList(tname,"owners",',');
 	tmp = structini->readString(tname, "owners");
-	if (tmp != NULL)
-	{
-		owners = splitList(tmp, ',');
-		delete[] tmp;
-		tmp = NULL;
-	}
+	owners = splitList(tmp.c_str(), ',');
+        
+        // Custom warning
 	if (owners.empty())
 	{
 		logger->warning("%s has no owners\n", tname);
@@ -208,14 +204,16 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	 xoffset = 0;
 	 yoffset = 0;
 	 */
-	memset(shpname, 0, 13);
+	//memset(shpname, 0, 13);
 	numshps = structini->readInt(tname, "layers", 1);
 
 	shpnums = new Uint16[(is_wall?numshps:numshps+1)];
 	shptnum = new Uint16[numshps];
 
 	// Read the Tech level
-	techLevel = structini->readInt(tname, "techlevel", -1);
+	// @todo : refactor this !!!!!!!
+	//techLevel = structini->readInt(tname,"TechLevel", -1);
+	techLevel = (Sint32)structini->readInt(tname, "techlevel", (Sint32)-1);
 
 	powerinfo.power = structini->readInt(tname, "power", 0);
 	powerinfo.drain = structini->readInt(tname, "drain", 0);
@@ -223,64 +221,44 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	maxhealth = structini->readInt(tname, "health", 100);
 
 	// Read "Charges"
-	tmpCharges = (structini->readString(tname, "Charges"));
-	charges = false;
-	if (tmpCharges != NULL)
-	{
-		if (strcmp(tmpCharges, "yes") == 0)
-		{
-			charges = true;
-		}
-		delete[] tmpCharges;
-		tmpCharges = NULL;
-	}
+        charges = (structini->readYesNo(string(tname), "Charges", 0) == 1);
+	
+        
 
-	// Read if it's a "waterbound" structure
-	tmpWaterBound = (structini->readString(tname, "WaterBound"));
-	WaterBound = false;
-	if (tmpWaterBound != 0)
-	{
-		if (strcmp(tmpWaterBound, "yes") == 0)
-		{
-			WaterBound = true;
-		}
-		delete[] tmpWaterBound;
-		tmpWaterBound = 0;
-	}
+	// Read if it's a "waterbound" structure	
+	WaterBound = (structini->readYesNo(tname, "WaterBound", 0) == 1);
+
 
 	// @todo Read SHP ???????
 	for (i = 0; i < numshps; i++)
 	{
 		// @todo TRY THIS (TEST !!!!!!!!!!!)
 		sprintf(imagename, "image%d", i+1);
-		tmp = structini->readString(tname, imagename);
-		if (tmp == NULL)
+		tmp = structini->readString(tname, imagename, "");
+                string shpname;
+		if (tmp.size() == 0)
 		{
-			strncpy(shpname, tname, 13);
-			strncat(shpname, ".shp", 13);
+			shpname = string(tname) + ".shp";
 		}
 		else
 		{
-			strncpy(shpname, tmp, 13);
-			delete[] tmp;
-			tmp = NULL;
+                    shpname = tmp + ".shp";
 		}
 
 		try
 		{
-			shpimage = new SHPImage(shpname, -1);
+			shpimage = new SHPImage(shpname.c_str(), -1);
 		}
 		catch (ImageNotFound&)
 		{
-			strncpy(shpname, tname, 13);
-			strncat(shpname, thext, 13);
+			shpname = string(tname) + string(thext);
 			try
 			{
-				shpimage = new SHPImage(shpname, -1);
+				shpimage = new SHPImage(shpname.c_str(), -1);
 			}
 			catch (ImageNotFound&)
 			{
-				logger->warning("Image not found: \"%s\"\n", shpname);
+				logger->warning("Image not found: \"%s\"\n", shpname.c_str());
 				numshps = 0;
 				return;
 			}
@@ -326,11 +304,11 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 
 		defaultface = structini->readInt(tname, "defaultface", 0);
 
+                string shpMakeName;
 		// Check if name of the structure <= 4
 		if (strlen(tname) <= 4)
 		{
-			strncpy(shpname, tname, 13);
-			strncat(shpname, "make.shp", 13);
+			shpMakeName = string(tname) + "make.shp";
 		}
 		else
 		{
@@ -339,39 +317,36 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 		// Load the MAKE anim and store anim info
 		try
 		{
-			makeimage = new SHPImage(shpname, -1);
+			makeimage = new SHPImage(shpMakeName.c_str(), -1);
 			animinfo.makenum = makeimage->getNumImg();
 
 			makeimg = pc::imagepool->size();
-			pc::imagepool->push_back(makeimage); // Store make image
+			pc::imagepool->push_back(makeimage); // Store make image			
 		}
 		catch (ImageNotFound&)
 		{
+                    // @todo try to load SHPNAME.XXX where XXX is 3 letters of theater
 			makeimg = 0;
 			animinfo.makenum = 0;
 		}
 
-		miscnames = structini->readString(tname, "primary_weapon");
-		if (miscnames == NULL)
+		string strPri = structini->readString(tname, "primary_weapon", "");
+		if (strPri == "")
 		{
 			primary_weapon = NULL;
 		}
 		else
 		{
-			primary_weapon = p::weappool->getWeapon(miscnames);
-			delete[] miscnames;
-			miscnames = NULL;
+			primary_weapon = p::weappool->getWeapon(strPri.c_str());			
 		}
-		miscnames = structini->readString(tname, "secondary_weapon");
-		if (miscnames == NULL)
+		string strSec = structini->readString(tname, "secondary_weapon", "");
+		if (strSec == "")
 		{
 			secondary_weapon = NULL;
 		}
 		else
 		{
-			secondary_weapon = p::weappool->getWeapon(miscnames);
-			delete[] miscnames;
-			miscnames = NULL;
+			secondary_weapon = p::weappool->getWeapon(strSec.c_str());
 		}
 		turret = (structini->readInt(tname, "turret", 0) != 0);
 		if (turret)
@@ -390,28 +365,25 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	// Read the Cost of the Structure Type
 	cost = structini->readInt(tname, "cost", 0);
 
-	// Reading of the armor
-	miscnames = structini->readString(tname, "armour", "none");
-	if (miscnames == 0)
-	{
-		armour = AC_none;
-	}
-	else
-	{
-		if (strncmp((miscnames), ("none"), (4)) == 0)
-			armour = AC_none;
-		else if (strncmp((miscnames), ("wood"), (4)) == 0)
-			armour = AC_wood;
-		else if (strncmp((miscnames), ("light"), (5)) == 0)
-			armour = AC_light;
-		else if (strncmp((miscnames), ("heavy"), (5)) == 0)
-			armour = AC_heavy;
-		else if (strncmp((miscnames), ("concrete"), (8)) == 0)
-			armour = AC_concrete;
-
-		delete[] miscnames;
-		miscnames = 0;
-	}
+    // Reading of the armor
+    string armStr = structini->readString(tname, "armour", "none");
+    if (armStr == "none")
+    {
+        armour = AC_none;
+    }
+    else
+    {
+        if (armStr == "none")
+            armour = AC_none;
+        else if (armStr == "wood")
+            armour = AC_wood;
+        else if (armStr == "light")
+            armour = AC_light;
+        else if (armStr == "heavy")
+            armour = AC_heavy;
+        else if (armStr == "concrete")
+            armour = AC_concrete;
+    }
 
 	// Check if this structure is primary setable
 	if (structini->readInt(tname, "primary", 0) == 1)
@@ -431,7 +403,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	// Read the Adjacent
 	this->adjacent = rulesIni->readInt(tname, "Adjacent", 1);
 
-	// Read the Sight
+	// Read the Sight	
 	this->sight = rulesIni->readInt(tname, "Sight", 1);
 
 	// Free rules.ini
@@ -462,9 +434,6 @@ StructureType::~StructureType()
 	if (shptnum != NULL)
 		delete[] shptnum;
 	shptnum = NULL;
-	if (name != NULL)
-		delete[] name;
-	name = NULL;
 }
 
 Uint16 * StructureType::getSHPNums()
@@ -481,9 +450,9 @@ const char * StructureType::getTName() const
 {
 	return tname;
 }
-const char * StructureType::getName() const
+const string StructureType::getName() const
 {
-	return name;
+    return name;
 }
 
 vector < char *> StructureType::getDeployWith() const
@@ -573,7 +542,7 @@ bool StructureType::isPowered()
 
 /**
  * Return the Primary weapon
- *
+ * 
  * @return Reference to the primary weapon
  * @see Weapon
  */
@@ -585,7 +554,7 @@ Weapon * StructureType::getWeapon() const
 
 /**
  * Return the weapon of the structure wanted
- *
+ * 
  * @param primary if true select the primary weapon else return the secondary
  * @return Reference to the selected weapon
  * @see Weapon
