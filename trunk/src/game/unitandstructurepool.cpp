@@ -30,6 +30,7 @@
 #include "misc/INIFile.h"
 #include "include/Logger.h"
 #include "PlayerPool.h"
+#include "game/Unit.hpp"
 #include "weaponspool.h"
 #include "video/ImageCache.h"
 #include "InfantryGroup.h"
@@ -451,8 +452,8 @@ bool UnitAndStructurePool::createReinforcements(RA_Teamtype* Team)
             return false;
         }
 
-        Uint16 x = 0;
-        Uint16 y = 0;
+        unsigned int x = 0;
+        unsigned int y = 0;
         p::ccmap->translateCoord(cellpos, &x, &y);
 
         logger->debug("SPAWN AT = %d %d       %d\n", x, y, cellpos);
@@ -2317,7 +2318,7 @@ void UnitAndStructurePool::updateWalls(Structure* st, bool add, CnCMap* theMap)
     int cellpos;
 
     cellpos = st->getPos();
-    type = dynamic_cast<StructureType*>(st->getType());
+    type = ((StructureType*)st->getType());
     // left
     if (cellpos % theMap->getWidth() > 0)
     {
