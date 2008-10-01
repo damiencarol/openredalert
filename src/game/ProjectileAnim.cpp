@@ -20,7 +20,7 @@
 #include <cmath>
 
 #include "SDL/SDL_types.h"
-#include "include/common.h"
+
 #include "UnitOrStructure.h"
 #include "ExplosionAnim.h"
 #include "L2Overlay.h"
@@ -82,7 +82,7 @@ ProjectileAnim::ProjectileAnim(Uint32 p, Weapon *weap, UnitOrStructure* owner,
         heatseek = false;
     }
 
-    if (heatseek)
+    if (heatseek) 
     {
 // @todo _check that
     	target = 0;
@@ -173,11 +173,11 @@ void ProjectileAnim::run()
     Uint32 oldpos;
     Unit* utarget = 0;
     Structure* starget = 0;
-
+    
     if (fuelled) {
         --fuel;
     }
-    if (heatseek)
+    if (heatseek) 
     {
         double pixelspertick;
         double totlen;
@@ -229,58 +229,41 @@ void ProjectileAnim::run()
     {
         ymod = 0;
     }
-
+    
     // if we are so close both
-    if (xmod == 0 && ymod == 0)
+    if (xmod == 0 && ymod == 0) 
     {
-    	// Play the animation for Warhead final crash
-    	unsigned int numPiffShp = pc::imgcache->loadImage("piff.shp", -1);
-    	unsigned int numPiffPiffShp = pc::imgcache->loadImage("piffpiff.shp", -1);
-    	unsigned int numFireShp = pc::imgcache->loadImage("fire1.shp", -1); // need test
-    	unsigned int numFragsShp = pc::imgcache->loadImage("frag1.shp", -1); // need test
-    	unsigned int numPopsShp = pc::imgcache->loadImage("atomsfx.shp", -1); // need test
-    	unsigned int numAtomShp = pc::imgcache->loadImage("atomsfx.shp", -1);
-
-    	unsigned int type = weap->getWarhead()->getType()->getExplosion();
+    	// Play the anim for piff
+    	Uint32 numPiffShp = pc::imgcache->loadImage("piff.shp", -1);
+    	Uint32 numPiffPiffShp = pc::imgcache->loadImage("piffpiff.shp", -1);
+    	Uint32 numAtomShp = pc::imgcache->loadImage("atomsfx.shp", -1);
+    	Uint32 type = weap->getWarhead()->getType()->getExplosion();
     	switch (type)
     	{
-		case 1:
-			new ExplosionAnim(1, dest, numPiffShp, 4, 0, 0);
-			// @todo use offsets
-			//	target->getXoffset(),
-			//	target->getYoffset());
-			break;
-		case 2:
-			new ExplosionAnim(1, dest, numPiffPiffShp, 8, 0, 0);
-			break;
-		case 3:
-			new ExplosionAnim(1, dest, numFireShp, 15, 0, 0);
-			break;
-		case 4:
-			new ExplosionAnim(1, dest, numFragsShp, 14, 0, 0);
-			break;
-		case 5:
-			new ExplosionAnim(1, dest, numPopsShp, 8, 0, 0);
-			break;
-		case 6:
-			new ExplosionAnim(1, dest, numAtomShp, 27, 0, 0);
-			break;
-		default:
-			//
-			break;
-		}
-
-    	// Play report of the weapon
-    	//pc::sfxeng->PlaySound(weap->getProjectile()->lnkProjectileData->Warhead()->getExplosionsound());
-
-
-
-
+    	case 1:
+    		new ExplosionAnim(1, dest, numPiffShp, 4, 0,0);    		
+    		//	target->getXoffset(), 
+    		//	target->getYoffset());
+    		break;
+    	case 2:
+    		new ExplosionAnim(1, dest, numPiffPiffShp, 8, 0, 0);
+    		break;
+    	default:
+    		//new ExplosionAnim(1, dest, numAtomShp, 27, 0, 0);
+    		break;
+    	} 
+    	
+    	// Play report of the weapon 
+    	//pc::sfxeng->PlaySound(weap->getProjectile()->lnkProjectileData->Warhead()->getExplosionsound());  	        
+    	
+    	
+    	
+    	
     	// @todo _PLAY ANIMATION ONLY IF IN PROJECTILE THEIR ARE "Animates" = 'yes'
         // projectile hit..
         /*if( weap->getWarhead()->getExplosionsound() != NULL ) {
             pc::sfxeng->PlaySound(weap->getWarhead()->getExplosionsound());
-        }
+        }        
         */
     	//printf("0\n");
     	//
@@ -288,12 +271,12 @@ void ProjectileAnim::run()
     	//
     	/*
     	Uint32 imageExplosionNum;
-    	//int explosionimage = pc::imagepool->size()<<16;
+    	//int explosionimage = pc::imagepool->size()<<16;    
     	Uint32 type = weap->getWarhead()->getType()->getExplosion();
     	// 1=piff
     	if (type==1)
     	{printf("1\n");
-
+    	
     		// Load the image
     		imageExplosionNum = pc::imgcache->loadImage("piff.shp");
     		SHPImage* temp;
@@ -303,10 +286,10 @@ void ProjectileAnim::run()
     			logger->error("Unenable to load the image of piff\n");
     			throw new ImageNotFound("Unenable to load the image of piff");
     		}
-
+    		
     		new ExplosionAnim(1, dest, imageExplosionNum, 4, 0, 0);
     	}
-
+    	
     	// 2=piffs
     	if (type==2)
     	{
@@ -320,11 +303,11 @@ void ProjectileAnim::run()
     	    new ExplosionAnim(1, dest, explosionimage, 8, 0, 0);
     	}
     	*/
-
-
-
-
-
+    	
+    	
+    	
+    	
+    	
     	// Apply damages to a structure if founded
         starget = p::uspool->getStructureAt(dest,weap->getWall());
         if( starget != 0 ) {
@@ -333,17 +316,17 @@ void ProjectileAnim::run()
             return;
         }
 
-
+        
         // Apply damages to a Unit if founded
         utarget = p::uspool->getUnitAt(dest, subdest);
         if( (utarget != 0) || inaccurate )
         {
-            if (inaccurate)
+            if (inaccurate) 
             {
-                for (int sud=0; sud<5; ++sud)
+                for (int sud=0; sud<5; ++sud) 
                 {
                     utarget = p::uspool->getUnitAt(dest, sud);
-                    if (utarget != 0)
+                    if (utarget != 0) 
                     {
                         // each soldier in that cell gets one third of
                         // normal damage
@@ -400,9 +383,9 @@ void ProjectileAnim::run()
         l2entry = p::uspool->addL2overlay(l2o->cellpos, l2o);
     }
     setDelay(1);
-
+    
     // The weapon is fuelled
-    if (fuelled && fuel == 0) {
+    if (fuelled && fuel == 0) {   	
     	// @todo _PLAY ANIMATION ONLY IF IN PROJECTILE THEIR ARE "Animates" = 'yes'
     	// projectile hit..
     	/*       if( weap->getWarhead()->getExplosionsound() != NULL ) {
