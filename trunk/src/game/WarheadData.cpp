@@ -132,44 +132,22 @@ WarheadData* WarheadData::loadWarheadData(INIFile * file, string name)
 	//  [A value of 1 means the damage is halved every pixel distant from
 	// center point.
 	//   a value of 2 means damage is halved every 2 pixels, etc.]
-	Uint32 tmpSpread = file->readInt(name.c_str(), "Spread", 1);
+	Uint32 tmpSpread = file->readInt(name, "Spread", 1);
 	ptrWarheadData->setSpread(tmpSpread);
 
 	// Wall = Does this warhead damage concrete walls (def=no)?
-	char* tmpPtWall = file->readString(name.c_str(), "Wall", "no");
-	string tmpWall = (string)tmpPtWall;
-	Uint32 a;
-	if (tmpWall == "yes")
-	{
-		a = 1;
-	}
-	else
-	{
-		a = 0;
-	}
-	delete[] tmpPtWall;
-	ptrWarheadData->setWall(a);
+	ptrWarheadData->setWall(file->readYesNo(name, "Wall", 0));
 
 	// Ore = Does this warhead destroy ore (def=no)?
-	char* tmpPtOre = file->readString(name.c_str(), "Ore", "no");
-	string tmpOre = (string)tmpPtOre;
-	Uint32 b;
-	if (tmpOre == "yes")
-	{
-		b = 1;
-	}
-	else
-	{
-		b = 0;
-	}
-	delete[] tmpPtOre;
-	ptrWarheadData->setOre(b);
-	
+	ptrWarheadData->setOre(file->readYesNo(name, "Ore", 0));
+		
 	// Verses = damage value verses various armor types (as percentage 
 	// of full damage)...
 	// -vs- none, wood (buildings), light armor, heavy armor, concrete
-	char* tmpPtVerses = file->readString(name.c_str(), "Verses");
-	if (tmpPtVerses != NULL) {
+        // @todo REFACTOR THAT
+	string tmpPtVerses = file->readString(name, "Verses", "");
+	if (tmpPtVerses != "")
+        {
 		Uint32 versus[5];
 		
 		versus[0] = 100;
@@ -177,14 +155,14 @@ WarheadData* WarheadData::loadWarheadData(INIFile * file, string name)
 		versus[2] = 100;
 		versus[3] = 100;
 		versus[4] = 100;
-				
-		sscanf(splitList(tmpPtVerses, ',')[0], "%u", &versus[0]);
-		sscanf(splitList(tmpPtVerses, ',')[1], "%u", &versus[1]);
-		sscanf(splitList(tmpPtVerses, ',')[2], "%u", &versus[2]);
-		sscanf(splitList(tmpPtVerses, ',')[3], "%u", &versus[3]);
-		sscanf(splitList(tmpPtVerses, ',')[4], "%u", &versus[4]);
-	
-		delete[] tmpPtVerses;
+		
+                vector<char*> toto = splitList(tmpPtVerses.c_str(), ',');
+                
+		sscanf(toto[0], "%u", &versus[0]);
+		sscanf(toto[1], "%u", &versus[1]);
+		sscanf(toto[2], "%u", &versus[2]);
+		sscanf(toto[3], "%u", &versus[3]);
+		sscanf(toto[4], "%u", &versus[4]);
 				
 		ptrWarheadData->setVersusNone(versus[0]);
 		ptrWarheadData->setVersusWood(versus[1]);
