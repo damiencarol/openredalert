@@ -36,7 +36,7 @@ public:
 	~Game();
 
 	void InitializeMap(string MapName);
-	/** Initialise some object of the game */
+	/** Initialize some object of the game */
 	void InitializeGameClasses();
 	void FreeMemory();
 	void play();

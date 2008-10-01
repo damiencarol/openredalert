@@ -122,19 +122,19 @@ int main(int argc, char** argv) {
             SDL_ShowCursor(0);
         }
 
-        // Initialise Video
+        // Initialize Video
         try {
-            logger->note("Initialising the graphics engine...");
+            logger->note("Initializing the graphics engine...");
             pc::gfxeng = new GraphicsEngine();
             logger->note("done\n");
         }
         catch (VideoError& ex) {
             logger->note("failed.  %s \n", ex.what());
-            throw runtime_error("Unable to initialise the graphics engine");
+            throw runtime_error("Unable to Initialize the graphics engine");
         }
 
-        // Initialise Sound
-        logger->note("Initialising the sound engine...");
+        // Initialize Sound
+        logger->note("Initializing the sound engine...");
         pc::sfxeng = new SoundEngine(pc::Config.nosound);
         logger->note("done\n");
 
@@ -202,8 +202,8 @@ int main(int argc, char** argv) {
         pc::gfxeng = 0;
 
         try {
-            // Initialise game engine
-            logger->note("Initialising game engine:\n");
+            // Initialize game engine
+            logger->note("Initializing game engine:\n");
             Game gsession;
             // Start the game engine
             logger->note("Starting game\n");

@@ -72,7 +72,7 @@ Path::Path(Unit *Unit, Uint32 crBeg, Uint32 crEnd, Uint8 max_dist) : std::stack<
     p::ccmap->translateFromPos(crEnd, &stopposx, &stopposy);
 
     /* When making optimised builds, the compiler whines about these variables
-     * being possibly uninitialised.
+     * being possibly unInitialized.
      */
     crU = crV = 0;
     ncrX = ncrY = 0;
