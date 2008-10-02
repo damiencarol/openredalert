@@ -19,7 +19,6 @@
 #define WSAMOVIE_H
 
 #include <string>
-#include <stdint.h>
 
 #include "SDL/SDL_video.h"
 

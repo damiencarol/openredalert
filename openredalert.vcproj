@@ -398,6 +398,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ui\MapAnimationMenu.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ui\Menu.cpp"
 				>
 			</File>
@@ -1025,6 +1029,10 @@
 			</File>
 			<File
 				RelativePath=".\src\game\LoopAnimEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ui\MapAnimationMenu.hpp"
 				>
 			</File>
 			<File

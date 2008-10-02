@@ -359,9 +359,6 @@ Uint8 UnitAndStructurePool::getL2overlays(Uint16 pos, Uint32 **inumbers, Sint8 *
 {
 	multimap<Uint16, L2Overlay*>::iterator entry;
     L2Overlay* curl2;
-    Uint8 numentries;
-    Uint8 i;
-    Uint8 j;
 
 	// Check that position is in the map
 	if (pos >= p::ccmap->getSize()){
@@ -376,16 +373,16 @@ Uint8 UnitAndStructurePool::getL2overlays(Uint16 pos, Uint32 **inumbers, Sint8 *
     // find in the l2 OVERLAY pool
     entry = l2pool.find(pos);
     // get the number of overlay saved for this position
-    numentries = numl2images[pos];
+    Uint16 numentries = numl2images[pos];
 
     // Alocate tables
     *inumbers = new Uint32[numentries];
     *xoffset = new Sint8[numentries];
     *yoffset = new Sint8[numentries];
-    for( i = 0; i < numentries; i++ )
+    for(unsigned int i = 0; i < numentries; i++ )
     {
         curl2 = entry->second;
-        for (j=0; j<(curl2->numimages); ++j)
+        for (unsigned int j=0; j<(curl2->numimages); ++j)
         {
             (*inumbers)[i+j] = curl2->imagenums[j];
             (*xoffset)[i+j] = curl2->xoffsets[j];
@@ -394,7 +391,7 @@ Uint8 UnitAndStructurePool::getL2overlays(Uint16 pos, Uint32 **inumbers, Sint8 *
         entry++;
     }
     // return number of entries in the overlay
-    return numentries;
+    return (Uint8)numentries;
 }
 
 multimap<Uint16, L2Overlay*>::iterator UnitAndStructurePool::addL2overlay(Uint16 cellpos, L2Overlay *ov)
@@ -751,7 +748,8 @@ Unit* UnitAndStructurePool::createUnit(UnitType* type, Uint16 cellpos, Uint8 sub
                 type->getTName(), cellpos);
         return false;
     }
-    if (getStructureAt(cellpos) != NULL && (unitandstructmat[cellpos].flags&(US_HIGH_COST) == 0)) {
+    if ((getStructureAt(cellpos) != 0) && ((unitandstructmat[cellpos].flags&(US_HIGH_COST)) == 0)) 
+	{
         logger->error("Cell %i already occupied by structure (%s).\n", cellpos,
                 getStructureAt(cellpos)->getType()->getTName());
         return false;
@@ -1239,10 +1237,12 @@ Uint16 UnitAndStructurePool::preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ym
 		return 0xffff;
 	}
 
-	if (unitandstructmat[newpos].flags&(US_HIGH_COST) != 0)
+	if ((unitandstructmat[newpos].flags&(US_HIGH_COST)) != 0)
+	{
 		printf ("%s line %i: strange tile with us high cost ??\n", __FILE__, __LINE__);
+	}
 
-    /* if an infantry's position got updated */
+    // if an infantry's position got updated
 	if( unitandstructmat[newpos].flags&(US_IS_WALL|US_IS_STRUCTURE|US_IS_UNIT|US_MOVING_HERE) && !un->IsAirBound ()){
 //	if(( unitandstructmat[newpos].flags&(US_IS_WALL|US_IS_STRUCTURE|US_IS_UNIT|US_MOVING_HERE)) && ((unitandstructmat[newpos].flags&(US_HIGH_COST)) == 0 || ((UnitType *)un->getType())->isInfantry())) {
 		if( !((UnitType *)un->getType())->isInfantry()  && (unitandstructmat[newpos].flags&(US_HIGH_COST)) == 0 ) {
@@ -1257,7 +1257,7 @@ Uint16 UnitAndStructurePool::preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ym
 			return 0xffff;
 		}
 
-		if (unitandstructmat[newpos].flags&(US_IS_STRUCTURE) && (unitandstructmat[newpos].flags&(US_IS_UNIT) == 0))
+		if ((unitandstructmat[newpos].flags&(US_IS_STRUCTURE)) && ((unitandstructmat[newpos].flags&(US_IS_UNIT)) == 0))
 		{
 			return 0xffff;
 		}
@@ -1681,7 +1681,8 @@ void UnitAndStructurePool::removeUnit(Unit *un)
 //	printf ("%s line %i: Remove unit\n", __FILE__, __LINE__);
     int i;
     unitpool[un->getNum()] = 0;
-    if( ((UnitType *)un->getType())->isInfantry() ) {
+    if( ((UnitType *)un->getType())->isInfantry() )
+	{
 //		printf ("%s line %i: Remove infantry!!\n", __FILE__, __LINE__);
         InfantryGroup *infgrp = un->getInfantryGroup();
         infgrp->RemoveInfantry(un->getSubpos());

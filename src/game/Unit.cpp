@@ -927,7 +927,8 @@ Uint16 Unit::getDist(Uint16 pos)
     xdiff = abs(x-nx);
     ydiff = abs(y-ny);
 //    return min(xdiff,ydiff)+abs(xdiff-ydiff);
-    return (Uint32) sqrt (xdiff*xdiff+ydiff*ydiff);
+	double res = sqrt(double(xdiff*xdiff+ydiff*ydiff));
+    return (Uint16)res;
 }
 
 Uint16 Unit::getTargetCell()
