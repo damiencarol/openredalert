@@ -147,16 +147,6 @@ WSAMovie::WSAMovie(const string& fname)
     VFSUtils::VFS_Close(wfile);
 
 
-    // Read which sound needs to be played
-    // @todo change that
-    INIFile* wsa_ini = 0;
-    try {
-        wsa_ini = GetConfig("wsa.ini");
-    } catch(runtime_error&) {
-        throw WSAError("wsa.ini not found.");
-    }
-
-
     // If there are data in this file
     if (wsadata != 0) 
     {
