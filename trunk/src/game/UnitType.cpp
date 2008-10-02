@@ -325,20 +325,24 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
  */
 UnitType::~UnitType()
 {
-    if (shpnums != NULL)
+    if (shpnums != 0)
         delete[] shpnums;
-    if (shptnum != NULL)
+
+    if (shptnum != 0)
         delete[] shptnum;
-    if (deploytarget != NULL)
+
+    if (deploytarget != 0)
         delete[] deploytarget;
-    for (int i = 0; i < owners.size(); ++i)
+
+    for (unsigned int i = 0; i < owners.size(); ++i)
     {
-        if (owners[i] != NULL)
+        if (owners[i] != 0)
             delete[] owners[i];
     }
-    for (int i = 0; i < prereqs.size(); ++i)
+
+    for (unsigned int i = 0; i < prereqs.size(); ++i)
     {
-        if (prereqs[i] != NULL)
+        if (prereqs[i] != 0)
             delete[] prereqs[i];
     }
 }

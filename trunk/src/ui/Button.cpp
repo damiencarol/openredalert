@@ -80,9 +80,10 @@ Button::~Button()
 
 bool Button::handleMouseEvent(SDL_Event event)
 {
-	bool OldButtonState;
+	int OldButtonState;
 
-	if (this->ButtonType == 2){
+	if (this->ButtonType == 2)
+	{
 		return false;
 	}
 

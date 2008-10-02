@@ -20,7 +20,7 @@
 #ifdef _WIN32
 #include <conio.h>  
 #endif
-#include <math.h>
+#include <cmath>
 #include <string>
 
 
@@ -143,7 +143,7 @@ bool RA_ProgressBar::HandleMouseClick(void)
 		// Cacl the percentage
 		perc = mx * 100 / _sizeAndPosition.w;
 	}else{
-		_curStep = round ( (double)mx * (double)_maxSteps / (double)_sizeAndPosition.w);
+		_curStep = (int)floor((double)(mx * _maxSteps / _sizeAndPosition.w));
 		//printf ("Step = %i\n", Step);
 		perc = _curStep * 100 / _maxSteps;
 		//printf ("perc = %i\n", perc);
