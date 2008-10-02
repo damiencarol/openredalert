@@ -43,7 +43,7 @@ void MapAnimationMenu::Play(GraphicsEngine& theGraphicEngine, const unsigned int
     
     // Convert map number into a letter
     // @todo convert mapNumber into a letter
-    nameWSAmovie += "a.WSA";
+    nameWSAmovie += "a.wsa";
     
     // Play the WSA movie
     // @todo change that way to drive frame by frame WSA movie
