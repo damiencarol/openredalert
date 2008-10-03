@@ -247,7 +247,7 @@ int INIFile::readInt(const string& section, const string& key, int defaultValue)
  * can be given in hex if it starts with 0x.
  *
  * @param section the section in the file to extract values from.
- * @param value the name of the value to extract.
+ * @param key the name of the value to extract.
  * @return the value.
  */
 int INIFile::readInt(const string& section, const string& key) const
@@ -303,8 +303,8 @@ int INIFile::readInt(const string& section, const string& key) const
  * Function to extract a float value from a ini file. The value
  * can be given in hex if it starts with 0x.
  *
- * @param section the section in the file to extract values from.
- * @param value the name of the value to extract.
+ * @param sectionString the section in the file to extract values from.
+ * @param keyString the name of the value to extract.
  * @return the value.
  */
 float INIFile::readFloat(const string& sectionString, const string& keyString) 
@@ -353,7 +353,7 @@ float INIFile::readFloat(const string& sectionString, const string& keyString)
  * Read a value in a section of IniFile
  *
  * @param section section of the ini file
- * @param value key to read in the section
+ * @param key key to read in the section
  * @param deflt default value to return
  * @return the value of the key or the default value if the key not exists 
  */
