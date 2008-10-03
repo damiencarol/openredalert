@@ -56,9 +56,9 @@ public:
 
     Uint8 getUnitpalNum(Uint8 player) const ;
     Uint8 getStructpalNum(Uint8 player) const ;
-    std::vector<Player*> getOpponents(Player* pl);
-    void playerDefeated(Player * pl);
-    void playerUndefeated(Player * pl);
+    vector<Player*> getOpponents(Player* pl);
+    /*void playerDefeated(Player * pl);
+    void playerUndefeated(Player * pl);*/
     bool hasWon() const ;
     bool hasLost() const ;
     void setAlliances();
@@ -75,9 +75,6 @@ public:
 
     /** Called by input to see if radar status has changed.*/
     Uint8 statRadar();
-
-	/** Set a player victorious */
-	void playerVictorious(Player* pl);
 
 private:
     PlayerPool();

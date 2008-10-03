@@ -16,6 +16,8 @@
 
 #include "MapAnimationMenu.hpp"
 
+#include <SDL/SDL.h>
+
 #include "video/WSAMovie.h"
 #include "video/GraphicsEngine.h"
 
@@ -49,6 +51,10 @@ void MapAnimationMenu::Play(GraphicsEngine& theGraphicEngine, const unsigned int
     // @todo change that way to drive frame by frame WSA movie
     WSAMovie mapAnimationMovie(nameWSAmovie);
     mapAnimationMovie.animate(theGraphicEngine);
+    
+    // Wait 200 ms
+    // @todo change that way to implemente mouse mouvement
+    SDL_Delay(200);
 }
 
 }

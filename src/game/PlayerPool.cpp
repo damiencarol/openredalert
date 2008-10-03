@@ -34,6 +34,9 @@ namespace pc
 }
 extern Logger* logger;
 
+/**
+ * @param inifile
+ */
 PlayerPool::PlayerPool(INIFile *inifile, Uint8 gamemode)
 {
     for (int i = 0; i < 8; i++)
@@ -252,7 +255,7 @@ Player* PlayerPool::getPlayerByName(const char* pname)
 {
 	return playerpool[getPlayerNum(pname)];
 }
-
+/*
 vector<Player*> PlayerPool::getOpponents(Player* pl)
 {
 	vector<Player*> opps;
@@ -265,7 +268,7 @@ vector<Player*> PlayerPool::getOpponents(Player* pl)
 	}
 	return opps;
 }
-
+*//*
 void PlayerPool::playerDefeated(Player *pl)
 {
 	Uint8 i;
@@ -339,7 +342,7 @@ void PlayerPool::playerUndefeated(Player* pl)
 
 /**
  * 
- */
+ *//*
 void PlayerPool::playerVictorious(Player* pl)
 {
 	Uint8 i;
@@ -363,7 +366,7 @@ void PlayerPool::playerVictorious(Player* pl)
 		}
 	}
 }
-
+*/
 INIFile* PlayerPool::getMapINI()
 {
 	return mapini;

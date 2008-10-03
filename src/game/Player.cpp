@@ -509,16 +509,17 @@ BQueue* Player::getQueue(Uint8 queuenum)
 
 void Player::builtUnit(Unit* un)
 {
-	// add in the unit pool
+    // add in the unit pool
     unitpool.push_back(un);
 
-	// add visible
+    // add visible
     addSoB(un->getPos(), 1, 1, un->getType()->getSight(), SOB_SIGHT);
 
-    if (defeated) {
+    /*if (defeated) {
         defeated = false;
         p::ppool->playerUndefeated(this);
-    }
+    }*/
+    this->defeated = false;
 }
 
 /**
@@ -541,7 +542,7 @@ void Player::lostUnit(Unit* un, bool wasDeployed)
     {
     	// Defeat this player
         defeated = true;
-        p::ppool->playerDefeated(this);
+        //p::ppool->playerDefeated(this);
     } else {
         for (i=0;i<unitpool.size();++i) {
             if (unitpool[i] == un) {
@@ -606,7 +607,7 @@ void Player::builtStruct(Structure* str)
     // REMOVE the defeat
     if (defeated) {
         defeated = false;
-        p::ppool->playerUndefeated(this);
+        //p::ppool->playerUndefeated(this);
     }
         
     // Update the number of radar
@@ -677,10 +678,10 @@ void Player::lostStruct(Structure* str)
     // Add it for stats
     ++structurelosses;
 
-    if( unitpool.empty() && structurepool.size() <= 1 ) {
+    if ( unitpool.empty() && structurepool.size() <= 1 ) {
         logger->gameMsg("Player \"%s\" defeated", playername);
         defeated = true;
-        p::ppool->playerDefeated(this);
+        //p::ppool->playerDefeated(this);
     } else {
         for (i=0;i<structurepool.size();++i) {
             if (structurepool[i] == str) {

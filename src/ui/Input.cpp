@@ -365,10 +365,10 @@ void Input::handle()
                     p::uspool->showMoves();
                     break;
                 case SDLK_F9:
-                    p::ppool->playerVictorious(p::ppool->getLPlayer());
+                    p::ppool->getLPlayer()->setVictorious(false);// playerVictorious(p::ppool->getLPlayer());
                     break;
                 case SDLK_F10:
-                	p::ppool->playerDefeated(p::ppool->getLPlayer());
+                	p::ppool->getLPlayer()->setVictorious(true); //playerDefeated(p::ppool->getLPlayer());
                 	break;
                 // Debug for blobals variables
                 case SDLK_F11:

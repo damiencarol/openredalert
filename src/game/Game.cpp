@@ -610,7 +610,8 @@ void Game::play()
 		if (pc::Config.gamemode == GAME_MODE_SINGLE_PLAYER)
 		{
 			MapAnimationMenu myAnimMenu;
-			myAnimMenu.Play(*(pc::gfxeng), MissionNr, true);
+			// @todo change that to get the good parameters
+                        myAnimMenu.Play(*(pc::gfxeng), MissionNr, true);
 		}
 
         // Initialize (load) the map
