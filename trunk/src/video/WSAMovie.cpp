@@ -127,10 +127,14 @@ SDL_Surface* WSAMovie::decodeFrame(unsigned int framenum)
 }
 
 /**
- * @param fname File name of the WSA movie
+ * @param movieFileName File name of the WSA movie
  */
-WSAMovie::WSAMovie(const string& fname)
+WSAMovie::WSAMovie(const string& movieFileName)
 {
+    string fname = movieFileName;
+    
+    //transform(movieFileName.begin(), movieFileName.end(), )
+    
     // Load the animation file from mix archives
     VFile* wfile = VFSUtils::VFS_Open(fname.c_str());
     // Test if their no file

@@ -777,11 +777,13 @@ void ExecuteTriggerAction(TriggerAction* action)
         	
         	logger->error ("%s line %i: ***TRIGGER_ACTION_LOSER_IS = %d ***\n", __FILE__, __LINE__, actTrig->getParam3());
         	
-        	p::ppool->playerDefeated(        	    
-        		p::ppool->getPlayer(
-        			p::ppool->getPlayerNumByHouseNum(actTrig->getParam3())
-        		)
-        	);
+                unsigned int numPlayer = p::ppool->getPlayerNumByHouseNum(actTrig->getParam3());
+                Player* thePlayer = p::ppool->getPlayer(numPlayer);
+        	
+                if (thePlayer != 0) 
+                {
+                    thePlayer->setVictorious(false);
+                }
         	break;
         }
         case TRIGGER_ACTION_PRODUCTION_BEGINS:

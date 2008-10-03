@@ -54,34 +54,32 @@ extern Logger * logger;
  */
 Menu::Menu() : StartNewGameButton()
 {
-	SDL_Color	palette[256];
-	SDL_Color	Fcolor;
-	Uint16		Ypos;
-	StringTableFile* strFile = NULL;
+    // Use located strings
+    StringTableFile* strFile = new StringTableFile("conquer.eng");
 
-	// Use located strings
-	strFile = new StringTableFile("conquer.eng");
+    // Use the red backgound for the multiplayer menu and the mission menu
+    this->MultiPlayerMenu.setPalette(9);
+    this->MissionMenu1.setPalette(9);
 
-	// Use the red backgound for the multiplayer menu and the mission menu
-	this->MultiPlayerMenu.setPalette(9);
-	MissionMenu1.setPalette(9);
+    // Set images to NULL
+    win95_logo = 0;
+    dos_logo = 0;
+    SDLlogo = 0;
+    cursorimg = 0;
 
-	// Setup the font color
-	Fcolor.r = 205;
-	Fcolor.g = 0;
-	Fcolor.b = 0;
+    // Set menu to general menu by default
+    MenuState	= 1;
 
-	win95_logo	= 0;
-	dos_logo	= 0;
-	SDLlogo 	= 0;
-	cursorimg	= 0;
-	MenuState	= 1;
-
-	done = false;
-	quit = false;
-	prolog = false;
+    done = false;
+    quit = false;
+    prolog = false;
 
 	display = pc::gfxeng->get_SDL_ScreenSurface();
+
+        	SDL_Color	palette[256];
+	
+	Uint16		Ypos;
+	 
 
 	this->loadPal("SNOW", palette);
 	SHPBase::setPalette(palette);
@@ -255,6 +253,13 @@ Menu::Menu() : StartNewGameButton()
 	Cancel.CreateSurface(strFile->getString(19), 500, 350, 90, 25);
 	//Cancel.CreateSurface("Cancel", 500, 350, 90, 25);
 
+
+    // Setup the font color
+    SDL_Color	Fcolor;
+    Fcolor.r = 205;
+    Fcolor.g = 0;
+    Fcolor.b = 0;
+        
 	// Initialize the labels to be drawn to the MultiPlayerMenu
 	YourColor.SetDrawingWindow(&MultiPlayerMenu);
 	YourName.SetDrawingWindow(&MultiPlayerMenu);
@@ -801,52 +806,53 @@ int Menu::HandleMenu()
 
 void Menu::loadPal(const string& paln, SDL_Color *palette)
 {
-	VFile *palfile;
-	int i;
+    // string palname = missionData.theater;
+    std::string palname = paln;
 
-	// string palname = missionData.theater;
-	std::string palname = paln;
+    logger->debug("Loading pallete: %s\n", palname.c_str());
 
-	logger->debug("Loading pallete: %s\n", palname.c_str());
+    if (palname.length() > 8)
+    {
+        palname.insert(8, ".PAL");
+    }
+    else
+    {
+        palname += ".PAL";
+    }
 
-	if (palname.length() > 8) {
-		palname.insert(8, ".PAL");
-	} else {
-		palname += ".PAL";
-	}
+    // Seek the palette file in the mix
+    VFile* palfile = VFSUtils::VFS_Open(palname.c_str());
+    if (palfile == NULL)
+    {
+        logger->error("%s line %i: Unable to open palette file (\"%s\").\n", __FILE__, __LINE__, palname.c_str());
+        return;
+    }
 
-	// Seek the palette file in the mix
-	palfile = VFSUtils::VFS_Open(palname.c_str());
+    // Load the palette
+    for (int k = 0; k < 256; k++)
+    {
+        palfile->readByte(&palette[k].r, 1);
+        palfile->readByte(&palette[k].g, 1);
+        palfile->readByte(&palette[k].b, 1);
+        palette[k].r <<= 2;
+        palette[k].g <<= 2;
+        palette[k].b <<= 2;
+    }
 
-	if (palfile == NULL) {
-		logger->error("%s line %i: Unable to open palette file (\"%s\").\n", __FILE__, __LINE__, palname.c_str());
-		return;
-	}
-
-	// Load the palette
-	for (i = 0; i < 256; i++) {
-		palfile->readByte(&palette[i].r, 1);
-		palfile->readByte(&palette[i].g, 1);
-		palfile->readByte(&palette[i].b, 1);
-		palette[i].r <<= 2;
-		palette[i].g <<= 2;
-		palette[i].b <<= 2;
-	}
-
-
-	VFSUtils::VFS_Close(palfile);
+    // Close the palette file 
+    VFSUtils::VFS_Close(palfile);
 }
 
 void Menu::ResetSideColorButtonStates()
 {
-	ButtonColGreece.setButtonState (1);
-	ButtonColUssr.setButtonState (1);
-	ButtonColUk.setButtonState (1);
-	ButtonColSpain.setButtonState (1);
-	ButtonColItaly.setButtonState (1);
-	ButtonColGermany.setButtonState (1);
-	ButtonColFranse.setButtonState (1);
-	ButtonColTurkey.setButtonState (1);
+    ButtonColGreece.setButtonState(1);
+    ButtonColUssr.setButtonState(1);
+    ButtonColUk.setButtonState(1);
+    ButtonColSpain.setButtonState(1);
+    ButtonColItaly.setButtonState(1);
+    ButtonColGermany.setButtonState(1);
+    ButtonColFranse.setButtonState(1);
+    ButtonColTurkey.setButtonState(1);
 }
 
 /**
@@ -854,7 +860,7 @@ void Menu::ResetSideColorButtonStates()
  */
 bool Menu::isDone() const
 {
-	return done;
+    return done;
 }
 
 /**
@@ -862,7 +868,7 @@ bool Menu::isDone() const
  */
 bool Menu::isQuit() const
 {
-	return quit;
+    return quit;
 }
 
 /**
@@ -870,5 +876,5 @@ bool Menu::isQuit() const
  */
 bool Menu::isProlog() const
 {
-	return prolog;
+    return prolog;
 }
