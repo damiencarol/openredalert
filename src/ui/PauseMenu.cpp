@@ -26,7 +26,7 @@
 #include "TCheckBox.h"
 #include "game/Player.h"
 #include "game/PlayerPool.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "video/GraphicsEngine.h"
 #include "include/Logger.h"
 #include "audio/SoundEngine.h"
@@ -138,9 +138,10 @@ PauseMenu::~PauseMenu()
 	// Free the windows
 	delete PauseWindow;
 
-	// Free the cursor surface
-	if (my_cursor != NULL){
-		SDL_FreeSurface(my_cursor);
+    // Free the cursor surface
+    if (my_cursor != 0)
+    {
+        SDL_FreeSurface(my_cursor);
     }
 }
 
