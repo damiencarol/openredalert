@@ -20,7 +20,7 @@
 #include "SDL/SDL_timer.h"
 #include "SDL/SDL_events.h"
 
-#include "include/config.h"
+#include "misc/config.h"
 #include "video/CPSImage.h"
 #include "video/GraphicsEngine.h"
 #include "include/Logger.h"
@@ -31,8 +31,8 @@
 using std::string;
 
 namespace pc {
-	extern GraphicsEngine * gfxeng;
-	extern MessagePool* msg;
+    extern GraphicsEngine * gfxeng;
+    extern MessagePool* msg;
 }
 extern Logger * logger;
 
