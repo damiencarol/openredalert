@@ -24,7 +24,7 @@
 #include "SDL/SDL_video.h"
 
 #include "Renderer.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "misc/Compression.hpp"
 #include "include/fcnc_endian.h"
 #include "video/GraphicsEngine.h"

@@ -21,7 +21,7 @@
 #include "SDL/SDL_video.h"
 
 #include "include/sdllayer.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "include/Logger.h"
 #include "VideoError.h"
 
