@@ -23,7 +23,7 @@
 
 #include "misc/INIFile.h"
 #include "include/Logger.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "CursorInfo.h"
 
 #include "misc/INIFile.h"

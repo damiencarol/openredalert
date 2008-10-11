@@ -39,7 +39,7 @@
 #include "game/InfantryGroup.h"
 #include "video/ImageCache.h"
 #include "video/MessagePool.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "game/Player.h"
 #include "game/ConStatus.h"
 #include "game/BQueue.h"
@@ -61,7 +61,7 @@ bool Input::drawing = false;
 SDL_Rect Input::markrect;
 
 namespace p {
-	extern CnCMap* ccmpa;
+    extern CnCMap* ccmap;
 }
 
 namespace pc {

@@ -25,7 +25,7 @@
 #include "Font.h"
 #include "video/CPSImage.h"
 #include "video/SHPImage.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "video/GraphicsEngine.h"
 #include "video/ImageCache.h"
 #include "include/sdllayer.h"
