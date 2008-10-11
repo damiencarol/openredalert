@@ -71,19 +71,18 @@ extern Logger * logger;
 Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
         Uint16 rhealth, Uint8 facing, string trigger_name) : UnitOrStructure()
 {
-    Uint32 i;
-    
-    
+	
     targetcell = cellpos;
     this->type = type;
     imagenumbers = new Uint16[type->getNumLayers()];
     if (!type->hasTurret()) {
         facing = 0;
     }
-    for(i=0;i<type->getNumLayers();i++) {
+    for (unsigned int i = 0; i<type->getNumLayers(); i++)
+    {
         imagenumbers[i] = facing;
         if( owner != 0xff && !type->isWall() ) {
-            imagenumbers[i] |= (p::ppool->getStructpalNum(owner)<<11);
+            imagenumbers[i] |= (p::ccmap->getPlayerPool()->getStructpalNum(owner)<<11);
         }
     }
     exploding = false;
@@ -94,16 +93,16 @@ Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
 	animating = false;
 	usemakeimgs = false;
 	primary = false;
-	buildAnim = NULL;
-	attackAnim = NULL;
+	buildAnim = 0;
+	attackAnim = 0;
 	health = (Uint16)((double)rhealth/256.0f * (double)type->getMaxHealth());
 	damaged = checkdamage();
-	if( !type->isWall() ) {
-		p::ppool->getPlayer(owner)->builtStruct(this);
-	}
+	
+	
 
 	// Handle deploy with...
-	for (unsigned int j = 0; j < type->getDeployWith().size(); j++){
+	for (unsigned int j = 0; j < type->getDeployWith().size(); j++)
+	{
 		//
 		Uint16 x = cellpos%p::ccmap->getWidth();
 		Uint16 y = cellpos/p::ccmap->getWidth();
@@ -114,18 +113,21 @@ Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
 			temppos = p::ccmap->translateToPos(x, y);
 		}
 
-		if (p::ccmap->isBuildableAt(this->getOwner(), temppos)){
+		if (p::ccmap->isBuildableAt(this->getOwner(), temppos))
+		{
 			// Health = 256 --> max
-			p::uspool->createUnit(this->type->getDeployWith()[j]/*"HARV"*/, 
+			p::uspool->createUnit(this->type->getDeployWith()[j], // "HARV"
 					temppos, 0, owner, 256, 0, 0, "None");
 		}
 
 		// If the current structure is a PROC and we are placing a extra harvester
-		if (strcmp ((char*)this->type->getDeployWith()[j], "HARV") == 0 && strcmp ((char*)type->getTName(), "PROC") == 0) {
-
+		if ((this->type->getDeployWith()[j] == "HARV") && (type->getTName() == "PROC"))
+		{
 			// Set base refinary
-			if (p::uspool->getUnitAt(temppos, 0) != NULL)
-				p::uspool->getUnitAt(temppos, 0)->SetBaseRefinery (this);
+			if (p::uspool->getUnitAt(temppos, 0) != 0)
+			{
+				p::uspool->getUnitAt(temppos, 0)->SetBaseRefinery(this);
+			}
 		}
 
 
@@ -208,9 +210,12 @@ void Structure::setImageNum(Uint32 num, Uint8 layer)
 {
 //	if (strcmp ((char*)type->getTName(), "PROC") == 0)
 //		printf ("%s line %i: Set image numb %i, layer = %i\n", __FILE__, __LINE__, num, layer);
-	if (getNumbImages( layer ) > num)
-		imagenumbers[layer]=(num)|(p::ppool->getStructpalNum(owner)<<11);
-	else {
+	if (getNumbImages(layer) > num)
+	{
+		imagenumbers[layer]=(num)|(p::ccmap->getPlayerPool()->getStructpalNum(owner)<<11);
+	}
+	else
+	{
 		logger->error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n", __FILE__, __LINE__, num, layer, getNumbImages( layer ));
 	}
 }
@@ -235,7 +240,8 @@ Uint16 Structure::getBPos(Uint16 pos) const
     sc = x+y*mwid;
     dw = type->getXsize() - mwid;
     bpos   = retpos - sc + dy*dw;
-    while (!type->isBlocked(dx+dy*type->getXsize())) {
+    while (!type->isBlocked(dx+dy*type->getXsize()))
+    {
         /* This happens in this situation (P is position of attacker,
          * X is a blocked cell and _ is an unblocked cell)
          * P   P
@@ -263,7 +269,7 @@ Uint16 Structure::getBPos(Uint16 pos) const
         }
         ++dy;
         if (dy >= type->getYsize()) {
-            logger->error("ERROR: could not find anywhere to shoot at %s!\n",type->getTName());
+            logger->error("ERROR: could not find anywhere to shoot at %s!\n", type->getTName().c_str());
         }
         retpos = (x+dx)+(y+dy)*mwid;
     }
@@ -333,28 +339,40 @@ Uint16 Structure::getFreePos(Uint8* subpos, bool findsubpos) {
 
 void Structure::remove() 
 {
-    if (!type->isWall()) {
-        p::ppool->getPlayer(owner)->lostStruct(this);
+    if (!type->isWall()) 
+    {
+        p::ccmap->getPlayerPool()->getPlayer(owner)->lostStruct(this);
     }
     UnitOrStructure::remove();
 }
 
+/**
+ * @param amount Amount of damage to apply
+ * @param weap Weapon to use
+ * @param attacker Unit or Structure that attack this structure
+ */
 void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 {
 	bool odam;	// Old damaged
 
-	if (exploding){
+	if (exploding)
+	{
 		return;
 	}
 	
-	if (this->getOwner() != p::ppool->getLPlayerNum()){
+	if (this->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
+	{
 		// This structure is from a computer player
-		if (p::ccmap->getGameMode() != GAME_MODE_SINGLE_PLAYER){
-			pc::ai->DefendComputerPlayerBaseUnderAttack ( p::ppool->getPlayer(this->getOwner()), this->getOwner(), attacker, this );
+		if (p::ccmap->getGameMode() != GAME_MODE_SINGLE_PLAYER)
+		{
+			pc::ai->DefendComputerPlayerBaseUnderAttack(p::ccmap->getPlayerPool()->getPlayer(this->getOwner()), this->getOwner(), attacker, this );
 		}
-	}else {
+	}
+	else 
+	{
 		// The structure is from the local player
-		if ((SDL_GetTicks() - LastAttackTick) > (60 * 1000)){
+		if ((SDL_GetTicks() - LastAttackTick) > (60 * 1000))
+		{
 		    pc::sfxeng->PlaySound(pc::Config.BaseUnderAttack);
 			LastAttackTick = SDL_GetTicks();
 		}
@@ -363,7 +381,8 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 
 	odam = damaged;
 	// If the Weapon exist
-	if (weap != 0){
+	if (weap != 0)
+	{
 		amount = (Sint16)((double)amount * weap->getVersus(type->getArmor()));
 	}
 	
@@ -375,15 +394,19 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 		// Throw the event (-1 means nothing)
 		int houseNum = -1;
 		if (attacker != 0){
-			p::ppool->getHouseNumByPlayerNum(attacker->getOwner());
+			p::ccmap->getPlayerPool()->getHouseNumByPlayerNum(attacker->getOwner());
 		}
 		HandleTriggers((UnitOrStructure*)this, TRIGGER_EVENT_DESTROYED, houseNum);
 
-		if (type->isWall()) {
+		if (type->isWall()) 
+		{
 			p::uspool->removeStructure(this);
-		} else {
-			if (attacker != 0){
-				p::ppool->getPlayer(attacker->getOwner())->addStructureKill();
+		} 
+		else
+		{
+			if (attacker != 0)
+			{
+				p::ccmap->getPlayerPool()->getPlayer(attacker->getOwner())->addStructureKill();
 			}
 			//printf ("%s line %i: Start explode anim for structure: %i\n", __FILE__, __LINE__, (int) this);
 			BExplodeAnimEvent* boom = new BExplodeAnimEvent(1, this);
@@ -684,12 +707,12 @@ void Structure::attack(UnitOrStructure* target)
 #if 0
 	// Check that we have power enough to attack
 	if ( type->getPowerInfo().powered){
-		if ( p::ppool->getPlayer(this->getOwner())->getPower() < p::ppool->getPlayer(this->getOwner())->getPowerUsed()){
+		if ( p::ccmap->getPlayerPool()->getPlayer(this->getOwner())->getPower() < p::ccmap->getPlayerPool()->getPlayer(this->getOwner())->getPowerUsed()){
 			return;
 		}
 	}
 
-	// printf ("%s line %i: PowerNeeded = %i, Power = %i, Player = %i\n", __FILE__, __LINE__, p::ppool->getPlayer(this->getOwner())->getPowerUsed(), p::ppool->getPlayer(this->getOwner())->getPower(), this->getOwner());
+	// printf ("%s line %i: PowerNeeded = %i, Power = %i, Player = %i\n", __FILE__, __LINE__, p::ccmap->getPlayerPool()->getPlayer(this->getOwner())->getPowerUsed(), p::ccmap->getPlayerPool()->getPlayer(this->getOwner())->getPower(), this->getOwner());
 #endif
 
 
@@ -718,18 +741,20 @@ void Structure::ChangeHealth (Sint16 amount)
 
 /**
  */
-bool Structure::CreateUnitAnimation (UnitType* UnType, Uint8 owner)
+bool Structure::CreateUnitAnimation(UnitType* UnType, Uint8 owner)
 {
-    Player* player = p::ppool->getPlayer(owner);
+    Player* player = p::ccmap->getPlayerPool()->getPlayer(owner);
     assert(player != 0);
     Structure* tmpstruct = player->getPrimary(type);
-	if (tmpstruct != this){
+	if (tmpstruct != this)
+	{
 		return false;
     }
 	CreateUnitType	= UnType;
 	CreateUnitOwner	= owner;
 
- 	if(!UnType->isInfantry() ){
+ 	if (!UnType->isInfantry())
+ 	{
 		tmpstruct->runSecAnim(5, true);
 		return true;
 	}
@@ -737,15 +762,22 @@ bool Structure::CreateUnitAnimation (UnitType* UnType, Uint8 owner)
 }
 
 /**
+ * @param Un The Unit to repair
  */
-bool Structure::RepairUnint (Unit *Un)
+bool Structure::RepairUnint(Unit *Un)
 {
-	if (strcmp ((char*)this->getType()->getTName(), "FIX") != 0 )
+	// If the structure is not the FIX structure
+	if (this->getType()->getTName() != "FIX")
+	{
 		return false;
-
+	}
+	
+	// Cehck the owner of the structure is the owner of the unit
 	if (Un->getOwner() != getOwner())
+	{
 		return false;
-
+	}
+	
 	UnitToRepairPos = Un->getPos();
     pc::sfxeng->PlaySound(pc::Config.RepairUnit);
 
@@ -947,7 +979,8 @@ bool Structure::isPowered()
 bool Structure::isRefinery()
 {
 	// @todo Hack !!!
-	if (strcmp ((char*)type->getTName(), "PROC") == 0){
+	if (type->getTName() == "PROC")
+	{
 		return true;
 	}
 	return false;

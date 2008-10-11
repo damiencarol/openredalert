@@ -23,7 +23,7 @@
 #include "Font.h"
 #include "video/CPSImage.h"
 #include "video/SHPImage.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "include/config.h"
 #include "video/GraphicsEngine.h"
 #include "video/ImageCache.h"

@@ -148,8 +148,13 @@ public:
     Uint16 preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ymod, Unit **BlockingUnit);
     Uint8 postMove(Unit *un, Uint16 newpos);
     void abortMove(Unit* un, Uint32 pos);
-    UnitType* getUnitTypeByName(const char* unitname);
-    StructureType* getStructureTypeByName(const char* structname);
+    
+    /** Return the UnitType with the specified name */
+    UnitType* getUnitTypeByName(const string& unitname);
+    
+    /** Return the StructureType with the specified name */
+    StructureType* getStructureTypeByName(const string& structname);
+    
     UnitOrStructureType* getTypeByName(const char* typen);
     bool freeTile(Uint16 pos) const ;
     Uint16 getTileCost( Uint16 pos, Unit* excpUn ) const;
@@ -174,9 +179,9 @@ public:
     void generateProductionGroups();
 
     /** Used by the sidebar to know units */
-    vector<const char*> getBuildableUnits(Player* pl);
+    vector<string> getBuildableUnits(Player* pl);
     /** Used by the sidebar to know structures */
-    vector<const char*> getBuildableStructures(Player* pl);
+    vector<string> getBuildableStructures(Player* pl);
 
     // unit is removed from map (to be stored in transport)
     void hideUnit(Unit* un);
@@ -196,8 +201,9 @@ private:
     vector<UnitAndStructureMat> unitandstructmat;
 
     vector<Structure *> structurepool;
-    vector<StructureType *> structuretypepool;
-    map<string, Uint16> structname2typenum;
+    //vector<StructureType *> structuretypepool;
+    //map<string, Uint16> structname2typenum;
+	map<string, StructureType *> structuretypepool;
 
     vector<Unit *> unitpool;
     vector<UnitType *> unittypepool;

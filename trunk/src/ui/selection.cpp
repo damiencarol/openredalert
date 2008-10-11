@@ -31,10 +31,11 @@
 #include "game/UnitOrStructure.h"
 #include "game/Structure.h"
 #include "game/Unit.hpp"
+#include "game/CnCMap.h"
 
 namespace p {
 	extern Dispatcher* dispatcher;
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 }
 extern Logger * logger;
 
@@ -435,7 +436,7 @@ bool Selection::loadSelection(Uint8 savepos)
     }
     copySelection(targetsel_units, targetsel_structs, sel_units, sel_structs);
 
-    Uint32 lplayernum = p::ppool->getLPlayerNum();
+    Uint32 lplayernum = p::ccmap->getPlayerPool()->getLPlayerNum();
     for_each(sel_units.begin(), sel_units.end(), postloadproc<Unit>(lplayernum, &enemy_selected, &numattacking));
     for_each(sel_structs.begin(), sel_structs.end(), postloadproc<Structure>(lplayernum, &enemy_selected, &numattacking));
 
@@ -495,7 +496,7 @@ bool Selection::areWaterBound()
 
 
 		UnitType = (*UnitIt)->getType();
-		PrimaryStruct = p::ppool->getPlayer((*UnitIt)->getOwner())->getPrimary(UnitType);
+		PrimaryStruct = p::ccmap->getPlayerPool()->getPlayer((*UnitIt)->getOwner())->getPrimary(UnitType);
 		if (PrimaryStruct != NULL){
 			if (!PrimaryStruct->getType()->isWaterBound())
 				return false;

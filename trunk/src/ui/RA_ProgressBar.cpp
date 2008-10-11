@@ -27,7 +27,7 @@
 #include "SDL/SDL_mouse.h"
 #include "SDL/SDL_video.h"
 
-#include "include/common.h"
+#include "misc/common.h"
 #include "video/GraphicsEngine.h"
 #include "RaWindow.h"
 

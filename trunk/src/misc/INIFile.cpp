@@ -26,7 +26,7 @@
 #include <list>
 
 #include "KeyNotFound.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
@@ -45,7 +45,7 @@ extern Logger * logger;
  *
  * @param filename the name of the inifile to open.
  */
-INIFile::INIFile(const char* filename)
+INIFile::INIFile(const string& filename)
 {
 	char line[1024];
 	char key[1024];
@@ -64,7 +64,7 @@ INIFile::INIFile(const char* filename)
 
 
 	// Open the File
-	inifile = VFSUtils::VFS_Open(filename);
+	inifile = VFSUtils::VFS_Open(filename.c_str());
 	if (inifile == 0) {
 		string s = "Unable to open ";
 		s += filename;
@@ -587,4 +587,12 @@ int INIFile::readYesNo(const string& section, const string& value, const int def
         a = 0;
     }
     return a;
+}
+
+/** 
+ * @return file name of the ini file
+ */
+string INIFile::getFileName() const
+{
+	return this->filename;
 }

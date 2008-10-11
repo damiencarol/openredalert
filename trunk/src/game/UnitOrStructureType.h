@@ -70,10 +70,7 @@ public:
 	virtual Uint8 getOffset() const = 0;
 
 	/** Returns the internal name, e.g. E1 */
-	virtual const char * getTName() const = 0;
-
-	/** Returns the external name, e.g. Minigunner */
-	virtual const string getName() const = 0;
+	virtual const string getTName() const = 0;
 
 	/** Returns the names of the sides that can build this */
 	virtual vector<char *> getOwners() const = 0;
@@ -92,7 +89,7 @@ public:
 	virtual bool isStructure() const = 0;
 
 	/** Returns the prerequisites. */
-	vector<char*> getPrereqs() const;
+	vector<string> getPrereqs() const;
 
 	/** Return the technology level required to build this [-1 means can't build] (def=-1)*/
 	int getTechLevel() const;
@@ -124,9 +121,10 @@ protected:
 	Uint16 cost;
 	/** Technology level required to build this [-1 means can't build] (default = -1) */
 	int techLevel;
-	vector<char*> prereqs;
+	vector<string> prereqs;
 	Uint8 ptype;
 	bool valid;
+	string tname;
 };
 
 #endif //UNITORSTRUCTURETYPE_H

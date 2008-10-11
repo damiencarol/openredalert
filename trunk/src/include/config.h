@@ -7,7 +7,7 @@
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_keysym.h"
 
-#include "common.h"
+#include "misc/common.h"
 #include "misc/gametypes.h"
 
 using std::string;

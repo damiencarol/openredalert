@@ -35,7 +35,7 @@
 #include "Unit.hpp"
 
 namespace p {
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 	extern ActionEventQueue * aequeue;
 	extern CnCMap * ccmap;
 }
@@ -175,7 +175,7 @@ void UAttackAnimEvent::run()
     
     // @todo modify calculs
     //distance = abs()>abs(ytiles)?abs(xtiles):abs(ytiles);
-    Sint32 distanceSint = xtiles*xtiles + ytiles*ytiles; // distance²
+    Sint32 distanceSint = xtiles*xtiles + ytiles*ytiles; // distance
     double distanceCube = distanceSint;
 	double distance = sqrt(distanceCube);
 
@@ -251,7 +251,7 @@ void UAttackAnimEvent::run()
 
 	// Throw an event
 	HandleTriggers(target, TRIGGER_EVENT_ATTACKED,
-	    		p::ppool->getHouseNumByPlayerNum(un->getOwner()));
+	    		p::ccmap->getPlayerPool()->getHouseNumByPlayerNum(un->getOwner()));
 
 		
     // We can shoot

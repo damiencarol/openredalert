@@ -35,43 +35,77 @@ namespace pc
 extern Logger* logger;
 
 /**
- * @param inifile
  */
-PlayerPool::PlayerPool(INIFile *inifile, Uint8 gamemode)
+PlayerPool::PlayerPool()
 {
-    for (int i = 0; i < 8; i++)
+	// RAZ of players starts
+	for (unsigned int i = 0; i < 8; i++)
     {
         playerstarts[i] = 0;
     }
-    lost = false;
-    won = false;
-    mapini = inifile;
-    updatesidebar = false;
-    this->gamemode = gamemode;
-
-    playerpool.push_back(new Player("Spain", inifile));
-    playerpool.push_back(new Player("Greece", inifile));
-    playerpool.push_back(new Player("USSR", inifile));
-    playerpool.push_back(new Player("England", inifile));
-    playerpool.push_back(new Player("Germany", inifile));
-    playerpool.push_back(new Player("France", inifile));
-    playerpool.push_back(new Player("Turkey", inifile));
     
-    playerpool.push_back(new Player("GoodGuy", inifile));
-    playerpool.push_back(new Player("Neutral", inifile));
-    playerpool.push_back(new Player("Special", inifile));
+    // By default no update of the sidebar
+    updatesidebar = false;
+    
+    // Create the default player list
+    playerpool.push_back(new Player("Spain"));
+    playerpool.push_back(new Player("Greece"));
+    playerpool.push_back(new Player("USSR"));
+    playerpool.push_back(new Player("England"));
+    playerpool.push_back(new Player("Germany"));
+    playerpool.push_back(new Player("France"));
+    playerpool.push_back(new Player("Turkey"));
+    
+    playerpool.push_back(new Player("GoodGuy"));
+    playerpool.push_back(new Player("Neutral"));
+    playerpool.push_back(new Player("Special"));
 }
 
+/**
+ * @param gamemode xxx
+ */
+void PlayerPool::Init(Uint8 gamemode)
+{
+}
+
+/**
+ * @param inifile Ini file where to laod the info
+ */
+void PlayerPool::LoadIni(INIFile *inifile)
+{
+	// Load ini informations
+	for (unsigned int i = 0; i < playerpool.size(); i++)
+	{
+		Player* thePlayer = playerpool.at(i);
+		thePlayer->LoadIni(inifile);
+	}
+	
+	// Set the local player
+	if  (gamemode == GAME_MODE_SINGLE_PLAYER)
+	{
+		// Test if the key exist
+		if (inifile->isKeyInSection("Basic", "Player") == true)
+		{
+			// Set the local player with info n the ini file
+			setLPlayer(inifile->readString("Basic", "Player"));
+		}
+	}
+	
+	// Set the alliances between players
+	setAlliances(inifile);
+}
+
+/**
+ */
 PlayerPool::~PlayerPool()
 {
-	Uint8 i;
-	for (i = 0; i < playerpool.size(); i++)
+	// Free all Player in the vector
+	for (unsigned int i = 0; i < playerpool.size(); i++)
 	{
-		if (playerpool[i] != NULL)
+		if (playerpool[i] != 0)
 		{
 			delete playerpool[i];
 		}
-		playerpool[i] = NULL;
 	}
 }
 
@@ -127,10 +161,9 @@ const int PlayerPool::MultiColourStringToNumb(const string& colour)
 
 void PlayerPool::setLPlayer(const string& pname)
 {
-    int i;
-    for (i = 0; i < playerpool.size(); i++)
+    for (unsigned int i = 0; i < playerpool.size(); i++)
     {
-        if (string(playerpool.at(i)->getName()) != pname)
+        if (playerpool.at(i)->getName() == pname)
         {
             localPlayer = i;
             return;
@@ -138,12 +171,12 @@ void PlayerPool::setLPlayer(const string& pname)
     }
     
     logger->warning("Tried to set local player to non-existing player '%s'\n", pname.c_str());
-    playerpool.push_back(new Player(pname.c_str(), mapini));
+    /*playerpool.push_back(new Player(pname.c_str(), mapini));
     localPlayer = static_cast<Uint8>(playerpool.size()-1);
-    playerpool[localPlayer]->setPlayerNum(localPlayer);
+    playerpool[localPlayer]->setPlayerNum(localPlayer);*/
 }
 
-void PlayerPool::setLPlayer(Uint8 number, const char* nick, const char* colour,
+/*void PlayerPool::setLPlayer(Uint8 number, const char* nick, const char* colour,
 		const char* mside)
 {
 	Uint8 i;
@@ -157,13 +190,13 @@ void PlayerPool::setLPlayer(Uint8 number, const char* nick, const char* colour,
 		}
 	}
 	//logger->warning("Tried to set local player to non-existing player number %i\n", number);
-	/*  playerpool.push_back(new Player("multi", mapini, this));
-	 localPlayer = playerpool.size()-1;
-	 playerpool[localPlayer]->setSettings(nick,colour,mside);
-	 */
-}
+	//  playerpool.push_back(new Player("multi", mapini, this));
+	//localPlayer = playerpool.size()-1;
+	// playerpool[localPlayer]->setSettings(nick,colour,mside);
+	 
+}*/
 
-void PlayerPool::setPlayer(Uint8 number, const char* nick, const int colour,
+/*void PlayerPool::setPlayer(Uint8 number, const char* nick, const int colour,
 		const char* mside)
 {
 	Uint8 i;
@@ -177,11 +210,11 @@ void PlayerPool::setPlayer(Uint8 number, const char* nick, const int colour,
 		}
 	}
 	//logger->warning("Tried to set local player to non-existing player number %i\n", number);
-	/*  playerpool.push_back(new Player("multi", mapini, this));
-	 localPlayer = playerpool.size()-1;
-	 playerpool[localPlayer]->setSettings(nick,colour,mside);
-	 */
-}
+	//  playerpool.push_back(new Player("multi", mapini, this));
+	// localPlayer = playerpool.size()-1;
+	// playerpool[localPlayer]->setSettings(nick,colour,mside);
+	
+}*/
 
 int PlayerPool::getPlayerNum(const string& pname)
 {
@@ -311,15 +344,16 @@ void PlayerPool::playerDefeated(Player *pl)
 	if (gamemode == GAME_MODE_SKIRMISH ||
 		gamemode == GAME_MODE_MULTI_PLAYER)
 	{
-		logger->gameMsg("Player \"%s\" defeated", pl->getName());
+		logger->gameMsg("Player \"%s\" defeated", pl->getName().c_str());
 	}
 }
 
 void PlayerPool::playerUndefeated(Player* pl)
 {
-	Uint8 i;
-
-	pl->setAlliances();
+	// @todo check that
+	//pl->setAlliances();
+	
+	unsigned int i = 0;
 	for (i = 0; i < playerpool.size(); i++)
 	{
 		if (playerpool[i] == pl)
@@ -347,7 +381,7 @@ void PlayerPool::playerVictorious(Player* pl)
 {
 	Uint8 i;
 
-	pl->setAlliances();
+	//pl->setAlliances();
 	for (i = 0; i < playerpool.size(); i++)
 	{
 		if (playerpool[i] == pl)
@@ -367,19 +401,20 @@ void PlayerPool::playerVictorious(Player* pl)
 	}
 }
 */
-INIFile* PlayerPool::getMapINI()
+/*INIFile* PlayerPool::getMapINI()
 {
 	return mapini;
-}
+}*/
 
-void PlayerPool::setAlliances()
+void PlayerPool::setAlliances(INIFile* mapini)
 {
-	for (Uint16 i=0; i < playerpool.size() ; ++i)
+	// @todo refactor this to set by player the ally
+	for (unsigned int i = 0; i < playerpool.size(); i++)
 	{
-		playerpool[i]->setAlliances();
+		playerpool[i]->setAlliances(mapini);
 	}
 }
-
+/*
 void PlayerPool::placeMultiUnits()
 {
 	for (Uint16 i=0; i < playerpool.size() ; ++i)
@@ -393,8 +428,11 @@ void PlayerPool::placeMultiUnits()
 			printf("%s line %i: Failed to get player start\n",__FILE__ , __LINE__);
 		}
 	}
-}
+}*/
 
+/**
+ * @return Random start in the map
+ */
 Uint16 PlayerPool::getAStart()
 {
 	Uint8 rnd, sze = 0;

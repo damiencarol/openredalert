@@ -25,7 +25,7 @@
 #include "SDL/SDL_video.h"
 #include "Font.h"
 #include "video/CPSImage.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "include/config.h"
 #include "video/GraphicsEngine.h"
 #include "video/ImageCache.h"

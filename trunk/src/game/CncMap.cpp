@@ -22,7 +22,6 @@
 #include <vector>
 #include <stdexcept>
 
-#include "Game.h"
 #include "Player.h"
 #include "UnitAndStructurePool.h"
 #include "MissionData.h"
@@ -47,7 +46,7 @@
 #include "video/LoadingScreen.h"
 #include "video/SHPImage.h"
 #include "video/TemplateImage.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "include/config.h"
 #include "include/imageproc.h"
 #include "include/Logger.h"
@@ -71,9 +70,7 @@ namespace pc
 	extern vector<SHPImage*>* imagepool;
 	extern MessagePool* msg;
 }
-namespace p {
-	extern PlayerPool* ppool;
-}
+
 extern Logger * logger;
 
 //-----------------------------------------------------------------------------
@@ -133,23 +130,24 @@ Uint32 CnCMap::getTerrain(Uint32 pos, Sint16* xoff, Sint16* yoff)
  */
 CnCMap::CnCMap()
 {
-	/**		Somehow the imagepool gets corrupted by the menu (widgets)
-	 --> create a new one
-	 pc::imgcache->flush(); doesn't help
-	 */
-	//    pc::imagepool = new std::vector<SHPImage*>();
-	//    pc::imgcache->setImagePool(pc::imagepool);
+	// Clear the waypoints
 	for (int i = 0; i < 100; i++)
 	{
 		waypoints[i] = 0;
 	}
-	//    this->InitCnCMap ();
+	
+	
 	fmax = (double)maxscroll/100.0;
 
 	// Build blank MissionData
 	this->missionData = new MissionData();
+	
+	// Build the Rich PlayerPool
+	this->playerPool = new PlayerPool();
 }
 
+/**
+ */
 void CnCMap::Init(gametypes gameNumber, Uint8 gameMode)
 {
 	// notify
@@ -195,7 +193,11 @@ void CnCMap::Init(gametypes gameNumber, Uint8 gameMode)
 	// (in fact we must translate in 128 (see
 	translate_64 = false;
 	//}
-
+	
+	
+	// Init the playerpool
+	this->playerPool->Init(gameMode);
+	
 }
 
 /**
@@ -203,6 +205,17 @@ void CnCMap::Init(gametypes gameNumber, Uint8 gameMode)
  */
 CnCMap::~CnCMap()
 {
+	// Free player pool
+	delete this->playerPool;
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	Uint32 i;
 
 	for (i = 0; i < tileimages.size(); i++)
@@ -224,9 +237,7 @@ CnCMap::~CnCMap()
 		delete p::uspool;
 	p::uspool = NULL;
 
-	if (p::ppool != NULL)
-		delete p::ppool;
-	p::ppool = NULL;
+	
 	if (minimap != NULL)
 		SDL_FreeSurface(minimap);
 	minimap = NULL;
@@ -241,15 +252,15 @@ CnCMap::~CnCMap()
 /**
  * @todo Map loading goes here.
  */
-void CnCMap::loadMap(const char* mapname, LoadingScreen* lscreen)
+void CnCMap::loadMap(const string& mapname, LoadingScreen* lscreen)
 {
 	// Copy the map name
-	missionData->mapname = string(mapname);
+	missionData->mapname = mapname;
 
+	// Log the map loading
 	string message = "Reading ";
 	message += mapname;
 	message += ".ini";
-	// Log it
 	logger->debug("%s\n", message.c_str());
 
 	loading = true;
@@ -259,12 +270,17 @@ void CnCMap::loadMap(const char* mapname, LoadingScreen* lscreen)
 		lscreen->setCurrentTask(message);
 	}
 
+	string ini = mapname + ".INI";
+
+	INIFile* iniFileOfMap = new INIFile(ini);
+	
 	// Load the ini part of the map
-	loadIni();
+	loadIni(iniFileOfMap);
 
-	// Set the alliances between players
-	p::ppool->setAlliances();
+	// Free the inifile
+	delete iniFileOfMap;
 
+	// End of loading
 	loading = false;
 	loaded = true;
 }
@@ -635,9 +651,9 @@ bool CnCMap::isBuildableAt(Uint32 PlayerNumb, Uint16 pos, bool WaterBound) const
 	//    UnitOrStructure* uos = 0;
 
 	// Can't build where you haven't explored
-	if (PlayerNumb == p::ppool->getLPlayerNum())
+	if (PlayerNumb == playerPool->getLPlayerNum())
 	{
-		if (!p::ppool->getLPlayer()->getMapVis()[pos])
+		if (!playerPool->getLPlayer()->getMapVis()[pos])
 		{
 			return false;
 		}
@@ -686,18 +702,19 @@ bool CnCMap::isBuildableAt(Uint32 PlayerNumb, Uint16 pos, bool WaterBound) const
  */
 bool CnCMap::isBuildableAt(Uint16 pos, Unit* excpUn) const
 {
-	Unit* uos = 0;
 	// Can't build where you haven't explored
-	if (!p::ppool->getLPlayer()->getMapVis()[pos])
+	if (!playerPool->getLPlayer()->getMapVis()[pos])
 	{
 		return false;
 	}
+	
 	// Can't build on tiberium
 	//    if (getTiberium(pos) != 0) {
 	if (getResourceFrame(pos) != 0)
 	{
 		return false;
 	}
+	
 	switch (terraintypes[pos])
 	{
 	case t_rock:
@@ -710,17 +727,19 @@ bool CnCMap::isBuildableAt(Uint16 pos, Unit* excpUn) const
 		return false;
 	case t_road:
 	case t_land:
+	{
 		if (p::uspool->tileAboutToBeUsed(pos))
 		{
 			return false;
 		}
-		uos = p::uspool->getGroundUnitAt(pos, 0x80);
+		Unit* uos  = p::uspool->getGroundUnitAt(pos, 0x80);
 		if (uos == excpUn)
 			return true;
 		//        if (uos == 0)
 		if (!p::uspool->cellOccupied(pos))
 			return true;
 		return false;
+	}
 	default:
 		return false;
 	}
@@ -732,16 +751,15 @@ bool CnCMap::isBuildableAt(Uint16 pos, Unit* excpUn) const
 //
 bool CnCMap::isBuildableAt(Uint32 PlayerNumb, Uint16 pos, Unit* excpUn) const
 {
-	Unit* uos= NULL;
-
 	// Can't build where you haven't explored
-	if (PlayerNumb == p::ppool->getLPlayerNum())
+	if (PlayerNumb == playerPool->getLPlayerNum())
 	{
-		if (!p::ppool->getLPlayer()->getMapVis()[pos])
+		if (!playerPool->getLPlayer()->getMapVis()[pos])
 		{
 			return false;
 		}
 	}
+	
 	// Can't build on tiberium
 	//    if (getTiberium(pos) != 0) {
 	if (getResourceFrame(pos) != 0)
@@ -760,18 +778,20 @@ bool CnCMap::isBuildableAt(Uint32 PlayerNumb, Uint16 pos, Unit* excpUn) const
 		return false;
 	case t_road:
 	case t_land:
+	{
 		if (p::uspool->tileAboutToBeUsed(pos))
 		{
 			return false;
 		}
 		/// By setting subpos to 0x80 (a actual invalid subpos) we indicate that we want the nearest infanty
-		uos = p::uspool->getGroundUnitAt(pos, 0x80);
+		Unit* uos = p::uspool->getGroundUnitAt(pos, 0x80);
 		if (uos == excpUn)
 			return true;
 		//        if (uos == 0)
 		if (!p::uspool->cellOccupied(pos))
 			return true;
 		return false;
+	}
 	default:
 		return false;
 	}
@@ -788,11 +808,11 @@ Uint16 CnCMap::getCost(Uint16 pos, Unit* excpUn) const
 		return 0xffff;
 
 #if 1
-	if (excpUn != NULL)
+	if (excpUn != 0)
 	{
-		if (excpUn->getOwner() == p::ppool->getLPlayerNum())
+		if (excpUn->getOwner() == playerPool->getLPlayerNum())
 		{
-			if ( !p::ppool->getLPlayer()->getMapVis()[pos] && (excpUn == 0 || excpUn->getDist(pos)>1 ))
+			if ( !playerPool->getLPlayer()->getMapVis()[pos] && (excpUn == 0 || excpUn->getDist(pos)>1 ))
 			{
 				if (!excpUn->IsAirBound())
 					return 0;
@@ -805,7 +825,7 @@ Uint16 CnCMap::getCost(Uint16 pos, Unit* excpUn) const
 	}
 	else
 	{
-		if ( !p::ppool->getLPlayer()->getMapVis()[pos] /*&& (excpUn == 0 || excpUn->getDist(pos)>1 )*/)
+		if ( !playerPool->getLPlayer()->getMapVis()[pos] /*&& (excpUn == 0 || excpUn->getDist(pos)>1 )*/)
 		{
 			return 0;
 		}
@@ -1313,7 +1333,7 @@ SDL_Surface *CnCMap::getShadowTile(Uint8 shadownum)
 	// ra has 48 shadow images...
 	if (shadownum >= numShadowImg)
 	{
-		return NULL;
+		return 0;
 	}
 
 	return shadowimages[shadownum];
@@ -1370,9 +1390,9 @@ Uint32 CnCMap::getSize() const
 	return width*height;
 }
 
-MissionData* CnCMap::getMissionData()
+const MissionData& CnCMap::getMissionData() const
 {
-	return missionData;
+	return *missionData;
 }
 
 Uint8 CnCMap::getGameMode() const
@@ -1475,41 +1495,33 @@ Uint16 CnCMap::getY() const
 /**
  * Loads the maps ini file containing info on dimensions, units, trees
  * and so on.
+ * @param inifile Ini file to load
  */
-void CnCMap::loadIni()
+void CnCMap::loadIni(INIFile* inifile)
 {
-	ostringstream TempString;
-	INIFile *inifile;
-	string tmpName;
-
-	// Get the ini file of the map
-	tmpName = missionData->mapname;
-	tmpName += ".ini";
-
-	// Load the INIFile
-	try
-	{
-		inifile = GetConfig(tmpName);
-	}
-	catch (runtime_error&)
+	// Check that inifile is not NULL
+	if (inifile == 0)
 	{
 		// Log the error
-		logger->error("Map \"%s\" not found.  Check your installation.\n", tmpName.c_str());
+		logger->error("Map ini not found.  Check your installation.\n");
 		// Throw an error
-		throw LoadMapError("Error in loading the ini file [" + tmpName + "]");
+		throw LoadMapError("Error in loading the ini file");
 	}
-
-	// Build the player list
-	p::ppool = new PlayerPool(inifile, gamemode);
-
+	
 	// WARN if the ini format is not supported
 	if (inifile->readInt("Basic", "NewINIFormat", 0) != 3)
 	{
 		// Log the error
 		logger->error("Only Red Alert maps are fully supported\nThe format of this Map is not supported\n");
 		// Trow an error
-		throw LoadMapError("Error in loading the ini file [" + tmpName + "], the version of the ini (NewINIFormat) is not equal to 3");
+		throw LoadMapError("Error in loading the ini file [" + inifile->getFileName() + "], the version of the ini (NewINIFormat) is not equal to 3");
 	}
+
+	// Build the player list
+	this->playerPool->LoadIni(inifile);
+	
+	
+	
 
 	// Read simple ini section
 	simpleSections(inifile);
@@ -1533,10 +1545,12 @@ void CnCMap::loadIni()
 	{
 		// Set the local player with House name in the BASIC section
 		// of the .ini of the map
-		p::ppool->setLPlayer(missionData->player);
-		// @todo modify that to set the colour
-		//p::ppool->getLPlayer()->setMultiColour(pc::Config.side_colour.c_str());
-		//			printf ("%s line %i: Set local player\n", __FILE__, __LINE__);
+		playerPool->setLPlayer(missionData->player);
+	}
+	else
+	{
+		// @todo change that
+		playerPool->setLPlayer("USSR");		
 	}
 
 	terraintypes.resize(width*height, 0);
@@ -1551,19 +1565,20 @@ void CnCMap::loadIni()
 	// spawn player starts for non single player games.
 	if (gamemode != GAME_MODE_SINGLE_PLAYER)
 	{
-		int LplayerColorNr = p::ppool->MultiColourStringToNumb(pc::Config.side_colour.c_str());
-		int offset = 0;
-		for (Uint8 i=0;i<pc::Config.totalplayers;++i)
+		//int LplayerColorNr = playerPool->MultiColourStringToNumb(pc::Config.side_colour.c_str());
+		//int offset = 0;
+		for (Uint8 i=0; i<pc::Config.totalplayers; i++)
 		{
 
 			//			sprintf (TempString, "%i", i+1);
+			/*stringstream TempString;
 			TempString.str("");
 			TempString << (unsigned int)(i+1);
 			printf ("Spawning player %s\n", TempString.str().c_str());
-			tmpName = "multi";
+			string tmpName = "multi";
 			//tmpname += TempString;
 			tmpName += TempString.str();
-			p::ppool->getPlayerNum(tmpName.c_str());
+			p::ccmap->getPlayerPool()->getPlayerNum(tmpName.c_str());
 			if ((i+1) != pc::Config.playernum)
 			{
 				string Nick;
@@ -1575,23 +1590,31 @@ void CnCMap::loadIni()
 				if (i == LplayerColorNr)
 				{
 					offset = 1;
-				}
+				}*/
 
-				p::ppool->setPlayer(i+1, Nick.c_str(), i+offset, "nod" /* pc::Config.mside.c_str() */);
-			}
-			else
-			{
+				//p::ccmap->getPlayerPool()->setPlayer(i+1, Nick.c_str(), i+offset, "nod" /* pc::Config.mside.c_str() */);
+			//}
+			//else
+			//{
 				//
 				// This is the local player ;)
 				//
-				p::ppool->setLPlayer(i+1, pc::Config.nick.c_str(),pc::Config.side_colour.c_str(), pc::Config.mside.c_str());
-			}
-			p::ppool->getPlayer(i)->setMoney(pc::Config.startMoney);
+				//p::ccmap->getPlayerPool()->setLPlayer(i+1, pc::Config.nick.c_str(),pc::Config.side_colour.c_str(), pc::Config.mside.c_str());
+			//}
+			playerPool->getPlayer(i)->setMoney(pc::Config.startMoney);
 		}
-		printf ("player side is %i\n", p::ppool->getPlayer(p::ppool->getLPlayerNum())->getSide());
-		p::ppool->placeMultiUnits();
+		//printf ("player side is %i\n", p::ccmap->getPlayerPool()->getPlayer(p::ccmap->getPlayerPool()->getLPlayerNum())->getSide());
+		//playerPool->placeMultiUnits();
+		
+		// Place a MCV for each players
+		for (unsigned int a = 0; a <8; a++)
+		{
+			printf ("%s line %i: Place multi units (MCV)\n", __FILE__, __LINE__);
+			// Create the unit in the pool
+			p::uspool->createUnit("MCV", waypoints[a], 0, a, 256, 0, 0, "None");
+		}
 	}
-
+	
 	// Load the images of pips and save the number
 	pipsnum = pc::imgcache->loadImage("pips.shp");
 
@@ -1849,7 +1872,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 	// set player start locations
 	for (int k = 0; k < 8; k++)
 	{
-		p::ppool->setPlayerStarts(k, getWaypoint(k));
+		playerPool->setPlayerStarts(k, getWaypoint(k));
 	}
 
 	// load the shadowimages
@@ -2213,7 +2236,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 
                         //printf("CnCMap::loadIni(%s)\n", owner);
 
-                        p::uspool->createStructure(type, linenum, p::ppool->getPlayerNum(owner), health, facing, false, trigger);
+                        p::uspool->createStructure(type, linenum, playerPool->getPlayerNum(owner), health, facing, false, trigger);
                         //                    printf ("%s line %i: createStructure STRUCTURE %s, trigger = %s\n", __FILE__, __LINE__, type, trigger);
                     }
                 }
@@ -2235,7 +2258,7 @@ void CnCMap::advancedSections(INIFile *inifile)
                         linenum = (ty - y) * width + tx - x;
 
                         //printf("CnCMap::advancedSections(%s)\n", owner);
-                        p::uspool->createStructure(type, linenum, p::ppool->getPlayerNum(owner),
+                        p::uspool->createStructure(type, linenum, p::ccmap->getPlayerPool()->getPlayerNum(owner),
                                                    health, facing, false, trigger);
                     }
                 }*/
@@ -2280,7 +2303,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 					}
 					linenum = (ty-y)*width + tx - x;
 					// Create the unit
-					p::uspool->createUnit(type, linenum, 5, p::ppool->getPlayerNum(owner), health, facing, UnitActionToNr(action), trigger);
+					p::uspool->createUnit(type, linenum, 5, playerPool->getPlayerNum(owner), health, facing, UnitActionToNr(action), trigger);
 
 					//printf ("%s line %i: createUnit UNIT %s, trigger = %s\n", __FILE__, __LINE__, key->first.c_str(), trigger);
 				} else {
@@ -2294,17 +2317,23 @@ void CnCMap::advancedSections(INIFile *inifile)
 	// Log it
 	logger->note("CncMap::advanced...UNIT ok\n");
 
-	//infantry
-	try
+
+	//
+	// Read the "Infantry" section of the ini file	
+	//
+	// get the number of keys
+	int numberOfKey = inifile->getNumberOfKeysInSection("INFANTRY");
+	
+	char typeCustom[500];
+	
+	for (int keynum = 0; (keynum < numberOfKey) && (keynum<22); keynum++ )
 	{
-		for(int keynum = 0;;keynum++ )
+		INISection::const_iterator key = inifile->readKeyValue("INFANTRY", keynum);
+		// , is the char which separate terraintype from action.
+		if( sscanf(key->first.c_str(), "%d", &tmpval ) == 1 &&
+			sscanf(key->second.c_str(), "%[^,],%[^,],%d,%d,%d,%[^,],%d,%s", owner, typeCustom,
+				&health, &linenum, &subpos, action, &facing, trigger ) == 8 )
 		{
-			INISection::const_iterator key = inifile->readKeyValue("INFANTRY", keynum);
-			/* , is the char which separate terraintype from action. */
-			if( sscanf(key->first.c_str(), "%d", &tmpval ) == 1 &&
-					sscanf(key->second.c_str(), "%[^,],%[^,],%d,%d,%d,%[^,],%d,%s", owner, type,
-							&health, &linenum, &subpos, action, &facing, trigger ) == 8 )
-			{
                             unsigned tx;
                             unsigned ty;
 				translateCoord(linenum, &tx, &ty);
@@ -2315,14 +2344,11 @@ void CnCMap::advancedSections(INIFile *inifile)
 				}
 				linenum = (ty-y)*width + tx - x;
 
-				p::uspool->createUnit(type, linenum, subpos, p::ppool->getPlayerNum(owner), health, facing, UnitActionToNr(action), trigger);
+				p::uspool->createUnit(typeCustom, linenum, subpos, playerPool->getPlayerNum(owner), health, facing, UnitActionToNr(action), trigger);
 
 				//printf ("%s line %i: createUnit INFANTRY, unit = %c%c%c, trigger = %s\n", __FILE__, __LINE__, type[0], type[1], type[2], trigger);
-			}
 		}
 	}
-	catch(...)
-	{}
 
 	// Decode and create CellTriggers
 	if (maptype == GAME_RA)
@@ -2991,7 +3017,7 @@ void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 			name == "WOOD" || name == "CYCL" || name == "BARB")
 	{
 		// Get the num of the player
-		Uint8 numPlayer = p::ppool->getPlayerNum("Neutral");
+		Uint8 numPlayer = playerPool->getPlayerNum("Neutral");
 
 		// Walls are structures.
 		p::uspool->createStructure(name.c_str(), linenum, numPlayer, 256, 0, false, "None");
@@ -3363,4 +3389,12 @@ void CnCMap::loadTeamTypes(INIFile* fileIni)
             RaTeamtypes.push_back(team);
         }
     }
+}
+
+/** 
+ * @return the PlayerPool of the map
+ */
+PlayerPool* CnCMap::getPlayerPool() const
+{
+	return this->playerPool;
 }

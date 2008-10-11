@@ -51,7 +51,7 @@ bool UnitOrStructureType::isValid() const
 	return valid;
 }
 
-vector < char *> UnitOrStructureType::getPrereqs() const
+vector<string> UnitOrStructureType::getPrereqs() const
 {
 	return prereqs;
 }

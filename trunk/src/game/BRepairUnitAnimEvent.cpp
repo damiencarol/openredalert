@@ -29,11 +29,12 @@
 #include "Structure.h"
 #include "include/Logger.h"
 #include "ActionEventQueue.h"
+#include "CnCMap.h"
 
 namespace p {
 	extern ActionEventQueue* aequeue;
 	extern UnitAndStructurePool* uspool;
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 }
 namespace pc {
     //extern ConfigType Config;
@@ -110,7 +111,7 @@ void BRepairUnitAnimEvent::run()
 
 	if (health < UnitToFix->getType()->getMaxHealth()){
 		cost = (Uint16)((double)dmg_cost/((double)UnitToFix->getType()->getMaxHealth() - (double)health));
-		Player* Owner = p::ppool->getPlayer(UnitToFix->getOwner());
+		Player* Owner = p::ccmap->getPlayerPool()->getPlayer(UnitToFix->getOwner());
 		if (Owner->getMoney() > cost){
 			Owner->changeMoney(-1 * cost);
 			dmg_cost -= cost;

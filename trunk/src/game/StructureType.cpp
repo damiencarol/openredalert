@@ -21,7 +21,7 @@
 
 #include "SDL/SDL_types.h"
 
-#include "include/common.h"
+#include "misc/common.h"
 #include "include/Logger.h"
 #include "weaponspool.h"
 #include "video/ImageNotFound.h"
@@ -43,8 +43,14 @@ namespace p
 extern WeaponsPool* weappool;
 }
 
-StructureType::StructureType(const char* typeName, INIFile *structini,
-		INIFile *artini, const char* thext) :
+/**
+ * @param tname Basic name of the StructureType (ex: FENC, WEAP ...)
+ * @param structini 
+ * @param artini
+ * @param thext
+ */
+StructureType::StructureType(const string& typeName, INIFile* structini, INIFile* artini, 
+	const string& thext) :
 	UnitOrStructureType()
 {
 	SHPImage *shpimage;
@@ -62,33 +68,17 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	INIFile* rulesIni = new INIFile("rules.ini");
 
 	// Check if the section exist
-	if (structini->isSection(string(typeName)) == false)
+	if (structini->isSection(typeName) == false)
 	{
-		logger->debug("Try to read a non existant ini section %s.\n", typeName);
-		return;
-	}
-
-	// Ensure that there is a section in the ini file
-	try
-	{
-		structini->readKeyValue(typeName,0);
-	}
-	catch (...)
-	{
-		// Log that section doesn't exist
-		logger->debug("The section [%s] of the building no exists in  inifile (StructureType constructor).\n", typeName);
-
-		shpnums = NULL;
-		blocked = NULL;
-		shptnum = NULL;
+		logger->debug("Try to read a non existant ini section %s.\n", typeName.c_str());
 		return;
 	}
 
 	is_wall = false;
 
-	memset(this->tname, 0x0, 8);
-	strncpy(this->tname, typeName, 8);
-	name = structini->readString(tname, "name");
+	//name = structini->readString(typeName, "name");
+
+	tname = typeName;
 
     {
         // Read prerequiste
@@ -96,9 +86,11 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
         //	printf ("%s line %i: Structure: %s --> prereqs = %s\n", __FILE__, __LINE__, tname, tmp);
         if (tmp.size() > 0)
         {
-            prereqs = splitList(tmp.c_str(), ',');
+            //prereqs = splitList(tmp..c_str(), ',');
+            Split(prereqs, tmp, ',');
         }
     }
+    
 #if 0
         // FOR DEBUG ONLY
 	printf ("%s line %i: Structure: %s \n", __FILE__, __LINE__, tname);
@@ -108,7 +100,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	}
 #endif
         
-	string tmp = structini->readString(tname, "deploywith");
+	string tmp = structini->readString(tname, "deploywith", "");
 	if (tmp.size() > 0)
 	{
             deploywith = splitList(tmp.c_str(), ',');
@@ -116,18 +108,18 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 
 	// Get the owners
 	//owners = structini->splitList(tname,"owners",',');
-	tmp = structini->readString(tname, "owners");
+	tmp = structini->readString(tname, "owners", "");
 	owners = splitList(tmp.c_str(), ',');
         
         // Custom warning
 	if (owners.empty())
 	{
-		logger->warning("%s has no owners\n", tname);
+		logger->warning("%s has no owners\n", tname.c_str());
 	}
 
 #if 0
 	// DEBUG
-	logger->debug("%s line %i: Structure: %s \n",__FILE__ , __LINE__, tname);
+	logger->debug("%s line %i: Structure: %s \n",__FILE__ , __LINE__, tname.c_str());
 	for (unsigned int j = 0; j < owners.size(); j++)
 	{
 		logger->debug("owners = %s\n", owners[j]);
@@ -208,9 +200,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	shptnum = new Uint16[numshps];
 
 	// Read the Tech level
-	// @todo : refactor this !!!!!!!
-	//techLevel = structini->readInt(tname,"TechLevel", -1);
-	techLevel = (Sint32)structini->readInt(tname, "techlevel", (Sint32)-1);
+	techLevel = structini->readInt(tname, "techlevel", -1);
 
 	powerinfo.power = structini->readInt(tname, "power", 0);
 	powerinfo.drain = structini->readInt(tname, "drain", 0);
@@ -303,13 +293,13 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 
                 string shpMakeName;
 		// Check if name of the structure <= 4
-		if (strlen(tname) <= 4)
+		if (tname.size() <= 4)
 		{
 			shpMakeName = string(tname) + "make.shp";
 		}
 		else
 		{
-			logger->warning("%s is nonstandard! (name lenght > 4)\n", tname);
+			logger->warning("%s is nonstandard! (name lenght > 4)\n", tname.c_str());
 		}
 		// Load the MAKE anim and store anim info
 		try
@@ -355,8 +345,8 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 	{
 		numwalllevels = structini->readInt(tname, "levels", 1);
 		turret = 0;
-		primary_weapon = NULL;
-		secondary_weapon = NULL;
+		primary_weapon = 0;
+		secondary_weapon = 0;
 	}
 
 	// Read the Cost of the Structure Type
@@ -392,7 +382,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 
 	// This is a hack :(
 	AirBoundUnits = false;
-	if (strcmp((char*)tname, "AFLD") == 0 || strcmp((char*)tname, "HPAD") == 0)
+	if (tname == "AFLD" || tname == "HPAD")
 	{
 		AirBoundUnits = true;
 	}
@@ -409,7 +399,7 @@ StructureType::StructureType(const char* typeName, INIFile *structini,
 
 StructureType::~StructureType()
 {
-	Uint16 i;
+	/*Uint16 i;
 	for (i=0; i<owners.size(); ++i)
 	{
 		if (owners[i] != NULL)
@@ -430,7 +420,7 @@ StructureType::~StructureType()
 	blocked = NULL;
 	if (shptnum != NULL)
 		delete[] shptnum;
-	shptnum = NULL;
+	shptnum = NULL;*/
 }
 
 Uint16 * StructureType::getSHPNums()
@@ -443,13 +433,9 @@ Uint16 * StructureType::getSHPTNum()
 	return shptnum;
 }
 
-const char * StructureType::getTName() const
+const string StructureType::getTName() const
 {
 	return tname;
-}
-const string StructureType::getName() const
-{
-    return name;
 }
 
 vector < char *> StructureType::getDeployWith() const

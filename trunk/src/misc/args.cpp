@@ -164,7 +164,7 @@ extern bool parse(int argc, char **argv)
             }
             continue;
         }
-        if (strcmp(argv[i], "-skirmish") == 0) {
+       /* if (strcmp(argv[i], "-skirmish") == 0) {
             if (argv[i+1]) {
                 config.gamemode = 1;
                 config.totalplayers = abs(atoi(argv[i+1]));
@@ -180,8 +180,8 @@ extern bool parse(int argc, char **argv)
                 pc::Config.startMoney = 10000;
             }
             continue;
-        }
-        if (strcmp(argv[i], "-multi") == 0) {
+        }*/
+      /*  if (strcmp(argv[i], "-multi") == 0) {
             if (argv[i+1]&&(argv[i+2])) {
                 config.gamemode = 2;
                 config.totalplayers = abs(atoi(argv[i+2]));
@@ -201,14 +201,14 @@ extern bool parse(int argc, char **argv)
                 i += 2;
             }
             continue;
-        }
-        if (strcmp(argv[i], "-nick") == 0) {
+        }*/
+      /*  if (strcmp(argv[i], "-nick") == 0) {
             if (argv[i+1]) {
                 config.nick = argv[i+1];
                 ++i;
             }
             continue;
-        }
+        }*/
         if (strcmp(argv[i], "-colour") == 0) {
             if (argv[i+1]) {
                 config.side_colour = argv[i+1];

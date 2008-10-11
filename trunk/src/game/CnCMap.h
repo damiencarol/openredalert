@@ -37,6 +37,7 @@ class LoadingScreen;
 class CnCMap;
 class MissionData;
 class TemplateImage;
+class PlayerPool;
 
 using std::string;
 
@@ -124,7 +125,8 @@ typedef std::vector<TemplateTilePair* > TemplateTileCache;
 /**
  * Map in Red Alert
  */
-class CnCMap {
+class CnCMap 
+{
 public:
     CnCMap();
     ~CnCMap();
@@ -134,9 +136,9 @@ public:
 
     // Comments with "C/S:" at the start are to do with the client/server split.
     // C/S: Members used in both client and server
-    void loadMap(const char* mapname, LoadingScreen* lscreen);
+    void loadMap(const string& mapname, LoadingScreen* lscreen);
 
-    MissionData* getMissionData() ;
+    const MissionData& getMissionData() const;
 
     bool isLoading() const ;
 
@@ -265,6 +267,10 @@ public:
 
     /** Return true if it's the last mission of the game */
     bool isEndOfGame();
+    
+    /** Return the PlayerPool of the map */
+    PlayerPool* getPlayerPool() const;
+    
 private:
     enum {
     	HAS_OVERLAY=0x100,
@@ -278,25 +284,25 @@ private:
     MissionData* missionData;
 
     /** Load the ini part of the map */
-    void loadIni();
+    void loadIni(INIFile* inifile);
 
     /** The map section of the ini */
-    void simpleSections(INIFile *inifile);
+    void simpleSections(INIFile* inifile);
 
     /** The advanced section of the ini*/
-    void advancedSections(INIFile *inifile);
+    void advancedSections(INIFile* inifile);
 
     /** Load the bin part of the map (TD)*/
     void loadBin();
 
     /** Load the overlay section of the map (TD)*/
-    void loadOverlay(INIFile *inifile);
+    void loadOverlay(INIFile* inifile);
 
     /** Extract RA map data*/
-    void unMapPack(INIFile *inifile);
+    void unMapPack(INIFile* inifile);
 
     /** Extract RA overlay data*/
-    void unOverlayPack(INIFile *inifile);
+    void unOverlayPack(INIFile* inifile);
 
     /** Load RA TeamTypes */
     void loadTeamTypes(INIFile* fileIni);
@@ -405,6 +411,9 @@ private:
 
 	/** only used in: Uint8 CnCMap::absScroll(Sint16 dx, Sint16 dy, Uint8 border)*/
     double fmax;
+    
+    /** Pool of the player of the map */
+    PlayerPool* playerPool;
 };
 
 #endif //CNCMAP_H

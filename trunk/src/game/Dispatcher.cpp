@@ -21,7 +21,7 @@
 
 #include "ActionEventQueue.h"
 #include "CnCMap.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "include/config.h"
 #include "include/Logger.h"
 #include "PlayerPool.h"
@@ -37,6 +37,7 @@ using std::string;
 
 namespace p {
     extern UnitAndStructurePool* uspool;
+    extern CnCMap* ccmap; 
 }
 
 /** 
@@ -46,7 +47,7 @@ namespace p {
  */
 Dispatcher::Dispatcher() :
     logstate(NORMAL),
-    localPlayer(p::ppool->getLPlayerNum())
+    localPlayer(p::ccmap->getPlayerPool()->getLPlayerNum())
 {
 }
 

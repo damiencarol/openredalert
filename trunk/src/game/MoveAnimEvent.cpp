@@ -182,7 +182,7 @@ void MoveAnimEvent::startMoveOne(bool wasblocked)
     newpos = p::uspool->preMove(un, path->top(), &xmod, &ymod, &BlockingUnit);
 
 #if 0
-	if ( un->getOwner() == p::ppool->getLPlayerNum() ){
+	if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() ){
 		Uint16 x, y;
 		p::ccmap->translateFromPos(newpos, &x, &y);
 		printf ("%s line %i: Newpos = %i [%i:%i]\n", __FILE__, __LINE__, newpos, x, y);
@@ -233,7 +233,7 @@ void MoveAnimEvent::startMoveOne(bool wasblocked)
 #else
     face = (32-(path->top() << 2))&0x1f;
 
-//	if (un->getOwner() == p::ppool->getLPlayerNum())
+//	if (un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum())
 //		printf ("%s line %i: TurnAnimEvent face(dir) = %i, path->top = %i, (path->top() << 2) = %i\n", __FILE__, __LINE__, face, path->top(), (path->top() << 2));
 #endif
     path->pop();

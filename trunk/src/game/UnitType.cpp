@@ -23,7 +23,7 @@
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_timer.h"
 
-#include "include/common.h"
+#include "misc/common.h"
 #include "CnCMap.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
@@ -59,10 +59,9 @@ extern Logger * logger;
 
 /**
  */
-UnitType::UnitType(const char *typeName, INIFile* unitini) :
+UnitType::UnitType(const string& typeName, INIFile* unitini) :
 	UnitOrStructureType(),
 	shpnums(0),
-	name(0),
 	deploytarget(0),
 	c4(false)
 {
@@ -80,25 +79,24 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
     if (unitini->isSection(typeName) == false)
     {
     	// Log it
-    	logger->error("%s line %i: Unknown type: %s\n", __FILE__, __LINE__, typeName);
+    	logger->error("%s line %i: Unknown type: %s\n", __FILE__, __LINE__, typeName.c_str());
 
         shpnums = 0;
         shptnum = 0;
         return;
     }
 
-	tname = cppstrdup(typeName);
+	tname = typeName;
 
 
-	name = unitini->readString(tname, "name");
 
 	string tmp = unitini->readString(tname, "prerequisites", "");
-	prereqs = splitList(tmp.c_str(), ',');
+	Split(prereqs, tmp, ',');
 
 	unittype = unitini->readInt(tname, "unittype", 0);
 	if (0 == unittype)
 	{
-		logger->warning("No unit type specified for \"%s\"\n", tname);
+		logger->warning("No unit type specified for \"%s\"\n", tname.c_str());
 	}
 
 	numlayers = unitini->readInt(tname, "layers", 1);
@@ -145,7 +143,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 	is_infantry = false;
 
 	//buildlevel = unitini->readInt(tname, "buildlevel", 99);
-	techLevel = (Sint32)(unitini->readInt(tname, "TechLevel", (Uint32)-1));
+	techLevel = unitini->readInt(tname, "TechLevel", -1);
 
 	tmp = unitini->readString(tname, "owners");
 	owners = splitList(tmp.c_str(), ',');
@@ -197,11 +195,11 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
 	}
 	talkback = p::uspool->getTalkback(talkmode.c_str());
 	
-        maxhealth = unitini->readInt(tname, "health", 50);
+    maxhealth = unitini->readInt(tname, "health", 50);
 	cost = unitini->readInt(tname, "cost", 0);
 	if (0 == cost)
 	{
-		logger->error("\"%s\" has no cost, setting to 1\n", tname);
+		logger->error("\"%s\" has no cost, setting to 1\n", tname.c_str());
 		cost = 1;
 	}
 
@@ -325,7 +323,7 @@ UnitType::UnitType(const char *typeName, INIFile* unitini) :
  */
 UnitType::~UnitType()
 {
-    if (shpnums != 0)
+   /* if (shpnums != 0)
         delete[] shpnums;
 
     if (shptnum != 0)
@@ -344,7 +342,7 @@ UnitType::~UnitType()
     {
         if (prereqs[i] != 0)
             delete[] prereqs[i];
-    }
+    }*/
 }
 
 const char* UnitType::getRandTalk(TalkbackType type) const
@@ -406,14 +404,9 @@ Uint16* UnitType::getSHPTNum()
         return shptnum;
 }
 
-const char* UnitType::getTName() const
+const string UnitType::getTName() const
 {
-        return tname;
-}
-
-const string UnitType::getName() const
-{
-    return name;
+	return tname;
 }
 
 vector<char*> UnitType::getOwners() const

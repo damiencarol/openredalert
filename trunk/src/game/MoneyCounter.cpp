@@ -41,11 +41,12 @@
 
 #include "audio/SoundEngine.h"
 #include "include/config.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "include/Logger.h"
 #include "Player.h"
 #include "PlayerPool.h"
 #include "ActionEventQueue.h"
+#include "CnCMap.h"
 
 namespace pc {
 	extern Sound::SoundEngine * sfxeng;
@@ -95,16 +96,20 @@ void MoneyCounter::run()
 void MoneyCounter::addCredit(Uint16 amount, Uint8 PlayerNumb)
 {
     creditleft += amount;
-    if ((sound && -1 == creditsound) && PlayerNumb == p::ppool->getLPlayerNum()) {
+    if ((sound && -1 == creditsound) && PlayerNumb == p::ccmap->getPlayerPool()->getLPlayerNum()) 
+    {
         creditsound = pc::sfxeng->PlayLoopedSound(pc::Config.MoneyCountUp,0);
     }
     reshedule();
 }
 
+/**
+ */
 void MoneyCounter::addDebt(Uint16 amount, Uint8 PlayerNumb)
 {
     debtleft += amount;
-    if ((sound && -1 == debitsound) && PlayerNumb == p::ppool->getLPlayerNum()) {
+    if ((sound && -1 == debitsound) && PlayerNumb == p::ccmap->getPlayerPool()->getLPlayerNum()) 
+    {
         debitsound = pc::sfxeng->PlayLoopedSound(pc::Config.MoneyCountDown,0);
     }
     reshedule();
