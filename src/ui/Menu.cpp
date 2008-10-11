@@ -25,7 +25,7 @@
 #include "Cursor.h"
 #include "TCheckBox.h"
 
-#include "include/config.h"
+#include "misc/config.h"
 #include "include/Logger.h"
 #include "game/MissionMapsClass.h"
 #include "game/MultiPlayerMaps.h"
