@@ -30,7 +30,7 @@
 #include "mix/mixvfs.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
-#include "include/config.h"
+#include "misc/config.h"
 
 using std::string;
 using std::vector;

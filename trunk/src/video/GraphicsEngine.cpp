@@ -26,7 +26,7 @@
 #include "SDL/SDL_video.h"
 
 #include "misc/common.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "include/Logger.h"
 #include "game/CnCMap.h"
 #include "game/PlayerPool.h"

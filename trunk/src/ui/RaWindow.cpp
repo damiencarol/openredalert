@@ -24,7 +24,7 @@
 #include "video/CPSImage.h"
 #include "video/SHPImage.h"
 #include "misc/common.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "video/GraphicsEngine.h"
 #include "video/ImageCache.h"
 #include "include/sdllayer.h"
@@ -34,9 +34,9 @@
 using std::string;
 
 namespace pc {
-	extern ConfigType Config;
-	extern GraphicsEngine * gfxeng;
-	extern ImageCache* imgcache;
+    extern ConfigType Config;
+    extern GraphicsEngine * gfxeng;
+    extern ImageCache* imgcache;
 }
 
 RaWindow::RaWindow()
