@@ -31,7 +31,7 @@
 #include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "headerformats.h"
 #include "ImageNotFound.h"
 #include "SHPHeader.h"

@@ -29,7 +29,7 @@
 #include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "video/ImageNotFound.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "video/headerformats.h"
 #include "Palettes.h"
 
