@@ -934,7 +934,9 @@ void Input::clickMap(int mx, int my)
                 pc::sfxeng->PlaySound(((UnitType *)curunit->getType())->getRandTalk(TB_report));
                 sndplayed = true;
             }
-        } else if ((!selected->isEnemy()) && (curunit->canDeploy(p::ccmap)))
+        } 
+        else 
+        if ((!selected->isEnemy()) && (curunit->canDeploy(p::ccmap)))
         {
             selected->purge(curunit);
             selected->removeUnit(curunit);
@@ -1243,12 +1245,15 @@ void Input::setCursorByPos(int mx, int my)
                         pc::cursor->setCursor("nomove");
                         return;
                     }
-                } else {
+                } 
+                else 
+                {
                     if (curunit->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum())
                     {
-                        if (((UnitType*)curunit->getType())->canDeploy())
+                        if (dynamic_cast<UnitType*>(curunit->getType())->canDeploy())
                         {
-                            if (curunit->canDeploy(p::ccmap))                             {
+                            if (curunit->canDeploy(p::ccmap))
+                            {
                                 pc::cursor->setCursor("deploy");
                             } else {
                                 pc::cursor->setCursor("nomove");
