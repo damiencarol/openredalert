@@ -22,15 +22,17 @@
 #include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
-#include "include/config.h"
+#include "misc/config.h"
 
 using std::string;
 
 extern Logger * logger;
 
+/**
+ */
 MultiPlayerMaps::MultiPlayerMaps()
 {
-	this->readMapData();
+    this->readMapData();
 }
 
 MultiPlayerMaps::~MultiPlayerMaps()

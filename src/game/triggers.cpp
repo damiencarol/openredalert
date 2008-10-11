@@ -22,7 +22,7 @@
 #include <string>
 
 #include "include/Logger.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "audio/SoundEngine.h"
 #include "CnCMap.h"
 #include "UnitAndStructurePool.h"

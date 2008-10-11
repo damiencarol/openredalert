@@ -27,7 +27,7 @@
 #include "Dispatcher.h"
 #include "video/GraphicsEngine.h"
 #include "PlayerPool.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "audio/SoundEngine.h"
 #include "audio/SoundError.h"
 #include "game/Ai.h"

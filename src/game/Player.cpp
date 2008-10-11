@@ -24,7 +24,7 @@
 #include <map>
 
 #include "CnCMap.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "Dispatcher.h"
 #include "misc/INIFile.h"
 #include "PlayerPool.h"

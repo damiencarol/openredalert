@@ -23,7 +23,7 @@
 
 #include "SDL/SDL_types.h"
 
-#include "include/config.h"
+#include "misc/config.h"
 #include "CnCMap.h"
 #include "misc/common.h"
 #include "game/Game.h"

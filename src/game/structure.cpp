@@ -51,7 +51,7 @@
 #include "Weapon.h"
 #include "Unit.hpp"
 #include "InfantryGroup.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "ActionEventQueue.h"
 #include "BarrelExplosionActionEvent.h"
 

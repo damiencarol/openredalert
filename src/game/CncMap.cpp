@@ -47,7 +47,7 @@
 #include "video/SHPImage.h"
 #include "video/TemplateImage.h"
 #include "misc/common.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "include/imageproc.h"
 #include "include/Logger.h"
 #include "PlayerPool.h"

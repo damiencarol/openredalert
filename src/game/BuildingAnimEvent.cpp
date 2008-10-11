@@ -27,7 +27,7 @@
 #include "Structure.h"
 #include "StructureType.h"
 #include "animinfo_t.h"
-#include "include/config.h"
+#include "misc/config.h"
 
 using Sound::SoundEngine;
 

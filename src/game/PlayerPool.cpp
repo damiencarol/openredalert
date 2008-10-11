@@ -21,7 +21,7 @@
 
 #include "ActionEventQueue.h"
 #include "Player.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "include/Logger.h"
 #include "misc/INIFile.h"
 #include "GameMode.h"
