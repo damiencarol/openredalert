@@ -73,8 +73,9 @@ void URepairEvent::stop()
 {
     if (un == 0)
     {
-        printf("Repair unit::stop: un is NULL!?\n");
-        abort();
+        //printf("Repair unit::stop: un is NULL!?\n");
+        //abort();
+        return;
     }
     stopping = true;
 }
@@ -95,13 +96,15 @@ void URepairEvent::run()
 
 	FixStr = p::uspool->getStructureAt(fix_str_pos);
 
-	if ( FixStr == NULL ){
+	if (FixStr == 0)
+	{
 		delete this;
 		return;
 	}
 
 	// Check the structure is actually fix
-	if (strcmp ((char*)FixStr->getType()->getTName(), "FIX") != 0 ){
+	if (FixStr->getType()->getTName() == "FIX") 
+	{
 		delete this;
 		return;
 	}

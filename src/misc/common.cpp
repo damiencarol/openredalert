@@ -22,7 +22,7 @@
 
 #include "audio/SoundEngine.h"
 #include "game/Ai.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "misc/INIFile.h"
 #include "video/Renderer.h"
 #include "game/ActionEventQueue.h"
@@ -57,8 +57,6 @@ namespace p {
 	CnCMap			*ccmap = 0;
 	/** Unit and structure pool in gmae */
 	UnitAndStructurePool	*uspool = 0;
-	/** Pool of players */
-	PlayerPool*		ppool = 0;
 	/** Pool of weapon data */
 	WeaponsPool*	weappool = 0;
 	/** Dispatcher of the game */
@@ -96,10 +94,13 @@ INIFile* GetConfig(string name)
 	return TempIniFile.inifile;
 }
 
+/**
+ */
 void CleanConfig()
 {
 	
-	for (Uint32 i = 0; i < p::Setting.size(); i++){
+	for (Uint32 i = 0; i < p::Setting.size(); i++)
+	{
 		delete p::Setting[i].inifile;
 	}
 	p::Setting.clear();
@@ -202,4 +203,21 @@ const string& determineBinaryLocation(const string& launchcmd) {
 
 const string& getBinaryLocation() {
     return binloc;
+}
+
+/**
+ */
+int Split(vector<string>& vecteur, string chaine, char separateur)
+{
+	vecteur.clear();
+	string::size_type stTemp = chaine.find(separateur); 
+	while(stTemp != string::npos)
+	{
+		vecteur.push_back(chaine.substr(0, stTemp));
+		chaine = chaine.substr(stTemp + 1);
+		stTemp = chaine.find(separateur);
+	}
+	
+	vecteur.push_back(chaine);
+	return vecteur.size();
 }

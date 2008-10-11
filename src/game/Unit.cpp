@@ -50,7 +50,7 @@
 namespace p {
 	extern ActionEventQueue * aequeue;
 	extern CnCMap* ccmap;
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 }
 namespace pc {
     extern ConfigType Config;
@@ -82,9 +82,9 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
         if (owner != 0xff)
         {
             if (type->getDeployTarget() != 0) {
-                palettenum = (p::ppool->getStructpalNum(owner)<<11);
+                palettenum = (p::ccmap->getPlayerPool()->getStructpalNum(owner)<<11);
             } else {
-                palettenum = (p::ppool->getUnitpalNum(owner)<<11);
+                palettenum = (p::ccmap->getPlayerPool()->getUnitpalNum(owner)<<11);
             }
             imagenumbers[i] |= palettenum;
         }
@@ -117,9 +117,8 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
     turnanim1 = 0;
     turnanim2 = 0;
     deployed = false;
-    p::ppool->getPlayer(owner)->builtUnit(this);
-
-    if (strcmp ((char*)type->getTName(), "HARV") == 0)
+    
+    if (type->getTName() == "HARV")
     {
 	   this->Harvest(0, 0);
     }
@@ -150,7 +149,7 @@ Unit::~Unit()
 //	if (p::uspool->getUnit(unitnum) != NULL && !pc::quit)
 //		logger->warning ("%s line %i: Unit destructor for unit = %i, unitandstructerpool not derefd\n", __FILE__, __LINE__, unitnum);
 
-//	if (p::uspool->getNumbUnits() != p::ppool->getPlayer(getOwner())->getNumUnits() && !pc::quit )
+//	if (p::uspool->getNumbUnits() != p::ccmap->getPlayerPool()->getPlayer(getOwner())->getNumUnits() && !pc::quit )
 //		logger->warning ("%s line %i: Player unit pool not the same size as unitandstructurepool unitoopl\n", __FILE__, __LINE__, unitnum);
 
     delete[] imagenumbers;
@@ -172,7 +171,7 @@ Unit::~Unit()
     if (deployed) {
         // @todo This is a client thing. Will dispatch a
     	// "play these sounds" event when the time comes.
-		if (this->getOwner() == p::ppool->getLPlayerNum()){
+		if (this->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum()){
 			pc::sfxeng->PlaySound(pc::Config.UnitDeployed);
 			if (pc::Config.gamenum == GAME_TD) {
 				pc::sfxeng->PlaySound("hvydoor1.aud");
@@ -200,7 +199,9 @@ Uint8 Unit::getImageNums(Uint32 **inums, Sint8 **xoffsets, Sint8 **yoffsets)
     *inums = new Uint32[type->getNumLayers()];
     *xoffsets = new Sint8[type->getNumLayers()];
     *yoffsets = new Sint8[type->getNumLayers()];
-    for(i = 0; i < type->getNumLayers(); i++ ) {
+    
+    for(i = 0; i < type->getNumLayers(); i++ ) 
+    {
         (*inums)[i] = shpnums[i]+imagenumbers[i];
         (*xoffsets)[i] = xoffset-type->getOffset();
         (*yoffsets)[i] = yoffset-type->getOffset();
@@ -531,7 +532,7 @@ void Unit::setOwner(Uint8 newowner)
 
 void Unit::remove()
 {
-    p::ppool->getPlayer(owner)->lostUnit(this, deployed);
+    p::ccmap->getPlayerPool()->getPlayer(owner)->lostUnit(this, deployed);
     UnitOrStructure::remove();
 }
 
@@ -542,10 +543,10 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 
 	LastDamageTick = SDL_GetTicks();
 
-	if (this->getOwner() != p::ppool->getLPlayerNum()){
+	if (this->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum()){
 		// This unit is from a computer player
 		if (p::ccmap->getGameMode() != GAME_MODE_SINGLE_PLAYER){
-			pc::ai->DefendComputerPlayerUnitUnderAttack ( p::ppool->getPlayer(this->getOwner()), this->getOwner(), attacker, this );
+			pc::ai->DefendComputerPlayerUnitUnderAttack ( p::ccmap->getPlayerPool()->getPlayer(this->getOwner()), this->getOwner(), attacker, this );
 		}
 	}
 #if 0
@@ -574,7 +575,7 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 
         // Add a death for stats
         if (attacker != 0){
-        	p::ppool->getPlayer(attacker->getOwner())->addUnitKill();
+        	p::ccmap->getPlayerPool()->getPlayer(attacker->getOwner())->addUnitKill();
         }
 
         // todo: add infantry death animation here
@@ -673,10 +674,10 @@ Uint32 Unit::FindTiberium()
 			}
 		}
 	}
-//	if (owner != p::ppool->getLPlayerNum()){
+//	if (owner != p::ccmap->getPlayerPool()->getLPlayerNum()){
 //		printf ("%s line %i: Exdist = %i, Dist = %i, ExFound = %i\n", __FILE__, __LINE__, ClosesedExpensiveDistance, ClosesedDistance, FirstExpensiveFound);
 //	}
-	if (owner != p::ppool->getLPlayerNum() && ((ClosesedExpensiveDistance < (ClosesedDistance*3)) || ClosesedExpensiveDistance < 10) && FirstExpensiveFound){
+	if (owner != p::ccmap->getPlayerPool()->getLPlayerNum() && ((ClosesedExpensiveDistance < (ClosesedDistance*3)) || ClosesedExpensiveDistance < 10) && FirstExpensiveFound){
 		//printf ("Return closesed expecive pos");
 		return ClosesedExpensivePos;
 	}
@@ -684,25 +685,35 @@ Uint32 Unit::FindTiberium()
 	return ClosesedPos;
 }
 
-void Unit::Harvest (Uint32 pos, Structure *Struct)
+/**
+ * @param pos position to harvest
+ * @param Struct 
+ */
+void Unit::Harvest(Uint32 pos, Structure* Struct)
 {
-	if (harvestanim == NULL)
+	if (harvestanim == 0)
 	{
 		harvestanim = new UHarvestEvent(0, this);
 		p::aequeue->scheduleEvent(harvestanim);
-	} else {
+	}
+	else
+	{
 		harvestanim->update();
     }
 
-	if (pos != 0){
-		if (moveanim != NULL)
+	if (pos != 0)
+	{
+		if (moveanim != 0)
+		{
 			this->move(pos, false);
+		}
 //		moveanim->stop();
 		harvestanim->setHarvestingPos(pos);
 	}
 
-	if (Struct != 0){
-		SetBaseRefinery (Struct);
+	if (Struct != 0)
+	{
+		SetBaseRefinery(Struct);
 	}
 }
 
@@ -711,15 +722,15 @@ void Unit::Harvest (Uint32 pos, Structure *Struct)
  */
 bool Unit::Repair(Structure *str)
 {
-	Uint16 xpos;
-	Uint16 ypos;
-
 	// Check if the structure is "FIX"
-	if (strcmp ((char*)str->getType()->getTName(), "FIX") != 0 ){
+	if (str->getType()->getTName() == "FIX")
+	{
 		return false;
 	}
 
-	// Get coordinates
+	// Get coordinates	
+	Uint16 xpos;
+	Uint16 ypos;
 	p::ccmap->translateFromPos(str->getPos(), &xpos, &ypos);
 
 	// Try to get the middle
@@ -931,15 +942,18 @@ Uint16 Unit::getDist(Uint16 pos)
     return (Uint16)res;
 }
 
+/**
+ */
 Uint16 Unit::getTargetCell()
 {
-    if (attackanim != NULL && target != NULL) {
+    if (attackanim != 0 && target != 0) 
+    {
         return target->getBPos(cellpos);
     }
     return targetcell;
 }
 
-Structure *Unit::GetBaseRefinery()
+Structure* Unit::GetBaseRefinery()
 {
 	return BaseRefinery;
 }
@@ -980,13 +994,6 @@ bool Unit::GetResourceType (Uint8 Numb, Uint8 *Type)
 		*Type = ResourceTypes[Numb];
 		return true;
 	}
-	return false;
-}
-
-bool Unit::is(const char *Name)
-{
-	if (strcmp (getType()->getTName(), Name) == 0)
-		return true;
 	return false;
 }
 

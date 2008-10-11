@@ -25,7 +25,7 @@
 
 #include "include/config.h"
 #include "CnCMap.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "game/Game.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
@@ -63,7 +63,6 @@ namespace pc {
 }
 namespace p {
     extern CnCMap* ccmap;
-	extern PlayerPool* ppool;
 }
 extern Logger * logger;
 
@@ -134,13 +133,13 @@ UnitAndStructurePool::~UnitAndStructurePool()
 		delete structurepool[i];
     }
 
-    for( i = 0; i < structuretypepool.size(); i++ ) {
+  /*  for ( i = 0; i < structuretypepool.size(); i++ ) {
         structpair = struct_prereqs.equal_range(structuretypepool[i]);
         for (Is l = structpair.first; l != structpair.second ; ++l) {
             delete l->second;
         }
         delete structuretypepool[i];
-    }
+    }*/
 
     delete p::weappool;
 }
@@ -287,7 +286,7 @@ bool UnitAndStructurePool::getUnitOrStructureLimAt(Uint32 curpos, float* width,
         *width   = 0.75f;
         *height  = 0.75f;
         *owner   = un->getOwner();
-        *pcol    = p::ppool->getPlayer(*owner)->getStructpalNum();
+        *pcol    = p::ccmap->getPlayerPool()->getPlayer(*owner)->getStructpalNum();
         *igroup  = 0;
         *cellpos = un->getPos();
         *blocked = true;
@@ -310,7 +309,7 @@ bool UnitAndStructurePool::getUnitOrStructureLimAt(Uint32 curpos, float* width,
         *width   = 1.0f;
         *height  = 1.0f;
         *owner   = st->getOwner();
-        *pcol    = p::ppool->getPlayer(*owner)->getStructpalNum();
+        *pcol    = p::ccmap->getPlayerPool()->getPlayer(*owner)->getStructpalNum();
         *igroup  = 0;
         *cellpos = st->getBPos(curpos);
         *blocked = true;
@@ -327,7 +326,7 @@ bool UnitAndStructurePool::getUnitOrStructureLimAt(Uint32 curpos, float* width,
         *width   = 0.75f;
         *height  = 0.75f;
         *owner   = un->getOwner();
-        *pcol    = p::ppool->getPlayer(*owner)->getStructpalNum();
+        *pcol    = p::ccmap->getPlayerPool()->getPlayer(*owner)->getStructpalNum();
         *igroup  = 0;
         *cellpos = un->getPos();
         *blocked = true;
@@ -432,7 +431,7 @@ bool UnitAndStructurePool::createReinforcements(RA_Teamtype* Team)
 	string name_trigger; // name of the trigger of all unit in team
 
 	// get the number of player by the num of House in Team data
-	owner = p::ppool->getPlayerNumByHouseNum(Team->country);
+	owner = p::ccmap->getPlayerPool()->getPlayerNumByHouseNum(Team->country);
 
 	//logger->debug("%s line %i: Team size = %i, Owner = %i\n", __FILE__, __LINE__, Team->Units.size(), (int)owner);
 
@@ -538,7 +537,7 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
 
     Uint32 br = cellpos + p::ccmap->getWidth()*(type->getYsize()-1);
     if (cellpos > p::ccmap->getSize() || (br > p::ccmap->getSize() && 0)) {
-        logger->error("%s line %i: Attempted to create a \"%s\" at %i, outside map (%i)\n", __FILE__, __LINE__, type->getTName(), br, p::ccmap->getSize());
+        logger->error("%s line %i: Attempted to create a \"%s\" at %i, outside map (%i)\n", __FILE__, __LINE__, type->getTName().c_str(), br, p::ccmap->getSize());
         return false;
     }
 
@@ -582,7 +581,7 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
                     if (getStructureAt(curpos+x) != 0) {
                         Uint16 tx, ty;
                         p::ccmap->translateFromPos(curpos+x, &tx, &ty);
-                        logger->error("\"%s\" already exists at (%i, %i) [%i]\n", getStructureAt(curpos+x)->getType()->getTName(), tx, ty, curpos+x);
+                        logger->error("\"%s\" already exists at (%i, %i) [%i]\n", getStructureAt(curpos+x)->getType()->getTName().c_str(), tx, ty, curpos+x);
                         return false;
                     }
                     if (0 != (unitandstructmat[curpos+x].flags & US_IS_UNIT) || 0 != (unitandstructmat[curpos+x].flags & US_IS_AIRUNIT)) {
@@ -681,6 +680,11 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
 
     // Create a new one
     st = new Structure(type, cellpos, owner, health, facing, trigger_name);
+    if (!type->isWall()) 
+	{
+		p::ccmap->getPlayerPool()->getPlayer(owner)->builtStruct(st);
+	}
+	
     st->referTo();
     st->setStructnum(structnum);
     if (structnum == structurepool.size()) {
@@ -691,7 +695,7 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
     }
 
     // Check if it's wall
-    if(type->isWall())
+    if (type->isWall())
     {
         // update the wall-images
     	updateWalls(st, true, p::ccmap);
@@ -745,24 +749,25 @@ Unit* UnitAndStructurePool::createUnit(UnitType* type, Uint16 cellpos, Uint8 sub
 
     if (cellpos > (p::ccmap->getWidth() * p::ccmap->getHeight())) {
         logger->error("Attempted to create a %s at %i, outside map.\n",
-                type->getTName(), cellpos);
+                type->getTName().c_str(), cellpos);
         return false;
     }
     if ((getStructureAt(cellpos) != 0) && ((unitandstructmat[cellpos].flags&(US_HIGH_COST)) == 0)) 
 	{
         logger->error("Cell %i already occupied by structure (%s).\n", cellpos,
-                getStructureAt(cellpos)->getType()->getTName());
+                getStructureAt(cellpos)->getType()->getTName().c_str());
         return false;
     }
     if (getUnitAt(cellpos,subpos) != 0) {
     	// @todo appear next !!! (next subpos)
         logger->error("Cell/subpos already occupied by %s\n", getUnitAt(cellpos,
-                    subpos)->getType()->getTName());
+                    subpos)->getType()->getTName().c_str());
         return false;
     }
 
     // Reuse an expired unitnum.
-    if (numdeletedunit > 0)  {
+    if (numdeletedunit > 0)  
+    {
         for (unitnum = 0; unitnum < unitpool.size(); ++unitnum) {
             if(0 == unitpool[unitnum])
                 break;
@@ -771,9 +776,10 @@ Unit* UnitAndStructurePool::createUnit(UnitType* type, Uint16 cellpos, Uint8 sub
         unitnum = unitpool.size();
     }
 
-    InfantryGroup *group = 0;
+    InfantryGroup* group = 0;
 
-    if (type->isInfantry()) {
+    if (type->isInfantry()) 
+    {
         if (unitandstructmat[cellpos].flags&US_IS_UNIT) {
             group = unitpool[unitandstructmat[cellpos].unitnumb]->getInfantryGroup();
         } else {
@@ -782,7 +788,8 @@ Unit* UnitAndStructurePool::createUnit(UnitType* type, Uint16 cellpos, Uint8 sub
     }
 
     Unit* un = new Unit(type, cellpos, subpos, group, owner, health, facing, action, trigger_name);
-
+	p::ccmap->getPlayerPool()->getPlayer(owner)->builtUnit(un);
+	
 	if (unitnum > unitpool.size()){
 		logger->error ("%s line %i: CRASHBUG, hmm this should not be possible, unit numb overflow, unitnum = %i, size = %i\n", __FILE__, __LINE__, unitnum, unitpool.size());
 		unitnum = unitpool.size();
@@ -840,7 +847,8 @@ bool UnitAndStructurePool::createCellTrigger(Uint32 cellpos)
 /**
  *
  */
-bool UnitAndStructurePool::spawnUnit(const char* typen, Uint8 owner) {
+bool UnitAndStructurePool::spawnUnit(const char* typen, Uint8 owner) 
+{
 
     UnitType* type = getUnitTypeByName(typen);
     if (0 == type) {
@@ -855,8 +863,11 @@ bool UnitAndStructurePool::spawnUnit(const char* typen, Uint8 owner) {
  */
 bool UnitAndStructurePool::spawnUnit(UnitType* type, Uint8 owner)
 {
+	
+	
+	
 	bool returnval = true;
-    Player* player = p::ppool->getPlayer(owner);
+    Player* player = p::ccmap->getPlayerPool()->getPlayer(owner);
     assert(player != 0);
     Structure* tmpstruct = player->getPrimary(type);
     Uint16 pos = 0xffff;
@@ -865,7 +876,7 @@ bool UnitAndStructurePool::spawnUnit(UnitType* type, Uint8 owner)
     if (0 != tmpstruct) {
         pos = tmpstruct->getFreePos(&subpos, type->isInfantry());
     } else {
-        logger->error("No primary building set for %s\n", type->getTName());
+        logger->error("No primary building set for %s\n", type->getTName().c_str());
         return false;
     }
 
@@ -883,7 +894,7 @@ bool UnitAndStructurePool::spawnUnit(UnitType* type, Uint8 owner)
 
 		return returnval;
     } else {
-        logger->error("%s line %i: No free position for %s\n", __FILE__, __LINE__, type->getTName());
+        logger->error("%s line %i: No free position for %s\n", __FILE__, __LINE__, type->getTName().c_str());
     }
     return false;
 }
@@ -1237,7 +1248,7 @@ Uint16 UnitAndStructurePool::preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ym
 		return 0xffff;
 	}
 
-	if ((unitandstructmat[newpos].flags&(US_HIGH_COST)) != 0)
+	if ((unitandstructmat[newpos].flags & (US_HIGH_COST)) != 0)
 	{
 		printf ("%s line %i: strange tile with us high cost ??\n", __FILE__, __LINE__);
 	}
@@ -1347,7 +1358,7 @@ Uint8 UnitAndStructurePool::postMove(Unit *un, Uint16 newpos)
 	if (subpos > 5)
 		return subpos;
 
-	p::ppool->getPlayer(un->getOwner())->movedUnit(un->getPos(), newpos, un->getType()->getSight());
+	p::ccmap->getPlayerPool()->getPlayer(un->getOwner())->movedUnit(un->getPos(), newpos, un->getType()->getSight());
 
 	/** @todo: Airborne infantry not supported jet **/
 	if( ((UnitType *)un->getType())->isInfantry() ) {
@@ -1394,24 +1405,27 @@ void UnitAndStructurePool::abortMove(Unit* un, Uint32 pos)
  * Searches the UnitType pool for a unit type with a given name.
  *  if the type can not be found, it is read in from units.ini
  *
- * @param unitname the name of the unit to retrieve
- * @returns pointer to the UnitType value
+ * @param unitname Name of the unit type to retrieve
+ * @return pointer to the UnitType value
  */
-UnitType* UnitAndStructurePool::getUnitTypeByName(const char* unitname)
+UnitType* UnitAndStructurePool::getUnitTypeByName(const string& unitname)
 {
-    map<string, Uint16>::iterator typeentry;
     UnitType* type;
     Uint16 typenum;
-    string uname = (string)unitname;
+    
+    string uname = unitname;
 
     //transform(uname.begin(),uname.end(), uname.begin(), toupper);
 
-    typeentry = unitname2typenum.find(uname);
+    map<string, Uint16>::iterator typeentry = unitname2typenum.find(uname);
 
-    if( typeentry != unitname2typenum.end() ) {
+    if( typeentry != unitname2typenum.end() ) 
+    {
         typenum = typeentry->second;
         type = unittypepool[typenum];
-    } else {
+    } 
+    else 
+    {
     	// Check that there are a section for the unitType
     	if (unitini->isSection(unitname) == true)
     	{
@@ -1425,9 +1439,11 @@ UnitType* UnitAndStructurePool::getUnitTypeByName(const char* unitname)
     		return 0;
     	}
     }
+    
     if (type->isValid()) {
         return type;
     }
+    
     return 0;
 }
 
@@ -1437,35 +1453,36 @@ UnitType* UnitAndStructurePool::getUnitTypeByName(const char* unitname)
  * @param structname the name of the structure to retrieve (e.g. FACT or PROC)
  * @return pointer to the StructureType value
  */
-StructureType* UnitAndStructurePool::getStructureTypeByName(const char* structname)
-{
-	StructureType* type; // Type to return
-	Uint16 typenum;
-    map<string, Uint16>::iterator typeentry;
-
-
-    string sname = (string)structname;
+StructureType* UnitAndStructurePool::getStructureTypeByName(const string& structname)
+{	
+	// Get a copy of the name
+    string sname = structname;
 
     // UPPER sname
     transform(sname.begin(),sname.end(),sname.begin(),toupper);
 
-    typeentry = structname2typenum.find(sname);
+	// Try to find the type
+    map<string, StructureType*>::const_iterator typeentry = structuretypepool.find(sname);
 
-    if( typeentry != structname2typenum.end() ) {
-        typenum = typeentry->second;
-        type = structuretypepool[typenum];
-    } else {
-        typenum = structuretypepool.size();
-        type = new StructureType(structname, structini, artini, theaterext);
-        structuretypepool.push_back(type);
-        structname2typenum[sname] = typenum;
+	// If not found
+    if (typeentry != structuretypepool.end())
+    {
+    	// Return the type found
+        return typeentry->second;
     }
-    if (type->isValid()) {
-    	return type;
+    else
+    {
+    	// build a new type and add it to the stack
+        StructureType* type = new StructureType(structname, structini, artini, theaterext);
+        structuretypepool[sname] = type;
+        return type;
     }
+   // if (type->isValid()) {
+  ///  	return type;
+   // }
 
     // Return error (NULL)
-    return 0;
+   // return 0;
 }
 
 /**
@@ -1790,24 +1807,34 @@ void UnitAndStructurePool::showMoves()
 }
 
 /**
- *
+ * Populate prerequiste for UnitType
+ * @param unittype UnitType to add prerequistes
  */
 void UnitAndStructurePool::addPrerequisites(UnitType* unittype)
 {
-    vector<StructureType*>* type_prereqs;
-    if (unittype == 0)
-        return;
-    vector<char*> prereqs = unittype->getPrereqs();
+	// Check the parameters
+	if (unittype == 0)
+	{
+		return;
+    }
 
-    if (prereqs.empty()) {
-        logger->warning("No prerequisites for unit \"%s\"\n",unittype->getTName());
+	// Get the prerequistes
+	vector<string> prereqs = unittype->getPrereqs();
+
+    if (prereqs.empty()) 
+    {
+        logger->warning("No prerequisites for unit \"%s\"\n",unittype->getTName().c_str());
         return;
     }
-    if (string(prereqs[0]) == "none")
+    
+    if (prereqs[0] == "none")
     {
         return;
     }
-    for (Uint16 x=0;x<prereqs.size();++x) {
+    
+	vector<StructureType*>* type_prereqs;
+    for (unsigned int x = 0; x<prereqs.size(); x++)
+    {
         type_prereqs = new vector<StructureType*>;
         splitORPreReqs(prereqs[x],type_prereqs);
         unit_prereqs.insert(make_pair(unittype,type_prereqs));
@@ -1822,11 +1849,12 @@ void UnitAndStructurePool::addPrerequisites(StructureType* structtype)
     vector<StructureType*>* type_prereqs;
     if (structtype == 0)
         return;
-    vector<char*> prereqs = structtype->getPrereqs();
+    
+    vector<string> prereqs = structtype->getPrereqs();
 
     if (prereqs.empty()) {
         logger->warning("No prerequisites for structure \"%s\".\n"
-                        "Use \"none\" if this intended.\n",structtype->getTName());
+                        "Use \"none\" if this intended.\n",structtype->getTName().c_str());
         return;
     }
 
@@ -1901,32 +1929,39 @@ void UnitAndStructurePool::preloadUnitAndStructures(Uint8 techlevel)
  */
 void UnitAndStructurePool::generateProductionGroups()
 {
-    for ( std::vector<UnitType*>::iterator ut = unittypepool.begin(); ut != unittypepool.end(); ++ut) {
+  /*  for (vector<UnitType*>::iterator ut = unittypepool.begin(); ut != unittypepool.end(); ++ut) 
+    {
         vector<StructureType*> options;
-        vector<char*> nopts = (*ut)->getPrereqs();
+        vector<string> nopts = (*ut)->getPrereqs();
+        
+        printf("nopts
+        
+        // decode pre requist
         splitORPreReqs(nopts[0], &options);
+        
+        
         if (0 == options.size()) {
             continue;
         }
         Uint32 ptype = (*ut)->getType();
         (*ut)->setPType(ptype);
-        for (vector<StructureType*>::iterator st = options.begin();
-                st != options.end(); ++st) {
+        for (vector<StructureType*>::iterator st = options.begin(); st != options.end(); ++st) 
+        {
             (*st)->setPType(ptype);
         }
-    }
+    }*/
 }
 
 /**
  * Return buildable unit from the unit and structurepool
  */
-vector<const char*> UnitAndStructurePool::getBuildableUnits(Player* pl)
+vector<string> UnitAndStructurePool::getBuildableUnits(Player* pl)
 {
-    vector<const char*> retval;
+    vector<string> retval;
     vector<StructureType*> prereqs;
     typedef multimap<UnitType*, vector<StructureType*>* >::const_iterator I;
     pair<I,I> b;
-    Uint32 x,y;
+    Uint32 y;
     UnitType* utype;
     bool ivalid;
     bool ovalid;
@@ -1936,14 +1971,18 @@ vector<const char*> UnitAndStructurePool::getBuildableUnits(Player* pl)
     buildall = pl->canBuildAll();
 
     // Parse all the list
-    for (x=0;x<unittypepool.size();++x) {
+    for (unsigned int x = 0; x<unittypepool.size(); x++) 
+    {
         utype = unittypepool[x];
         if (!utype->isValid())
+        {
             continue;
+        }
         b = unit_prereqs.equal_range(utype);
         ovalid = true;
-        if (buildall) {
-            if (strlen(utype->getTName()) < 5) {
+        if (buildall)
+        {
+            if (utype->getTName().size() < 5) {
                 retval.push_back(utype->getTName());
             }
             continue;
@@ -1978,7 +2017,8 @@ vector<const char*> UnitAndStructurePool::getBuildableUnits(Player* pl)
                 int curside;
                 char* tmpname;
                 playerSide = pl->getSide();
-                for (y=0; y<utype->getOwners().size(); ++y) {
+                for (y=0; y<utype->getOwners().size(); ++y) 
+                {
                     tmpname = utype->getOwners()[y];
                     string sider = string(tmpname);
 
@@ -2005,25 +2045,30 @@ vector<const char*> UnitAndStructurePool::getBuildableUnits(Player* pl)
 /**
  *
  */
-vector<const char*> UnitAndStructurePool::getBuildableStructures(Player* pl)
+vector<string> UnitAndStructurePool::getBuildableStructures(Player* pl)
 {
-    vector<const char*> retval;
+    vector<string> retval;
     vector<StructureType*> prereqs;
     typedef multimap<StructureType*, vector<StructureType*>* >::const_iterator I;
     pair<I,I> b;
-    Uint32 x,y;
+    Uint32 y;
     bool ivalid, ovalid, buildall;
-    StructureType* stype;
+    
     buildall = pl->canBuildAll();
 
-    for (x=0;x<structuretypepool.size();++x) {
-        stype = structuretypepool[x];
+    for (map<string, StructureType*>::const_iterator x = structuretypepool.begin();
+    		x != structuretypepool.end(); x++)
+    {
+    	// Get the structure type
+        StructureType* stype = x->second; 
+        
         if (!stype->isValid())
             continue;
         b = struct_prereqs.equal_range(stype);
         ovalid = true;
-        if (buildall) {
-            if (strlen(stype->getTName()) < 5) {
+        if (buildall) 
+        {
+            if (stype->getTName().size() < 5) {
                 retval.push_back(stype->getTName());
             }
             continue;
@@ -2292,7 +2337,8 @@ void UnitAndStructurePool::splitORPreReqs(const string& prereqs, vector<Structur
     char tmp[16];
     Uint32 i, i2;
     memset(tmp,0,16);
-    for (i=0,i2=0;prereqs[i]!=0x0;++i) {
+    for (i=0,i2=0;prereqs[i]!=0x0;++i) 
+    {
         if ( (i2>=1024) || (tmp != 0 && (prereqs[i] == '|')) ) {
             type_prereqs->push_back(getStructureTypeByName(tmp));
             memset(tmp,0,16);
@@ -2302,7 +2348,10 @@ void UnitAndStructurePool::splitORPreReqs(const string& prereqs, vector<Structur
             ++i2;
         }
     }
-    type_prereqs->push_back(getStructureTypeByName(tmp));
+    
+    StructureType* theStrToAdd = getStructureTypeByName(tmp);
+    
+    type_prereqs->push_back(theStrToAdd);
 }
 
 /**

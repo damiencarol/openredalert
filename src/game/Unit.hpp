@@ -147,7 +147,6 @@ public:
 
     bool GetResourceType(Uint8 Numb, Uint8 *Type);
 
-    bool is(const char *Name);
     Uint32 GetFixStr(void);
 
     Uint16 GetFixPos(void);

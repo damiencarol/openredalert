@@ -36,7 +36,7 @@
 
 #include "video/Renderer.h"
 #include "externalvfs.h"
-#include "include/common.h"
+#include "misc/common.h"
 
 #if _MSC_VER && _MSC_VER < 1300
 using namespace std;
@@ -418,7 +418,13 @@ FILE* ret;
 #endif
 }
 
-bool isdir(const string& path) {
+/**
+ * @param path Path to test
+ * @return true if it's a Directory
+ */
+bool isdir(const string& path) 
+{
+	
 #ifdef _WIN32
     DWORD length = GetCurrentDirectory(0, 0);
     char* orig_path = new char[length];
@@ -446,7 +452,7 @@ bool isdir(const string& path) {
     if (-1 == chdir(path.c_str())) {
         return false;
     }
-    fchdir(curdirfd);
+    int res = fchdir(curdirfd);
     close(curdirfd);
 #endif
     return true;

@@ -29,27 +29,31 @@
 /**
  * Button of the Sidebar
  */
-class SidebarButton {
+class SidebarButton 
+{
 public:
-    SidebarButton(Sint16 x, Sint16 y, const char* fname, Uint8 func,
-            const char* theatre, Uint8 palnum);
+    /** */
+    SidebarButton(int x, int y, const string& fname, Uint8 func, const string& theatre, Uint8 palnum);
     ~SidebarButton();
     
-    void ChangeImage(const char* fname);
-    void ChangeImage(const char* fname, Uint8 number);
-    void ChangeImage(const char* fname, Uint8 number,  Uint8 side);
-    SDL_Surface* getSurface() const ;
-    SDL_Rect getRect() const ;
-    Uint8 getFunction() const ;
-    SDL_Surface* Fallback(const char* fname);
+    void ChangeImage(const string& fname);
+    void ChangeImage(const string&, Uint8 number);
+    void ChangeImage(const string&, Uint8 number,  Uint8 side);
+    
+    SDL_Surface* getSurface() const;
+    SDL_Rect getRect() const;
+    unsigned int getFunction() const;
+    
+    SDL_Surface* Fallback(const string& fname);
 
     void ReloadImage();
+    
 private:
     Uint32 picnum;
     SDL_Surface *pic;
     Uint8 function; 
     Uint8 palnum;
-    const char* theatre;
+    string theatre;
 
     bool using_fallback;
     const char *fallbackfname;

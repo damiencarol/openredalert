@@ -20,7 +20,7 @@
 #include <cmath>
 
 #include "CnCMap.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "include/Logger.h"
 #include "ProjectileAnim.h"
 #include "weaponspool.h"
@@ -94,7 +94,7 @@ void TurnAnimEvent::run()
 #endif
     } else
         layerface = dir;
-//		if (un->getOwner() == p::ppool->getLPlayerNum())
+//		if (un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum())
 //			printf ("%s line %i: TurnAnimEvent layerface %i, dir = %i, turnmod = %i\n", __FILE__, __LINE__, layerface, dir, turnmod);
 		un->setImageNum(layerface,layer);
 

@@ -29,7 +29,7 @@
 #include "audio/SoundEngine.h"
 #include "UnitAndStructurePool.h"
 #include "TalkbackType.h"
-#include "include/common.h"
+#include "misc/common.h"
 
 using std::map;
 using std::string;

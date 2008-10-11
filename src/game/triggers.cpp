@@ -180,8 +180,8 @@ bool CheckEvent(unsigned int Event, int param1, int param2, unsigned int Eventpa
         	printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER try to analysis\n", __FILE__, __LINE__);
         	// The player to check
         	Player* pl = 0;
-        	pl = p::ppool->getPlayer((Uint8)param2);
-        	printf ("%s line %i: CheckParameters, TRIGGER_EVENT_LOW_POWER analysis player %s\n", __FILE__, __LINE__, pl->getName());
+        	pl = p::ccmap->getPlayerPool()->getPlayer((Uint8)param2);
+        	printf ("%s line %i: CheckParameters, TRIGGER_EVENT_LOW_POWER analysis player %s\n", __FILE__, __LINE__, pl->getName().c_str());
         	if (pl->getPowerUsed() > pl->getPower())
         	{
         		printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER decide TRUE\n", __FILE__, __LINE__);        		        	
@@ -269,7 +269,7 @@ bool CheckOtherEvent(unsigned int Event, int param1, int param2, int value)
         	// param2 = player to check
         	printf ("%s line %i: CheckParameters, Event TRIGGER_EVENT_LOW_POWER try to analysis\n", __FILE__, __LINE__);
         	// The player to check
-        	Player* pl = p::ppool->getPlayer((Uint8)param2);
+        	Player* pl = p::ccmap->getPlayerPool()->getPlayer((Uint8)param2);
         	printf ("%s line %i: CheckParameters, TRIGGER_EVENT_LOW_POWER analysis player %s\n", __FILE__, __LINE__, pl->getName());
         	if (pl->getPowerUsed() > pl->getPower())
         	{
@@ -373,7 +373,7 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
     }
 
 #if 0
-    int countrynr = p::ppool->getHouseNumByPlayerNum(UnitOrStructure->getOwner());
+    int countrynr = p::ccmap->getPlayerPool()->getHouseNumByPlayerNum(UnitOrStructure->getOwner());
 
     // Check if the trigger was meant for us
     if (countrynr != AssociatedTrigger->country){
@@ -692,7 +692,7 @@ void CheckCellTriggers(Uint32 pos)
     if (Trigger == 0){
         return;
     }
-    int countrynr = p::ppool->getHouseNumByPlayerNum(unit->getOwner());
+    int countrynr = p::ccmap->getPlayerPool()->getHouseNumByPlayerNum(unit->getOwner());
 
     // Check if the trigger was meant for us
     if (countrynr != Trigger->country)
@@ -777,13 +777,12 @@ void ExecuteTriggerAction(TriggerAction* action)
         	
         	logger->error ("%s line %i: ***TRIGGER_ACTION_LOSER_IS = %d ***\n", __FILE__, __LINE__, actTrig->getParam3());
         	
-                unsigned int numPlayer = p::ppool->getPlayerNumByHouseNum(actTrig->getParam3());
-                Player* thePlayer = p::ppool->getPlayer(numPlayer);
-        	
-                if (thePlayer != 0) 
-                {
-                    thePlayer->setVictorious(false);
-                }
+        	unsigned int numPlayer = p::ccmap->getPlayerPool()->getPlayerNumByHouseNum(actTrig->getParam3());
+        	Player* thePlayer = p::ccmap->getPlayerPool()->getPlayer(numPlayer);
+        	if (thePlayer != 0)
+            {
+        		thePlayer->setVictorious(false);
+        	}        	
         	break;
         }
         case TRIGGER_ACTION_PRODUCTION_BEGINS:
@@ -844,7 +843,7 @@ void ExecuteTriggerAction(TriggerAction* action)
         case TRIGGER_ACTION_REVEAL_MAP:
         	//logger->error ("%s line %i: ***TRIGGER_ACTION_REVEAL_MAP***\n", __FILE__, __LINE__);
         	//ppool->getLPlayer()->revealAroundWaypoint(Uint32 Waypoint);
-        	p::ppool->getLPlayer()->setVisBuild(Player::SOB_SIGHT, true);
+        	p::ccmap->getPlayerPool()->getLPlayer()->setVisBuild(Player::SOB_SIGHT, true);
         	break;
         case TRIGGER_ACTION_REVEAL_AROUND_WAYPOINT:
         {
@@ -855,7 +854,7 @@ void ExecuteTriggerAction(TriggerAction* action)
         	actionTrig = dynamic_cast<RawTriggerAction*>(action);
         	int Waypoint = actionTrig->getParam3();
         	logger->error ("%s line %i: ***TRIGGER_ACTION_REVEAL_AROUND_WAYPOINT***, waypoint1 == %u\n", __FILE__, __LINE__, Waypoint);
-        	p::ppool->getLPlayer()->revealAroundWaypoint(Waypoint);
+        	p::ccmap->getPlayerPool()->getLPlayer()->revealAroundWaypoint(Waypoint);
         	break;
         }
         case TRIGGER_ACTION_REVEAL_ZONE_OF_WAYPOINT:
@@ -867,7 +866,7 @@ void ExecuteTriggerAction(TriggerAction* action)
         	 * 		}else if (ActionNr == 2){
         	 * 			Waypoint = Trigger->action2->param3;
         	 * 		}
-        	 * 		p::ppool->getLPlayer()->revealAroundWaypoint(Waypoint);*/
+        	 * 		p::ccmap->getPlayerPool()->getLPlayer()->revealAroundWaypoint(Waypoint);*/
         	logger->error ("%s line %i: ***TRIGGER_ACTION_REVEAL_ZONE_OF_WAYPOINT***\n", __FILE__, __LINE__);
         	break;
         case TRIGGER_ACTION_PLAY_SOUND:

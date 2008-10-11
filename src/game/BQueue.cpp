@@ -34,6 +34,7 @@
 #include "BQTimer.h"
 #include "RQstate.h"
 #include "include/config.h"
+#include "CnCMap.h"
 
 namespace pc {
 	extern Sound::SoundEngine* sfxeng;
@@ -42,7 +43,7 @@ namespace pc {
 namespace p {
 	extern Dispatcher* dispatcher;
 	extern ActionEventQueue* aequeue;
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 }
 extern Logger * logger;
 
@@ -74,7 +75,7 @@ bool BQueue::Add(const UnitOrStructureType * type)
             break;
         case BQ_EMPTY:        
             if (0 == (left = type->getCost())) {
-                logger->error("Type \"%s\" has no cost\n", type->getTName());
+                logger->error("Type \"%s\" has no cost\n", type->getTName().c_str());
             }
             last = p::aequeue->getCurtick();
             production.insert(Production::value_type(type, 1));
@@ -98,7 +99,7 @@ bool BQueue::Add(const UnitOrStructureType * type)
                 if (p::dispatcher->unitSpawn((UnitType *) type, player->getPlayerNum())) {
                     Placed();
                 } else {
-                    logger->debug("Didn't spawn %s...\n", type->getTName());
+                    logger->debug("Didn't spawn %s...\n", type->getTName().c_str());
                 }
             }
             return false;
@@ -114,7 +115,7 @@ bool BQueue::Add(const UnitOrStructureType * type)
                     // This type is new to the queue
                     if (0 == type->getCost()) {
                         // We divide by cost, so must not be zero.
-                        logger->error("Type \"%s\" has no cost\n", type->getTName());
+                        logger->error("Type \"%s\" has no cost\n", type->getTName().c_str());
                         return false;
                     }
                     production.insert(Production::value_type(type, 1));
@@ -150,7 +151,7 @@ ConStatus BQueue::PauseCancel(const UnitOrStructureType * type)
         switch (status) {
             case BQ_RUNNING:
                 status = BQ_PAUSED;
-                p::ppool->updateSidebar();
+                p::ccmap->getPlayerPool()->updateSidebar();
                 return status;
                 break;
             case BQ_READY:
@@ -181,7 +182,7 @@ ConStatus BQueue::PauseCancel(const UnitOrStructureType * type)
         }
     }
 
-    p::ppool->updateSidebar();
+    p::ccmap->getPlayerPool()->updateSidebar();
     return BQ_CANCELLED;
 }
 
@@ -216,7 +217,7 @@ ConStatus BQueue::getStatus(const UnitOrStructureType * type, Uint8 * quantity, 
  */
 void BQueue::Placed() 
 {
-    p::ppool->updateSidebar();
+    p::ccmap->getPlayerPool()->updateSidebar();
     status = BQ_RUNNING;
     next();
 }
@@ -225,7 +226,7 @@ void BQueue::Pause()
 {
     if (status == BQ_RUNNING) {
         status = BQ_ALL_PAUSED;
-        p::ppool->updateSidebar();
+        p::ccmap->getPlayerPool()->updateSidebar();
     }
 }
 
@@ -268,7 +269,7 @@ void BQueue::next()
     left = it->first->getCost();
     last = p::aequeue->getCurtick();
     timer->Reshedule();
-    p::ppool->updateSidebar();
+    p::ccmap->getPlayerPool()->updateSidebar();
 }
 
 RQstate BQueue::requeue(const UnitOrStructureType * type) 
@@ -316,7 +317,7 @@ bool BQueue::tick()
     left -= delta;
 
     if (0 != left) {
-        p::ppool->updateSidebar();
+        p::ccmap->getPlayerPool()->updateSidebar();
         return true;
     }
     const UnitOrStructureType * type = getCurrentType();
@@ -337,7 +338,7 @@ bool BQueue::tick()
         // Play "construction complete" sound
         pc::sfxeng->PlaySound(pc::Config.StructureReady);
     }
-    p::ppool->updateSidebar();
+    p::ccmap->getPlayerPool()->updateSidebar();
     return false;
 }
 

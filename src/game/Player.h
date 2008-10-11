@@ -44,19 +44,25 @@ using std::vector;
 class Player
 {
 public:
-	explicit Player(const char *pname, INIFile *mapini);
+	explicit Player(const string& pname);
 	~Player();
 	
-	bool isLPlayer();
+	/** Load information from ini file */	
+	void LoadIni(INIFile* mapini);
+	
+	/*bool isLPlayer();*/
 	void setPlayerNum(Uint8 num);
 	void setMultiColour(const char* colour);
 	void setMultiColour(const int colour);
 	Uint8 getMultiColour (void) ;
-	void setSettings(const char* nick, const char* colour, const char* mside);
-	void setSettings(const char* nick, const int colour, const char* mside);
+	//void setSettings(const char* nick, const char* colour, const char* mside);
+	//void setSettings(const char* nick, const int colour, const char* mside);
 
 	Uint8 getPlayerNum() const ;
-	const char* getName() const ;
+	
+	/** Return the name of the player */
+	const string& getName() const ;
+	
 	Uint8 getSide() const ;
 	bool setSide(Uint8 Side);
 	Uint8 getMSide() const ;
@@ -91,7 +97,6 @@ public:
 	Uint32 getPowerUsed() const ;
 
 	Uint16 getPlayerStart() const ;
-	void placeMultiUnits();
 
 	void updateOwner(Uint8 newnum);
 
@@ -103,7 +108,7 @@ public:
 	void didAlly(Player* pl);
 	bool unallyWithPlayer(Player* pl);
 	void didUnally(Player* pl);
-	void setAlliances();
+	void setAlliances(INIFile* mapini);
 	void clearAlliances();
 
 	void addUnitKill() ;
@@ -158,8 +163,8 @@ private:
 	map<Uint8, BQueue*> queues;
 
 	bool defeated;
-	char* playername;
-	char* nickname;
+	string playername;
+	string nickname;
 	Uint8 playerside;
 	Uint8 multiside;
 	Uint8 playernum;

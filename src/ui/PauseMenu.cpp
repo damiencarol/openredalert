@@ -33,13 +33,14 @@
 #include "include/sdllayer.h"
 #include "video/Dune2Image.h"
 #include "misc/StringTableFile.h"
+#include "game/CnCMap.h"
 
 #define VERSION "439"
 
 using Sound::SoundEngine;
 
 namespace p {
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 }
 namespace pc {
 	extern ConfigType Config;
@@ -158,8 +159,8 @@ int PauseMenu::HandleMenu()
 	pc::sfxeng->PauseLoopedSound(-1);
 
 	// Pause the build queue
-	for (int i = 0; i < p::ppool->getNumPlayers(); i++){
-		p::ppool->getPlayer(i)->pauseBuilding();
+	for (int i = 0; i < p::ccmap->getPlayerPool()->getNumPlayers(); i++){
+		p::ccmap->getPlayerPool()->getPlayer(i)->pauseBuilding();
     }
 
 	// Get the mouse coordinates
@@ -227,15 +228,15 @@ void PauseMenu::HandleInput()
 						pc::sfxeng->StopLoopedSound(-1);
 						//pc::sfxeng->ResumeLoopedSound(-1);
 
-						for (int i = 0; i < p::ppool->getNumPlayers(); i++)
-							p::ppool->getPlayer(i)->resumeBuilding();
+						for (int i = 0; i < p::ccmap->getPlayerPool()->getNumPlayers(); i++)
+							p::ccmap->getPlayerPool()->getPlayer(i)->resumeBuilding();
 					}
 					if (ContinueButton->MouseOver()){
 						// Continue the game
 						pc::Config.pause = false;
 						pc::sfxeng->ResumeLoopedSound(-1);
-						for (int i = 0; i < p::ppool->getNumPlayers(); i++){
-							p::ppool->getPlayer(i)->resumeBuilding();
+						for (int i = 0; i < p::ccmap->getPlayerPool()->getNumPlayers(); i++){
+							p::ccmap->getPlayerPool()->getPlayer(i)->resumeBuilding();
 						}
 					}
 				}
@@ -246,8 +247,8 @@ void PauseMenu::HandleInput()
 					// Continue the game
 					pc::Config.pause = false;
 					pc::sfxeng->ResumeLoopedSound(-1);
-					for (int i = 0; i < p::ppool->getNumPlayers(); i++){
-						p::ppool->getPlayer(i)->resumeBuilding();
+					for (int i = 0; i < p::ccmap->getPlayerPool()->getNumPlayers(); i++){
+						p::ccmap->getPlayerPool()->getPlayer(i)->resumeBuilding();
 					}
 				}
 				break;

@@ -45,7 +45,6 @@
 namespace p {
 	extern CnCMap* ccmap;
 	extern UnitAndStructurePool* uspool;
-	extern PlayerPool* ppool;
 	extern Dispatcher* dispatcher;
 }
 extern Logger * logger;
@@ -59,7 +58,7 @@ Ai::Ai()
 	LplayerBasePos = 0;
 	guide = false;
 
-	NumbPlayers = p::ppool->getNumPlayers();
+	NumbPlayers = p::ccmap->getPlayerPool()->getNumPlayers();
 
 	for (unsigned int i = 0; i < (unsigned)NumbPlayers; i++)
 	{
@@ -208,7 +207,7 @@ void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 			// Don't distract units on a AI mission (only abort the mission if we see a harvester)
 			if (!lUnit->UnderAttack () && lUnit->AI_Mission != 1 ){
 				// Abort the ai mission if we 'see' a harvester
-				if (lEnemyUnit->is("HARV"))
+				if (lEnemyUnit->getType()->getTName() == "HARV")
 					lUnit->AI_Mission = 1;
 				else
 					continue;
@@ -377,14 +376,14 @@ void Ai::handle()
 	}
 
 
-//	c 	= p::ppool->getNumPlayers();
-	this->HumanPlayerNumb	= p::ppool->getLPlayerNum();
+//	c 	= p::ccmap->getPlayerPool()->getNumPlayers();
+	this->HumanPlayerNumb	= p::ccmap->getPlayerPool()->getLPlayerNum();
 
 	// This part of the AI takes care of the computer player attacking a enemy within range
 	// and of the human player fighting back when attacked.
 	for (int PlayerNumb = 0; PlayerNumb < this->NumbPlayers; PlayerNumb++){
 
-		CurPlayer = p::ppool->getPlayer(PlayerNumb);
+		CurPlayer = p::ccmap->getPlayerPool()->getPlayer(PlayerNumb);
 
 		// Don't try to control defeated players
 		if (CurPlayer->isDefeated()){
@@ -470,9 +469,9 @@ void Ai::guideAttack (Player *Player, int PlayerNumb)
 	NumbStructures		= Player->getNumStructs();
 
 	// Handle lPlayer vars
-	lPlayerStructurePool	= p::ppool->getLPlayer()->getStructures();
+	lPlayerStructurePool	= p::ccmap->getPlayerPool()->getLPlayer()->getStructures();
 	lPlayerNumbStructures	= lPlayerStructurePool.size();
-	lPlayerUnitPool		= p::ppool->getLPlayer()->getUnits();
+	lPlayerUnitPool		= p::ccmap->getPlayerPool()->getLPlayer()->getUnits();
 	lPlayerNumbUnits	= lPlayerUnitPool.size();
 
 
@@ -514,19 +513,19 @@ void Ai::guideAttack (Player *Player, int PlayerNumb)
 				for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++)
 				{
 					// Make a list of all nearby tesla's
-					if ( lPlayerStructurePool[i]->is("TSLA") && lPlayerStructurePool[i]->isAlive()){
+					if ((lPlayerStructurePool[i]->getType()->getTName() == "TSLA") && lPlayerStructurePool[i]->isAlive()){
 						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
 							EnemyTeslaCoils.push_back(lPlayerStructurePool[i]);
 					}
 
 					// Make a list of all nearby advanced power plants
-					if ( lPlayerStructurePool[i]->is("APWR") && lPlayerStructurePool[i]->isAlive()){
+					if ((lPlayerStructurePool[i]->getType()->getTName() == "APWR") && lPlayerStructurePool[i]->isAlive()){
 						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
 							EnemyPowerPlants.push_back(lPlayerStructurePool[i]);
 					}
 
 					// Make a list of all nearby ore refinery's
-					if (lPlayerStructurePool[i]->is("PROC") && lPlayerStructurePool[i]->isAlive()){
+					if ((lPlayerStructurePool[i]->getType()->getTName() == "PROC") && lPlayerStructurePool[i]->isAlive()){
 						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
 							EnemyOreRefs.push_back(lPlayerStructurePool[i]);
 					}
@@ -675,7 +674,7 @@ bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
 
 	StructureType* Type	= p::uspool->getStructureTypeByName(structname);
 
-	vector<bool>& buildable = p::ppool->getPlayer(PlayerNumb)->getMapBuildable();
+	vector<bool>& buildable = p::ccmap->getPlayerPool()->getPlayer(PlayerNumb)->getMapBuildable();
 
 	// Check that we don't try to build outside the map (copied check from unitandstructurepool.cpp!!
 	br = pos + p::ccmap->getWidth()*(Type->getYsize()-1);
@@ -915,7 +914,7 @@ Uint16				xpos,
 			NumbOfInfantry++;
 		}
 
-		if (theUnit->is("HARV") == true)
+		if (theUnit->getType()->getTName() == "HARV")
 		{
 			if (theUnit->GetBaseRefinery() == 0)
 			{
@@ -924,7 +923,7 @@ Uint16				xpos,
 			NumbOfOreTrucks++;
 		}
 
-		if (theUnit->is("1TNK") == true)
+		if (theUnit->getType()->getTName() == "1TNK")
 		{
 			NumbTanks++;
 		}
@@ -937,7 +936,7 @@ Uint16				xpos,
 		{
 			theUnit = unitpool[UnitNumb];
 
-			if ( theUnit->is ("MCV") )
+			if (theUnit->getType()->getTName() == "MCV")
 			{
 				if (theUnit->canDeploy(p::ccmap) == true)
 				{
@@ -1098,22 +1097,20 @@ Uint16				xpos,
 	}
 
 }
+
 /**
  *	Returns a enemy **unit** if one is in range of our **unit**
  */
-Unit* Ai::EnemyUnitInRange (int MyPlayerNumb, Unit* MyUnit, int AttackRange )
+Unit* Ai::EnemyUnitInRange(int MyPlayerNumb, Unit* MyUnit, int AttackRange)
 {
-Player                  *EnemyPlayer,
-                        *MyPlayer;
-int                     EnemyNumbUnits;
-std::vector<Unit*>      Enemyunitpool;
-Unit*                   EnemyUnit;
+	// Check parameter pb
+	if (MyUnit == 0)
+		return 0;
 
-	if (MyUnit == NULL)
-		return NULL;
-
+	// If Unit can't attack return nothing to attack
 	if (!MyUnit->canAttack())
-		return NULL;
+		return 0;
+
 
 	#if 1
 	if (AttackRange == -1)
@@ -1121,47 +1118,57 @@ Unit*                   EnemyUnit;
 	#else
 	if (AttackRange == -1)
 		AttackRange = MyUnit->getType()->getSight();
-
 	#endif
 
-	for (int i = 0; i < this->NumbPlayers; i++){
+
+
+	for (int i = 0; i < this->NumbPlayers; i++)
+	{
 		// Don't find my own units
 		if (MyPlayerNumb == i)
 			continue;
+			
+		Player* EnemyPlayer = p::ccmap->getPlayerPool()->getPlayer(i);
 
-		EnemyPlayer = p::ppool->getPlayer(i);
-
-		MyPlayer = p::ppool->getPlayer(MyPlayerNumb);
-
+		Player* MyPlayer = p::ccmap->getPlayerPool()->getPlayer(MyPlayerNumb);
+		
+		Player* localPl = p::ccmap->getPlayerPool()->getLPlayer(); 
+		
 		// Check to see if these are both ai players and if ai players are allied
-		if (!MyPlayer->isLPlayer() && !EnemyPlayer->isLPlayer() && Rules->AlwaysAlly)
+		if ((MyPlayer != localPl) && (EnemyPlayer != localPl) && Rules->AlwaysAlly)
 			continue;
 
 		// Check if the Enemy player is a allie ;)
 		if (EnemyPlayer->isAllied(MyPlayer))
 			continue;
 
-		EnemyNumbUnits = EnemyPlayer->getNumUnits();
 
-		Enemyunitpool = EnemyPlayer->getUnits();
+		vector<Unit*> Enemyunitpool = EnemyPlayer->getUnits();
+		unsigned int EnemyNumbUnits = EnemyPlayer->getNumUnits();
+		
 
 		// For each unit from this player
-		for (int UnitNumb = 0; UnitNumb < EnemyNumbUnits; UnitNumb++){
-			EnemyUnit = Enemyunitpool[UnitNumb];
+		for (int UnitNumb = 0; UnitNumb < EnemyNumbUnits; UnitNumb++)
+		{
+			Unit* EnemyUnit = Enemyunitpool[UnitNumb];
 			int distance = MyUnit->getDist(EnemyUnit->getPos());
 			if (distance <= AttackRange && EnemyPlayer->getSide() != PS_NEUTRAL){
 				return EnemyUnit;
 			}
 
 			// Make it easyer to attack harvesters
-			if (EnemyUnit->is ("HARV") && MyPlayerNumb != this->HumanPlayerNumb){
-				if (distance <= 4*AttackRange && EnemyPlayer->getSide() != PS_NEUTRAL){
+			if ((EnemyUnit->getType()->getTName() == "HARV") && MyPlayerNumb != this->HumanPlayerNumb)
+			{
+				if (distance <= 4*AttackRange && EnemyPlayer->getSide() != PS_NEUTRAL)
+				{
 					return EnemyUnit;
 				}
 			}
 		}
 	}
-	return NULL;
+	
+	// Return NULL
+	return 0;
 }
 
 /**
@@ -1187,12 +1194,13 @@ Unit* Ai::EnemyUnitInRange (int MyPlayerNumb, Structure* MyStructure, int Attack
 		if (MyPlayerNumb == i)
 			continue;
 
-		Player* enemyPlayer = p::ppool->getPlayer(i);
+		Player* enemyPlayer = p::ccmap->getPlayerPool()->getPlayer(i);
 
-		Player* myPlayer = p::ppool->getPlayer(MyPlayerNumb);
+		Player* myPlayer = p::ccmap->getPlayerPool()->getPlayer(MyPlayerNumb);
+		Player* localPl = p::ccmap->getPlayerPool()->getLPlayer();
 
 		// Check to see if these are both AI players and if AI players are allied
-		if (!myPlayer->isLPlayer() && !enemyPlayer->isLPlayer() && Rules->AlwaysAlly)
+		if ((myPlayer != localPl) && (enemyPlayer = localPl) && Rules->AlwaysAlly)
 			continue;
 
 		// Check if the Enemy player is a ally ;)
@@ -1246,12 +1254,14 @@ Structure* Ai::EnemyStructureInRange (int MyPlayerNumb, Unit* MyUnit, int Attack
         if (MyPlayerNumb == i)
             continue;
 
-        EnemyPlayer = p::ppool->getPlayer(i);
+        EnemyPlayer = p::ccmap->getPlayerPool()->getPlayer(i);
 
-        MyPlayer = p::ppool->getPlayer(MyPlayerNumb);
+        MyPlayer = p::ccmap->getPlayerPool()->getPlayer(MyPlayerNumb);
+        
+        Player* localPl = p::ccmap->getPlayerPool()->getLPlayer();
 
 	// Check to see if these are both ai players and if ai players are allied
-	if (!MyPlayer->isLPlayer() && !EnemyPlayer->isLPlayer() && Rules->AlwaysAlly)
+	if ((MyPlayer != localPl) && (EnemyPlayer != localPl) && Rules->AlwaysAlly)
 		continue;
 
 
@@ -1295,7 +1305,7 @@ void Ai::Harvest(Player *Player, int PlayerNumb)
 	for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++)
 	{
 		Unit* theUnit = unitpool[UnitNumb];
-		if (theUnit->is("HARV"))
+		if (theUnit->getType()->getTName() == "HARV")
 		{
 			if (!theUnit->IsHarvesting())
 			{
@@ -1340,10 +1350,10 @@ void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
 	NumbStructures		= Player->getNumStructs();
 
 	// Handle lPlayer vars
-	lPlayerStructurePool	= p::ppool->getLPlayer()->getStructures();
-	lPlayerNumbStructures	= p::ppool->getLPlayer()->getNumStructs();
-	lPlayerUnitPool		= p::ppool->getLPlayer()->getUnits();
-	lPlayerNumbUnits	= p::ppool->getLPlayer()->getNumUnits();
+	lPlayerStructurePool	= p::ccmap->getPlayerPool()->getLPlayer()->getStructures();
+	lPlayerNumbStructures	= p::ccmap->getPlayerPool()->getLPlayer()->getNumStructs();
+	lPlayerUnitPool		= p::ccmap->getPlayerPool()->getLPlayer()->getUnits();
+	lPlayerNumbUnits	= p::ccmap->getPlayerPool()->getLPlayer()->getNumUnits();
 
 	// First find a good target
 	if (lPlayerNumbStructures > 0){
@@ -1379,17 +1389,22 @@ void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
 		}
 	}
 
-	if ((lPlayerNumbStructures > 0 || lPlayerNumbUnits > 0) && NumbUnits > 0){
+	if ((lPlayerNumbStructures > 0 || lPlayerNumbUnits > 0) && NumbUnits > 0)
+	{
 
-		for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++){
+		for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++)
+		{
 			Unit = unitpool[UnitNumb];
 			if (!Unit->canAttack())
 				continue;
-			if (Unit->AI_Mission == 1 || Unit->AI_Mission == 3){
-				if ( Unit->is ("HARV") ){
+			if (Unit->AI_Mission == 1 || Unit->AI_Mission == 3)
+			{
+				if (Unit->getType()->getTName() == "HARV")
+				{
 					logger->error ("%s line %i: !!!!!!!!!!Error harvesters can't attack\n", __FILE__, __LINE__);
-				}else{
-
+				}
+				else
+				{
 					Unit->AI_Mission		= 3;
 					player_targets[PlayerNumb]	= target;
 

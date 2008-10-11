@@ -37,7 +37,7 @@
 #include "ProjectileAnim.h"
 #include "RedAlertDataLoader.h"
 
-#include "include/common.h"
+#include "misc/common.h"
 
 using std::vector;
 using std::for_each;

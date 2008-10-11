@@ -39,19 +39,19 @@ using std::vector;
 /**
  * Base class for structure in game
  */
-class StructureType : public UnitOrStructureType {
+class StructureType : public UnitOrStructureType
+{
 public:
-	StructureType(const char * typeName, INIFile* structini, INIFile * artini,
-			const char * thext);
+	/** Constructor */
+	StructureType(const string& typeName, INIFile* structini, INIFile* artini,
+			const string& thext);
 	~StructureType();
 
 	Uint16 * getSHPNums();
 
 	Uint16 * getSHPTNum();
 
-	const char * getTName() const;
-
-	const string getName() const;
+	virtual const string getTName() const;
 
 	vector < char *> getDeployWith() const;
 
@@ -140,8 +140,7 @@ private:
 	Uint8 defaultface;
 	Uint8 buildlevel;
 	Uint8 * blocked;
-	char tname[12];
-	string name;
+
 	vector<char*> owners;
 	vector<char*> deploywith;
 	PowerInfo powerinfo;

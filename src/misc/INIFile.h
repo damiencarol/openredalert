@@ -33,7 +33,7 @@ using std::map;
 class INIFile
 {
 public:
-    explicit INIFile(const char* filename);
+    explicit INIFile(const string& filename);
     ~INIFile();
 
     /** Read a String */
@@ -62,8 +62,14 @@ public:
 
     /** Function to get number of key/value per section */
     int getNumberOfKeysInSection(const string& section) const;
+    
+    /** Get the file name of the ini file */
+    string getFileName() const;
 
 private:
+	/** File name of the inifile loaded */
+	string filename;
+	
     /** Internal data */
     map<string, INISection> Inidata;
 };

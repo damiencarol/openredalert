@@ -35,7 +35,7 @@
 #include "Unit.hpp"
 
 namespace p {
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 	extern ActionEventQueue * aequeue;
 	extern CnCMap * ccmap;
 }
@@ -249,7 +249,7 @@ void UInfiltrateAnimEvent::run()
 	// Throw an event
     // @todo FINISH THIS
 	HandleTriggers(target, TRIGGER_EVENT_ENTERED_BY,
-	    		p::ppool->getHouseNumByPlayerNum(un->getOwner()));
+	    		p::ccmap->getPlayerPool()->getHouseNumByPlayerNum(un->getOwner()));
 
 	if (target->getType()->isStructure()){
 		((Structure*)target)->bomb();

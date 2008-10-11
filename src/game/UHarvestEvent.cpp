@@ -35,7 +35,7 @@
 namespace p {
 	extern ActionEventQueue * aequeue;
 	extern CnCMap* ccmap;
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 	extern UnitAndStructurePool* uspool;
 }
 extern Logger * logger;
@@ -126,14 +126,14 @@ void UHarvestEvent::update()
 void UHarvestEvent::run()
 {
 #ifdef DEBUG_HARVEST_ANIM
-	if ( un->getOwner() == p::ppool->getLPlayerNum() ){
+	if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() ){
 		printf ("%s line %i: Run harvest animation\n", __FILE__, __LINE__);
 	}
 #endif
 
 	if( !un->isAlive() || stopping ) {
 #ifdef DEBUG_HARVEST_ANIM
-		if ( un->getOwner() == p::ppool->getLPlayerNum() ){
+		if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() ){
 			printf ("%s line %i: Stopping harvest animation\n", __FILE__, __LINE__);
 		}
 #endif
@@ -156,7 +156,7 @@ void UHarvestEvent::run()
 
 	if (manual_pauze){
 #ifdef DEBUG_HARVEST_ANIM
-		if ( un->getOwner() == p::ppool->getLPlayerNum() )
+		if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() )
 			printf ("%s line %i: Manual pauze harvest animation\n", __FILE__, __LINE__);
 #endif
 		un->setImageNum(OrgImage, 0);
@@ -190,7 +190,7 @@ void UHarvestEvent::run()
 
 	if (NumbResources < 5 && !ForceEmpty/*&& !un->EmptyHarvester*/){
 #ifdef DEBUG_HARVEST_ANIM
-		if ( un->getOwner() == p::ppool->getLPlayerNum() )
+		if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() )
 			printf ("%s line %i: Harvest\n", __FILE__, __LINE__);
 #endif
 		if (un->getPos() != MoveTargePos){
@@ -237,7 +237,7 @@ void UHarvestEvent::run()
                 p::ccmap->decreaseResource(un->getPos(), 1);
                 ResourceTypes[NumbResources] = type;
                 un->AddResource (ResourceTypes[NumbResources]);
-                //if (un->getOwner() == p::ppool->getLPlayerNum())
+                //if (un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum())
                     //printf ("LPlayer, add resource type %i to harvester\n", type);
                 NumbResources++;
                 ReturnStep = 1;
@@ -245,7 +245,7 @@ void UHarvestEvent::run()
         }
     }else if (un->GetBaseRefinery() != NULL){
 #ifdef DEBUG_HARVEST_ANIM
-		if ( un->getOwner() == p::ppool->getLPlayerNum() )
+		if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() )
 			printf ("%s line %i: Empty, step = %i \n", __FILE__, __LINE__, ReturnStep);
 #endif
 		// We are full --> move back to our base and dump our content there
@@ -301,9 +301,9 @@ void UHarvestEvent::run()
 
 				ForceEmpty = false;
 
-				p::ppool->getPlayer(un->getOwner())->changeMoney(Value);
+				p::ccmap->getPlayerPool()->getPlayer(un->getOwner())->changeMoney(Value);
 
-				if (un->getOwner() != p::ppool->getLPlayerNum())
+				if (un->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
 					MoveTargePos = un->FindTiberium ();
 			}
 		}else{

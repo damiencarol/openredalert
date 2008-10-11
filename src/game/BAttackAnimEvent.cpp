@@ -21,7 +21,7 @@
 
 #include "BTurnAnimEvent.h"
 #include "CnCMap.h"
-#include "include/common.h"
+#include "misc/common.h"
 #include "PlayerPool.h"
 #include "ProjectileAnim.h"
 #include "audio/SoundEngine.h"
@@ -36,6 +36,7 @@
 
 namespace p {
 	extern ActionEventQueue * aequeue;
+	extern CnCMap* ccmap;
 }
 namespace pc {
 	extern Sound::SoundEngine* sfxeng;
@@ -212,8 +213,7 @@ void BAttackAnimEvent::run()
 	}
 
 	// Throw an event
-	HandleTriggers(target, TRIGGER_EVENT_ATTACKED,
-		    		p::ppool->getHouseNumByPlayerNum(strct->getOwner()));
+	HandleTriggers(target, TRIGGER_EVENT_ATTACKED, p::ccmap->getPlayerPool()->getHouseNumByPlayerNum(strct->getOwner()));
 
 	// We can shoot
 	strct->getType()->getWeapon()->fire(strct, target->getBPos(strct->getPos()), target->getSubpos());

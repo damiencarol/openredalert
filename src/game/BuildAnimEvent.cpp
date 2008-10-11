@@ -25,12 +25,15 @@
 #include "UnitAndStructurePool.h"
 #include "anim_nfo.h"
 #include "Structure.h"
+#include "CnCMap.h"
 
 namespace p {
 	extern UnitAndStructurePool* uspool;
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 }
 
+/**
+ */
 BuildAnimEvent::BuildAnimEvent(Uint32 p, Structure* str, bool sell) : 
 	BuildingAnimEvent(p, str, 0)
 {
@@ -45,6 +48,8 @@ BuildAnimEvent::BuildAnimEvent(Uint32 p, Structure* str, bool sell) :
 	}
 }
 
+/**
+ */
 BuildAnimEvent::~BuildAnimEvent()
 {
 	Uint16 dmg_cost;
@@ -62,7 +67,7 @@ BuildAnimEvent::~BuildAnimEvent()
 			dmg_cost = (Uint16)Cost;
         }
 
-		p::ppool->getPlayer(structure->getOwner())->changeMoney(Cost - dmg_cost);
+		p::ccmap->getPlayerPool()->getPlayer(structure->getOwner())->changeMoney(Cost - dmg_cost);
 	}
 }
 

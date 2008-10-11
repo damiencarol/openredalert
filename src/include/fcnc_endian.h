@@ -27,14 +27,14 @@
 static __inline__ Uint8 freadbyte(FILE *fptr)
 {
     Uint8 x;
-    fread(&x,1,1,fptr);
+    size_t res = fread(&x,1,1,fptr);
     return x;
 }
 
 static __inline__ Uint16 freadword(FILE *fptr)
 {
     Uint16 x;
-    fread(&x,2,1,fptr);
+    size_t res = fread(&x,2,1,fptr);
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     return SDL_Swap16(x);
 #else
@@ -46,14 +46,14 @@ static __inline__ Uint32 freadthree(FILE *fptr)
 {
     // Can this be made better?
     Uint8 x[3];
-    fread(x,3,1,fptr);
+    size_t res = fread(x,3,1,fptr);
     return readthree(x,0);
 }
 
 static __inline__ Uint32 freadlong(FILE *fptr)
 {
     Uint32 x;
-    fread(&x, 4, 1, fptr);
+    size_t res = fread(&x, 4, 1, fptr);
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     return SDL_Swap32(x);
 #else

@@ -25,7 +25,7 @@
 #include "SDL/SDL_timer.h"
 #include "SDL/SDL_video.h"
 
-#include "include/common.h"
+#include "misc/common.h"
 #include "include/config.h"
 #include "include/Logger.h"
 #include "game/CnCMap.h"
@@ -583,7 +583,7 @@ void GraphicsEngine::DrawMinimap()
 	Player* 	lplayer;
 
 	// Get the Local player
-	lplayer = p::ppool->getLPlayer();
+	lplayer = p::ccmap->getPlayerPool()->getLPlayer();
 
 	// Get the visibility of the local player
 	vector<bool>& mapvis = lplayer->getMapVis();
@@ -859,8 +859,8 @@ void GraphicsEngine::DrawBombing()
 		if (str->isBombing()==false){
 			continue;
 		}
-		printf("str bb = %s\n",
-				p::uspool->getStructure(i)->getType()->getTName());
+		//printf("str bb = %s\n",
+		//		p::uspool->getStructure(i)->getType()->getTName());
 
 		// Load the bombing icon image (displayed while bombing a structure)
 		if (bombing_icon == 0){
@@ -1084,8 +1084,9 @@ void GraphicsEngine::DrawGroundUnitHealthBars(SDL_Rect dest, SDL_Rect udest, Uin
 			}
 
 			// Draw the harvester contents (if needed)
-			if (un->isSelected() && strcmp (un->getType()->getTName(), "HARV") == 0){
-				if (un->getOwner() == p::ppool->getLPlayerNum()){
+			if ((un->isSelected()) && (un->getType()->getTName() == "HARV"))
+			{
+				if (un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum()){
 					Uint8 ResourceType;
 					Uint8 NumbResources = un->GetNumResources ();
 					for (int k = 0; k < 5; k++){
@@ -1225,7 +1226,7 @@ void GraphicsEngine::DrawL2Overlays()
 void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 {
 	Uint32				curpos;
-	Player				*lplayer = p::ppool->getLPlayer();
+	Player				*lplayer = p::ccmap->getPlayerPool()->getLPlayer();
 	std::vector<bool>	&mapvis = lplayer->getMapVis();
 	int					i;
 	Uint16				mapWidth;
@@ -1769,7 +1770,7 @@ void GraphicsEngine::clipToMaparea(SDL_Rect *src, SDL_Rect *dest)
 void GraphicsEngine::drawMissionLabel()
 {
 	// Get the local player
-	//Player* lplayer = p::ppool->getLPlayer();
+	//Player* lplayer = p::ccmap->getPlayerPool()->getLPlayer();
 	//printf("x=%d y=%d w=%d h=%d\n", maparea.x, maparea.y, maparea.w, maparea.h);
 	//printf("resX=%d W=%d resY=%d  H=%d\n",
 	//maparea.x + (maparea.w + defeatLabel->getWidth())/2, defeatLabel->getWidth(),
@@ -1777,7 +1778,7 @@ void GraphicsEngine::drawMissionLabel()
 
 
 	// If the local player is winning
-	if (p::ppool->hasWon() == true)
+	if (p::ccmap->getPlayerPool()->hasWon() == true)
 	{
 		Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
 
@@ -1796,7 +1797,7 @@ void GraphicsEngine::drawMissionLabel()
 	}
 
 	// If the local player is lossing
-	if (p::ppool->hasLost() == true)
+	if (p::ccmap->getPlayerPool()->hasLost() == true)
 	{
 		Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
 
@@ -1829,7 +1830,7 @@ void GraphicsEngine::drawSidebar()
     Uint16 framerate;
     char mtext[128];
 
-    Player* lplayer = p::ppool->getLPlayer();
+    Player* lplayer = p::ccmap->getPlayerPool()->getLPlayer();
 
     tabpos = pc::sidebar->getTabLocation();
 

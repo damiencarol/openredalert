@@ -121,7 +121,7 @@ ImageCacheEntry& ImageCache::getImage(Uint32 imgnum)
 
 	ImageCacheEntry& entry = cache[imgnum];
 
-	//Uint8 palnum = p::ppool->getLPlayer()->getMultiColour ();
+	//Uint8 palnum = p::ccmap->getPlayerPool()->getLPlayer()->getMultiColour ();
 
     // Palette is ((imgnum>>11)&0x1f).
 //		printf ("%s line %i: Palette number = %i\n", __FILE__, __LINE__, ((imgnum>>11)&0x1f));

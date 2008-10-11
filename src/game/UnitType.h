@@ -42,7 +42,7 @@ using std::vector;
 class UnitType : public UnitOrStructureType
 {
 public:
-	UnitType(const char *typeName, INIFile* unitini);
+	UnitType(const string& typeName, INIFile* unitini);
 	~UnitType();
 
 	Uint32 *getSHPNums();
@@ -50,8 +50,7 @@ public:
 	bool isInfantry() const;
 	Uint8 getType() const;
 	Uint16 *getSHPTNum();
-	const char* getTName() const;
-	const string getName() const;
+	virtual const string getTName() const;
 
 	vector<char*> getOwners() const;
 	Uint8 getOffset() const;
@@ -114,8 +113,6 @@ private:
 	Uint8 unittype;
 	Sint8 movemod;
 
-	char* tname;
-	string name;
 	vector<char*> owners;
 
 	/** Talkback related members*/

@@ -23,9 +23,10 @@
 #include "Structure.h"
 #include "Player.h"
 #include "PlayerPool.h"
+#include "CnCMap.h"
 
 namespace p {
-	extern PlayerPool* ppool;
+	extern CnCMap* ccmap;
 }
 
 RepairAnimEvent::RepairAnimEvent(Uint32 p, Structure* str) : BuildingAnimEvent(p,str,0)
@@ -72,7 +73,7 @@ void RepairAnimEvent::anim_func(anim_nfo* data)
 		cost = (Uint16)((double)dmg_cost/((double)structure->getType()->getMaxHealth() - (double)health));
 		Player* Owner = 0;
 		// Get the owner
-		Owner = p::ppool->getPlayer(structure->getOwner());
+		Owner = p::ccmap->getPlayerPool()->getPlayer(structure->getOwner());
 		if (Owner->getMoney() > cost){
 			Owner->changeMoney(-1 * cost);
 			dmg_cost -= cost;

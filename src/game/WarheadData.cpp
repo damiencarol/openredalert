@@ -23,7 +23,7 @@
 
 #include "misc/INIFile.h"
 #include "include/Logger.h"
-#include "include/common.h"
+#include "misc/common.h"
 
 #include "misc/INIFile.h"
 
