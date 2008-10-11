@@ -22,7 +22,7 @@
 #include "ActionEventQueue.h"
 #include "CnCMap.h"
 #include "misc/common.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "include/Logger.h"
 #include "PlayerPool.h"
 #include "Unit.hpp"

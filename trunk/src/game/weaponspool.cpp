@@ -25,7 +25,7 @@
 #include "include/Logger.h"
 #include "ProjectileAnim.h"
 #include "audio/SoundEngine.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "Projectile.h"
 #include "Warhead.h"
 #include "ExplosionAnim.h"

@@ -23,7 +23,7 @@
 #include "include/sdllayer.h"
 
 #include "video/Renderer.h"
-#include "include/config.h"
+#include "config.h"
 #include "misc/INIFile.h"
 #include "include/Logger.h"
 

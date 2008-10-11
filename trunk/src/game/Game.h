@@ -22,7 +22,7 @@
 
 #include "SDL/SDL_types.h"
 
-#include "include/config.h" 
+#include "misc/config.h" 
 
 using std::string;
 

@@ -40,7 +40,7 @@
 #include "SDL/SDL_types.h"
 
 #include "audio/SoundEngine.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "misc/common.h"
 #include "include/Logger.h"
 #include "Player.h"

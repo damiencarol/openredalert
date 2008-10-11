@@ -23,11 +23,7 @@
 #include "SoundCommon.h"
 #include "SOUND_DECODE_STATE.h"
 #include "include/Logger.h"
-#include "include/config.h"
 
-namespace pc {
-    extern ConfigType Config;
-}
 extern Logger * logger;
 
 using std::string;

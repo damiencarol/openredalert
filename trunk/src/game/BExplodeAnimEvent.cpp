@@ -20,7 +20,7 @@
 #include <cmath>
 
 #include "CnCMap.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "audio/SoundEngine.h"
 #include "UnitAndStructurePool.h"
 #include "anim_nfo.h"

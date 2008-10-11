@@ -24,7 +24,7 @@
 #include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
-#include "include/config.h"
+#include "misc/config.h"
 
 using std::string;
 
@@ -44,14 +44,17 @@ string MissionMapsClass::getGdiMissionMap(Uint32 missionNumber)
 	return NULL;
 }
 
+/**
+ * @param missionNumber Number of the Nod/Soviets mission
+ */
 string MissionMapsClass::getNodMissionMap(Uint32 missionNumber)
 {
-	//
-	if (missionNumber < NodMissionMaps.size())
-	{
-		return NodMissionMaps[missionNumber];
-	}
-	return NULL;
+    //
+    if (missionNumber < NodMissionMaps.size())
+    {
+        return NodMissionMaps[missionNumber];
+    }
+    return 0;
 }
 
 void MissionMapsClass::readMissionData()

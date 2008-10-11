@@ -43,7 +43,7 @@
 #include "audio/SoundEngine.h"
 #include "PlayerPool.h"
 #include "include/Logger.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "TalkbackType.h"
 #include "UInfiltrateAnimEvent.h"
 

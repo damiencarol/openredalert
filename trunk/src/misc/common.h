@@ -105,5 +105,6 @@ const std::string& determineBinaryLocation(const std::string& launchcmd);
 
 const std::string& getBinaryLocation();
 
+int Split(vector<string>& vecteur, string chaine, char separateur);
 
 #endif /* COMMON_H */

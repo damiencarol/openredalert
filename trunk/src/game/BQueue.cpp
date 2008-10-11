@@ -33,7 +33,7 @@
 #include "Player.h"
 #include "BQTimer.h"
 #include "RQstate.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "CnCMap.h"
 
 namespace pc {

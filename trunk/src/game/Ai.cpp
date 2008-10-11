@@ -35,7 +35,7 @@
 #include "AiRules.h"
 #include "Unit.hpp"
 #include "include/Logger.h"
-#include "include/config.h"
+#include "misc/config.h"
 #include "misc/INIFile.h"
 #include "audio/SoundEngine.h"
 #include "video/Renderer.h"
