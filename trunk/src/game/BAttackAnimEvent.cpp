@@ -1,6 +1,5 @@
 // BAttackAnimEvent.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -35,11 +34,11 @@
 #include "include/Logger.h"
 
 namespace p {
-	extern ActionEventQueue * aequeue;
-	extern CnCMap* ccmap;
+    extern ActionEventQueue * aequeue;
+    extern CnCMap* ccmap;
 }
 namespace pc {
-	extern Sound::SoundEngine* sfxeng;
+    extern Sound::SoundEngine* sfxeng;
 }
 extern Logger * logger;
 
@@ -61,20 +60,26 @@ BAttackAnimEvent::BAttackAnimEvent(Uint32 p, Structure *str) :
 	StartFrame = 0;
 }
 
+/**
+ */
 BAttackAnimEvent::~BAttackAnimEvent()
 {
-	if (strct->getType()->Charges())
-	{
-		frame = (Uint8) StartFrame;				//intended conversion?
-		if (strct->getNumbImages(0) > frame)
-			strct->setImageNum(frame, 0);
-	}
+    if (strct->getType()->Charges())
+    {
+        frame = StartFrame; //intended conversion?
+        if (strct->getNumbImages(0) > frame)
+        {
+            strct->setImageNum(frame, 0);
+        }
+    }
 
-	target->unrefer();
-	strct->unrefer();
-	strct->attackAnim = 0;
+    target->unrefer();
+    strct->unrefer();
+    strct->attackAnim = 0;
 }
 
+/**
+ */
 void BAttackAnimEvent::run()
 {
 	Sint32 xtiles, ytiles;
@@ -221,16 +226,20 @@ void BAttackAnimEvent::run()
 	p::aequeue->scheduleEvent(this);
 }
 
+/**
+ */
 void BAttackAnimEvent::stop()
 {
-	done = true;
+    done = true;
 }
 
+/**
+ */
 void BAttackAnimEvent::update()
 {
-	target->unrefer();
-	target = strct->getTarget();
-	target->referTo();
+    target->unrefer();
+    target = strct->getTarget();
+    target->referTo();
 }
 
 /**
