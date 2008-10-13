@@ -31,7 +31,8 @@ using std::string;
  * @param scaleq Scale factor, if caleq = -1 there are no scale factor
  */
 CPSImage::CPSImage(const char* fname, int scaleq) :
-cpsdata(0), image(0) {
+cpsdata(0), image(0) 
+{
     
     // Copy the scaler factor
     this->scaleq = scaleq;
@@ -74,7 +75,8 @@ cpsdata(0), image(0) {
 
 /**
  */
-CPSImage::~CPSImage() {
+CPSImage::~CPSImage() 
+{
     delete[] cpsdata;
     
     if (image != 0) {
@@ -85,8 +87,10 @@ CPSImage::~CPSImage() {
 
 /**
  */
-SDL_Surface* CPSImage::getImage() {
-    if (image == 0) {
+SDL_Surface* CPSImage::getImage() 
+{
+    if (image == 0) 
+    {
         loadImage();
     }
     return image;
@@ -94,7 +98,8 @@ SDL_Surface* CPSImage::getImage() {
 
 /**
  */
-void CPSImage::loadImage() {
+void CPSImage::loadImage() 
+{
     Uint32 len;
     Uint8* imgsrc;
     Uint8 *imgdst;
@@ -128,11 +133,12 @@ void CPSImage::loadImage() {
 
 /**
  */
-void CPSImage::readPalette() {
-    Uint16 i;
-    
+void CPSImage::readPalette() 
+{    
     offset = 10;
-    for (i = 0; i < 256; i++) {
+
+    for (unsigned int i = 0; i < 256; i++) 
+    {
         palette[i].r = cpsdata[offset];
         palette[i].g = cpsdata[offset+1];
         palette[i].b = cpsdata[offset+2];
