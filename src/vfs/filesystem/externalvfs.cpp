@@ -403,7 +403,7 @@ FILE* ret;
     // Skip over non-alpha chars.
     // @todo These are the old style text munging routines that are a) consise
     // and b) doesn't work with UTF8 filenames.
-    for (i=caseoffset;i<fname.length()&&!isalpha(fname[i]);++i);
+    for (i=caseoffset;i<fname.length()&&!isalpha(fname[i]);++i) {}
     if (islower(fname[i])) {
         transform(fname.begin()+caseoffset, fname.end(), fname.begin()+caseoffset, toupper);
     } else {

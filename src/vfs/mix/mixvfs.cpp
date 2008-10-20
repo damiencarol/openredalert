@@ -187,12 +187,12 @@ MixRecord* MIXFiles::decodeHeader(VFile* mix, MixHeader* header, tscheck_ tschec
     memcpy(&header->size, &Block[sizeof(Uint16)], sizeof(Uint32));
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     header->c_files = SDL_Swap16(header->c_files);
-    header->size	= SDL_Swap32(header->size);
+    header->size = SDL_Swap32(header->size);
 #endif
 
     // Decrypt all indexes
     const int m_size = sizeof(MixRecord) * header->c_files;
-    const int m_f = m_size + 5 & ~7;
+    const int m_f = (m_size + 5) & ~7;
     mindex = new MixRecord[header->c_files];
     e = new Uint8[m_f];
     //fread(e, m_f, 1, mix);

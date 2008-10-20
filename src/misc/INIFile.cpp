@@ -50,7 +50,6 @@ INIFile::INIFile(const string& filename)
 	char line[1024];
 	char key[1024];
 	char value[1024];
-	Uint32 i;
 	char* str;
 
 	VFile* inifile;
@@ -92,13 +91,14 @@ INIFile::INIFile(const string& filename)
 				//                cursection.clear();
 				newSection.clear();
 			}
-			for (i = 0; key[i] != '\0'; i++) {
-				key[i] = toupper(key[i]);
-			}
-			cursectionName = key;
+            for (unsigned int i = 0; key[i] != '\0'; i++) 
+            {
+                key[i] = toupper(key[i]);
+            }
+            cursectionName = key;
 		} else if (cursectionName != "" && sscanf(str, "%[^=]=%[^\r\n;]", key,
 				value) == 2) {
-			for (i = 0; key[i] != '\0'; i++) {
+			for (unsigned int i = 0; key[i] != '\0'; i++) {
 				key[i] = toupper(key[i]);
 			}
 			if (strlen(key) > 0) {
