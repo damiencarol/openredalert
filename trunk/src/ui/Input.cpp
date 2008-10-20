@@ -1390,23 +1390,24 @@ void Input::selectRegion()
 
 void Input::clickSidebar(int mx, int my, bool rightbutton)
 {
-	Uint8		butclick;
-	createmode_t	createmode;
+    // Clear the selection of the player
+    selected->clearSelection();
 
-	// Clear the selection of the player
-	selected->clearSelection();
-
-	mx -= (width-tabwidth);
-	my -= pc::sidebar->getTabLocation()->h;
+    mx -= (width-tabwidth);
+    my -= pc::sidebar->getTabLocation()->h;
 
 
-	butclick = pc::sidebar->getSpecialButton(mx, my);
-	if (butclick != 255){
-		printf ("%s line %i: Sidebar click, special button = %i\n", __FILE__, __LINE__, butclick);
-		if (butclick == 1 && pc::sidebar->getSpecialButtonState(2) == 0 || butclick == 2 && pc::sidebar->getSpecialButtonState(1) == 0 || butclick == 3){
-			pc::sidebar->setSpecialButtonState(butclick, true);
-		}
-	}
+    Uint8 butclick = pc::sidebar->getSpecialButton(mx, my);
+    if (butclick != 255)
+    {
+        //printf ("%s line %i: Sidebar click, special button = %i\n", __FILE__, __LINE__, butclick);
+        if ((butclick == 1 && pc::sidebar->getSpecialButtonState(2) == 0) || 
+            (butclick == 2 && pc::sidebar->getSpecialButtonState(1) == 0) ||
+            (butclick == 3))
+        {
+            pc::sidebar->setSpecialButtonState(butclick, true);
+        }
+    }
 
 
     butclick = pc::sidebar->getButton(mx, my);
@@ -1418,9 +1419,10 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
 
     // @todo find a more elegant way to do this, as scrolling will blank current place.
     string placename= "xxxx";
+    createmode_t createmode;
     pc::sidebar->ClickButton(butclick, placename, &createmode);
 
-	// If the command is invalid and placename was not changed
+    // If the command is invalid and placename was not changed
     if (CM_INVALID == createmode || (placename == "xxxx"))
     {
         currentaction = a_none;

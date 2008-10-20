@@ -169,7 +169,7 @@ void Talkback::merge(Talkback *mergee)
 
 TalkbackType Talkback::getTypeNum(string name)
 {
-	// lower the string
+    // lower the string
     transform(name.begin(), name.end(), name.begin(), tolower);
     typedef map<string, TalkbackType>::const_iterator TBCI;
     
