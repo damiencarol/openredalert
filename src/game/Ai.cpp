@@ -1148,7 +1148,7 @@ Unit* Ai::EnemyUnitInRange(int MyPlayerNumb, Unit* MyUnit, int AttackRange)
 		
 
 		// For each unit from this player
-		for (int UnitNumb = 0; UnitNumb < EnemyNumbUnits; UnitNumb++)
+		for (unsigned int UnitNumb = 0; UnitNumb < EnemyNumbUnits; UnitNumb++)
 		{
 			Unit* EnemyUnit = Enemyunitpool[UnitNumb];
 			int distance = MyUnit->getDist(EnemyUnit->getPos());
