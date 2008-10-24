@@ -1,6 +1,5 @@
 // INIFile.h
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -53,6 +52,7 @@ public:
     INISection::const_iterator readIndexedKeyValue(const char* section, unsigned int keynum, const char* prefix=0);
     string readSection(unsigned int secnum);
 
+    /** Read a Key with value equal 'yes' or 'no' */
     int readYesNo(const string& section, const string& value, const int defaultValue) const;
 
     /** Function to test if a section is in the inifile */
