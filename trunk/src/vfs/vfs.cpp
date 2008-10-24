@@ -222,7 +222,7 @@ VFile * VFSUtils::VFS_Open(const char *fname, const char* mode)
     if (mixfiles != 0)
     {
         fnum = mixfiles->getFile(fname);
-        if (fnum != -1)
+        if (fnum != (Uint32)-1)
         {
             return new VFile(fnum, mixfiles);
         }
