@@ -218,9 +218,9 @@ void PlayerPool::setLPlayer(const string& pname)
 
 int PlayerPool::getPlayerNum(const string& pname)
 {
-    for (int i = 0; i < playerpool.size(); i++)
+    for (unsigned int i = 0; i < playerpool.size(); i++)
     {
-        if (string(playerpool.at(i)->getName()) == pname)
+        if (playerpool.at(i)->getName() == pname)
         {
             return i;
         }
@@ -249,9 +249,9 @@ int PlayerPool::getPlayerNumByHouseNum(int House) const
         return -1;
     }
 
-    for (int i = 0; i < playerpool.size(); i++)
+    for (unsigned int i = 0; i < playerpool.size(); i++)
     {
-        if (string(playerpool[i]->getName()) == RA_house[House])
+        if (playerpool[i]->getName() == RA_house[House])
         {
             return i;
         }
@@ -272,7 +272,7 @@ int PlayerPool::getHouseNumByPlayerNum(unsigned int playerNumber) const
     }
 
     // Parse the vector
-    for (int i = 0; i < playerpool.size(); i++)
+    for (unsigned int i = 0; i < playerpool.size(); i++)
     {
         if (string(playerpool[playerNumber]->getName()) == RA_house[i])
         {
@@ -373,7 +373,7 @@ void PlayerPool::playerUndefeated(Player* pl)
 		}
 	}
 }
-
+*/
 /**
  * 
  *//*
