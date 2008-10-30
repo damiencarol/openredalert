@@ -3,7 +3,9 @@
 
 = Introduction =
 
-This page should help you setup visual studio for compilation of openredalert
+This page should help you setup visual studio for compilation of openredalert.
+please note that at this moment (revision 603) visual studio solution can compile but there will be runtime assertions, it seems mainly when using STLs priority_queue. 
+
 
 
 = Details =
