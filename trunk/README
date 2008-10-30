@@ -68,7 +68,7 @@ This section will outline how to successfully compile OpenRedAlert.
 5.2. Compiling with GCC
 =======================
 
-  The only things to do is to get the last version of source at :
+  The only thing to do is to get the latest version of source at :
 
   $> svn checkout http://openredalert.googlecode.com/svn/trunk/ openredalert
 
@@ -91,7 +91,7 @@ This section will outline how to successfully compile OpenRedAlert.
 6. Data Files
 -------------------------------------------------------------------------------
 
-  Only two files are needed for red alert:
+  Only two files are needed for Red Alert:
     * redalert.mix
     * main.mix
 
@@ -104,7 +104,7 @@ This section will outline how to successfully compile OpenRedAlert.
 6.1. Red Alert Demo
 ===================
 
-  The demo version work !!!
+  The demo version works !!!
 
   The demo version can be downloaded from here:
   ftp://ftp.westwood.com/pub/redalert/previews/demo/ra95demo.zip
@@ -117,8 +117,8 @@ This section will outline how to successfully compile OpenRedAlert.
 6.2. Electronic Arts - Free 2008 version
 =======================================
 
-  When RedAlert 3 was launched, EA provide download of original game (2 iso CD) for free
-  It's only englsih version, but it's the original archives.
+  When RedAlert 3 was launched, EA provided the original game (2 iso CD) to download for free.
+  It's only available in an english version, but it contains the original archives.
 
   You can get it at :
   http://www.ea.com/redalert/news-detail.jsp?id=62
