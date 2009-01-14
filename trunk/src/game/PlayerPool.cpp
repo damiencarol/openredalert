@@ -59,6 +59,16 @@ PlayerPool::PlayerPool()
     playerpool.push_back(new Player("GoodGuy"));
     playerpool.push_back(new Player("Neutral"));
     playerpool.push_back(new Player("Special"));
+    
+    // Create players for scirmish
+    playerpool.push_back(new Player("Multi1"));
+    playerpool.push_back(new Player("Multi2"));
+    playerpool.push_back(new Player("Multi3"));
+    playerpool.push_back(new Player("Multi4"));
+    playerpool.push_back(new Player("Multi5"));
+    playerpool.push_back(new Player("Multi6"));
+    playerpool.push_back(new Player("Multi7"));
+    playerpool.push_back(new Player("Multi8"));    
 }
 
 /**
@@ -231,6 +241,8 @@ int PlayerPool::getPlayerNum(const string& pname)
     playerpool.push_back(new Player(pname.c_str(), mapini));
     playerpool[playerpool.size() - 1]->setPlayerNum(playerpool.size() - 1);
     return playerpool.size() - 1;*/
+    
+    return -1;
 }
 
 char RA_house[20][10] =
