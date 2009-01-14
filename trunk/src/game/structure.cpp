@@ -115,10 +115,11 @@ Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
 
 		if (p::ccmap->isBuildableAt(this->getOwner(), temppos))
 		{
+            vector<string> depWith = this->type->getDeployWith();
 			// Health = 256 --> max
-			p::uspool->createUnit(this->type->getDeployWith()[j], // "HARV"
+			p::uspool->createUnit(depWith[j].c_str(), // "HARV"
 					temppos, 0, owner, 256, 0, 0, "None");
-		}
+        }
 
 		// If the current structure is a PROC and we are placing a extra harvester
 		if ((this->type->getDeployWith()[j] == "HARV") && (type->getTName() == "PROC"))
@@ -129,8 +130,6 @@ Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
 				p::uspool->getUnitAt(temppos, 0)->SetBaseRefinery(this);
 			}
 		}
-
-
 	}
 
 	retry_sell = false;

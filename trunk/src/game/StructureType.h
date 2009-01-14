@@ -53,9 +53,9 @@ public:
 
 	virtual const string getTName() const;
 
-	vector < char *> getDeployWith() const;
+	vector<string> getDeployWith() const;
 
-	vector < char *> getOwners() const;
+	vector<string> getOwners() const;
 
 	Uint8 getNumLayers() const;
 
@@ -141,8 +141,8 @@ private:
 	Uint8 buildlevel;
 	Uint8 * blocked;
 
-	vector<char*> owners;
-	vector<char*> deploywith;
+	vector<string> owners;
+	vector<string> deploywith;
 	PowerInfo powerinfo;
 
 	bool is_wall;

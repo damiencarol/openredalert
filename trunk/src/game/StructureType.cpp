@@ -57,11 +57,11 @@ StructureType::StructureType(const string& typeName, INIFile* structini, INIFile
 	SHPImage *makeimage;
 	Uint32 i = 0;
 	char imagename[8];
-	char* tmpCharges;
-	char* tmpWaterBound;
+	//char* tmpCharges;
+	//char* tmpWaterBound;
 	char blocktest[128];
 	Uint32 size;
-	char* miscnames;
+	//char* miscnames;
 	
 
 	// Load the rules.ini file
@@ -103,19 +103,19 @@ StructureType::StructureType(const string& typeName, INIFile* structini, INIFile
 	string tmp = structini->readString(tname, "deploywith", "");
 	if (tmp.size() > 0)
 	{
-            deploywith = splitList(tmp.c_str(), ',');
+        Split(deploywith, tmp, ',');
 	}
 
 	// Get the owners
-	//owners = structini->splitList(tname,"owners",',');
-	tmp = structini->readString(tname, "owners", "");
-	owners = splitList(tmp.c_str(), ',');
-        
-        // Custom warning
+	string ownersString = structini->readString(tname, "owners", "");
+    // Split the List of owners
+	Split(owners, ownersString, ',');        
+    // Custom warning
 	if (owners.empty())
 	{
 		logger->warning("%s has no owners\n", tname.c_str());
 	}
+    
 
 #if 0
 	// DEBUG
@@ -438,12 +438,12 @@ const string StructureType::getTName() const
 	return tname;
 }
 
-vector < char *> StructureType::getDeployWith() const
+vector<string> StructureType::getDeployWith() const
 {
 	return deploywith;
 }
 
-vector < char *> StructureType::getOwners() const
+vector<string> StructureType::getOwners() const
 {
 	return owners;
 }

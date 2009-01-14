@@ -2015,12 +2015,13 @@ vector<string> UnitAndStructurePool::getBuildableUnits(Player* pl)
             if (ovalid) {
                 int playerSide;
                 int curside;
-                char* tmpname;
+                //char* tmpname;
                 playerSide = pl->getSide();
                 for (y=0; y<utype->getOwners().size(); ++y) 
                 {
-                    tmpname = utype->getOwners()[y];
-                    string sider = string(tmpname);
+                    //tmpname = utype->getOwners()[y];
+                    //string sider = string(tmpname);
+                    string sider = utype->getOwners()[y];
 
                     // note: should avoid hardcoded side names
                     if (sider == "gdi" || sider == "GDI") {

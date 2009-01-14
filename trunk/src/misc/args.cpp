@@ -84,7 +84,6 @@ const ConfigType& getConfig()
 extern bool parse(int argc, char **argv)
 {
     int i;
-    char *tmp;
     bool fullscreen = false;
     INIFile *freecnc_ini;
     INIFile *internal_ini;
