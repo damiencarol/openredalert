@@ -52,7 +52,7 @@ public:
 	Uint16 *getSHPTNum();
 	virtual const string getTName() const;
 
-	vector<char*> getOwners() const;
+	virtual vector<string> getOwners() const;
 	Uint8 getOffset() const;
 
 	Uint8 getROT() const;
@@ -113,7 +113,7 @@ private:
 	Uint8 unittype;
 	Sint8 movemod;
 
-	vector<char*> owners;
+	vector<string> owners;
 
 	/** Talkback related members*/
 	Talkback* talkback;

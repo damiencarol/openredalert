@@ -73,7 +73,7 @@ public:
 	virtual const string getTName() const = 0;
 
 	/** Returns the names of the sides that can build this */
-	virtual vector<char *> getOwners() const = 0;
+	virtual vector<string> getOwners() const = 0;
 
 	/** Returns whether the type is valid or not (loaded fully) */
 	virtual bool isValid() const;

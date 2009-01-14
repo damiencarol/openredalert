@@ -27,8 +27,7 @@ using std::string;
 
 UnitOrStructureType::UnitOrStructureType() :
 	ptype(0),
-	valid(false),
-	techLevel(-1)
+	valid(false)
 {
 }
 

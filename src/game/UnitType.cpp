@@ -146,7 +146,7 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
 	techLevel = unitini->readInt(tname, "TechLevel", -1);
 
 	tmp = unitini->readString(tname, "owners");
-	owners = splitList(tmp.c_str(), ',');
+	Split(owners, tmp, ',');
 
 	if (unittype == 1)
 	{
@@ -409,7 +409,7 @@ const string UnitType::getTName() const
 	return tname;
 }
 
-vector<char*> UnitType::getOwners() const
+vector<string> UnitType::getOwners() const
 {
 	return owners;
 }
