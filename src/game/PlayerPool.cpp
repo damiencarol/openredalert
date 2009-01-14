@@ -226,8 +226,12 @@ void PlayerPool::setLPlayer(const string& pname)
 	
 }*/
 
+/**
+ * Return the number of the player with this name
+ */
 int PlayerPool::getPlayerNum(const string& pname)
 {
+    // Parse each players to found it
     for (unsigned int i = 0; i < playerpool.size(); i++)
     {
         if (playerpool.at(i)->getName() == pname)
@@ -252,22 +256,27 @@ char RA_house[20][10] =
 };
 
 /**
+ * Decode player number coded in ini files
+ * 
+ * @param house number of the house
  */
-int PlayerPool::getPlayerNumByHouseNum(int House) const
+int PlayerPool::getPlayerNumByHouseNum(int house) const
 {
     // Check if num <19 (because their are only 20 houses)
-    if (House > 19 || House < 0)
+    if (house > 19 || house < 0)
     {
         return -1;
     }
 
     for (unsigned int i = 0; i < playerpool.size(); i++)
     {
-        if (playerpool[i]->getName() == RA_house[House])
+        if (playerpool[i]->getName() == RA_house[house])
         {
             return i;
         }
     }
+    
+    // No player found
     return -1;
 }
 
