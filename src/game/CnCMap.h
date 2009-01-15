@@ -102,8 +102,10 @@ struct ScrollBookmark {
 };
 
 struct ScrollData {
-    Uint16 maxx, maxy;
-    Uint16 curx, cury;
+    Uint16 maxx;
+    Uint16 maxy;
+    Uint16 curx;
+    Uint16 cury;
     Uint16 maxxtileoffs;
     Uint16 maxytileoffs;
     Uint16 curxtileoffs;
