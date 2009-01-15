@@ -35,7 +35,6 @@
 namespace p {
 	extern ActionEventQueue * aequeue;
 	extern CnCMap* ccmap;
-	extern CnCMap* ccmap;
 	extern UnitAndStructurePool* uspool;
 }
 extern Logger * logger;
