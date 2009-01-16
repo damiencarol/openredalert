@@ -1116,22 +1116,25 @@ Uint32 CnCMap::setTiberium(Uint32 pos, Uint8 value)
  */
 void CnCMap::setTriggerByName(string TriggerName, RA_Tiggers *Trig)
 {
-	for (unsigned int i = 0; i < RaTriggers.size(); i++)
-	{
-		if (TriggerName.size() != RaTriggers[i].name.size())
-			continue;
-		unsigned int j;
-		for (j = 0; j < TriggerName.size(); j++)
-		{
-			if (toupper(TriggerName[j]) != toupper(RaTriggers[i].name[j]))
-				break;
-		}
-		//printf ("String1 = %s, String2 = %s, j = %i, size1 = %i, size2 = %i\n", TriggerName.c_str(), RaTriggers[i].name.c_str(), j, TriggerName.size(), RaTriggers[i].name.size());
-		if (j == TriggerName.size())
-		{
-			memcpy(&RaTriggers[i], Trig, sizeof(RA_Tiggers));
-		}
-	}
+    // Parse all triggers
+    for (unsigned int i = 0; i < RaTriggers.size(); i++)
+    {
+        if (TriggerName.size() != RaTriggers[i]->name.size())
+        {
+            continue;
+        }
+        unsigned int j;
+        for (j = 0; j < TriggerName.size(); j++)
+        {
+            if (toupper(TriggerName[j]) != toupper(RaTriggers[i]->name[j]))
+                break;
+        }
+        //printf ("String1 = %s, String2 = %s, j = %i, size1 = %i, size2 = %i\n", TriggerName.c_str(), RaTriggers[i].name.c_str(), j, TriggerName.size(), RaTriggers[i].name.size());
+        if (j == TriggerName.size())
+        {
+            memcpy(&RaTriggers[i], Trig, sizeof (RA_Tiggers));
+        }
+    }
 }
 
 /**
@@ -1217,82 +1220,58 @@ void CnCMap::decreaseResource(Uint32 pos, Uint8 amount)
 }
 
 /**
+ * Return the Trigger by this number
  *
+ * @param triggerNumber Number of the trigger
  */
-RA_Tiggers* CnCMap::getTriggerByNumb(int TriggerNumb)
-{
-	int size = RaTriggers.size();
+RA_Tiggers* CnCMap::getTriggerByNumb(int triggerNumber)
+{   
+    // If number = -1
+    if (triggerNumber == -1)
+    {
+        // Return NULL
+        return 0;
+    }
+    
+    // If the number is out of array size
+    if (triggerNumber >= RaTriggers.size() || triggerNumber < -1)
+    {
+        // Return NULL
+        return 0;
+    }
 
-	// If number = -1
-	if (TriggerNumb == -1)
-	{
-		// Return a blank trigger
-		RA_Tiggers* toto = new RA_Tiggers();
-		toto->name = "None";
-		return toto;
-	}
-
-	if (TriggerNumb >= size ||	TriggerNumb < -1) {
-		return 0;
-	}
-
-	// Return the right trigger
-	return &RaTriggers[TriggerNumb];
+    // Return the right trigger
+    return RaTriggers[triggerNumber];
 }
 
 /**
  * Get a trigger by this name
+ *
+ * @param TriggerName Name of the trigger wanted
  */
 RA_Tiggers* CnCMap::getTriggerByName(string TriggerName)
 {
-	vector<RA_Tiggers>::iterator i = RaTriggers.begin();
-	int index = 0;
-
-	string name = TriggerName;
-
-	// Upper the string
+    // Upper the string
+    string name = TriggerName;
     transform(name.begin(), name.end(), name.begin(), toupper);
 
-
-	while (i != RaTriggers.end())
-	{
-		string UpTrig = i->name;
-		// Upper the string
-		transform(UpTrig.begin(), UpTrig.end(), UpTrig.begin(), toupper);
-
-		if (UpTrig == name)
-		{
-			printf("%s = %s \n", UpTrig.c_str(), name.c_str());
-			return &RaTriggers[index];
-		}
-		i++;
-		index++;
+    // Parse all triggers to found one
+    for (int j = 0; j < RaTriggers.size(); j++)
+    {
+        // Upper the string of the trigger
+        string UpTrig = RaTriggers[j]->name;
+        transform(UpTrig.begin(), UpTrig.end(), UpTrig.begin(), toupper);
+        
+        // Compare both
+        if (UpTrig == name)
+        {
+            // We found it ! :)
+            //printf("%s = %s \n", UpTrig.c_str(), name.c_str());
+            return RaTriggers[j];
 	}
-
-	return 0;
-	/*
-	unsigned int j;
-	for (unsigned int i = 0; i < RaTriggers.size(); ++i)
-	{
-		printf ("%s line %i: String1 = %s, String2 = %s, j = %i, size1 = %i, size2 = %i\n",  __FILE__, __LINE__, TriggerName.c_str(), RaTriggers[i].name.c_str(), j, TriggerName.size(), RaTriggers[i].name.size());
-
-		if (TriggerName.size() != RaTriggers[i].name.size())
-			continue;
-
-		for (j = 0; j < TriggerName.size(); ++j)
-		{
-			printf ("%s line %i: TriggerName.size() = %i, RaTriggers[i].name.size() = %i, j = %i\n", __FILE__, __LINE__, TriggerName.size(), RaTriggers[i].name.size(), j);
-			if (toupper(TriggerName[j]) != toupper(RaTriggers[i].name[j]))
-				break;
-		}
-		printf ("%s line %i: String1 = %s, String2 = %s, j = %i, size1 = %i, size2 = %i\n",  __FILE__, __LINE__, TriggerName.c_str(), RaTriggers[i].name.c_str(), j, TriggerName.size(), RaTriggers[i].name.size());
-		if (j == TriggerName.size())
-		{
-			//trigger = &RaTriggers[i];
-			return &RaTriggers[i];
-		}
-	}
-	return 0;*/
+    }
+    // Nothing found, return NULL
+    return 0;
 }
 
 RA_Teamtype *CnCMap::getTeamtypeByNumb(unsigned int TeamNumb)
@@ -2396,72 +2375,72 @@ void CnCMap::advancedSections(INIFile *inifile)
 		{}
 	}
 
-	// triggers
-	RA_Tiggers triggers;
-	INIFile* messageTable = new INIFile("tutorial.ini");
-	try
-	{
-		for(int keynum = 0;;keynum++ )
-		{
-			if (maptype == GAME_RA)
-			{
-				INISection::const_iterator key = inifile->readKeyValue("TRIGS", keynum);
-				// is the char which separate terraintype from action.
-				triggers.name = key->first;
-				transform(triggers.name.begin(),triggers.name.end(), triggers.name.begin(), toupper);
-				// Split the line
-				vector<char*> triggsData = splitList(key->second, ',');
-				// check that the line had 18 param
-				if (triggsData.size()!=18) {
-					logger->warning("error in reading trigger [%s]\n", key->first.c_str());
-				}
-				else
-				{
-					sscanf(triggsData[0], "%d", &triggers.repeatable);
-					sscanf(triggsData[1], "%d", &triggers.country);
-					sscanf(triggsData[2], "%d", &triggers.activate);
-					sscanf(triggsData[3], "%d", &triggers.actions);
-					sscanf(triggsData[4], "%d", &triggers.trigger1.event);
-					sscanf(triggsData[5], "%d", &triggers.trigger1.param1);
-					sscanf(triggsData[6], "%d", &triggers.trigger1.param2);
-					sscanf(triggsData[7], "%d", &triggers.trigger2.event);
-					sscanf(triggsData[8], "%d", &triggers.trigger2.param1);
-					sscanf(triggsData[9], "%d", &triggers.trigger2.param2);
-					// Build Action 1
-					int actionType = 0;
-					sscanf(triggsData[10], "%d", &actionType); // get the type
-					int param1 = 0;
-					sscanf(triggsData[11], "%d", &param1);
-					int param2 = 0;
-					sscanf(triggsData[12], "%d", &param2);
-					int param3 = 0;
-					sscanf(triggsData[13], "%d", &param3);
-					switch (actionType)
-					{
-					case TRIGGER_ACTION_NO_ACTION:
-						triggers.action1 = new NoActionTriggerAction();
-						break;
-					case TRIGGER_ACTION_TEXT:
-					{
-						// Get string with the num in data
-						string messageToDraw = string(messageTable->readString("Tutorial", triggsData[13]));
-						printf("Txt = %s\n", messageToDraw.c_str());
-						// Build the TriggerAction
-						triggers.action1 = new TextTriggerAction(messageToDraw, pc::msg);
-					}
-						break;
-					case TRIGGER_ACTION_GLOBAL_SET:
-						// Create an action (param 3 is the number of the global)
-						triggers.action1 = new GlobalSetTriggerAction(param3);
-						break;
-					case TRIGGER_ACTION_GLOBAL_CLEAR:
-						// Create an action (param 3 is the number of the global)
-						triggers.action1 = new GlobalClearTriggerAction(param3);
-						break;
-					default:
-						triggers.action1 = new RawTriggerAction(actionType, param1, param2, param3);
-						break;
-					}
+    // Parse and Create triggers
+    INIFile* messageTable = new INIFile("tutorial.ini");
+    try
+    {
+        for (int keynum = 0;; keynum++)
+        {
+            if (maptype == GAME_RA)
+            {
+                INISection::const_iterator key = inifile->readKeyValue("TRIGS", keynum);
+                // is the char which separate terraintype from action.
+                RA_Tiggers triggers(key->first);
+                transform(triggers.name.begin(), triggers.name.end(), triggers.name.begin(), toupper);
+                // Split the line
+                vector<char*> triggsData = splitList(key->second, ',');
+                // check that the line had 18 param
+                if (triggsData.size() != 18)
+                {
+                    logger->warning("error in reading trigger [%s]\n", key->first.c_str());
+                }
+                else
+                {
+                    sscanf(triggsData[0], "%d", &triggers.repeatable);
+                    sscanf(triggsData[1], "%d", &triggers.country);
+                    sscanf(triggsData[2], "%d", &triggers.activate);
+                    sscanf(triggsData[3], "%d", &triggers.actions);
+                    sscanf(triggsData[4], "%d", &triggers.trigger1.event);
+                    sscanf(triggsData[5], "%d", &triggers.trigger1.param1);
+                    sscanf(triggsData[6], "%d", &triggers.trigger1.param2);
+                    sscanf(triggsData[7], "%d", &triggers.trigger2.event);
+                    sscanf(triggsData[8], "%d", &triggers.trigger2.param1);
+                    sscanf(triggsData[9], "%d", &triggers.trigger2.param2);
+                    // Build Action 1
+                    int actionType = 0;
+                    sscanf(triggsData[10], "%d", &actionType); // get the type
+                    int param1 = 0;
+                    sscanf(triggsData[11], "%d", &param1);
+                    int param2 = 0;
+                    sscanf(triggsData[12], "%d", &param2);
+                    int param3 = 0;
+                    sscanf(triggsData[13], "%d", &param3);
+                    switch (actionType)
+                    {
+                    case TRIGGER_ACTION_NO_ACTION:
+                        triggers.action1 = new NoActionTriggerAction();
+                        break;
+                    case TRIGGER_ACTION_TEXT:
+                    {
+                        // Get string with the num in data
+                        string messageToDraw = string(messageTable->readString("Tutorial", triggsData[13]));
+                        printf("Txt = %s\n", messageToDraw.c_str());
+                        // Build the TriggerAction
+                        triggers.action1 = new TextTriggerAction(messageToDraw, pc::msg);
+                    }
+                        break;
+                    case TRIGGER_ACTION_GLOBAL_SET:
+                        // Create an action (param 3 is the number of the global)
+                        triggers.action1 = new GlobalSetTriggerAction(param3);
+                        break;
+                    case TRIGGER_ACTION_GLOBAL_CLEAR:
+                        // Create an action (param 3 is the number of the global)
+                        triggers.action1 = new GlobalClearTriggerAction(param3);
+                        break;
+                    default:
+                        triggers.action1 = new RawTriggerAction(actionType, param1, param2, param3);
+                        break;
+                    }
 
 					// Build Action 2
 					int action2Type = 0;
@@ -2505,7 +2484,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 
 					// Set to zero (=never executed)
 					triggers.hasexecuted = false;
-					RaTriggers.push_back(triggers);
+					RaTriggers.push_back(&triggers);
 				}
 			}
 			else if (maptype == GAME_TD)
