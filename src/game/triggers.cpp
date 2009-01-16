@@ -983,7 +983,7 @@ void ExecuteTriggerAction(TriggerAction* action)
 /**
  * Print a Trigger
  */
-void PrintTrigger(RA_Tiggers Trigger)
+void PrintTrigger(const RA_Tiggers& Trigger)
 {
 	printf ("%s line %i: Read trigger:\n", __FILE__, __LINE__);
 	printf ("name = \t\t\t%s\n", Trigger.name.c_str());	

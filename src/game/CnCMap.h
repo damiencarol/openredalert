@@ -367,7 +367,7 @@ private:
 
     vector<Uint32> overlaymatrix;
 
-    vector<RA_Tiggers> RaTriggers;
+    vector<RA_Tiggers*> RaTriggers;
 
     vector<RA_Teamtype> RaTeamtypes;
 
