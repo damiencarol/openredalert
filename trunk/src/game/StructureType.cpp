@@ -397,6 +397,17 @@ StructureType::StructureType(const string& typeName, INIFile* structini, INIFile
 	delete rulesIni;
 }
 
+/**
+ * Copy constructor
+ */
+StructureType::StructureType(const StructureType& orig)
+{
+    // Do Nothing
+}
+
+/**
+ * Destructor
+ */
 StructureType::~StructureType()
 {
 	/*Uint16 i;

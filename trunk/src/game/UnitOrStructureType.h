@@ -122,9 +122,14 @@ protected:
 	/** Technology level required to build this [-1 means can't build] (default = -1) */
 	int techLevel;
 	vector<string> prereqs;
-	Uint8 ptype;
+
 	bool valid;
 	string tname;
+
+private:
+    UnitOrStructureType(const UnitOrStructureType& orig);
+
+    Uint8 ptype;
 };
 
 #endif //UNITORSTRUCTURETYPE_H

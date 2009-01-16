@@ -489,7 +489,8 @@ vector<UnitType*> UnitType::getSpecificTypeAllow() const
 
 Uint8 UnitType::getPQueue() const
 {
-	return ptype;
+    // Return the production type (infantry/ship/vehicule/...)
+    return getPType();
 }
 
 bool UnitType::isC4() const

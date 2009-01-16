@@ -42,10 +42,10 @@ using std::vector;
 class StructureType : public UnitOrStructureType
 {
 public:
-	/** Constructor */
-	StructureType(const string& typeName, INIFile* structini, INIFile* artini,
-			const string& thext);
-	~StructureType();
+    /** Constructor */
+    StructureType(const string& typeName, INIFile* structini, INIFile* artini,
+                  const string& thext);
+    ~StructureType();
 
 	Uint16 * getSHPNums();
 
@@ -127,6 +127,8 @@ public:
 	Uint32 getAdjacent() const;
 
 private:
+    StructureType(const StructureType& orig);
+
 	/** Index in the ImagePool of the first MAKE image */
 	Uint16 makeimg;
 	Uint16 blckoff;
