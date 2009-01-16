@@ -249,8 +249,9 @@ using std::string;
 class RA_Tiggers
 {
 public:
-    string         		name;
-    int                 repeatable;
+    /** Name of this trigger **/
+    string name;
+    int repeatable;
     /** which country trigger applies to */
     int                 country;
     /**
