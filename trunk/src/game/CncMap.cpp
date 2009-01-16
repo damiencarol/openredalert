@@ -53,6 +53,7 @@
 #include "PlayerPool.h"
 #include "triggers.h"
 #include "AiCommand.h"
+#include "Trigger.hpp"
 
 using std::vector;
 using std::string;
@@ -144,6 +145,9 @@ CnCMap::CnCMap()
 	
 	// Build the Rich PlayerPool
 	this->playerPool = new PlayerPool();
+
+        // Build the trigger pool
+        this->triggerPool = new vector<Trigger*>();
 }
 
 /**
@@ -194,10 +198,9 @@ void CnCMap::Init(gametypes gameNumber, Uint8 gameMode)
 	translate_64 = false;
 	//}
 	
-	
-	// Init the playerpool
-	this->playerPool->Init(gameMode);
-	
+
+    // Init the playerpool
+    this->playerPool->Init(gameMode);
 }
 
 /**
@@ -205,12 +208,13 @@ void CnCMap::Init(gametypes gameNumber, Uint8 gameMode)
  */
 CnCMap::~CnCMap()
 {
-	// Free player pool
-	delete this->playerPool;
-	
-	
-	
-	
+    // Free player pool
+    delete this->playerPool;
+
+    // Release Trigger Pool
+    delete this->triggerPool;
+
+
 	
 	
 	
@@ -3376,4 +3380,12 @@ void CnCMap::loadTeamTypes(INIFile* fileIni)
 PlayerPool* CnCMap::getPlayerPool() const
 {
 	return this->playerPool;
+}
+
+/**
+ * @return the Trigger Pool
+ */
+vector<OpenRedAlert::Game::Trigger*>* CnCMap::getTriggerPool()
+{
+    return this->triggerPool;
 }

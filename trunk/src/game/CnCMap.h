@@ -31,6 +31,7 @@
 #include "misc/INIFile.h"
 #include "misc/gametypes.h"
 #include "video/SHPImage.h"
+#include "Trigger.hpp"
 
 class CellTrigger;
 class LoadingScreen;
@@ -38,6 +39,15 @@ class CnCMap;
 class MissionData;
 class TemplateImage;
 class PlayerPool;
+
+using OpenRedAlert::Game::Trigger;
+namespace OpenRedAlert
+{
+namespace Game
+{
+class Trigger;
+}
+}
 
 using std::string;
 
@@ -193,6 +203,9 @@ public:
 
     RA_Tiggers* getTriggerByNumb(int TriggerNumb);
 
+    /** Return the trigger pool */
+    vector<Trigger*>* getTriggerPool();
+
     /**
      * In red alert when type is bigger the 4 it is normal ore,
      * when type is smaller or equal to 4 the resource is christal :)
@@ -274,6 +287,8 @@ public:
     PlayerPool* getPlayerPool() const;
     
 private:
+    vector<Trigger*>* triggerPool;
+    
     enum {
     	HAS_OVERLAY=0x100,
     	HAS_TERRAIN=0x200

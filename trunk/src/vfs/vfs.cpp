@@ -48,6 +48,7 @@ void VFSUtils::VFS_PreInit(const char* binpath)
 {
     externals = new ExternalFiles(binpath);
     externals->loadArchive("data/settings/");
+    externals->loadArchive("data/maps/");
 }
 
 /**
@@ -76,25 +77,25 @@ void VFSUtils::VFS_Init(const string& binpath)
         return;
     }
     //for (Uint32 pathnum = 1;; ++pathnum)
-    int pathnum =1;
+    int pathnum = 1;
     {
-		INISection::const_iterator key;
-		try
-		{
-			key = filesini->readIndexedKeyValue("GENERAL", pathnum, "PATH");
-		} catch (...)
-		{
-			//logger->error("Unenable to read [GENERAL]-PATH\n");
-			//break;
-		}
-		string defpath = key->second;
-		if (defpath[defpath.length() - 1] != '/' && defpath[defpath.length()
-				- 1] != '\\')
-		{
-			defpath += "/";
-		}
-		externals->loadArchive(defpath.c_str());
-	}
+        INISection::const_iterator key;
+        try
+        {
+            key = filesini->readIndexedKeyValue("GENERAL", pathnum, "PATH");
+        }
+        catch (...)
+        {
+            //logger->error("Unenable to read [GENERAL]-PATH\n");
+            //break;
+        }
+        string defpath = key->second;
+        if (defpath[defpath.length() - 1] != '/' && defpath[defpath.length() - 1] != '\\')
+        {
+            defpath += "/";
+        }
+        externals->loadArchive(defpath.c_str());
+    }
 
     // Create Mix file loader
     mixfiles = new MIXFiles();

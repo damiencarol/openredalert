@@ -37,7 +37,9 @@
 #include "video/WSAMovie.h"
 #include "video/WSAError.h"
 
-#define VERSION "439"
+#include "game/MultiPlayerMaps.h"
+
+#define VERSION "6xx"
 
 using std::abort;
 using std::map;
@@ -103,6 +105,14 @@ int main(int argc, char** argv)
     VFSUtils::VFS_LoadGame(pc::Config.gamenum);
     // Log success of loading RA gmae
     logger->note(".MIX archives loading ok\n");
+
+
+    // Test loading multi-player map
+    //logger->note("Test loading multi-player map\n");
+    //MultiPlayerMaps* toto = new MultiPlayerMaps();
+    //
+    //return 0;
+
 
     // Load the start
     logger->note("Please wait, OpenRedAlert %s is starting\n", VERSION);
