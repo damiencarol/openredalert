@@ -23,6 +23,15 @@
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "misc/config.h"
+#include "misc\INIFile.h"
+
+#ifdef __MSVC__
+#include <windows.h>
+#else
+#if __GNUC__
+#include <dirent.h>
+#endif
+#endif
 
 using std::string;
 
@@ -31,6 +40,13 @@ extern Logger * logger;
 /**
  */
 MultiPlayerMaps::MultiPlayerMaps()
+{
+    this->readMapData();
+}
+
+/**
+ */
+MultiPlayerMaps::MultiPlayerMaps(const MultiPlayerMaps& orig)
 {
     this->readMapData();
 }
@@ -67,6 +83,9 @@ void MultiPlayerMaps::readMapData()
 	string	tmpString;
 	Uint32	pos;
 	Uint32	pos1;
+
+    // Try to load file in /data/maps/
+    loadMapsFolder();
 
 	// Test the ABANDON1.mpr file
 	MapFile = VFSUtils::VFS_Open("ABANDON1.INI");
@@ -130,4 +149,103 @@ void MultiPlayerMaps::readMapData()
 			}
 		}
 	}
+}
+
+void MultiPlayerMaps::loadMapsFolder()
+{
+
+#ifdef __MSVC__
+
+    string path = ".\\data\\maps\\";
+
+    string searchPattern = "*.mpr";
+    string fullSearchPath = path + searchPattern;
+
+    WIN32_FIND_DATA FindData;
+    HANDLE hFind;
+
+    hFind = FindFirstFile(fullSearchPath.c_str(), &FindData);
+    if( hFind == INVALID_HANDLE_VALUE )
+    {
+        //cout << "Error searching directory\n";
+        //return -1;
+    }
+
+    do
+    {
+        string filePath = path + FindData.cFileName;
+        // Read the map file
+        INIFile* customMultiPlayerMap  = new INIFile(filePath.c_str());
+        if (customMultiPlayerMap != 0)
+        {
+            string name = string(FindData.cFileName);
+            string rawName = name.substr(0, name.length() - 4);
+            logger->debug("Load %s map...\n", rawName.c_str());
+
+            // Get the name of the multi-player map
+            string theName = customMultiPlayerMap->readString("Basic", "Name");
+
+            // Logg it
+            logger->note("Multi-Player map file %s was loaded successfully\n", theName.c_str());
+
+            MapNames.push_back(rawName);
+            MapDescriptions.push_back(theName);
+        }
+
+        //ifstream in( filePath.c_str() );
+        //if( in )
+        //{
+            // do stuff with the file here
+        //}
+        //else
+        //{
+        //    cout << "Problem opening file " << FindData.cFileName << "\n";
+        //}
+    }
+    while( FindNextFile(hFind, &FindData) > 0 );
+
+    //if( GetLastError() != ERROR_NO_MORE_FILES )
+    //{
+    //    cout << "Something went wrong during searching\n";
+    //}
+#else
+#if __GNUC__
+    DIR *dpdf;
+    struct dirent *epdf;
+    dpdf = opendir("./data/maps/");
+    if (dpdf != 0)
+    {
+        while (epdf = readdir(dpdf))
+        {
+
+            // Check that extenstion is ".MPR" or ".mpr"
+            string fileName = string(epdf->d_name);
+            // Check that the file is "????"
+            if (fileName.length() > 4)
+            {
+                string ext = fileName.substr(fileName.length()-4, 4);
+                string rawName = fileName.substr(0, fileName.length() - 4);
+
+
+                if (ext == ".MPR" || ext == ".mpr")
+                {
+                //printf("Filename: %s\n",rawName.c_str());
+               // printf("ext: %s\n", ext.c_str());
+
+                    // Read the map file
+                    INIFile* customMultiPlayerMap = new INIFile(rawName + ext);
+                    if (customMultiPlayerMap != 0)
+                    {
+                        // Logg it
+                        logger->note("Multi-Player map file %s.MPR \"%s\" was loaded successfully\n", rawName.c_str(), string(customMultiPlayerMap->readString("Basic", "Name", "CUSTOM MAP" + MapDescriptions.size())).c_str());
+
+                        MapNames.push_back(rawName);
+                        MapDescriptions.push_back(customMultiPlayerMap->readString("Basic", "Name", "CUSTOM MAP" + MapDescriptions.size()));
+                    }
+                }
+            }
+        }
+    }
+#endif
+#endif
 }

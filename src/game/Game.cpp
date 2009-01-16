@@ -52,6 +52,7 @@
 #include "video/VideoError.h"
 #include "game/UnitAndStructurePool.h"
 #include "ui/MapAnimationMenu.hpp"
+#include "TriggerManager.hpp"
 
 using std::string;
 using std::runtime_error;
@@ -59,6 +60,7 @@ using VQA::VQAMovie;
 
 using Sound::SoundEngine;
 using OpenRedAlert::Sound::SoundError;
+using OpenRedAlert::Game::TriggerManager;
 using UI::MapAnimationMenu;
 
 extern Logger * logger;
@@ -688,10 +690,10 @@ void Game::play()
 		//
 		// main gameloop
 		//
-		pc::ai = new Ai;
+		pc::ai = new Ai();
 		PauseMenu* lPauseMenu = new PauseMenu();
 		// Create the trigger manager
-		//TriggerManager* lTriggerManager = new TriggerManager();
+		TriggerManager lTriggerManager(p::ccmap);
 
 		while (!pc::input->shouldQuit() && !pc::quit)
 		{
@@ -720,14 +722,14 @@ void Game::play()
 			pc::ai->handle();
 
 			// Handle triggers
-			//lTriggerManager->h
+			lTriggerManager.handle();
 			// Handle AiCommand for mission
-			handleAiCommands();
-
+			//handleAiCommands();
 			// Handle timing triggers
-			HandleTiming();
+			//HandleTiming();
+                        
 
-			if (gamemode == 2)
+			if (gamemode == GAME_MODE_MULTI_PLAYER)
 			{
 				// Synchronise events with server
 			}
@@ -796,7 +798,7 @@ void Game::play()
 	//delete missions;
 }
 
-void Game::HandleTiming()
+/*void Game::HandleTiming()
 {
 	Uint32 uptime;
 	// get elapsed time
@@ -808,7 +810,7 @@ void Game::HandleTiming()
 		HandleGlobalTrigger(TRIGGER_EVENT_TIME_ELAPSED, uptime/6);
 		OldUptime = uptime;
 	}
-}
+}*/
 
 /**
  * Prints stats of a game session
