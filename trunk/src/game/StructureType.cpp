@@ -79,12 +79,12 @@ StructureType::StructureType(const string& typeName, INIFile* structini, INIFile
 	//name = structini->readString(typeName, "name");
 
 	this->setName(typeName);
-
-        if (typeName == "WEAP")
-        {
-            int a = 0;
-            a+=1;
-        }
+    
+    // DEBUG
+    if (typeName == "WEAP")
+    {
+        int a = 0;
+    }
 
     {
         // Read prerequiste

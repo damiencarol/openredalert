@@ -1185,9 +1185,12 @@ Unit* Ai::EnemyUnitInRange (int MyPlayerNumb, Structure* MyStructure, int Attack
 	if (!MyStructure->canAttack())
 		return 0;
 
-	if (AttackRange == -1)
-		AttackRange = MyStructure->getType()->getWeapon(true)->getRange();
-
+	if (AttackRange == -1){
+        StructureType* theType = MyStructure->getType();
+        Weapon* theWeapon = theType->getWeapon(true);
+		AttackRange = theWeapon->getRange();
+    }
+    
 	for (int i = 0; i < this->NumbPlayers; i++)
 	{
 		// Don't defend against my own units

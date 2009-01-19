@@ -240,11 +240,10 @@ int PlayerPool::getPlayerNum(const string& pname)
         }
     }
 
-    /*
-    logger->error("%s line %i: Create new player: %s\n", __FILE__, __LINE__, pname.c_str());
-    playerpool.push_back(new Player(pname.c_str(), mapini));
-    playerpool[playerpool.size() - 1]->setPlayerNum(playerpool.size() - 1);
-    return playerpool.size() - 1;*/
+    //logger->error("%s line %i: Create new player: %s\n", __FILE__, __LINE__, pname.c_str());
+    //playerpool.push_back(new Player(pname.c_str(), mapini));
+    //playerpool[playerpool.size() - 1]->setPlayerNum(playerpool.size() - 1);
+    //return playerpool.size() - 1;
     
     return -1;
 }
