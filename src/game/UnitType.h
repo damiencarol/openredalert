@@ -50,7 +50,6 @@ public:
 	bool isInfantry() const;
 	Uint8 getType() const;
 	Uint16 *getSHPTNum();
-	virtual const string getTName() const;
 
 	virtual vector<string> getOwners() const;
 	Uint8 getOffset() const;

@@ -460,7 +460,7 @@ ConStatus Player::stopBuilding(UnitOrStructureType *type)
     if (0 == queue) 
     {
         logger->error("Didn't find build queue for \"%s\" (pqueue: %i)\n",
-                type->getTName().c_str(), type->getPQueue());
+                type->getName().c_str(), type->getPQueue());
         return BQ_EMPTY;
     }
     return queue->PauseCancel(type);
@@ -629,7 +629,7 @@ void Player::builtStruct(Structure* str)
     }
         
     // Update the number of radar
-    if (string(st->getTName()) == "DOME") 
+    if (string(st->getName()) == "DOME") 
     {
     	numberRadars++;
     };
@@ -690,7 +690,7 @@ void Player::lostStruct(Structure* str)
 	//}
     
     // Update number of radars
-    if (string(st->getTName()) == "DOME") {
+    if (st->getName() == "DOME") {
     	numberRadars--;
     }
     

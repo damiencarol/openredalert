@@ -537,7 +537,7 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
 
     Uint32 br = cellpos + p::ccmap->getWidth()*(type->getYsize()-1);
     if (cellpos > p::ccmap->getSize() || (br > p::ccmap->getSize() && 0)) {
-        logger->error("%s line %i: Attempted to create a \"%s\" at %i, outside map (%i)\n", __FILE__, __LINE__, type->getTName().c_str(), br, p::ccmap->getSize());
+        logger->error("%s line %i: Attempted to create a \"%s\" at %i, outside map (%i)\n", __FILE__, __LINE__, type->getName().c_str(), br, p::ccmap->getSize());
         return false;
     }
 
@@ -581,7 +581,7 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
                     if (getStructureAt(curpos+x) != 0) {
                         Uint16 tx, ty;
                         p::ccmap->translateFromPos(curpos+x, &tx, &ty);
-                        logger->error("\"%s\" already exists at (%i, %i) [%i]\n", getStructureAt(curpos+x)->getType()->getTName().c_str(), tx, ty, curpos+x);
+                        logger->error("\"%s\" already exists at (%i, %i) [%i]\n", getStructureAt(curpos+x)->getType()->getName().c_str(), tx, ty, curpos+x);
                         return false;
                     }
                     if (0 != (unitandstructmat[curpos+x].flags & US_IS_UNIT) || 0 != (unitandstructmat[curpos+x].flags & US_IS_AIRUNIT)) {
@@ -749,19 +749,19 @@ Unit* UnitAndStructurePool::createUnit(UnitType* type, Uint16 cellpos, Uint8 sub
 
     if (cellpos > (p::ccmap->getWidth() * p::ccmap->getHeight())) {
         logger->error("Attempted to create a %s at %i, outside map.\n",
-                type->getTName().c_str(), cellpos);
+                type->getName().c_str(), cellpos);
         return false;
     }
     if ((getStructureAt(cellpos) != 0) && ((unitandstructmat[cellpos].flags&(US_HIGH_COST)) == 0)) 
 	{
         logger->error("Cell %i already occupied by structure (%s).\n", cellpos,
-                getStructureAt(cellpos)->getType()->getTName().c_str());
+                getStructureAt(cellpos)->getType()->getName().c_str());
         return false;
     }
     if (getUnitAt(cellpos,subpos) != 0) {
     	// @todo appear next !!! (next subpos)
         logger->error("Cell/subpos already occupied by %s\n", getUnitAt(cellpos,
-                    subpos)->getType()->getTName().c_str());
+                    subpos)->getType()->getName().c_str());
         return false;
     }
 
@@ -876,7 +876,7 @@ bool UnitAndStructurePool::spawnUnit(UnitType* type, Uint8 owner)
     if (0 != tmpstruct) {
         pos = tmpstruct->getFreePos(&subpos, type->isInfantry());
     } else {
-        logger->error("No primary building set for %s\n", type->getTName().c_str());
+        logger->error("No primary building set for %s\n", type->getName().c_str());
         return false;
     }
 
@@ -894,7 +894,7 @@ bool UnitAndStructurePool::spawnUnit(UnitType* type, Uint8 owner)
 
 		return returnval;
     } else {
-        logger->error("%s line %i: No free position for %s\n", __FILE__, __LINE__, type->getTName().c_str());
+        logger->error("%s line %i: No free position for %s\n", __FILE__, __LINE__, type->getName().c_str());
     }
     return false;
 }
@@ -1823,7 +1823,7 @@ void UnitAndStructurePool::addPrerequisites(UnitType* unittype)
 
     if (prereqs.empty()) 
     {
-        logger->warning("No prerequisites for unit \"%s\"\n",unittype->getTName().c_str());
+        logger->warning("No prerequisites for unit \"%s\"\n", unittype->getName().c_str());
         return;
     }
     
@@ -1854,7 +1854,7 @@ void UnitAndStructurePool::addPrerequisites(StructureType* structtype)
 
     if (prereqs.empty()) {
         logger->warning("No prerequisites for structure \"%s\".\n"
-                        "Use \"none\" if this intended.\n",structtype->getTName().c_str());
+                        "Use \"none\" if this intended.\n",structtype->getName().c_str());
         return;
     }
 
@@ -1982,8 +1982,8 @@ vector<string> UnitAndStructurePool::getBuildableUnits(Player* pl)
         ovalid = true;
         if (buildall)
         {
-            if (utype->getTName().size() < 5) {
-                retval.push_back(utype->getTName());
+            if (utype->getName().size() < 5) {
+                retval.push_back(utype->getName());
             }
             continue;
         }
@@ -2033,7 +2033,7 @@ vector<string> UnitAndStructurePool::getBuildableUnits(Player* pl)
                     }
 
                     if (curside == (playerSide&~PS_MULTI) || (utype->isDoubleOwned())){// && pc::Config.gamemode != 0)) {
-                        retval.push_back(utype->getTName());
+                        retval.push_back(utype->getName());
                         break;
                     }
                 }
@@ -2069,8 +2069,8 @@ vector<string> UnitAndStructurePool::getBuildableStructures(Player* pl)
         ovalid = true;
         if (buildall) 
         {
-            if (stype->getTName().size() < 5) {
-                retval.push_back(stype->getTName());
+            if (stype->getName().size() < 5) {
+                retval.push_back(stype->getName());
             }
             continue;
         }
@@ -2116,7 +2116,7 @@ vector<string> UnitAndStructurePool::getBuildableStructures(Player* pl)
                         curside = PS_NEUTRAL;
                     }
                     if (curside == playerSide) {
-                        retval.push_back(stype->getTName());
+                        retval.push_back(stype->getName());
                         break;
                     }
                 }

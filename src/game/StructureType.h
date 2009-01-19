@@ -51,8 +51,6 @@ public:
 
 	Uint16 * getSHPTNum();
 
-	virtual const string getTName() const;
-
 	vector<string> getDeployWith() const;
 
 	vector<string> getOwners() const;

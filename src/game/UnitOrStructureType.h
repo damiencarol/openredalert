@@ -69,9 +69,6 @@ public:
 	/** Only applicable to units.  StructureType always returns zero. */
 	virtual Uint8 getOffset() const = 0;
 
-	/** Returns the internal name, e.g. E1 */
-	virtual const string getTName() const = 0;
-
 	/** Returns the names of the sides that can build this */
 	virtual vector<string> getOwners() const = 0;
 
@@ -106,6 +103,9 @@ public:
 	/** Sight range, in cells (def=1). */
 	Uint8 getSight() const;
 
+    /** Return the internal name of the structure/unit type */
+    string getName() const;
+
 protected:
 	/** Sight of the Unit (in Cell) */
 	Uint8 sight;
@@ -118,18 +118,22 @@ protected:
 	Weapon* primary_weapon;
 	Uint16 maxhealth;
 	Uint8 speed;
-	Uint16 cost;
+	int cost;
 	/** Technology level required to build this [-1 means can't build] (default = -1) */
 	int techLevel;
 	vector<string> prereqs;
 
 	bool valid;
-	string tname;
+
+    
+    void setName(string pName);
 
 private:
     UnitOrStructureType(const UnitOrStructureType& orig);
 
     Uint8 ptype;
+    /** Name of the Type */
+    string tname;
 };
 
 #endif //UNITORSTRUCTURETYPE_H

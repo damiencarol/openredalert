@@ -207,7 +207,7 @@ void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 			// Don't distract units on a AI mission (only abort the mission if we see a harvester)
 			if (!lUnit->UnderAttack () && lUnit->AI_Mission != 1 ){
 				// Abort the ai mission if we 'see' a harvester
-				if (lEnemyUnit->getType()->getTName() == "HARV")
+				if (lEnemyUnit->getType()->getName() == "HARV")
 					lUnit->AI_Mission = 1;
 				else
 					continue;
@@ -513,19 +513,19 @@ void Ai::guideAttack (Player *Player, int PlayerNumb)
 				for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++)
 				{
 					// Make a list of all nearby tesla's
-					if ((lPlayerStructurePool[i]->getType()->getTName() == "TSLA") && lPlayerStructurePool[i]->isAlive()){
+					if ((lPlayerStructurePool[i]->getType()->getName() == "TSLA") && lPlayerStructurePool[i]->isAlive()){
 						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
 							EnemyTeslaCoils.push_back(lPlayerStructurePool[i]);
 					}
 
 					// Make a list of all nearby advanced power plants
-					if ((lPlayerStructurePool[i]->getType()->getTName() == "APWR") && lPlayerStructurePool[i]->isAlive()){
+					if ((lPlayerStructurePool[i]->getType()->getName() == "APWR") && lPlayerStructurePool[i]->isAlive()){
 						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
 							EnemyPowerPlants.push_back(lPlayerStructurePool[i]);
 					}
 
 					// Make a list of all nearby ore refinery's
-					if ((lPlayerStructurePool[i]->getType()->getTName() == "PROC") && lPlayerStructurePool[i]->isAlive()){
+					if ((lPlayerStructurePool[i]->getType()->getName() == "PROC") && lPlayerStructurePool[i]->isAlive()){
 						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
 							EnemyOreRefs.push_back(lPlayerStructurePool[i]);
 					}
@@ -914,7 +914,7 @@ Uint16				xpos,
 			NumbOfInfantry++;
 		}
 
-		if (theUnit->getType()->getTName() == "HARV")
+		if (theUnit->getType()->getName() == "HARV")
 		{
 			if (theUnit->GetBaseRefinery() == 0)
 			{
@@ -923,7 +923,7 @@ Uint16				xpos,
 			NumbOfOreTrucks++;
 		}
 
-		if (theUnit->getType()->getTName() == "1TNK")
+		if (theUnit->getType()->getName() == "1TNK")
 		{
 			NumbTanks++;
 		}
@@ -936,7 +936,7 @@ Uint16				xpos,
 		{
 			theUnit = unitpool[UnitNumb];
 
-			if (theUnit->getType()->getTName() == "MCV")
+			if (theUnit->getType()->getName() == "MCV")
 			{
 				if (theUnit->canDeploy(p::ccmap) == true)
 				{
@@ -1157,7 +1157,7 @@ Unit* Ai::EnemyUnitInRange(int MyPlayerNumb, Unit* MyUnit, int AttackRange)
 			}
 
 			// Make it easyer to attack harvesters
-			if ((EnemyUnit->getType()->getTName() == "HARV") && MyPlayerNumb != this->HumanPlayerNumb)
+			if ((EnemyUnit->getType()->getName() == "HARV") && MyPlayerNumb != this->HumanPlayerNumb)
 			{
 				if (distance <= 4*AttackRange && EnemyPlayer->getSide() != PS_NEUTRAL)
 				{
@@ -1305,7 +1305,7 @@ void Ai::Harvest(Player *Player, int PlayerNumb)
 	for (int UnitNumb = 0; UnitNumb < NumbUnits; UnitNumb++)
 	{
 		Unit* theUnit = unitpool[UnitNumb];
-		if (theUnit->getType()->getTName() == "HARV")
+		if (theUnit->getType()->getName() == "HARV")
 		{
 			if (!theUnit->IsHarvesting())
 			{
@@ -1399,7 +1399,7 @@ void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
 				continue;
 			if (Unit->AI_Mission == 1 || Unit->AI_Mission == 3)
 			{
-				if (Unit->getType()->getTName() == "HARV")
+				if (Unit->getType()->getName() == "HARV")
 				{
 					logger->error ("%s line %i: !!!!!!!!!!Error harvesters can't attack\n", __FILE__, __LINE__);
 				}
