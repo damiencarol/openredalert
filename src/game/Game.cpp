@@ -745,7 +745,7 @@ void Game::play()
         if (gamemode == GAME_MODE_SINGLE_PLAYER)
         {
             // ? if player won ?
-            if (p::ccmap->getPlayerPool()->hasWon())
+            if (p::ccmap->getPlayerPool()->hasWon() == true)
             {
                 missionWon = true;
                 MissionNr++;
@@ -857,7 +857,7 @@ void Game::handleAiCommands()
 				AiCommand* com = unit->aiCommandList[0];
 				//if (com->getId() == 3 || com->getId() == 8)
 				{
-					logger->debug("AICOMMAND MOVE UNIT = %s \n", unit->getType()->getTName().c_str());
+					logger->debug("AICOMMAND MOVE UNIT = %s \n", unit->getType()->getName().c_str());
 					Uint32 pos = p::ccmap->getWaypoint(com->getWaypoint());
 					logger->debug("here$-1%d\n", pos);
 					unit->move(pos, true);

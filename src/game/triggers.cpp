@@ -64,6 +64,8 @@ bool GlobalVar[100];
  */
 bool CheckEvent(unsigned int Event, int param1, int param2, unsigned int Eventparam, int value)
 {
+    return false;
+    
     switch (Event)
     {
     	//
@@ -340,6 +342,8 @@ bool CheckSecondTriggerEvent(int TriggerNumb, RA_Tiggers  *Trigger)
  */
 void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
 {
+    return;
+    
 	string AssociatedTriggerName = "None";
 	RA_Tiggers* AssociatedTrigger = 0;
 	//int			value = 0;
@@ -657,6 +661,8 @@ void HandleGlobalTrigger(int Event, int value)
 
 void CheckCellTriggers(Uint32 pos)
 {
+    return;
+ 
 	//UnitOrStructure *unitOrStructure;
 	Unit            *unit;
 	RA_Tiggers      *Trigger;
@@ -726,6 +732,8 @@ void CheckCellTriggers(Uint32 pos)
 void ExecuteTriggerAction(TriggerAction* action)
 //void ExecuteTriggerAction(unsigned int Event, Uint8 ActionNr, RA_Tiggers *Trigger )
 {
+    return;
+ 
     /*unsigned int    Action;
     int             parameter;
     RA_Tiggers      *Trig;
@@ -985,6 +993,8 @@ void ExecuteTriggerAction(TriggerAction* action)
  */
 void PrintTrigger(const RA_Tiggers& Trigger)
 {
+    return;
+ 
 	printf ("%s line %i: Read trigger:\n", __FILE__, __LINE__);
 	printf ("name = \t\t\t%s\n", Trigger.name.c_str());	
 	printf ("repeatable = \t\t%i\n", Trigger.repeatable);
@@ -1023,6 +1033,8 @@ void PrintTrigger(const RA_Tiggers& Trigger)
  */
 void InitializeTriggers()
 {
+    return;
+    
 	// Reset all the Global Vars
     for (int i = 0; i < 100; i++){
         GlobalVar[i] = false;

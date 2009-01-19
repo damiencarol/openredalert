@@ -23,7 +23,7 @@
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "misc/config.h"
-#include "misc\INIFile.h"
+#include "misc/INIFile.h"
 
 #ifdef __MSVC__
 #include <windows.h>

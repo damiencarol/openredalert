@@ -682,7 +682,9 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
     st = new Structure(type, cellpos, owner, health, facing, trigger_name);
     if (!type->isWall()) 
 	{
-		p::ccmap->getPlayerPool()->getPlayer(owner)->builtStruct(st);
+        PlayerPool* thePlayerPool = p::ccmap->getPlayerPool();
+        Player* thePlayer = thePlayerPool->getPlayer(owner);
+        thePlayer->builtStruct(st);
 	}
 	
     st->referTo();

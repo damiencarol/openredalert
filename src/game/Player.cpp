@@ -586,14 +586,25 @@ void Player::movedUnit(Uint32 oldpos, Uint32 newpos, Uint8 sight)
  * Called after a Player build a structure
  */
 void Player::builtStruct(Structure* str)
-{    
+{
+    if (str == 0)
+    {
+        // Log it
+        logger->debug("Player::builtStruct !!!!! Structure = null !!!!! Player = %s \n", this->playername.c_str());   
+        return;
+    }
+    
+    logger->debug("Player::builtStruct !!!!! Structure =  AVANT \n" ) ; 
+    
     // Get the type of the structure
     StructureType* st = dynamic_cast<StructureType*> (str->getType());
     
-    // Add this structure to the pool
+   logger->debug("Player::builtStruct !!!!! Structure =  2 \n" ) ; 
+     // Add this structure to the pool
     structurepool.push_back(str);
     
-	// Add some sight (sight of the building)
+  logger->debug("Player::builtStruct !!!!! Structure =  3 \n" ) ; 
+  	// Add some sight (sight of the building)
     // @todo change this feature to test during the placement
     addSoB(str->getPos(), st->getXsize(), st->getYsize(), st->getSight(), SOB_SIGHT);
     // If building 
