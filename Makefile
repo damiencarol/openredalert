@@ -4,7 +4,7 @@
 #############
 APPNAME=openredalert
 TARGET=../obj/$(APPNAME)
-VERSION=462
+VERSION=607
 RELEASE=1
 
 #############
@@ -69,11 +69,13 @@ OBJECTS=$(notdir $(patsubst %.cpp,%.o,$(source_files)))
 #############
 release:
 	$(MAKE) $(TARGET) CPPFLAGS="$(CPPFLAGS_RELEASE) $(ALL_CPPFLAGS)"
+	mv ./obj/openredalert ./Release/openredalert
 
 #############
 #############
 debug:
 	$(MAKE) $(TARGET) CPPFLAGS="$(CPPFLAGS_DEBUG) $(ALL_CPPFLAGS)"
+	mv ./obj/openredalert ./Debug/openredalert
 
 #############
 #############
