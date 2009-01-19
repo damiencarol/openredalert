@@ -122,7 +122,7 @@ Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
         }
 
 		// If the current structure is a PROC and we are placing a extra harvester
-		if ((this->type->getDeployWith()[j] == "HARV") && (type->getTName() == "PROC"))
+		if ((this->type->getDeployWith()[j] == "HARV") && (type->getName() == "PROC"))
 		{
 			// Set base refinary
 			if (p::uspool->getUnitAt(temppos, 0) != 0)
@@ -268,12 +268,13 @@ Uint16 Structure::getBPos(Uint16 pos) const
         }
         ++dy;
         if (dy >= type->getYsize()) {
-            logger->error("ERROR: could not find anywhere to shoot at %s!\n", type->getTName().c_str());
+            logger->error("ERROR: could not find anywhere to shoot at %s!\n", type->getName().c_str());
         }
         retpos = (x+dx)+(y+dy)*mwid;
     }
     return retpos;
 }
+
 Uint16 Structure::getFreePos(Uint8* subpos, bool findsubpos) {
     bool (*checker)(StructureType*, Uint8, Uint16, Uint8*);
     Uint8 i, xsize, ysize;
@@ -416,16 +417,15 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 				buildAnim = boom;
 				p::aequeue->scheduleEvent(boom);
 			}
-			
-			// If it was a barrel
-			if (string(type->getTName()) == "BARL" ||
-				string(type->getTName()) == "BRL3")
-			{
-				// Create the barrel Explosion Anim
-				new BarrelExplosionActionEvent(3, this->getPos());
-			}
-		}
-		return;
+
+            // If it was a barrel
+            if (type->getName() == "BARL" || type->getName() == "BRL3")
+            {
+                // Create the barrel Explosion Anim
+                new BarrelExplosionActionEvent(3, this->getPos());
+            }
+        }
+        return;
 	} else if ((health-amount)>type->getMaxHealth()) {
 		health = type->getMaxHealth();
 	} else {
@@ -765,19 +765,19 @@ bool Structure::CreateUnitAnimation(UnitType* UnType, Uint8 owner)
  */
 bool Structure::RepairUnint(Unit *Un)
 {
-	// If the structure is not the FIX structure
-	if (this->getType()->getTName() != "FIX")
-	{
-		return false;
-	}
-	
-	// Cehck the owner of the structure is the owner of the unit
-	if (Un->getOwner() != getOwner())
-	{
-		return false;
-	}
-	
-	UnitToRepairPos = Un->getPos();
+    // If the structure is not the FIX structure
+    if (this->getType()->getName() != "FIX")
+    {
+        return false;
+    }
+
+    // Cehck the owner of the structure is the owner of the unit
+    if (Un->getOwner() != getOwner())
+    {
+        return false;
+    }
+
+    UnitToRepairPos = Un->getPos();
     pc::sfxeng->PlaySound(pc::Config.RepairUnit);
 
     // runAnim(10);
@@ -816,12 +816,13 @@ Uint16 Structure::getTargetCell() const
     return targetcell;
 }
 
-bool Structure::is(string Name) 
+bool Structure::is(string Name)
 {
-	if (string(getType()->getTName()) == Name){
-		return true;
-	}
-	return false;
+    if (getType()->getName() == Name)
+    {
+        return true;
+    }
+    return false;
 }
 
 void Structure::sell()
@@ -978,7 +979,7 @@ bool Structure::isPowered()
 bool Structure::isRefinery()
 {
 	// @todo Hack !!!
-	if (type->getTName() == "PROC")
+	if (type->getName() == "PROC")
 	{
 		return true;
 	}

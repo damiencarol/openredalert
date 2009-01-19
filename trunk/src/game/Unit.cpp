@@ -118,7 +118,7 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
     turnanim2 = 0;
     deployed = false;
     
-    if (type->getTName() == "HARV")
+    if (type->getName() == "HARV")
     {
 	   this->Harvest(0, 0);
     }
@@ -601,11 +601,14 @@ void Unit::updateDamaged()
  */
 bool Unit::IsHarvester()
 {
-	if (string(type->getTName()) == "HARV")
-	{
-		return true;
-	}
-	return false;
+    // Check if the internal type of this unit is "HARV"
+    if (type->getName() == "HARV")
+    {
+        // Return true because it's an Harvester
+        return true;
+    }
+    // Return false because it's not an Harvester
+    return false;
 }
 
 bool Unit::IsHarvesting()
@@ -722,11 +725,11 @@ void Unit::Harvest(Uint32 pos, Structure* Struct)
  */
 bool Unit::Repair(Structure *str)
 {
-	// Check if the structure is "FIX"
-	if (str->getType()->getTName() == "FIX")
-	{
-		return false;
-	}
+    // Check if the structure is "FIX"
+    if (str->getType()->getName() == "FIX")
+    {
+        return false;
+    }
 
 	// Get coordinates	
 	Uint16 xpos;

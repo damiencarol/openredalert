@@ -65,6 +65,7 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
 	deploytarget(0),
 	c4(false)
 {
+    string tname = typeName;
     SHPImage* shpimage = 0;
     Uint32 i;
     string shpname;
@@ -86,7 +87,8 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
         return;
     }
 
-	tname = typeName;
+    // Set the internal name
+    this->setName(typeName);
 
 
 
@@ -286,36 +288,25 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
 	valid = true;
 
 #ifdef LOOPEND_TURN
-	animinfo.loopend = unitini->readInt(tname, "loopend", 31);
-	animinfo.loopend2 = unitini->readInt(tname, "loopend2", 0);
+	animinfo.loopend = unitini->readInt(typeName, "loopend", 31);
+	animinfo.loopend2 = unitini->readInt(typeName, "loopend2", 0);
 
-	animinfo.animspeed = unitini->readInt(tname, "animspeed", 3);
+	animinfo.animspeed = unitini->readInt(typeName, "animspeed", 3);
 	animinfo.animspeed = abs(animinfo.animspeed);
 	animinfo.animspeed = (animinfo.animspeed>1 ? animinfo.animspeed : 2);
-	animinfo.animdelay = unitini->readInt(tname, "delay", 0);
+	animinfo.animdelay = unitini->readInt(typeName, "delay", 0);
 
-	animinfo.animtype = unitini->readInt(tname, "animtype", 0);
-	animinfo.sectype = unitini->readInt(tname, "sectype", 0);
+	animinfo.animtype = unitini->readInt(typeName, "animtype", 0);
+	animinfo.sectype = unitini->readInt(typeName, "sectype", 0);
 
-	animinfo.dmgoff = unitini->readInt(tname, "dmgoff", ((shptnum[0]-1)>>1));
+	animinfo.dmgoff = unitini->readInt(typeName, "dmgoff", ((shptnum[0]-1)>>1));
 #endif
 
-	// Read the C4 caract
-	if (string(unitini->readString(tname, "C4", "no")) == "yes")
-	{
-		c4 = true;
-	} else {
-		c4 = false;
-	}
+    // Read the C4 caract
+    this->c4 = unitini->readYesNo(typeName, "C4", 0);
 
-	// Read the Infiltrate caracteristic
-	if (string(unitini->readString(tname, "Infiltrate", "no")) == "yes" ||
-		string(unitini->readString(tname, "Infiltrate", "no")) == "Yes")
-	{
-		infiltrate = true;
-	} else {
-		infiltrate = false;
-	}
+    // Read the Infiltrate caracteristic
+    this->infiltrate = unitini->readYesNo(typeName, "Infiltrate", 0);
 }
 
 /**
@@ -402,11 +393,6 @@ Uint8 UnitType::getNumLayers() const
 Uint16* UnitType::getSHPTNum()
 {
         return shptnum;
-}
-
-const string UnitType::getTName() const
-{
-	return tname;
 }
 
 vector<string> UnitType::getOwners() const

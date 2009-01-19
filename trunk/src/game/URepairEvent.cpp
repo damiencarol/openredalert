@@ -103,7 +103,7 @@ void URepairEvent::run()
 	}
 
 	// Check the structure is actually fix
-	if (FixStr->getType()->getTName() == "FIX") 
+	if (FixStr->getType()->getName() == "FIX") 
 	{
 		delete this;
 		return;

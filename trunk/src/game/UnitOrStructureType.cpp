@@ -82,3 +82,13 @@ Uint8 UnitOrStructureType::getSight() const
 {
 	return sight;
 }
+
+string UnitOrStructureType::getName() const
+{
+    return tname;
+}
+
+void UnitOrStructureType::setName(string pName)
+{
+    tname = pName;
+}

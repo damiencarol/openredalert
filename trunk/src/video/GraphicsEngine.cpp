@@ -1084,7 +1084,7 @@ void GraphicsEngine::DrawGroundUnitHealthBars(SDL_Rect dest, SDL_Rect udest, Uin
 			}
 
 			// Draw the harvester contents (if needed)
-			if ((un->isSelected()) && (un->getType()->getTName() == "HARV"))
+			if ((un->isSelected()) && (un->getType()->getName() == "HARV"))
 			{
 				if (un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum()){
 					Uint8 ResourceType;

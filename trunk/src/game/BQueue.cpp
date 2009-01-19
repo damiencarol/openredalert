@@ -75,7 +75,7 @@ bool BQueue::Add(const UnitOrStructureType * type)
             break;
         case BQ_EMPTY:        
             if (0 == (left = type->getCost())) {
-                logger->error("Type \"%s\" has no cost\n", type->getTName().c_str());
+                logger->error("Type \"%s\" has no cost\n", type->getName().c_str());
             }
             last = p::aequeue->getCurtick();
             production.insert(Production::value_type(type, 1));
@@ -99,7 +99,7 @@ bool BQueue::Add(const UnitOrStructureType * type)
                 if (p::dispatcher->unitSpawn((UnitType *) type, player->getPlayerNum())) {
                     Placed();
                 } else {
-                    logger->debug("Didn't spawn %s...\n", type->getTName().c_str());
+                    logger->debug("Didn't spawn %s...\n", type->getName().c_str());
                 }
             }
             return false;
@@ -115,7 +115,7 @@ bool BQueue::Add(const UnitOrStructureType * type)
                     // This type is new to the queue
                     if (0 == type->getCost()) {
                         // We divide by cost, so must not be zero.
-                        logger->error("Type \"%s\" has no cost\n", type->getTName().c_str());
+                        logger->error("Type \"%s\" has no cost\n", type->getName().c_str());
                         return false;
                     }
                     production.insert(Production::value_type(type, 1));

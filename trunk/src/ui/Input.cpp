@@ -733,7 +733,7 @@ void Input::clickMap(int mx, int my)
 	//
 	if (selected->numbUnits() == 1)
 	{
-		if (selected->getUnit(0)->getType()->getTName() == "MEDI" &&
+		if (selected->getUnit(0)->getType()->getName() == "MEDI" &&
 				selected->getUnit(0)->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() &&
 				p::uspool->getUnitAt(pos) != 0)
 		{
@@ -750,7 +750,7 @@ void Input::clickMap(int mx, int my)
 			p::uspool->getStructureAt(pos)!=NULL &&
 			selected->getUnit(0)->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum())
 		{
-			if (p::uspool->getStructureAt(pos)->getType()->getTName() == "FIX")
+			if (p::uspool->getStructureAt(pos)->getType()->getName() == "FIX")
 			{
 				//printf ("%s line %i: I am here\n", __FILE__, __LINE__);
 				selected->getUnit(0)->Repair (p::uspool->getStructureAt(pos));
@@ -1107,7 +1107,7 @@ void Input::setCursorByPos(int mx, int my)
         			if (selected->getUnit(0)->getType()->isInfiltrate() == true)
         			{
         				// ENGINEER
-        				if (selected->getUnit(0)->getType()->getTName() == "E6")
+        				if (selected->getUnit(0)->getType()->getName() == "E6")
         				{
         					// if structure is enemy structure
         					if (p::uspool->getStructureAt(pos)->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
@@ -1121,7 +1121,7 @@ void Input::setCursorByPos(int mx, int my)
         				}
 
         				// SPY
-        				if (selected->getUnit(0)->getType()->getTName() == "SPY")
+        				if (selected->getUnit(0)->getType()->getName() == "SPY")
         				{
         					// if structure is enemy structure
         					if (p::uspool->getStructureAt(pos)->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
@@ -1148,7 +1148,7 @@ void Input::setCursorByPos(int mx, int my)
         		// Handle FIX for all units
         		if (selected->getUnit(0)->getHealth() <  selected->getUnit(0)->getType()->getMaxHealth() && p::uspool->getStructureAt(pos)!=NULL && selected->getUnit(0)->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum())
         		{
-        			if (p::uspool->getStructureAt(pos)->getType()->getTName() == "FIX")
+        			if (p::uspool->getStructureAt(pos)->getType()->getName() == "FIX")
         			{
         				pc::cursor->setCursor("enter");
         				return;
@@ -1175,7 +1175,7 @@ void Input::setCursorByPos(int mx, int my)
         	//
         	if (selected->numbUnits() == 1)
         	{
-        		if ((selected->getUnit(0)->getType()->getTName() == "MEDI") && selected->getUnit(0)->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() && (p::uspool->getUnitAt(pos) != 0))
+        		if ((selected->getUnit(0)->getType()->getName() == "MEDI") && selected->getUnit(0)->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() && (p::uspool->getUnitAt(pos) != 0))
         		{
         			if ( p::uspool->getUnitAt(pos)->getType()->isInfantry() && p::uspool->getUnitAt(pos)->getHealth() < p::uspool->getUnitAt(pos)->getType()->getMaxHealth())
         			{

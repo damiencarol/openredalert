@@ -499,7 +499,7 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
         
     stringstream TipString;
     // Get raw name of the type
-    string nameOfType = string(type->getTName());
+    string nameOfType = type->getName();
     if (nameOfType.size() > 0)
     {
 		if (nameOfType=="POWR"){
