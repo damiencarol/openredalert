@@ -72,7 +72,7 @@ public:
     friend class UInfiltrateAnimEvent;
 
     Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
-            Uint8 owner, Uint16 rhealth, Uint8 facing, Uint8 action,
+            unsigned int owner, Uint16 rhealth, Uint8 facing, Uint8 action,
             string trigger_name);
     ~Unit();
 
@@ -110,8 +110,6 @@ public:
     void turn(Uint8 facing, Uint8 layer);
     void stop();
 
-    Uint8 getOwner() const;
-    void setOwner(Uint8 newowner);
     void remove();
     void applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker);
     void updateDamaged();
@@ -184,7 +182,6 @@ private:
     Uint16 cellpos;
     Uint16 palettenum;
 
-    Uint8 owner;
     Uint8 subpos;
     Sint8 xoffset;
     bool deployed;

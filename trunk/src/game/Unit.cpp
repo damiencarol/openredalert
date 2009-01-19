@@ -67,7 +67,7 @@ using std::vector;
  * @note to self, pass owner, cellpos, facing and health to this (maybe subcellpos)
  */
 Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
-        Uint8 owner, Uint16 rhealth, Uint8 facing, Uint8 action, string trigger_name) : UnitOrStructure()
+        unsigned int owner, Uint16 rhealth, Uint8 facing, Uint8 action, string trigger_name) : UnitOrStructure()
 {
     EmptyResources ();
 
@@ -146,17 +146,17 @@ Unit::~Unit()
 	Tm = localtime (&Now_epoch);
 //	logger->warning ("%s line %i: %02i:%02i:%02i Unit destructor, unitnr = %i\n", __FILE__, __LINE__, Tm->tm_hour, Tm->tm_min, Tm->tm_sec, unitnum);
 
-//	if (p::uspool->getUnit(unitnum) != NULL && !pc::quit)
+//	if (p::uspool->getUnit(unitnum) != 0 && !pc::quit)
 //		logger->warning ("%s line %i: Unit destructor for unit = %i, unitandstructerpool not derefd\n", __FILE__, __LINE__, unitnum);
 
 //	if (p::uspool->getNumbUnits() != p::ccmap->getPlayerPool()->getPlayer(getOwner())->getNumUnits() && !pc::quit )
 //		logger->warning ("%s line %i: Player unit pool not the same size as unitandstructurepool unitoopl\n", __FILE__, __LINE__, unitnum);
 
     delete[] imagenumbers;
-    if (attackanim != NULL && target != NULL) {
+    if (attackanim != 0 && target != 0) {
         target->unrefer();
     }
-    if( l2o != NULL ) {
+    if( l2o != 0 ) {
         p::uspool->removeL2overlay(l2entry);
         delete l2o;
     }
@@ -265,7 +265,7 @@ Sint8 Unit::getYoffset() const
 
 void Unit::setXoffset(Sint8 xo)
 {
-    if (l2o != NULL) {
+    if (l2o != 0) {
         l2o->xoffsets[0] = xo;
     } else {
         xoffset = xo;
@@ -329,15 +329,15 @@ void Unit::move(Uint16 dest, bool needStop)
 {
     targetcell = dest;
 
-    if (needStop && (attackanim != NULL)) {
+    if (needStop && (attackanim != 0)) {
         attackanim->stop();
-        if (target != NULL) {
+        if (target != 0) {
             target->unrefer();
-            target = NULL;
+            target = 0;
         }
     }
 
-	if (needStop && harvestanim != NULL){
+	if (needStop && harvestanim != 0){
 		harvestanim->stop();
 	}
 
@@ -345,7 +345,7 @@ void Unit::move(Uint16 dest, bool needStop)
 		infianim->stop();
 	}
 
-    if (moveanim == NULL)
+    if (moveanim == 0)
     {
         moveanim = new MoveAnimEvent(type->getSpeed(), this);
         p::aequeue->scheduleEvent(moveanim);
@@ -371,7 +371,7 @@ bool Unit::IsAttacking()
 }
 
 bool Unit::canAttack(bool primary) {
-	return type->getWeapon(primary)!=NULL;
+	return type->getWeapon(primary)!=0;
 }
 
 bool Unit::UnderAttack()
@@ -408,10 +408,10 @@ void Unit::attack(UnitOrStructure* target, bool stop)
 			case UN_INFANTRY:
 			case UN_VEHICLE:
 				Weap = type->getWeapon();
-				if (Weap != NULL){
+				if (Weap != 0){
 					if (!Weap->getProjectile()->AntiGround()){
 						Weap = type->getWeapon(false);
-						if (Weap != NULL){
+						if (Weap != 0){
 							if (!Weap->getProjectile()->AntiGround())
 								return;
 						}else
@@ -422,10 +422,10 @@ void Unit::attack(UnitOrStructure* target, bool stop)
 				break;
 			case UN_BOAT:
 				Weap = type->getWeapon();
-				if (Weap != NULL){
+				if (Weap != 0){
 					if (!Weap->getProjectile()->AntiGround()){
 						Weap = type->getWeapon(false);
-						if (Weap != NULL){
+						if (Weap != 0){
 							if (!Weap->getProjectile()->AntiGround())
 								return;
 						}else
@@ -437,10 +437,10 @@ void Unit::attack(UnitOrStructure* target, bool stop)
 			case UN_PLANE:
 			case UN_HELICOPTER:
 				Weap = type->getWeapon();
-				if (Weap != NULL){
+				if (Weap != 0){
 					if (!Weap->getProjectile()->AntiAir()){
 						Weap = type->getWeapon(false);
-						if (Weap != NULL){
+						if (Weap != 0){
 							if (!Weap->getProjectile()->AntiAir())
 								return;
 						}else
@@ -456,10 +456,10 @@ void Unit::attack(UnitOrStructure* target, bool stop)
 		}
 	} else {
 		Weap = type->getWeapon();
-		if (Weap != NULL){
+		if (Weap != 0){
 			if (!Weap->getProjectile()->AntiGround()){
 				Weap = type->getWeapon(false);
-				if (Weap != NULL){
+				if (Weap != 0){
 					if (!Weap->getProjectile()->AntiGround())
 						return;
 				}else
@@ -469,16 +469,16 @@ void Unit::attack(UnitOrStructure* target, bool stop)
 			return;
 	}
 
-    if (stop && (moveanim != NULL)) {
+    if (stop && (moveanim != 0)) {
         moveanim->stop();
     }
-    if (this->target != NULL) {
+    if (this->target != 0) {
         this->target->unrefer();
     }
     this->target = target;
     target->referTo();
     targetcell = target->getBPos(cellpos);
-    if (attackanim == NULL) {
+    if (attackanim == 0) {
         attackanim = new UAttackAnimEvent(0, this);
         p::aequeue->scheduleEvent(attackanim);
     } else {
@@ -501,7 +501,7 @@ void Unit::turn(Uint8 facing, Uint8 layer)
         return;
         break;
     }
-    if (*t == NULL) {
+    if (*t == 0) {
         *t = new TurnAnimEvent(type->getROT(), this, facing, layer);
         p::aequeue->scheduleEvent(*t);
     } else {
@@ -512,22 +512,12 @@ void Unit::turn(Uint8 facing, Uint8 layer)
 
 void Unit::stop()
 {
-    if (moveanim != NULL) {
+    if (moveanim != 0) {
         moveanim->stop();
     }
-    if (attackanim != NULL) {
+    if (attackanim != 0) {
         attackanim->stop();
     }
-}
-
-Uint8 Unit::getOwner() const
-{
-	return owner;
-}
-
-void Unit::setOwner(Uint8 newowner)
-{
-	owner = newowner;
 }
 
 void Unit::remove()
@@ -668,7 +658,7 @@ Uint32 Unit::FindTiberium()
 				//Christal
 				Distance = this->getDist(pos);
 				if (Distance < ClosesedExpensiveDistance || !FirstExpensiveFound){
-					if (p::uspool->getUnitAt(pos) == NULL){
+					if (p::uspool->getUnitAt(pos) == 0){
 						ClosesedExpensivePos		= pos;
 						ClosesedExpensiveDistance	= Distance;
 						FirstExpensiveFound = true;
@@ -743,7 +733,7 @@ bool Unit::Repair(Structure *str)
 	fix_str_num = str->getNum();
 	fix_str_pos = (Uint16)p::ccmap->translateToPos(xpos, ypos);
 
-	if (repairanim == NULL) {
+	if (repairanim == 0) {
 		repairanim = new URepairEvent(0, this);
 		p::aequeue->scheduleEvent(repairanim);
 	} else {
@@ -898,7 +888,7 @@ Uint32 Unit::calcDeployPos(Uint32 pos) const
     Uint32 mapwidth = p::ccmap->getWidth();
     Uint8 w,h;
 
-    if (type->getDeployType() == NULL) {
+    if (type->getDeployType() == 0) {
         if (pos%mapwidth == mapwidth) {
             return (Uint32)-1;
         }

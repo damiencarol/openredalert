@@ -54,7 +54,9 @@ public:
     void setLPlayer(const string& pname);
     //void setLPlayer(Uint8 number, const char* nick, const char* colour, const char* mside);
     void setPlayer(Uint8 number, const char* nick, const int colour, const char* mside);
-    Player *getPlayer(Uint8 player);
+    Player* getPlayer(int player) const;
+    Player* getPlayer(const string& playerName);
+    
     int getPlayerNum(const string& pname);
     Player* getPlayerByName(const char* pname);
 
@@ -66,8 +68,8 @@ public:
     vector<Player*> getOpponents(Player* pl);
     /*void playerDefeated(Player * pl);
     void playerUndefeated(Player * pl);*/
-    bool hasWon() const ;
-    bool hasLost() const ;
+   // bool hasWon() const ;
+   // bool hasLost() const ;
     void setAlliances(INIFile* mapini);
     //void placeMultiUnits();
     //INIFile * getMapINI();

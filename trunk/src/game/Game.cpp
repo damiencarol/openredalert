@@ -621,7 +621,7 @@ void Game::play()
 		{
 			MapAnimationMenu myAnimMenu;
 			// @todo change that to get the good parameters
-                        myAnimMenu.Play(*(pc::gfxeng), MissionNr, true);
+           //             myAnimMenu.Play(*(pc::gfxeng), MissionNr, true);
 		}
 		
 
@@ -744,8 +744,9 @@ void Game::play()
 	// Check if it was a single player game
         if (gamemode == GAME_MODE_SINGLE_PLAYER)
         {
-            // ? if player won ?
-            if (p::ccmap->getPlayerPool()->hasWon() == true)
+            // Get Local Player
+            Player* localPlayer = p::ccmap->getPlayerPool()->getPlayer(p::ccmap->getMissionData().player);            // ? if player won ?
+            if (localPlayer->isVictorious() == true)
             {
                 missionWon = true;
                 MissionNr++;
@@ -758,23 +759,22 @@ void Game::play()
                 {
                 }
             }
-			else if (p::ccmap->getPlayerPool()->hasLost() )
-			{
-				missionWon = false;
-				try
-				{
-					VQAMovie mov(p::ccmap->getMissionData().losemov.c_str());
-					mov.play();
-				}
-				catch (runtime_error&)
-				{}
-			}
-			else
-			{
-				// Game was abborted
-				missionWon = false;
-			}
-		}
+            else if (localPlayer->isDefeated() == true) 
+                {
+                    missionWon = false;
+                    try {
+                        VQAMovie mov(p::ccmap->getMissionData().losemov.c_str());
+                        mov.play();
+                    }
+                    catch (runtime_error&)
+                    {}
+                }
+                else
+                {
+                // Game was abborted
+                missionWon = false;
+               }
+	}
 
 		// Stop all the music
 		pc::sfxeng->StopMusic();
