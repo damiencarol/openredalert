@@ -304,10 +304,16 @@ int PlayerPool::getHouseNumByPlayerNum(unsigned int playerNumber) const
     return -1;
 }
 
+Player* PlayerPool::getPlayer(const string& pname)
+{
+    return getPlayerByName(pname.c_str());
+}
+
 Player* PlayerPool::getPlayerByName(const char* pname)
 {
 	return playerpool[getPlayerNum(pname)];
 }
+
 /*
 vector<Player*> PlayerPool::getOpponents(Player* pl)
 {
@@ -607,12 +613,14 @@ Player* PlayerPool::getLPlayer()
 	return 0;
 }
 
-Player* PlayerPool::getPlayer(Uint8 player)
+Player* PlayerPool::getPlayer(int playerNumber) const
 {
-	if (player < playerpool.size()){
-		return playerpool[player];
-	}
-	return 0;
+    if (playerNumber >=0 && playerNumber < playerpool.size())
+    {
+        return playerpool[playerNumber];
+    }
+    // Return NULL
+    return 0;
 }
 
 Uint8 PlayerPool::getUnitpalNum(Uint8 player) const
@@ -633,15 +641,15 @@ Uint8 PlayerPool::getStructpalNum(Uint8 player) const
 /**
  * Return if the Local player has WON the mission
  */
-bool PlayerPool::hasWon() const
+/*bool PlayerPool::hasWon() const
 {
 	return won;
-}
+}*/
 
 /**
  * Return if the Local player has LOST the mission
  */
-bool PlayerPool::hasLost() const
+/*bool PlayerPool::hasLost() const
 {
 	return lost;
-}
+}*/

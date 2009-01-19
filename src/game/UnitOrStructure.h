@@ -97,14 +97,17 @@ public:
 
 private:
     Uint16 health;
+    
+    /** Number of the player who is the owner of this unit */
+    unsigned int owner;
+    
 public:
     Uint16 getHealth() const;
 
     void setHealth(Uint16 health);
 
-    virtual Uint8 getOwner() const = 0;
+    unsigned int getOwner() const;
 
-    virtual void setOwner(Uint8) = 0;
 
     virtual Uint16 getPos() const = 0;
 
@@ -159,6 +162,9 @@ public:
     virtual UnitOrStructure * getTarget() ;
 
     virtual string getTriggerName (void)  = 0;
+    
+protected:    
+    void setOwner(unsigned int newOwner);
 };
 
 #endif

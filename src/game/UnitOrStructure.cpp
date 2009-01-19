@@ -125,3 +125,13 @@ void UnitOrStructure::setHealth(Uint16 health)
 {
 	this->health = health;
 }
+
+unsigned int UnitOrStructure::getOwner() const
+{
+    return this->owner;
+}
+
+void UnitOrStructure::setOwner(unsigned int newowner)
+{
+    this->owner = newowner;
+}

@@ -508,7 +508,7 @@ void Input::handle()
     }
 
     sdir = CnCMap::s_none;
-    keystate = SDL_GetKeyState(NULL);
+    keystate = SDL_GetKeyState(0);
     if (keystate[SDLK_LEFT])
         sdir |= CnCMap::s_left;
     else if (keystate[SDLK_RIGHT])
@@ -562,12 +562,15 @@ void Input::handle()
     }
 
 
-
-    if( p::ccmap->getPlayerPool()->hasWon() || p::ccmap->getPlayerPool()->hasLost() ) {
+    // Get local player
+    Player* lPlayer = p::ccmap->getPlayerPool()->getLPlayer();
+    if (lPlayer->isVictorious() || lPlayer->isDefeated()) 
+    {
         ++donecount;
     }
     if (donecount == 1) {
-        if (p::ccmap->getPlayerPool()->hasWon()) {
+        if (lPlayer->isVictorious()) 
+        {
 		pc::sfxeng->PlaySound(pc::Config.MissionWon);
 		//logger->gameMsg("MISSION ACCOMPLISHED");
         } else {

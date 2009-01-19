@@ -75,7 +75,7 @@ UnitAndStructurePool::UnitAndStructurePool(const char* theTheater) :
 	numdeletedunit(0),
 	numdeletedstruct(0)
 {
-	// CERTAIN STRUCTURE ARE VARIABLE WITH TEATHER
+	// Some STRUCTURE ARE VARIABLE WITH TEATHER    
 	strcpy(this->theaterext, ".");
 	strncat(this->theaterext, theTheater, 3);
 
@@ -106,19 +106,17 @@ UnitAndStructurePool::UnitAndStructurePool(const char* theTheater) :
  */
 UnitAndStructurePool::~UnitAndStructurePool()
 {
-    Uint32 i = 0;
-
     // this is for cleaning up the multimaps
     typedef multimap<UnitType*, vector<StructureType*>* >::const_iterator Iu;
     typedef multimap<StructureType*, vector<StructureType*>* >::const_iterator Is;
     std::pair<Is,Is> structpair;
     std::pair<Iu,Iu> unitpair;
 
-    for( i = 0; i < unitpool.size(); i++ ) {
+    for (int i = 0; i < unitpool.size(); i++ ) {
         delete unitpool[i];
     }
 
-    for (i = 0; i < unittypepool.size(); i++)
+    for (int i = 0; i < unittypepool.size(); i++)
     {
     	unitpair = unit_prereqs.equal_range(unittypepool[i]);
 
@@ -128,7 +126,8 @@ UnitAndStructurePool::~UnitAndStructurePool()
         delete unittypepool[i];
     }
 
-    for( i = 0; i < structurepool.size(); i++ ) {
+    for(int i = 0; i < structurepool.size(); i++) 
+    {
         //structurepool[i]->unrefer();
 		delete structurepool[i];
     }
@@ -741,7 +740,7 @@ Unit* UnitAndStructurePool::createUnit(const char *typen, Uint16 cellpos, Uint8 
 /**
  * Create a unit in the map
  */
-Unit* UnitAndStructurePool::createUnit(UnitType* type, Uint16 cellpos, Uint8 subpos, Uint8 owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name)
+Unit* UnitAndStructurePool::createUnit(UnitType* type, Uint16 cellpos, Uint8 subpos, unsigned int owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name)
 {
 	if (cellpos >= p::ccmap->getSize()){
 		return false;

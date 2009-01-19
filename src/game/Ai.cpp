@@ -1252,7 +1252,8 @@ Structure* Ai::EnemyStructureInRange (int MyPlayerNumb, Unit* MyUnit, int Attack
     if (AttackRange == -1)
         AttackRange = MyUnit->getType()->getWeapon()->getRange();  //MyUnit->getType()->getSight();
 
-    for (int i = 0; i < this->NumbPlayers; i++){
+    for (unsigned int i = 0; i < this->NumbPlayers; i++)
+    {
         // Don't find my own units
         if (MyPlayerNumb == i)
             continue;

@@ -489,14 +489,15 @@ bool Selection::areWaterBound()
         return false;
     }
 
-    for (list<Unit*>::iterator UnitIt = sel_units.begin(); UnitIt != sel_units.end(); ++UnitIt) {
-        assert(*UnitIt != 0);
+    for (list<Unit*>::iterator UnitIt = sel_units.begin(); UnitIt != sel_units.end(); ++UnitIt)
+    {
+        //assert(*UnitIt != 0);
         if (!(*UnitIt)->isAlive())
-			continue;
+            continue;
 
 
-		UnitType = (*UnitIt)->getType();
-		PrimaryStruct = p::ccmap->getPlayerPool()->getPlayer((*UnitIt)->getOwner())->getPrimary(UnitType);
+	UnitType = (*UnitIt)->getType();
+	PrimaryStruct = p::ccmap->getPlayerPool()->getPlayer((*UnitIt)->getOwner())->getPrimary(UnitType);
 		if (PrimaryStruct != NULL){
 			if (!PrimaryStruct->getType()->isWaterBound())
 				return false;

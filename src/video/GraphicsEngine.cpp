@@ -1769,37 +1769,37 @@ void GraphicsEngine::clipToMaparea(SDL_Rect *src, SDL_Rect *dest)
  */
 void GraphicsEngine::drawMissionLabel()
 {
-	// Get the local player
-	//Player* lplayer = p::ccmap->getPlayerPool()->getLPlayer();
-	//printf("x=%d y=%d w=%d h=%d\n", maparea.x, maparea.y, maparea.w, maparea.h);
-	//printf("resX=%d W=%d resY=%d  H=%d\n",
-	//maparea.x + (maparea.w + defeatLabel->getWidth())/2, defeatLabel->getWidth(),
-	//maparea.y + (maparea.h + defeatLabel->getHeight())/2, defeatLabel->getHeight());
+    // Get the local player
+    Player* lPlayer = p::ccmap->getPlayerPool()->getLPlayer();
 
+    //printf("x=%d y=%d w=%d h=%d\n", maparea.x, maparea.y, maparea.w, maparea.h);
+    //printf("resX=%d W=%d resY=%d  H=%d\n",
+    //maparea.x + (maparea.w + defeatLabel->getWidth())/2, defeatLabel->getWidth(),
+    //maparea.y + (maparea.h + defeatLabel->getHeight())/2, defeatLabel->getHeight());
 
-	// If the local player is winning
-	if (p::ccmap->getPlayerPool()->hasWon() == true)
-	{
-		Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
+    // If the local player is winning
+    if (lPlayer->isVictorious() == true)
+    {
+        Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
 
-		// If the sidebar is visible
-		if (pc::sidebar->getVisible())
-		{
-			// @todo get the real width of the sidebar
-			// resX -= pc::sidebar->getSidebarImage()->w;
-			resX -=30;
-		}
-
+        // If the sidebar is visible
+        if (pc::sidebar->getVisible())
+        {
+            // @todo get the real width of the sidebar
+            // resX -= pc::sidebar->getSidebarImage()->w;
+            resX -=30;
+        }
+        
 		victoryLabel->Draw(screen, // Draw at screen
 							resX,
 							maparea.y + (maparea.h + victoryLabel->getHeight())/2
 							);
-	}
-
-	// If the local player is lossing
-	if (p::ccmap->getPlayerPool()->hasLost() == true)
-	{
-		Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
+    }
+    
+    // If the local player is lossing
+    if (lPlayer->isDefeated() == true) 
+    {
+        Sint16 resX = maparea.x + (maparea.w - defeatLabel->getWidth())/2;
 
 		// If the sidebar is visible
 		if (pc::sidebar->getVisible())
