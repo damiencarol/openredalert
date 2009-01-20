@@ -497,7 +497,7 @@ bool UnitAndStructurePool::createReinforcements(RA_Teamtype* Team)
  * Creates a structure
  */
 bool UnitAndStructurePool::createStructure(const char* typen, Uint16 cellpos,
-        Uint8 owner, Uint16 health, Uint8 facing, bool makeanim, string trigger_name)
+        unsigned int owner, Uint16 health, Uint8 facing, bool makeanim, string trigger_name)
 {
 	// If the pos is not in the size
 	if (cellpos >= p::ccmap->getSize()){
@@ -522,7 +522,7 @@ bool UnitAndStructurePool::createStructure(const char* typen, Uint16 cellpos,
  *
  */
 bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
-        Uint8 owner, Uint16 health, Uint8 facing, bool makeanim, string trigger_name)
+        unsigned int owner, Uint16 health, Uint8 facing, bool makeanim, string trigger_name)
 {
 	Uint16 frame;
 	Uint32 pos;
@@ -717,7 +717,7 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
 /**
  * Creates a unit
  */
-Unit* UnitAndStructurePool::createUnit(const char *typen, Uint16 cellpos, Uint8 subpos, Uint8 owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name)
+Unit* UnitAndStructurePool::createUnit(const char *typen, Uint16 cellpos, Uint8 subpos, unsigned int owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name)
 {
 	// Check that the unit is in the map
 	if (cellpos >= p::ccmap->getSize()){
@@ -749,8 +749,7 @@ Unit* UnitAndStructurePool::createUnit(UnitType* type, Uint16 cellpos, Uint8 sub
     Uint32 unitnum = 0;
 
     if (cellpos > (p::ccmap->getWidth() * p::ccmap->getHeight())) {
-        logger->error("Attempted to create a %s at %i, outside map.\n",
-                type->getName().c_str(), cellpos);
+        logger->error("Attempted to create a %s at %i, outside map.\n",                type->getName().c_str(), cellpos);
         return false;
     }
     if ((getStructureAt(cellpos) != 0) && ((unitandstructmat[cellpos].flags&(US_HIGH_COST)) == 0)) 

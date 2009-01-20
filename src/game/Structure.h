@@ -47,7 +47,7 @@ public:
 	friend class BRepairUnitAnimEvent;
 	friend class DoorAnimEvent;
 
-	Structure(StructureType *type, Uint16 cellpos, Uint8 owner, Uint16 rhealth,
+	Structure(StructureType *type, Uint16 cellpos, unsigned int owner, Uint16 rhealth,
 			Uint8 facing, string trigger_name);
 	~Structure();
 
@@ -138,7 +138,7 @@ private:
 	Uint16 bcellpos;
 	Uint16 health;
 
-	Uint8 owner;
+	unsigned int owner;
 
 	bool damaged;
 	bool animating;
@@ -159,7 +159,7 @@ private:
 	bool bombing;
 
 	UnitType* CreateUnitType;
-	Uint8 CreateUnitOwner;
+	unsigned int CreateUnitOwner;
 	Uint32 UnitToRepairPos;
 	Uint32 LastAttackTick;
 

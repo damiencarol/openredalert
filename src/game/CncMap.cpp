@@ -2992,27 +2992,25 @@ void CnCMap::unOverlayPack(INIFile *inifile)
  */
 void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 {
-	Uint8 type, frame;
-	Uint16 res;
-
-	// Hack !!
-	if (name == "BRIK" || name == "SBAG" || name == "FENC" ||
-			name == "WOOD" || name == "CYCL" || name == "BARB")
-	{
-		// Get the num of the player
-		Uint8 numPlayer = playerPool->getPlayerNum("Neutral");
-
-		// Walls are structures.
-		p::uspool->createStructure(name.c_str(), linenum, numPlayer, 256, 0, false, "None");
-		return;
-	}
-
-	string shpname;
-	shpname = name + '.' + missionData->theater.substr(0, 3);
-
-	try
-	{
-		// Remember: imagecache's indexing format is different
+    Uint8 type, frame;
+    Uint16 res;
+    
+    // Hack !!
+    if (name == "BRIK" || name == "SBAG" || name == "FENC" ||
+            name == "WOOD" || name == "CYCL" || name == "BARB") {
+        // Get the num of the player
+        unsigned int numPlayer = playerPool->getPlayerNum("Neutral");
+        
+        // Walls are structures.
+        p::uspool->createStructure(name.c_str(), linenum, numPlayer, 256, 0, false, "None");
+        return;
+    }
+    
+    string shpname;
+    shpname = name + '.' + missionData->theater.substr(0, 3);
+    
+    try {
+        // Remember: imagecache's indexing format is different
 		// (imagepool index << 16) | frame
 		frame = pc::imgcache->loadImage(shpname.c_str()) >> 16;
 	}

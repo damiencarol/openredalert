@@ -98,20 +98,20 @@ public:
     bool createReinforcements(RA_Teamtype* Team);
     
     /** Create a structure in a map with this pool */
-    bool createStructure(const char* typen, Uint16 cellpos, Uint8 owner,
+    bool createStructure(const char* typen, Uint16 cellpos, unsigned int owner,
                 Uint16 health, Uint8 facing, bool makeanim, string trigger_name);
     
     /** Create a structure in a map with this pool */
-    bool createStructure(StructureType* type, Uint16 cellpos, Uint8 owner,
+    bool createStructure(StructureType* type, Uint16 cellpos, unsigned int owner,
             Uint16 health, Uint8 facing, bool makeanim, string trigger_name);
     
     
     /** Create a Unit and return it or return NULL */
     Unit* createUnit(const char* typen, Uint16 cellpos, Uint8 subpos,
-            Uint8 owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name);
+            unsigned int owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name);
     /** Create a Unit and return it or return NULL */
     Unit* createUnit(UnitType* type, Uint16 cellpos, Uint8 subpos,
-    		Uint8 owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name);
+    		unsigned int owner, Uint16 health, Uint8 facing, Uint8 action, string trigger_name);
     
     
     /** Create a trigger on a cell */

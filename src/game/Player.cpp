@@ -383,9 +383,9 @@ Uint8 Player::getMultiColour()
     }
 }*/
 
-Uint8 Player::getPlayerNum() const 
+unsigned int Player::getPlayerNum() const 
 {
-	return playernum;
+    return playernum;
 }
 
 const string& Player::getName() const 
@@ -767,7 +767,7 @@ Uint16 Player::getPlayerStart() const
 /**
  * 
  */
-void Player::updateOwner(Uint8 newnum)
+void Player::updateOwner(unsigned int newnum)
 {
     Uint32 i;
     for (i=0;i<unitpool.size();++i){

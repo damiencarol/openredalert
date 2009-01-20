@@ -196,7 +196,7 @@ bool Dispatcher::unitSpawn(const char* tname, Uint8 owner) {
     return true;
 }
 
-bool Dispatcher::unitCreate(const char* tname, Uint32 pos, Uint8 subpos, Uint8 owner) 
+bool Dispatcher::unitCreate(const char* tname, Uint32 pos, Uint8 subpos, unsigned int owner) 
 {
     switch (logstate) 
     {

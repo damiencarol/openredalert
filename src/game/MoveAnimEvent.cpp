@@ -81,9 +81,10 @@ void MoveAnimEvent::stop()
 
 void MoveAnimEvent::run()
 {
-    Sint8 uxoff, uyoff;
+    Sint8 uxoff;
+    Sint8 uyoff;
     Uint8 oldsubpos;
-	Uint8 NewSubpos;
+    Uint8 NewSubpos;
 
     waiting = false;
     if( !un->isAlive() ) {
@@ -92,7 +93,7 @@ void MoveAnimEvent::run()
     }
 
     if (path == 0) {
-        p::uspool->setCostCalcOwnerAndType(un->owner, 0);
+        p::uspool->setCostCalcOwnerAndType(un->getOwner(), 0);
         path = new Path(un, un->getPos(), dest, range);
         if( !path->empty() ) {
             startMoveOne(false);
@@ -191,7 +192,7 @@ void MoveAnimEvent::startMoveOne(bool wasblocked)
     if( newpos == 0xffff ) {
         delete path;
         path = NULL;
-        p::uspool->setCostCalcOwnerAndType(un->owner, 0);
+        p::uspool->setCostCalcOwnerAndType(un->getOwner(), 0);
         path = new Path(un, un->getPos(), dest, range);
         pathinvalid = false;
         if( path->empty() ) {
@@ -291,7 +292,7 @@ void MoveAnimEvent::moveDone()
 
     if (pathinvalid) {
         delete path;
-        p::uspool->setCostCalcOwnerAndType(un->owner, 0);
+        p::uspool->setCostCalcOwnerAndType(un->getOwner(), 0);
         path = new Path(un, un->getPos(), dest, range);
         pathinvalid = false;
     }
@@ -300,7 +301,7 @@ void MoveAnimEvent::moveDone()
     } else {
         if( dest != un->getPos() && !stopping ) {
             delete path;
-            p::uspool->setCostCalcOwnerAndType(un->owner, 0);
+            p::uspool->setCostCalcOwnerAndType(un->getOwner(), 0);
             path = new Path(un, un->getPos(), dest, range);
             pathinvalid = false;
         }
