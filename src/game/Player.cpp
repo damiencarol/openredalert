@@ -72,6 +72,7 @@ Player::Player(const string& pname)
     unallycalls = 0;
     playerstart = 0;
     defeated = false;
+    victorious = false;
     
     // Set Player side unit and structure palette
     if (playername == "Spain") 

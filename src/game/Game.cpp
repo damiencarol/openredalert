@@ -719,7 +719,7 @@ void Game::play()
 			pc::input->handle();
 
 			// Handle the ai
-			pc::ai->handle();
+			//pc::ai->handle();
 
 			// Handle triggers
 			lTriggerManager.handle();
