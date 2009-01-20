@@ -679,12 +679,17 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
 
     // Create a new one
     st = new Structure(type, cellpos, owner, health, facing, trigger_name);
-    if (!type->isWall()) 
-	{
+    if (!type->isWall())
+    {
         PlayerPool* thePlayerPool = p::ccmap->getPlayerPool();
         Player* thePlayer = thePlayerPool->getPlayer(owner);
-        thePlayer->builtStruct(st);
-	}
+        
+        // HACK TO TEST IF IT'S APWR THAT BUG 
+        if (st->getType()->getName() != "APWR")
+        {
+            thePlayer->builtStruct(st);
+        }
+    }
 	
     st->referTo();
     st->setStructnum(structnum);

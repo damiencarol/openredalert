@@ -462,7 +462,7 @@ string Sidebar::getButtonName(unsigned int index)
 	else 
 	{
 		// Out of range
-		return 0;
+		return "";
 	}
 }
 

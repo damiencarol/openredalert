@@ -578,8 +578,13 @@ void Input::handle()
 		//logger->gameMsg("MISSION FAILED");
         }
     }
-    if (donecount > finaldelay) {
+
+    // test if it's over
+    if (donecount > finaldelay) 
+    {
         done = 1;
+        // Reset donecount
+        donecount = 0;
     }
 }
 
