@@ -58,7 +58,7 @@ public:
 	//void setSettings(const char* nick, const char* colour, const char* mside);
 	//void setSettings(const char* nick, const int colour, const char* mside);
 
-	Uint8 getPlayerNum() const ;
+	unsigned int getPlayerNum() const ;
 	
 	/** Return the name of the player */
 	const string& getName() const ;
@@ -98,7 +98,7 @@ public:
 
 	Uint16 getPlayerStart() const ;
 
-	void updateOwner(Uint8 newnum);
+	void updateOwner(unsigned int newnum);
 
 	bool isDefeated() const;
 

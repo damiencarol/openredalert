@@ -17,8 +17,8 @@
 
 #include "Unit.hpp"
 
-#include <cstdlib>
-#include <cstring>
+//#include <cstdlib>
+//#include <cstring>
 #include <string>
 #include <math.h>
 
@@ -89,7 +89,7 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
             imagenumbers[i] |= palettenum;
         }
     }
-    this->owner = owner;
+    this->setOwner(owner);
     this->cellpos = cellpos;
     this->subpos = subpos;
     l2o = 0;
@@ -122,19 +122,19 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
     {
 	   this->Harvest(0, 0);
     }
-
+    
     AI_Mission = 1;
-
-	TriggerName = trigger_name;
-	Command     = action;
-
-	fix_str_num = 0;
-
-	// Init last damage tick var
-	LastDamageTick = SDL_GetTicks();
-
-	// Initialisation
-	infianim = 0;
+    
+    TriggerName = trigger_name;
+    Command     = action;
+    
+    fix_str_num = 0;
+    
+    // Init last damage tick var
+    LastDamageTick = SDL_GetTicks();
+    
+    // Initialisation
+    infianim = 0;
 }
 
 Unit::~Unit()
@@ -177,7 +177,7 @@ Unit::~Unit()
 				pc::sfxeng->PlaySound("hvydoor1.aud");
 			}
 		}
-        p::uspool->createStructure(type->getDeployTarget(),calcDeployPos(),owner,(Uint16)(ratio*256.0f),0, true, "None");
+        p::uspool->createStructure(type->getDeployTarget(),calcDeployPos(), this->getOwner(), (Uint16)(ratio*256.0f),0, true, "None");
 /*
 	//printf ("Deploy\n");
 	if (!pc::sidebar->getVisible()){
@@ -221,16 +221,15 @@ void Unit::setInfantryGroup(InfantryGroup *ig)
 
 Uint32 Unit::getImageNum(Uint8 layer) const
 {
-	return type->getSHPNums()[layer]+imagenumbers[layer];
+    return type->getSHPNums()[layer]+imagenumbers[layer];
 }
 
 Uint16 Unit::getNumbImages(Uint8 layer)
 {
-	if (type->getSHPTNum() != 0)
-	{
-		return type->getSHPTNum()[layer];
-	}
-	return 0;
+    if (type->getSHPTNum() != 0) {
+        return type->getSHPTNum()[layer];
+    }
+    return 0;
 }
 
 /**
@@ -522,7 +521,7 @@ void Unit::stop()
 
 void Unit::remove()
 {
-    p::ccmap->getPlayerPool()->getPlayer(owner)->lostUnit(this, deployed);
+    p::ccmap->getPlayerPool()->getPlayer(this->getOwner())->lostUnit(this, deployed);
     UnitOrStructure::remove();
 }
 
@@ -670,7 +669,7 @@ Uint32 Unit::FindTiberium()
 //	if (owner != p::ccmap->getPlayerPool()->getLPlayerNum()){
 //		printf ("%s line %i: Exdist = %i, Dist = %i, ExFound = %i\n", __FILE__, __LINE__, ClosesedExpensiveDistance, ClosesedDistance, FirstExpensiveFound);
 //	}
-	if (owner != p::ccmap->getPlayerPool()->getLPlayerNum() && ((ClosesedExpensiveDistance < (ClosesedDistance*3)) || ClosesedExpensiveDistance < 10) && FirstExpensiveFound){
+	if (this->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum() && ((ClosesedExpensiveDistance < (ClosesedDistance*3)) || ClosesedExpensiveDistance < 10) && FirstExpensiveFound){
 		//printf ("Return closesed expecive pos");
 		return ClosesedExpensivePos;
 	}

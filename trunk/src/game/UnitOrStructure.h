@@ -162,8 +162,7 @@ public:
     virtual UnitOrStructure * getTarget() ;
 
     virtual string getTriggerName (void)  = 0;
-    
-protected:    
+       
     void setOwner(unsigned int newOwner);
 };
 

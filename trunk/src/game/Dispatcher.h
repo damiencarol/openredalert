@@ -66,7 +66,7 @@ public:
     bool unitSpawn(UnitType* type, Uint8 owner);
     bool unitSpawn(const char* tname, Uint8 owner);
     /** Temporary function to place a unit directly on the map */
-    bool unitCreate(const char* tname, Uint32 pos, Uint8 subpos, Uint8 owner);
+    bool unitCreate(const char* tname, Uint32 pos, Uint8 subpos, unsigned int owner);
 
     Uint16 getExitCell(const UnitOrStructureType* type);
     Uint16 getExitCell(Uint8 ptype);

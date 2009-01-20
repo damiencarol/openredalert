@@ -52,41 +52,41 @@ DoorAnimEvent::~DoorAnimEvent()
 
 void DoorAnimEvent::anim_func(anim_nfo* data)
 {
-	Uint8 subpos = 0;
-	Uint16 pos;
-	
-	updateDamaged();
-	
-	if (opening) {
-		if (frame < framend) {
-			++frame;
-		} else {
-			delayCounter++;
-			if (delayCounter > 15)
-				data->done = true;
-
-			if (delayCounter == 8){
-				pos = strct->getFreePos(&subpos, strct->CreateUnitType->isInfantry());
-				if (pos != 0xffff) {
-					strct->runAnim(1);
-					// (256 = FULLHEALTH)
-					p::uspool->createUnit(strct->CreateUnitType, pos, subpos, strct->CreateUnitOwner, 255, 16, 0, "None");
-				} else {
-					logger->error("%s line %i: No free position for %s\n", __FILE__, __LINE__, strct->CreateUnitType->getName().c_str());
-				}
-			}
-
-		}
-	} else {
-		if (frame > framestart) {
-			--frame;
-		} else {
-			frame = framestart;
-			data->done = true;
-		}
-	}
-	data->frame1 = frame;
-	data->frame0 = frame0;
+    Uint8 subpos = 0;
+    Uint16 pos;
+    
+    updateDamaged();
+    
+    if (opening) {
+        if (frame < framend) {
+            ++frame;
+        } else {
+            delayCounter++;
+            if (delayCounter > 15)
+                data->done = true;
+            
+            if (delayCounter == 8){
+                pos = strct->getFreePos(&subpos, strct->CreateUnitType->isInfantry());
+                if (pos != 0xffff) {
+                    strct->runAnim(1);
+                    // (256 = FULLHEALTH)
+                    p::uspool->createUnit(strct->CreateUnitType, pos, subpos, strct->CreateUnitOwner, 255, 16, 0, "None");
+                } else {
+                    logger->error("%s line %i: No free position for %s\n", __FILE__, __LINE__, strct->CreateUnitType->getName().c_str());
+                }
+            }
+            
+        }
+    } else {
+        if (frame > framestart) {
+            --frame;
+        } else {
+            frame = framestart;
+            data->done = true;
+        }
+    }
+    data->frame1 = frame;
+    data->frame0 = frame0;
 }
 
 void DoorAnimEvent::updateDamaged()

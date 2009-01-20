@@ -68,7 +68,7 @@ namespace pc {
 }
 extern Logger * logger;
 
-Structure::Structure(StructureType *type, Uint16 cellpos, Uint8 owner,
+Structure::Structure(StructureType *type, Uint16 cellpos, unsigned int owner,
         Uint16 rhealth, Uint8 facing, string trigger_name) : UnitOrStructure()
 {
 	
