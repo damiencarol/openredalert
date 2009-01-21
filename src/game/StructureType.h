@@ -93,15 +93,6 @@ public:
 
 	bool isPowered();
 
-	/**
-     * Units and structures can have at most two weapons. Currently any secondary weapons are ignored.
-     * @param primary if true return the first weapon else the second
-     * @todo Write a version that accepts an armour type and returns the weapon that'll cause the most damage.
-     */
-	Weapon* getWeapon(bool primary) const;
-	/** @brief Return by default the primary weapon */
-	Weapon* getWeapon() const;
-
 	bool hasTurret() const;
 
 	Uint16 getBlckOff() const;

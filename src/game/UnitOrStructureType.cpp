@@ -90,5 +90,61 @@ string UnitOrStructureType::getName() const
 
 void UnitOrStructureType::setName(string pName)
 {
-    tname = pName;
+    this->tname = pName;
 }
+
+/**
+ * Return the Primary weapon
+ *
+ * @return Reference to the primary weapon
+ * @see Weapon
+ */
+Weapon * UnitOrStructureType::getWeapon() const
+{
+    // Return Reference to the Primary weapon
+    return getWeapon(true);
+}
+
+/**
+ * Return the weapon of the structure wanted
+ *
+ * @param primary if true select the primary weapon else return the secondary
+ * @return Reference to the selected weapon
+ * @see Weapon
+ */
+Weapon * UnitOrStructureType::getWeapon(bool primary) const
+{
+    if (primary)
+    {
+        return this->getPrimaryWeapon();
+    }
+    else
+    {
+        return this->getSecondaryWeapon();
+    }
+}
+
+Weapon* UnitOrStructureType::getPrimaryWeapon() const
+{
+    return this->primary_weapon;
+}
+
+Weapon* UnitOrStructureType::getSecondaryWeapon() const
+{
+    return this->secondary_weapon;
+}
+
+void UnitOrStructureType::setPrimaryWeapon(Weapon* value)
+{
+    if (this->tname == "WEAP")
+    {
+        int a = 0;
+    }
+    this->primary_weapon = value;
+}
+
+void UnitOrStructureType::setSecondaryWeapon(Weapon* value)
+{
+    this->secondary_weapon = value;
+}
+

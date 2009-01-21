@@ -57,9 +57,7 @@ public:
 	 */
 	virtual Uint8 getNumLayers() const = 0;
 
-	/** Returns the weapon of the Unit or Structure */
-	virtual Weapon * getWeapon(bool primary) const = 0;
-
+	
 	/** Only applicable to units.  StructureType always returns false. */
 	virtual bool isInfantry() const = 0;
 
@@ -106,16 +104,25 @@ public:
     /** Return the internal name of the structure/unit type */
     string getName() const;
 
+
+    /**
+     * Units and structures can have at most two weapons. Currently any secondary weapons are ignored.
+     * @param primary if true return the first weapon else the second
+     * @todo Write a version that accepts an armour type and returns the weapon that'll cause the most damage.
+     */
+    Weapon* getWeapon(bool primary) const;
+    /** @brief Return by default the primary weapon */
+    Weapon* getWeapon() const;
+
+    Weapon* getPrimaryWeapon() const;
+    Weapon* getSecondaryWeapon() const;
+
 protected:
 	/** Sight of the Unit (in Cell) */
 	Uint8 sight;
 	animinfo_t animinfo;
 	/** Armor of the Unit */
 	armor_t armour;
-	/** Secondary weapon of the Unit */
-	Weapon* secondary_weapon;
-	/** Primary weapon of the Unit */
-	Weapon* primary_weapon;
 	Uint16 maxhealth;
 	Uint8 speed;
 	int cost;
@@ -128,12 +135,21 @@ protected:
     
     void setName(string pName);
 
+    void setPrimaryWeapon(Weapon* theWeapon);
+    void setSecondaryWeapon(Weapon* theWeapon);
+
 private:
     UnitOrStructureType(const UnitOrStructureType& orig);
 
     Uint8 ptype;
     /** Name of the Type */
     string tname;
+
+    /** Secondary weapon of the Unit */
+    Weapon* secondary_weapon;
+
+    /** Primary weapon of the Unit */
+    Weapon* primary_weapon;
 };
 
 #endif //UNITORSTRUCTURETYPE_H
