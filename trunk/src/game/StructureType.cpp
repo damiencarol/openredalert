@@ -1,3 +1,6 @@
+
+#include "UnitOrStructureType.h"
+
 // StructureType.cpp
 // 1.0
 
@@ -323,20 +326,20 @@ StructureType::StructureType(const string& typeName, INIFile* structini, INIFile
         string strPri = structini->readString(typeName, "primary_weapon", "");
         if (strPri == "")
         {
-            primary_weapon = 0;
+            this->setPrimaryWeapon(0);
         }
         else
         {
-            primary_weapon = p::weappool->getWeapon(strPri.c_str());
+            this->setPrimaryWeapon(p::weappool->getWeapon(strPri.c_str()));
         }
 		string strSec = structini->readString(typeName, "secondary_weapon", "");
 		if (strSec == "")
 		{
-			secondary_weapon = 0;
+			this->setSecondaryWeapon(0);
 		}
 		else
 		{
-			secondary_weapon = p::weappool->getWeapon(strSec.c_str());
+			this->setSecondaryWeapon(p::weappool->getWeapon(strSec.c_str()));
 		}
 		turret = (structini->readInt(typeName, "turret", 0) != 0);
 		if (turret)
@@ -348,8 +351,8 @@ StructureType::StructureType(const string& typeName, INIFile* structini, INIFile
 	{
 		numwalllevels = structini->readInt(typeName, "levels", 1);
 		turret = 0;
-		primary_weapon = 0;
-		secondary_weapon = 0;
+                this->setPrimaryWeapon(0);
+		this->setSecondaryWeapon(0);
 	}
 
 	// Read the Cost of the Structure Type
@@ -527,40 +530,9 @@ PowerInfo StructureType::getPowerInfo() const
 
 bool StructureType::isPowered()
 {
-	if (powerinfo.powered)
-		return true;
-	return false;
-}
-
-/**
- * Return the Primary weapon
- * 
- * @return Reference to the primary weapon
- * @see Weapon
- */
-Weapon * StructureType::getWeapon() const
-{
-	// Return Reference to the Primary weapon
-	return getWeapon(true);
-}
-
-/**
- * Return the weapon of the structure wanted
- * 
- * @param primary if true select the primary weapon else return the secondary
- * @return Reference to the selected weapon
- * @see Weapon
- */
-Weapon * StructureType::getWeapon(bool primary) const
-{
-	if (primary)
-	{
-		return primary_weapon;
-	}
-	else
-	{
-		return secondary_weapon;
-	}
+    if (powerinfo.powered)
+        return true;
+    return false;
 }
 
 bool StructureType::hasTurret() const

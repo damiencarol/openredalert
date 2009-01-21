@@ -239,22 +239,22 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
     string priStr = unitini->readString(tname, "Primary", "");
     if (priStr == "")
     {
-        primary_weapon = 0;
+        this->setPrimaryWeapon(0);
     }
     else
     {
-        primary_weapon = p::weappool->getWeapon(priStr.c_str());
+        this->setPrimaryWeapon(p::weappool->getWeapon(priStr.c_str()));
     }
         
     //
     string secStr = unitini->readString(tname, "Secondary", "");
     if (secStr == "")
     {
-        secondary_weapon = 0;
+        this->setSecondaryWeapon(0);
     }
     else
     {
-        secondary_weapon = p::weappool->getWeapon(secStr.c_str());
+        this->setSecondaryWeapon(p::weappool->getWeapon(secStr.c_str()));
     }
     
     
@@ -428,19 +428,6 @@ Uint8 UnitType::getTurnspeed() const
 armor_t UnitType::getArmor() const
 {
 	return armour;
-}
-
-Weapon* UnitType::getWeapon() const
-{
-	return getWeapon(true);
-}
-
-Weapon* UnitType::getWeapon(bool primary) const
-{
-	if (primary == true) {
-		return primary_weapon;
-	}
-	return secondary_weapon;
 }
 
 const char* UnitType::getDeployTarget() const

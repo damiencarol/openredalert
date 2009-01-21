@@ -63,19 +63,13 @@ public:
 	armor_t getArmor() const;
 
 #ifdef LOOPEND_TURN
-	animinfo_t getAnimInfo() const
-	{
-		return animinfo;
-	}
+    animinfo_t getAnimInfo() const
+    {
+        return animinfo;
+    }
 #endif
 
 	const char* getRandTalk(TalkbackType type) const;
-
-	/** Returns the primary Weapon of this type of Unit */
-	Weapon* getWeapon() const;
-	/** Returns the primary Weapon of this type of Unit if 
-	 * primary is true else returns the secondary Weapon */
-	Weapon* getWeapon(bool primary) const;
 
 	bool isWall() const;
 	bool canDeploy() const;
