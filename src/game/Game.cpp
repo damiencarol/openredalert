@@ -711,7 +711,7 @@ void Game::play()
 			}
 
 			// Draw the scene
-			//pc::gfxeng->renderScene();
+			pc::gfxeng->renderScene();
 
 			// Run scheduled events
 			p::aequeue->runEvents();
