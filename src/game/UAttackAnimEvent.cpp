@@ -33,6 +33,7 @@
 #include "CnCMap.h"
 #include "include/Logger.h"
 #include "Unit.hpp"
+#include "UnitType.h"
 
 namespace p {
 	extern CnCMap* ccmap;
@@ -55,7 +56,7 @@ UAttackAnimEvent::UAttackAnimEvent(Uint32 p, Unit *un) : UnitAnimEvent(p,un)
 
 	// Determine the weapon to use
 	if (!target->getType()->isStructure()){
-		switch (((Unit*)target)->getType()->getType()){
+		switch (((Unit*)target)->getType()->getPType()){
 			case UN_INFANTRY:
 			case UN_VEHICLE:
 				Weap = un->getType()->getWeapon();
@@ -83,7 +84,7 @@ UAttackAnimEvent::UAttackAnimEvent(Uint32 p, Unit *un) : UnitAnimEvent(p,un)
 				}
 				break;
 			default:
-				logger->error ("%s line %i: ERROR unknown unit type %i\n", __FILE__, __LINE__, ((Unit*)target)->getType()->getType());
+				logger->error ("%s line %i: ERROR unknown unit type %i\n", __FILE__, __LINE__, ((Unit*)target)->getType()->getPType());
 				break;
 		}
 	}else{
@@ -141,7 +142,8 @@ void UAttackAnimEvent::run()
     
     Uint8 facing;
 #ifdef LOOPEND_TURN
-    Uint8 loopend2=((UnitType*)un->type)->getAnimInfo().loopend2;
+    UnitType* unitType = dynamic_cast<UnitType*>(un->getType());
+    Uint8 loopend2 = unitType->getAnimInfo().loopend2;
 #endif
 
     //logger->debug("attack run t%p u%p\n",this,un);

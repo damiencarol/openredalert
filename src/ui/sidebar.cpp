@@ -49,6 +49,8 @@
 #include "game/UnitAndStructurePool.h"
 #include "misc/StringTableFile.h"
 #include "vfs/vfs.h"
+#include "game/UnitType.h"
+#include "game/StructureType.h"
 
 /// @todo Move this into config file(s)
 static const char* radarnames[] =

@@ -217,7 +217,8 @@ void BuildingAnimEvent::updateDamaged()
 
 animinfo_t BuildingAnimEvent::getaniminfo()
 {
-	return this->strct->getType()->getAnimInfo();
+    StructureType* theType = dynamic_cast<StructureType*>(this->strct->getType());
+    return theType->getAnimInfo();
 }
 
 StructureType* BuildingAnimEvent::getType()

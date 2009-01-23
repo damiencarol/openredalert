@@ -17,8 +17,6 @@
 
 #include "Unit.hpp"
 
-//#include <cstdlib>
-//#include <cstring>
 #include <string>
 #include <math.h>
 
@@ -46,6 +44,8 @@
 #include "misc/config.h"
 #include "TalkbackType.h"
 #include "UInfiltrateAnimEvent.h"
+#include "UnitType.h"
+#include "StructureType.h"
 
 namespace p {
 	extern ActionEventQueue * aequeue;
@@ -276,9 +276,9 @@ void Unit::setYoffset(Sint8 yo)
 	this->yoffset = yo;
 }
 
-UnitType* Unit::getType()
+UnitOrStructureType* Unit::getType()
 {
-	return type;
+    return this->type;
 }
 
 Uint16 Unit::getPos() const
@@ -403,7 +403,7 @@ void Unit::attack(UnitOrStructure* target, bool stop)
 
 	if (!target->getType()->isStructure())
 	{
-		switch (((Unit*)target)->getType()->getType()){
+		switch (((Unit*)target)->getType()->getPType()){
 			case UN_INFANTRY:
 			case UN_VEHICLE:
 				Weap = type->getWeapon();
@@ -714,8 +714,11 @@ void Unit::Harvest(Uint32 pos, Structure* Struct)
  */
 bool Unit::Repair(Structure *str)
 {
+    // Get the type of the structure
+    StructureType* strType = dynamic_cast<StructureType*>(str->getType());
+
     // Check if the structure is "FIX"
-    if (str->getType()->getName() == "FIX")
+    if (strType->getName() == "FIX")
     {
         return false;
     }
@@ -726,8 +729,8 @@ bool Unit::Repair(Structure *str)
 	p::ccmap->translateFromPos(str->getPos(), &xpos, &ypos);
 
 	// Try to get the middle
-	xpos += str->getType()->getXsize()/2 ;
-	ypos += str->getType()->getYsize()/2;
+	xpos += strType->getXsize()/2 ;
+	ypos += strType->getYsize()/2;
 
 	fix_str_num = str->getNum();
 	fix_str_pos = (Uint16)p::ccmap->translateToPos(xpos, ypos);

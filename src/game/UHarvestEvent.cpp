@@ -216,7 +216,7 @@ void UHarvestEvent::run()
             MoveTargePos = un->FindTiberium ();
         }
 
-        int NumbLayers = un->type->getNumLayers();
+        int NumbLayers = un->getType()->getNumLayers();
 
         facing = (Uint32)(((double)OrgImage / (double)32) * (double)8);
 
@@ -275,7 +275,7 @@ void UHarvestEvent::run()
 			return;
 		}else if (ReturnStep == 3){
 			// We are back at the refinery, start dump animation
-			int NumbLayers = un->type->getNumLayers();
+			int NumbLayers = un->getType()->getNumLayers();
 
 			if (index < 8){
 				un->setImageNum(32+(8*8) + index, NumbLayers - 1);

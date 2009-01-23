@@ -412,6 +412,8 @@ Menu::~Menu()
 
 void Menu::DrawMenuBackground()
 {
+    return ;
+    
 	SDL_Rect dest;
 
 	dest.x = 0;

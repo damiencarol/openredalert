@@ -27,7 +27,6 @@
 
 #include "triggers.h"
 #include "MiniMapClipping.h"
-#include "Unit.hpp"
 #include "misc/INIFile.h"
 #include "misc/gametypes.h"
 #include "video/SHPImage.h"
@@ -39,6 +38,9 @@ class CnCMap;
 class MissionData;
 class TemplateImage;
 class PlayerPool;
+class AiCommand;
+class Unit;
+
 
 using OpenRedAlert::Game::Trigger;
 namespace OpenRedAlert

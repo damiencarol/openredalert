@@ -53,6 +53,7 @@
 #include "game/UnitAndStructurePool.h"
 #include "ui/MapAnimationMenu.hpp"
 #include "TriggerManager.hpp"
+#include "game/Unit.hpp"
 
 using std::string;
 using std::runtime_error;
@@ -710,7 +711,7 @@ void Game::play()
 			}
 
 			// Draw the scene
-			pc::gfxeng->renderScene();
+			//pc::gfxeng->renderScene();
 
 			// Run scheduled events
 			p::aequeue->runEvents();

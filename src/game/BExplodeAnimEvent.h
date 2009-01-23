@@ -21,7 +21,8 @@
 //
 #include "BuildingAnimEvent.h"
 #include "anim_nfo.h"
-#include "Structure.h"
+
+class Structure;
 
 /** Animation used when a building explodes
  *

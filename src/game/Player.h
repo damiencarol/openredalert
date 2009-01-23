@@ -26,13 +26,14 @@
 
 #include "ConStatus.h"
 #include "UnitOrStructureType.h"
-#include "Unit.hpp"
+//#include "Unit.hpp"
 
 class MoneyCounter;
 class Structure;
 class StructureType;
 class BQueue;
 class INIFile;
+class Unit;
 
 using std::map;
 using std::list;

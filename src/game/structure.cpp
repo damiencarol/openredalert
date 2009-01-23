@@ -54,6 +54,7 @@
 #include "misc/config.h"
 #include "ActionEventQueue.h"
 #include "BarrelExplosionActionEvent.h"
+#include "UnitType.h"
 
 using Sound::SoundEngine;
 
@@ -639,11 +640,12 @@ void Structure::attack(UnitOrStructure* target)
 	
 	if (!target->getType()->isStructure())
 	{
-		switch (((Unit*)target)->getType()->getType()){
+            switch (((Unit*)target)->getType()->getPType())
+            {
 			case UN_INFANTRY:
 			case UN_VEHICLE:
 				Weap = type->getWeapon();
-				if (Weap != NULL){
+				if (Weap != 0){
 					if (!Weap->getProjectile()->AntiGround()){
 						Weap = type->getWeapon(false);
 						if (Weap != NULL){
@@ -1006,9 +1008,9 @@ bool Structure::isPrimary() const
 	return primary;
 }
 
-StructureType* Structure::getType()
+UnitOrStructureType* Structure::getType()
 {
-	return type;
+    return this->type;
 }
 
 Uint16* Structure::getImageNums() const

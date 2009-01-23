@@ -20,17 +20,19 @@
 
 #include "BTurnAnimEvent.h"
 #include "CnCMap.h"
-#include "misc/common.h"
 #include "PlayerPool.h"
 #include "ProjectileAnim.h"
-#include "audio/SoundEngine.h"
 #include "Unit.hpp"
 #include "UnitAndStructurePool.h"
 #include "weaponspool.h"
 #include "anim_nfo.h"
 #include "UnitOrStructure.h"
+#include "UnitOrStructureType.h"
+#include "StructureType.h"
 #include "ActionEventQueue.h"
 #include "Structure.h"
+#include "misc/common.h"
+#include "audio/SoundEngine.h"
 #include "include/Logger.h"
 
 namespace p {
@@ -64,7 +66,7 @@ BAttackAnimEvent::BAttackAnimEvent(Uint32 p, Structure *str) :
  */
 BAttackAnimEvent::~BAttackAnimEvent()
 {
-    if (strct->getType()->Charges())
+    if (((StructureType*)strct->getType())->Charges())
     {
         frame = StartFrame; //intended conversion?
         if (strct->getNumbImages(0) > frame)
@@ -82,6 +84,10 @@ BAttackAnimEvent::~BAttackAnimEvent()
  */
 void BAttackAnimEvent::run()
 {
+    // Get the type of the structure
+    StructureType* theType = dynamic_cast<StructureType*>(strct->getType());
+
+    
 	Sint32 xtiles, ytiles;
 	Uint16 atkpos, mwid;
 	float alpha;
@@ -96,7 +102,7 @@ void BAttackAnimEvent::run()
 
 	if (!target->isAlive() || done)
 	{
-		if (strct->getType()->Charges())
+		if (theType->Charges())
 		{
 			if (strct->getNumbImages(0) > frame)
 			{
@@ -126,7 +132,7 @@ void BAttackAnimEvent::run()
 		// Since buildings can not move, give up for now.
 		// Alternatively, we could just wait to see if the target ever
 		// enters range (highly unlikely when the target is a structure)
-		if (strct->getType()->Charges())
+		if (theType->Charges())
 		{
 			if (strct->getNumbImages (0)> frame)
 			{
@@ -165,7 +171,7 @@ void BAttackAnimEvent::run()
 	//
 	// turn to face target first if this building have turret
 	//
-	if ((strct->getType()->hasTurret()) && ((strct->getImageNums()[0]&0x1f)!=facing) )
+	if ((theType->hasTurret()) && ((strct->getImageNums()[0]&0x1f)!=facing) )
 	{
 		setDelay(0);
 		strct->buildAnim = new BTurnAnimEvent(strct->type->getTurnspeed(), strct, facing);
@@ -177,7 +183,7 @@ void BAttackAnimEvent::run()
 	//
 	// This is the charging animation I only know of the tesla coil that uses it.
 	//
-	if (strct->getType()->Charges())
+	if (theType->Charges())
 	{
 		if (frame < StartFrame+8)
 		{

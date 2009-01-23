@@ -23,6 +23,7 @@
 #include "Structure.h"
 #include "include/Logger.h"
 #include "UnitAndStructurePool.h"
+#include "UnitType.h"
 
 extern Logger * logger;
 namespace p {
