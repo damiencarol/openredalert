@@ -44,6 +44,7 @@
 #include "game/ConStatus.h"
 #include "game/BQueue.h"
 #include "game/UnitAndStructurePool.h"
+#include "game/UnitType.h"
 
 using Sound::SoundEngine;
 
@@ -787,7 +788,8 @@ void Input::clickMap(int mx, int my)
 
 
 		// Check if this unit can infiltrate
-		if (selected->getUnit(0)->getType()->isInfiltrate() == true)
+                UnitType* theType = static_cast<UnitType*>(selected->getUnit(0)->getType());
+		if (theType->isInfiltrate() == true)
 		{
 			// If their are a structure at this position
 			if (p::uspool->getStructureAt(pos) != 0)
@@ -1106,51 +1108,54 @@ void Input::setCursorByPos(int mx, int my)
         	if (selected->numbUnits() == 1 &&
         		selected->getUnit(0)->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum())
         	{
-        		// If the cursor is under a structure
-        		if (p::uspool->getStructureAt(pos) != 0)
-        		{
-        			//
-        			// Handle Infiltrate
-        			// (if the selected unit can infiltrate)
-        			if (selected->getUnit(0)->getType()->isInfiltrate() == true)
-        			{
-        				// ENGINEER
-        				if (selected->getUnit(0)->getType()->getName() == "E6")
-        				{
-        					// if structure is enemy structure
-        					if (p::uspool->getStructureAt(pos)->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
-        					{
-        						pc::cursor->setCursor("red_enter");
-        						return;
-        					} else {
-        						pc::cursor->setCursor("enter");
-        						return;
-        					}
-        				}
+                // If the cursor is under a structure
+                if (p::uspool->getStructureAt(pos) != 0)
+                {
+                    //
+                    // Handle Infiltrate
+                    // (if the selected unit can infiltrate)
+                    UnitType* theType = dynamic_cast<UnitType*> (selected->getUnit(0)->getType());
+                    if (theType->isInfiltrate() == true)
+                    {
+                        // ENGINEER
+                        if (selected->getUnit(0)->getType()->getName() == "E6")
+                        {
+                            // if structure is enemy structure
+                            if (p::uspool->getStructureAt(pos)->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
+                            {
+                                pc::cursor->setCursor("red_enter");
+                                return;
+                            }
+                            else
+                            {
+                                pc::cursor->setCursor("enter");
+                                return;
+                            }
+                        }
 
-        				// SPY
-        				if (selected->getUnit(0)->getType()->getName() == "SPY")
-        				{
-        					// if structure is enemy structure
-        					if (p::uspool->getStructureAt(pos)->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
-        					{
-        						pc::cursor->setCursor("red_enter");
-        						return;
-        					}
-        				}
+                        // SPY
+                        if (selected->getUnit(0)->getType()->getName() == "SPY")
+                        {
+                            // if structure is enemy structure
+                            if (p::uspool->getStructureAt(pos)->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
+                            {
+                                pc::cursor->setCursor("red_enter");
+                                return;
+                            }
+                        }
 
-        				// if C4
-        				if (selected->getUnit(0)->getType()->isC4())
-        				{
-        					// if structure is enemy structure
-        					if (p::uspool->getStructureAt(pos)->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
-        					{
-        						pc::cursor->setCursor("bom");
-        						return;
-        					}
-        				}
-        			}
-        		}
+                        // if C4
+                        if (theType->isC4())
+                        {
+                            // if structure is enemy structure
+                            if (p::uspool->getStructureAt(pos)->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
+                            {
+                                pc::cursor->setCursor("bom");
+                                return;
+                            }
+                        }
+                    }
+                }
 
 
         		// Handle FIX for all units

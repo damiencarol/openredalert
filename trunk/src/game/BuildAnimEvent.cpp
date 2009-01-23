@@ -26,6 +26,7 @@
 #include "anim_nfo.h"
 #include "Structure.h"
 #include "CnCMap.h"
+#include "StructureType.h"
 
 namespace p {
 	extern UnitAndStructurePool* uspool;

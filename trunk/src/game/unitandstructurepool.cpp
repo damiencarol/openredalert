@@ -873,8 +873,9 @@ bool UnitAndStructurePool::spawnUnit(UnitType* type, Uint8 owner)
 	
 	bool returnval = true;
     Player* player = p::ccmap->getPlayerPool()->getPlayer(owner);
-    assert(player != 0);
+
     Structure* tmpstruct = player->getPrimary(type);
+    StructureType* tmpStructType = dynamic_cast<StructureType*>(tmpstruct->getType());
     Uint16 pos = 0xffff;
     Uint8 subpos = 0;
 
@@ -885,9 +886,11 @@ bool UnitAndStructurePool::spawnUnit(UnitType* type, Uint8 owner)
         return false;
     }
 
-    if (pos != 0xffff) {
+    if (pos != 0xffff)
+    {
         /// @todo run weap animation (let unit exit weap)
- 		if(!type->isInfantry() && !tmpstruct->getType()->hasAirBoundUnits() && !tmpstruct->getType()->isWaterBound()){
+        if(!type->isInfantry() && !tmpStructType->hasAirBoundUnits() && !tmpStructType->isWaterBound())
+        {
 			/// CreateUnitAnimation eventually calls createUnit
 			returnval = tmpstruct->CreateUnitAnimation(type, owner);
 		}else{
@@ -1743,12 +1746,11 @@ void UnitAndStructurePool::removeStructure(Structure *st)
 {
     Uint16 curpos, x, y;
 	Uint32 pos;
-	StructureType *type;
-
-	type = st->getType();
+        
+    StructureType* type = dynamic_cast<StructureType*>(st->getType());
 
     // unitandstructmat[st->getPos()] &= ~(US_UNIT_LOWER_RIGHT|US_IS_STRUCTURE);
-    structurepool[st->getNum()] = NULL;
+    structurepool[st->getNum()] = 0;
     curpos = st->getPos();
     if (((StructureType*)st->getType())->isWall()) {
         updateWalls(st, false, p::ccmap);

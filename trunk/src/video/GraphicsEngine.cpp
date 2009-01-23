@@ -33,6 +33,7 @@
 #include "game/Player.h"
 #include "game/Unit.hpp"
 #include "game/UnitAndStructurePool.h"
+#include "game/StructureType.h"
 #include "audio/SoundEngine.h"
 #include "include/sdllayer.h"
 #include "misc/StringTableFile.h"
@@ -815,8 +816,9 @@ void GraphicsEngine::DrawRepairing()
 		}
 
 		// Draw the repair icon (animation)
-		udest.x = xpos + (str->getType()->getXsize() * tilewidth/2)- (RepairImg->w/2); //+ (str->getType()->getXsize() * tilewidth)
-		udest.y = ypos + (str->getType()->getYsize() * tileheight/2) - (RepairImg->h/2)/* + (str->getType()->getYsize() * tileheight) */;
+                StructureType* theType = dynamic_cast<StructureType*>(str->getType());
+		udest.x = xpos + (theType->getXsize() * tilewidth/2)- (RepairImg->w/2); //+ (str->getType()->getXsize() * tilewidth)
+		udest.y = ypos + (theType->getYsize() * tileheight/2) - (RepairImg->h/2); // + (str->getType()->getYsize() * tileheight)
 		udest.w = RepairImg->w;
 		udest.h = RepairImg->h;
 		SDL_UpperBlit(RepairImg, 0, screen, &udest);
@@ -892,8 +894,9 @@ void GraphicsEngine::DrawBombing()
 		}
 
 		// Draw the repair icon (animation)
-		udest.x = xpos + (str->getType()->getXsize() * tilewidth - bombImage->w)/2; //+ (str->getType()->getXsize() * tilewidth)
-		udest.y = ypos + (str->getType()->getYsize() * tileheight - bombImage->h)/2; /* + (str->getType()->getYsize() * tileheight) */
+                StructureType* theType = dynamic_cast<StructureType*>(str->getType());
+		udest.x = xpos + (theType->getXsize() * tilewidth - bombImage->w)/2; //+ (str->getType()->getXsize() * tilewidth)
+		udest.y = ypos + (theType->getYsize() * tileheight - bombImage->h)/2; /* + (str->getType()->getYsize() * tileheight) */
 		udest.w = bombImage->w;
 		udest.h = bombImage->h;
 		// Draw the icon

@@ -22,8 +22,6 @@
 
 #include "SDL/SDL_types.h"
 
-#include "UnitOrStructureType.h"
-
 //
 //  Commands that tell us what the unit or structure should be doing
 //
@@ -56,6 +54,7 @@ class WeaponsPool;
 class Unit;
 class Structure;
 class UnitAndStructurePool;
+class UnitOrStructureType;
 
 using std::string;
 

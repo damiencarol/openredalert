@@ -32,6 +32,7 @@
 #include "game/Structure.h"
 #include "game/Unit.hpp"
 #include "game/CnCMap.h"
+#include "game\unittypes.h"
 
 namespace p {
 	extern Dispatcher* dispatcher;
@@ -479,13 +480,13 @@ Uint8 Selection::getOwner() const
 
 bool Selection::areWaterBound()
 {
-	UnitType	*UnitType = NULL;
-	Structure	*PrimaryStruct = NULL;
+    // Test if the selection is ENEMY selection
+    if (enemy_selected == true) {
+        return false;
+    }
 
-	if (enemy_selected)
-		return false;
-
-    if (sel_units.empty()) {
+    // Test if the selection IS NOT EMPTY
+    if (sel_units.empty() == true) {
         return false;
     }
 
@@ -495,16 +496,22 @@ bool Selection::areWaterBound()
         if (!(*UnitIt)->isAlive())
             continue;
 
-
-	UnitType = (*UnitIt)->getType();
-	PrimaryStruct = p::ccmap->getPlayerPool()->getPlayer((*UnitIt)->getOwner())->getPrimary(UnitType);
-		if (PrimaryStruct != NULL){
-			if (!PrimaryStruct->getType()->isWaterBound())
-				return false;
-		}else
-			return false;
-	}
-	return true;
+        // Get the type of the unit
+        //UnitType* theUnitType = dynamic_cast<UnitType*> ((*UnitIt)->getType()->getPType());
+        /*PrimaryStruct = p::ccmap->getPlayerPool()->getPlayer((*UnitIt)->getOwner())->getPrimary(UnitType);
+        if (PrimaryStruct != NULL)
+        {
+            if (!PrimaryStruct->getType()->isWaterBound())
+                return false;
+        }
+        else
+            return false;*/
+        if ((*UnitIt)->getType()->getPType() != UN_BOAT)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 Uint32 Selection::numbUnits() const

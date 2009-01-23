@@ -23,14 +23,11 @@
 #include "SDL/SDL_types.h"
 
 #include "UnitOrStructure.h"
-#include "UnitOrStructureType.h"
-#include "StructureType.h"
-#include "Weapon.h"
-#include "UnitType.h"
-#include "Unit.hpp"
 
 using std::string;
 
+class StructureType;
+class UnitType;
 class BuildingAnimEvent;
 class BAttackAnimEvent;
 class BRepairUnitAnimEvent;
@@ -59,7 +56,7 @@ public:
 	Uint32 getImageNum(Uint8 layer) const;
 	Uint16 getNumbImages(Uint8 layer);
 	void setImageNum(Uint32 num, Uint8 layer);
-	StructureType* getType();
+	UnitOrStructureType* getType();
 	void setStructnum(Uint32 stn);
 	Uint32 getNum() const;
 	Uint16 getPos() const;

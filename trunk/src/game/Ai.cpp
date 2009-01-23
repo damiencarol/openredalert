@@ -39,6 +39,8 @@
 #include "misc/INIFile.h"
 #include "audio/SoundEngine.h"
 #include "video/Renderer.h"
+#include "UnitType.h"
+#include "StructureType.h"
 
 #define DEBUG_AI
 
@@ -1186,7 +1188,7 @@ Unit* Ai::EnemyUnitInRange (int MyPlayerNumb, Structure* MyStructure, int Attack
 		return 0;
 
 	if (AttackRange == -1){
-        StructureType* theType = MyStructure->getType();
+        StructureType* theType = dynamic_cast< StructureType*>(MyStructure->getType());
         Weapon* theWeapon = theType->getWeapon(true);
 		AttackRange = theWeapon->getRange();
     }

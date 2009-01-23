@@ -29,6 +29,7 @@
 #include "unittypes.h"
 #include "Unit.hpp"
 #include "ActionEventQueue.h"
+#include "UnitType.h"
 
 namespace p {
 	extern ActionEventQueue* aequeue;
@@ -37,7 +38,8 @@ namespace p {
 TurnAnimEvent::TurnAnimEvent(Uint32 p, Unit *un, Uint8 dir, Uint8 layer) : UnitAnimEvent(p,un)
 {
 #ifdef LOOPEND_TURN
-    Uint8 loopend=((UnitType*)un->type)->getAnimInfo().loopend;
+    UnitType* theType = dynamic_cast<UnitType*>(un->getType());
+    Uint8 loopend= theType->getAnimInfo().loopend;
 #endif
     //logger->debug("Turn cons (t%p u%p d%i l%i)\n",this,un,dir,layer);
     Uint8 layerface;

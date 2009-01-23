@@ -26,6 +26,7 @@
 #include "UnitAndStructurePool.h"
 #include "Unit.hpp"
 #include "ActionEventQueue.h"
+#include "UnitOrStructureType.h"
 
 namespace p {
 	extern UnitAndStructurePool* uspool;

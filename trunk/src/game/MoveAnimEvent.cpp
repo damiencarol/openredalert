@@ -30,6 +30,7 @@
 #include "UnitAndStructurePool.h"
 #include "Unit.hpp"
 #include "InfantryGroup.h"
+#include "UnitType.h"
 
 namespace p {
 	extern ActionEventQueue * aequeue;
@@ -260,7 +261,7 @@ void MoveAnimEvent::startMoveOne(bool wasblocked)
 //            if( (delta <= (Sint8)((loopend+1)/8)) || (delta >= (Sint8)(loopend*7/8))) {
 		// Don't try to turn if we are already turning
         if( curface != face && un->turnanim1 == NULL) {
-            if( ((delta <= (Sint8)((loopend+1)/8)) || (delta >= (Sint8)(loopend*7/8))) || un->getType()->getType() == UN_PLANE) {
+            if( ((delta <= (Sint8)((loopend+1)/8)) || (delta >= (Sint8)(loopend*7/8))) || un->getType()->getPType() == UN_PLANE) {
 #else
         Uint8 curface = (un->getImageNum(0)&0x1f);
         Uint8 delta = (abs(curface-face))&0x1f;

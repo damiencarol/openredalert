@@ -25,6 +25,7 @@
 #include "UnitAndStructurePool.h"
 #include "anim_nfo.h"
 #include "Structure.h"
+#include "StructureType.h"
 
 namespace pc
 {

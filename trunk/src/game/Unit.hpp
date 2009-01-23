@@ -29,12 +29,8 @@
 
 #include "SDL/SDL_types.h"
 
-#include "game/UnitOrStructure.h"
-#include "game/UnitType.h"
 #include "game/TalkbackType.h"
 #include "UnitOrStructure.h"
-#include "UnitType.h"
-//#include "InfantryGroup.h"
 #include "Weapon.h"
 #include "Structure.h"
 #include "TalkbackType.h"
@@ -56,6 +52,9 @@ class InfantryGroup;
 
 using std::string;
 using std::multimap;
+
+//namespace OpenRedAlert { namespace Game { class UnitType; }}
+//namespace OpenRedAlert { namespace Game { class UnitOrStructureType; }}
 
 /**
  * Unit in game
@@ -88,7 +87,7 @@ public:
     Sint8 getYoffset() const; // return yoffset-type->getOffset();
     void setXoffset(Sint8 xo);
     void setYoffset(Sint8 yo);
-    UnitType * getType();
+    UnitOrStructureType * getType();
 
     Uint16 getPos() const;
     Uint16 getBPos(Uint16 pos) const;

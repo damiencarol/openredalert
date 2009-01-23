@@ -30,7 +30,7 @@
 #include "animinfo_t.h"
 
 class INIFile;
-class UnitType;
+//class UnitType;
 class Weapon;
 
 using std::string;

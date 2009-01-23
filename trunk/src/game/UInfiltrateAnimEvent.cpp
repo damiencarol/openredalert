@@ -33,6 +33,7 @@
 #include "CnCMap.h"
 #include "include/Logger.h"
 #include "Unit.hpp"
+#include "UnitOrStructureType.h"
 
 namespace p {
 	extern CnCMap* ccmap;

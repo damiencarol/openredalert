@@ -51,7 +51,7 @@ WalkAnimEvent::WalkAnimEvent(Uint32 p, Unit *un, Uint8 dir, Uint8 layer) : UnitA
 WalkAnimEvent::~WalkAnimEvent()
 {
 #ifdef LOOPEND_TURN
-	UnitType* unitTypeOf = this->un->getType();
+	UnitType* unitTypeOf = dynamic_cast<UnitType*>(this->un->getType());
 	
     un->setImageNum((unitTypeOf->getAnimInfo().loopend+1)*dir/8, layer);
 #else
