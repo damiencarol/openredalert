@@ -32,7 +32,7 @@
 #include "game/Structure.h"
 #include "game/Unit.hpp"
 #include "game/CnCMap.h"
-#include "game\unittypes.h"
+#include "game/unittypes.h"
 
 namespace p {
 	extern Dispatcher* dispatcher;
