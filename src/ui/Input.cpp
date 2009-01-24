@@ -89,7 +89,7 @@ Input::Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea) :
     height(screenheight),
     done(0),
     donecount(0),
-    finaldelay(1000),
+    finaldelay(200),
     gamemode(p::ccmap->getGameMode()),
     maparea(maparea),
     tabwidth(pc::sidebar->getTabLocation()->w),
@@ -1198,7 +1198,8 @@ void Input::setCursorByPos(int mx, int my)
         		}
         	}
 
-            if( lplayer->getMapVis()[pos] ) {
+            if( lplayer->getMapVis()->at(pos) == true )
+            {
                 curunit = p::uspool->getUnitAt(pos, subpos);
                 curstruct = p::uspool->getStructureAt(pos,selected->getWall());
                 InfantryGroup *ig = p::uspool->getInfantryGroupAt(pos);
@@ -1337,7 +1338,8 @@ void Input::setCursorByPos(int mx, int my)
 			}else if (selected->canMove() && selected->areWaterBound()){
 				//printf ("%s line %i: Selected are water bound\n", __FILE__, __LINE__);
                 p::uspool->setCostCalcOwnerAndType(lplayer->getPlayerNum(),0);
-                if( p::ccmap->getCost(pos, selected->getRandomUnit()) < 0xfff0 || !lplayer->getMapVis()[pos]) {
+                if( p::ccmap->getCost(pos, selected->getRandomUnit()) < 0xfff0 || !lplayer->getMapVis()->at(pos)) 
+                {
                     pc::cursor->setCursor("move");
                 } else {
                     pc::cursor->setCursor("nomove");
@@ -1345,7 +1347,8 @@ void Input::setCursorByPos(int mx, int my)
                 return;
             } else if (selected->canMove()) {
                 p::uspool->setCostCalcOwnerAndType(lplayer->getPlayerNum(),0);
-                if( p::ccmap->getCost(pos) < 0xfff0 || !lplayer->getMapVis()[pos]) {
+                if( p::ccmap->getCost(pos) < 0xfff0 || !lplayer->getMapVis()->at(pos)) 
+                {
                     pc::cursor->setCursor("move");
                 } else {
                     pc::cursor->setCursor("nomove");
@@ -1505,7 +1508,7 @@ Uint16 Input::checkPlace(int mx, int my)
     Sint16 delta;
     Uint8 placexpos, placeypos;
     Uint8* placemat;
-    vector<bool>& buildable = lplayer->getMapBuildable();
+    vector<bool>* buildable = lplayer->getMapBuildable();
     Uint16 pos, curpos, placeoff;
     Uint8 subpos;
 
@@ -1578,7 +1581,8 @@ Uint16 Input::checkPlace(int mx, int my)
 					placemat[placeoff] = 4;
 					continue;
 				}
-				if (buildable[curpos]) {
+				if (buildable->at(curpos) == true) 
+                                {
 					++rangecount;
 				} else {
 					// Hmm inside fog or something --> make yellow

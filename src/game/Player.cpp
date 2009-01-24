@@ -117,13 +117,13 @@ Player::Player(const string& pname)
     	unitpalnum = 8;
     	structpalnum = 8;
     }
-    else if (playername == "GoodGuy")
+    else if (playername == "Goodguy")
     {
     	playerside = PS_GOOD;
         unitpalnum = 0;
         structpalnum = 0;
     } 
-    else if (playername == "BadGuy")
+    else if (playername == "Badguy")
     {
         playerside = PS_BAD;
         unitpalnum = 2;
@@ -173,6 +173,17 @@ Player::Player(const string& pname)
         unitpalnum = 0;
         structpalnum = 0;
     }
+    
+    // Hack !
+    //this->structurepool.reserve(500);
+    this->structurepool = new vector<Structure*>(500);
+    //this->structurepool->resize(1000, 0);
+    
+   sightMatrix = new vector<Uint8>(128*128);
+     buildMatrix= new vector<Uint8>(128*128);
+
+mapVisible= new vector<bool>(128*128); 
+ mapBuildable= new vector<bool>(128*128);
 }
 
 /**
@@ -188,10 +199,14 @@ void Player::LoadIni(INIFile *mapini)
     // this size is just to size matrixs
     //mapsize = p::ccmap->getWidth()*p::ccmap->getHeight();
     unsigned int mapsize = mapini->readInt("Map", "Width", 255) * mapini->readInt("Map", "Height", 255);
-    sightMatrix.resize(mapsize);
-    buildMatrix.resize(mapsize);
-    mapVisible.resize(mapsize);
-    mapBuildable.resize(mapsize);
+    //sightMatrix.resize(mapsize);
+    //buildMatrix.resize(mapsize);
+    //mapVisible.resize(mapsize);
+    //mapBuildable.resize(mapsize);
+    sightMatrix->resize(255*255);
+    buildMatrix->resize(255*255);
+    mapVisible->resize(255*255);
+    mapBuildable->resize(255*255);
 
     // cheats ...
     allmap = buildall = buildany = infmoney = false;
@@ -231,6 +246,8 @@ Player::~Player()
 	if (counter != NULL)
 		delete counter;
 	counter = NULL;*/
+    
+    delete this->structurepool;
 }
 
 /**
@@ -559,7 +576,7 @@ void Player::lostUnit(Unit* un, bool wasDeployed)
 //        logger->gameMsg("%s has %d structs and %d units", playername, (Uint32)structurepool.size(), (Uint32)unitpool.size()-1);
         ++unitlosses;
     }
-    if( unitpool.size() <= 1 && structurepool.empty() && !wasDeployed) 
+    if( unitpool.size() <= 1 && this->structurepool->empty() && !wasDeployed) 
     {
     	// Defeat this player
         defeated = true;
@@ -602,9 +619,11 @@ void Player::builtStruct(Structure* str)
     
    logger->debug("Player::builtStruct !!!!! Structure =  2 \n" ) ; 
      // Add this structure to the pool
-    structurepool.push_back(str);
+    //structurepool->push_back(str);
     
-  logger->debug("Player::builtStruct !!!!! Structure =  3 \n" ) ; 
+
+    
+    logger->debug("Player::builtStruct !!!!! Structure =  3 \n" ) ; 
   	// Add some sight (sight of the building)
     // @todo change this feature to test during the placement
     addSoB(str->getPos(), st->getXsize(), st->getYsize(), st->getSight(), SOB_SIGHT);
@@ -709,7 +728,7 @@ void Player::lostStruct(Structure* str)
     // Add it for stats
     ++structurelosses;
 
-    if( unitpool.empty() && structurepool.size() <= 1 ) 
+    if( unitpool.empty() && structurepool->size() <= 1 ) 
     {
         logger->gameMsg("Player \"%s\" defeated", playername.c_str());
         defeated = true;
@@ -717,15 +736,26 @@ void Player::lostStruct(Structure* str)
     } 
     else 
     {
-        for (i=0;i<structurepool.size();++i) {
-            if (structurepool[i] == str) {
+        /*for (i=0; i < this->structurepool->size(); ++i) 
+        {
+            if (*(structurepool)[i] == str) 
+            {
                 break;
             }
         }
-        for (i=i+1;i<structurepool.size();++i) {
+        for (i=i+1;i<structurepool->size();++i) {
             structurepool[i-1] = structurepool[i];
         }
-        structurepool.resize(structurepool.size()-1);
+        structurepool->resize(structurepool->size()-1);*/
+        //this->structurepool->
+        for (unsigned j = 0; j < this->structurepool->size(); j++)
+        {
+            if (this->structurepool->at(j) == str)
+            {
+                this->structurepool->erase(this->structurepool->begin() + j);
+            }
+        }
+
     }
     
     // If it's the local player
@@ -736,7 +766,7 @@ void Player::lostStruct(Structure* str)
    // }
     
     // Check TRIGGER "Low Power"
-    HandleGlobalTrigger(TRIGGER_EVENT_LOW_POWER, this->getPlayerNum());
+    //HandleGlobalTrigger(TRIGGER_EVENT_LOW_POWER, this->getPlayerNum());
 }
 
 size_t Player::getNumUnits() 
@@ -746,11 +776,14 @@ size_t Player::getNumUnits()
 
 size_t Player::getNumStructs() const 
 {
-	return structurepool.size();
+    return this->structurepool->size();
 }
 
 const std::vector<Unit*>& Player::getUnits() const {return unitpool;}
-const std::vector<Structure*>& Player::getStructures() const {return structurepool;}
+const std::vector<Structure*>* Player::getStructures() const 
+{
+    return this->structurepool;
+}
 Uint8 Player::getStructpalNum() const {return structpalnum;}
 Uint8 Player::getUnitpalNum() const {return unitpalnum;}
 Uint32 Player::getPower() const {return powerGenerated;}
@@ -774,8 +807,14 @@ void Player::updateOwner(unsigned int newnum)
     for (i=0;i<unitpool.size();++i){
         unitpool[i]->setOwner(newnum);
     }
-    for (i=0;i<structurepool.size();++i){
-        structurepool[i]->setOwner(newnum);
+    /*for (i=0;i<structurepool.size();++i){
+        *(structurepool)[i]->setOwner(newnum);
+    }*/
+    
+    // Upadte the owner of all owned structure
+    for (unsigned int j = 0; j < this->structurepool->size(); j++)
+    {
+        this->structurepool->at(j)->setOwner(newnum);
     }
 }
 
@@ -1000,18 +1039,18 @@ void Player::revealAroundWaypoint(Uint32 waypointNumber)
 void Player::setVisBuild(SOB_update mode, bool val)
 {
     if (mode == SOB_SIGHT) {
-        fill(mapVisible.begin(), mapVisible.end(), val);
+        fill(mapVisible->begin(), mapVisible->end(), val);
     } else {
-        fill(mapBuildable.begin(), mapBuildable.end(), val);
+        fill(mapBuildable->begin(), mapBuildable->end(), val);
     }
 }
 
-vector<bool>& Player::getMapVis() 
+vector<bool>* Player::getMapVis() 
 {
 	return mapVisible;
 }
 
-vector<bool>& Player::getMapBuildable() 
+vector<bool>* Player::getMapBuildable() 
 {
 	return mapBuildable;
 }
@@ -1044,17 +1083,24 @@ void Player::addSoB(Uint32 pos, Uint8 sight, SOB_update mode)
 	
 
 
-	if (mode == SOB_SIGHT) {
-        mapVoB = &mapVisible;
+	/*if (mode == SOB_SIGHT) {
+        mapVoB = mapVisible;
     } else if (mode == SOB_BUILD) {
-        mapVoB = &mapBuildable;
+        mapVoB = mapBuildable;
         sight  = brad;			// Buildable radius from config file internal-global.ini
     } else {
         //logger->error("addSoB was given an invalid mode: %i\n", mode);
         //return;
         // By default it's about visibility
-        mapVoB = &mapVisible;
+        mapVoB = mapVisible;
+    }*/
+     if (mode == SOB_SIGHT) {
+        mapVoB = mapVisible;
+    } else {
+        mapVoB = mapBuildable;
+        sight  = brad;			// Buildable radius from config file internal-global.ini
     }
+        
     		
 	
 	// check min X
@@ -1126,9 +1172,16 @@ void Player::addSoB(Uint32 pos, Uint8 sight, SOB_update mode)
 	
 			if (distance <= (sight*sight))
 			{
-				sightMatrix[curpos] += (mode == SOB_SIGHT);
-				buildMatrix[curpos] += (mode == SOB_BUILD);
-				(*mapVoB)[curpos] = true;        	
+                            if (curpos>=0 && curpos<sightMatrix->size() && curpos < buildMatrix->size()&& curpos <mapVoB->size())
+                            {
+                                if (mode == SOB_SIGHT)
+                                {
+                                    sightMatrix->at(curpos) += 1;
+                                } else {
+                                    buildMatrix->at(curpos) += 1;
+                                }
+				(*mapVoB)[curpos] = true;  
+                            }
 			}
 		}
 	}
@@ -1230,11 +1283,11 @@ void Player::removeSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_u
     if (mode == SOB_SIGHT) {
         for( cpos = 0; cpos < xsize*ysize; cpos++ ) {
             // sightMatrix[curpos] will never be < 1 here
-			if ( curpos >= sightMatrix.size() ){
+			if ( curpos >= sightMatrix->size() ){
 				printf ("%s line %i: ERROR sigtMatrix size error, curpos = %i, mapsize = %i, width = %i height = %i\n", __FILE__, __LINE__, curpos, p::ccmap->getWidth()*p::ccmap->getHeight(), p::ccmap->getWidth(), p::ccmap->getHeight());
 				return;
 			}
-			sightMatrix[curpos]--;
+			sightMatrix->at(curpos)--;
             curpos++;
             if (cpos%xsize == xsize-1)
                 curpos += mwid-xsize;
@@ -1243,16 +1296,16 @@ void Player::removeSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_u
         for( cpos = 0; cpos < xsize*ysize; cpos++ ){
 
            // sightMatrix[curpos] will never be < 1 here
-			if ( curpos >= sightMatrix.size() ){
+			if ( curpos >= sightMatrix->size() ){
 				printf ("%s line %i: ERROR sigtMatrix size error, curpos = %i, mapsize = %i, width = %i height = %i\n", __FILE__, __LINE__, curpos, p::ccmap->getWidth()*p::ccmap->getHeight(), p::ccmap->getWidth(), p::ccmap->getHeight());
 				return;
 			}
 
-            if (buildMatrix[curpos] <= 1) {
-                mapBuildable[curpos] = false;
-                buildMatrix[curpos] = 0;
+            if (buildMatrix->at(curpos) <= 1) {
+                mapBuildable->at(curpos) = false;
+                buildMatrix->at(curpos) = 0;
             } else {
-                --buildMatrix[curpos];
+                --buildMatrix->at(curpos);
             }
             curpos++;
             if (cpos%xsize == xsize-1)

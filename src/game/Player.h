@@ -89,7 +89,7 @@ public:
 	size_t getNumUnits() ;
 	size_t getNumStructs() const ;
 	const vector<Unit*>& getUnits() const ;
-	const vector<Structure*>& getStructures() const ;
+	const vector<Structure*>* getStructures() const ;
 
 	Uint8 getStructpalNum() const ;
 	Uint8 getUnitpalNum() const ;
@@ -128,8 +128,8 @@ public:
 	void revealAroundWaypoint(Uint32 Waypoint);
 	enum SOB_update { SOB_SIGHT = 1, SOB_BUILD = 2 };
 	void setVisBuild(SOB_update mode, bool val);
-	vector<bool>& getMapVis() ;
-	vector<bool>& getMapBuildable() ;
+	vector<bool>* getMapVis() ;
+	vector<bool>* getMapBuildable() ;
 
 	/** Turns on a block of cells in either the sight or buildable matrix */
 	void addSoB(Uint32 pos, Uint8 width, Uint8 height, Uint8 sight, SOB_update mode);
@@ -191,7 +191,7 @@ private:
 
 	// All of these pointers are owned elsewhere.
 	vector<Unit*> unitpool;
-	vector<Structure*> structurepool;
+    vector<Structure*>* structurepool;
 	map<StructureType*, list<Structure*> > structures_owned;
 	map<Uint32, list<Structure*> > production_groups;
 	map<Uint32, Structure*> primary_structure;
@@ -205,13 +205,13 @@ private:
      */
 	vector<Player*> non_reciproc_allies;
 
-	vector<Uint8> sightMatrix;
-	vector<Uint8> buildMatrix;
+	vector<Uint8>* sightMatrix;
+	vector<Uint8>* buildMatrix;
 
 	/** List of location that is visible by player */
-	vector<bool> mapVisible; 
+	vector<bool>* mapVisible; 
 	/** List of location that is buildable by player */
-	vector<bool> mapBuildable;
+	vector<bool>* mapBuildable;
 	
 	/** cheat/debug flags: allmap (reveal all map) */
 	bool allmap; 

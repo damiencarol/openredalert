@@ -685,7 +685,7 @@ bool UnitAndStructurePool::createStructure(StructureType* type, Uint16 cellpos,
         Player* thePlayer = thePlayerPool->getPlayer(owner);
         
         // HACK TO TEST IF IT'S APWR THAT BUG 
-        if (st->getType()->getName() != "APWR")
+        //if (st->getType()->getName() != "APWR")
         {
             thePlayer->builtStruct(st);
         }

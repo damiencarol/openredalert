@@ -587,7 +587,7 @@ void GraphicsEngine::DrawMinimap()
 	lplayer = p::ccmap->getPlayerPool()->getLPlayer();
 
 	// Get the visibility of the local player
-	vector<bool>& mapvis = lplayer->getMapVis();
+	vector<bool>* mapvis = lplayer->getMapVis();
 
     // draw minimap
     if (lplayer->getNumberRadars()>0 && !pc::sidebar->isRadaranimating())
@@ -631,9 +631,12 @@ void GraphicsEngine::DrawMinimap()
         minx = min(curpos%mapwidth, mapwidth - clip.tilew);
         cury = min(curpos/mapwidth, mapheight - clip.tileh);
         curpos = minx+cury*mapwidth;
-        for (ypos = 0; ypos < clip.tileh ; ++ypos) {
-            for (xpos = 0 ; xpos < clip.tilew ; ++xpos) {
-                if (mapvis[curpos]) {
+        
+        for (ypos = 0; ypos < clip.tileh ; ++ypos) 
+        {
+            for (xpos = 0 ; xpos < clip.tilew ; ++xpos) 
+            {
+                if (mapvis->at(curpos)) {
  			float width, height;
 			Uint8 igroup, owner, pcol;
 			Uint32 cellpos;
@@ -1230,10 +1233,11 @@ void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 {
 	Uint32				curpos;
 	Player				*lplayer = p::ccmap->getPlayerPool()->getLPlayer();
-	std::vector<bool>	&mapvis = lplayer->getMapVis();
 	int					i;
 	Uint16				mapWidth;
 	Uint16				mapHeight;
+
+    vector<bool>* mapvis = lplayer->getMapVis();
 
     mapWidth = (maparea.w+p::ccmap->getXTileScroll()+tilewidth-1)/tilewidth;
     mapWidth = min(mapWidth, p::ccmap->getWidth());
@@ -1258,7 +1262,8 @@ void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 			udest.y = dest.y;
 			udest.w = tilewidth;
 			udest.h = tilewidth;
-			if (mapvis[curpos]) {
+			if (mapvis->at(curpos)) 
+                        {
 				src.x = 0;
 				src.y = 0;
 				src.w = tilewidth;
@@ -1267,19 +1272,19 @@ void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 				i = 0;
 
 				// tile above this one is not visible
-				if (curpos >= p::ccmap->getWidth() && !mapvis[curpos-p::ccmap->getWidth()]) {
+				if (curpos >= p::ccmap->getWidth() && !mapvis->at(curpos - p::ccmap->getWidth())) {
 					i |= 1;
 				}
 				// tile next to this one (right) is not visible
-				if (curpos%p::ccmap->getWidth() < (Uint16)(p::ccmap->getWidth()-1) && !mapvis[curpos+1]) {
+				if (curpos%p::ccmap->getWidth() < (Uint16)(p::ccmap->getWidth()-1) && !mapvis->at(curpos + 1)) {
 					i |= 2;
 				}
 				// tile below this one is not visible
-				if (curpos < (Uint32)p::ccmap->getWidth()*(p::ccmap->getHeight()-1) && !mapvis[curpos+p::ccmap->getWidth()]) {
+				if (curpos < (Uint32)p::ccmap->getWidth()*(p::ccmap->getHeight()-1) && !mapvis->at(curpos + p::ccmap->getWidth())) {
 					i |= 4;
 				}
 				// tile to the left is not visible
-				if (curpos%p::ccmap->getWidth() > 0 && !mapvis[curpos-1]) {
+				if (curpos%p::ccmap->getWidth() > 0 && !mapvis->at(curpos-1)) {
 					i |= 8;
 				}
 
@@ -1334,16 +1339,16 @@ void GraphicsEngine::DrawFogOfWar(SDL_Rect dest, SDL_Rect src, SDL_Rect udest)
 					}
 				} else {
 
-					if (curpos >= p::ccmap->getWidth() && curpos%p::ccmap->getWidth() < (Uint16)(p::ccmap->getWidth()-1) && !mapvis[curpos-p::ccmap->getWidth()+1]) {
+					if (curpos >= p::ccmap->getWidth() && curpos%p::ccmap->getWidth() < (Uint16)(p::ccmap->getWidth()-1) && !mapvis->at(curpos-p::ccmap->getWidth()+1)) {
 						i |= 1;
 					}
-					if (curpos < (Uint32)p::ccmap->getWidth()*(p::ccmap->getHeight()-1) && curpos%p::ccmap->getWidth() < (Uint16)(p::ccmap->getWidth()-1) && !mapvis[curpos+p::ccmap->getWidth()+1]) {
+					if (curpos < (Uint32)p::ccmap->getWidth()*(p::ccmap->getHeight()-1) && curpos%p::ccmap->getWidth() < (Uint16)(p::ccmap->getWidth()-1) && !mapvis->at(curpos+p::ccmap->getWidth()+1)) {
 						i |= 2;
 					}
-					if (curpos < (Uint32)p::ccmap->getWidth()*(p::ccmap->getHeight()-1) && curpos%p::ccmap->getWidth() > 0 && !mapvis[curpos+p::ccmap->getWidth()-1]) {
+					if (curpos < (Uint32)p::ccmap->getWidth()*(p::ccmap->getHeight()-1) && curpos%p::ccmap->getWidth() > 0 && !mapvis->at(curpos+p::ccmap->getWidth()-1)) {
 						i |= 4;
 					}
-					if (curpos >= p::ccmap->getWidth() && curpos%p::ccmap->getWidth() > 0 && !mapvis[curpos-p::ccmap->getWidth()-1]) {
+					if (curpos >= p::ccmap->getWidth() && curpos%p::ccmap->getWidth() > 0 && !mapvis->at(curpos-p::ccmap->getWidth()-1)) {
 						i |= 8;
 					}
 
