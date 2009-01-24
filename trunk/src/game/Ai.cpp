@@ -439,12 +439,12 @@ void Ai::handle()
 }
 
 void Ai::guideAttack (Player *Player, int PlayerNumb)
-{
+{/*
     int NumbUnits;
     int NumbStructures;
     int lPlayerNumbStructures;
     int lPlayerNumbUnits;
-    vector<Structure*>		structurepool, lPlayerStructurePool;
+    vector<Structure*>* lPlayerStructurePool;
     vector<Structure*>		EnemyTeslaCoils, EnemyPowerPlants, EnemyOreRefs;
     vector<Unit*> unitpool;
     vector<Unit*> lPlayerUnitPool;
@@ -467,12 +467,12 @@ void Ai::guideAttack (Player *Player, int PlayerNumb)
 	unitpool		= Player->getUnits();
 
 	// Handle structure vars
-	structurepool		= Player->getStructures();
+    vector<Structure*>* structurepool =0;// Player->getStructures();
 	NumbStructures		= Player->getNumStructs();
 
 	// Handle lPlayer vars
-	lPlayerStructurePool	= p::ccmap->getPlayerPool()->getLPlayer()->getStructures();
-	lPlayerNumbStructures	= lPlayerStructurePool.size();
+	lPlayerStructurePool	=0;// p::ccmap->getPlayerPool()->getLPlayer()->getStructures();
+	lPlayerNumbStructures	= 0;//lPlayerStructurePool.size();
 	lPlayerUnitPool		= p::ccmap->getPlayerPool()->getLPlayer()->getUnits();
 	lPlayerNumbUnits	= lPlayerUnitPool.size();
 
@@ -494,21 +494,23 @@ void Ai::guideAttack (Player *Player, int PlayerNumb)
 		if (!player_targets[PlayerNumb]->isAlive()){
 			player_targets[PlayerNumb] = NULL;
 
-			if (lPlayerStructurePool.size() > 0)
+			if (true)//lPlayerStructurePool.size() > 0)
 			{
-				if (lPlayerStructurePool[0]->isAlive()){
-					NextTargetDist = FirstUnit->getDist(lPlayerStructurePool[0]->getPos());
-					player_targets[PlayerNumb] = lPlayerStructurePool[0];
+				if (true)//lPlayerStructurePool[0]->isAlive())
+                                {
+					NextTargetDist = FirstUnit->getDist(0);//lPlayerStructurePool[0]->getPos());
+					//player_targets[PlayerNumb] = lPlayerStructurePool[0];
 				}else
 					NextTargetDist = 10000;
 
 				// Find the closest target
-				for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++)
+				//for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++)
 				{
-					if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < NextTargetDist && lPlayerStructurePool[i]->isAlive()){
+                                    unsigned i = 0;
+					//if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < NextTargetDist && lPlayerStructurePool[i]->isAlive()){
 						NextTargetDist = FirstUnit->getDist(lPlayerStructurePool[i]->getPos());
 						player_targets[PlayerNumb] = lPlayerStructurePool[i];
-					}
+					//}
 				}
 
 				// Find the preferred targets
@@ -638,7 +640,7 @@ void Ai::guideAttack (Player *Player, int PlayerNumb)
 				}
 			}
 		}
-	}
+	}*/
 }
 
 /**
@@ -665,7 +667,7 @@ Uint32 Ai::getDist(Uint32 pos1, Uint32 pos2)
 
 bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
 {
-	Uint32 placeypos;
+/*	Uint32 placeypos;
 	Uint32 placexpos;
 	Uint32 curpos;
 	Uint16 xpos;
@@ -702,7 +704,7 @@ bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
 				return false;
 
 		}
-	}
+	}*/
 	return true;
 }
 
@@ -791,8 +793,7 @@ unsigned int Ai::FindClosesedTiberium(Unit *Unit)
 
 
 void Ai::DefendStructures (Player *Player, int PlayerNumb)
-{
-	std::vector<Structure*> structurepool;
+{/*
 //UnitOrStructure         *Enemy = NULL;
 int                     NumbStructures;
 Structure               *Structure;
@@ -801,7 +802,7 @@ Unit                    *EnemyUnit;
 	//
 	// Make structures defend themselfes
 	//
-	structurepool = Player->getStructures();
+  //  vector<Structure*>* structurepool = Player->getStructures();
 	NumbStructures = Player->getNumStructs();
 
 	// For each structure from this player
@@ -833,7 +834,7 @@ Unit                    *EnemyUnit;
 				Structure->attack(EnemyUnit);
 			}
 		}
-	}
+	}*/
 }
 
 void Ai::Build (Player *Player, int PlayerNumb)
@@ -867,7 +868,7 @@ Uint16				xpos,
 	}
 
 	NumbUnits	= Player->getNumUnits();
-	structurepool	= Player->getStructures();
+	//structurepool	= Player->getStructures();
 	NumbStructures	= Player->getNumStructs();
 
 	unitpool = Player->getUnits();
@@ -1276,7 +1277,7 @@ Structure* Ai::EnemyStructureInRange (int MyPlayerNumb, Unit* MyUnit, int Attack
             continue;
 
         EnemyNumbStructures	= EnemyPlayer->getNumStructs();
-        Enemystructurepool	= EnemyPlayer->getStructures();
+       // Enemystructurepool	= EnemyPlayer->getStructures();
 
         // For each unit from this player
         for (int StructureNumb = 0; StructureNumb < EnemyNumbStructures; StructureNumb++){
@@ -1333,7 +1334,7 @@ void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
     int lPlayerNumbStructures;
     int lPlayerNumbUnits;
 
-    std::vector<Structure*> structurepool, lPlayerStructurePool;
+    std::vector<Structure*>* structurepool, lPlayerStructurePool;
     std::vector<Unit*> unitpool, lPlayerUnitPool;
     Unit *Unit;
     UnitOrStructure* target = NULL;
@@ -1352,11 +1353,11 @@ void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
 	unitpool		= Player->getUnits();
 
 	// Handle structure vars
-	structurepool		= Player->getStructures();
+	structurepool		= 0;//Player->getStructures();
 	NumbStructures		= Player->getNumStructs();
 
 	// Handle lPlayer vars
-	lPlayerStructurePool	= p::ccmap->getPlayerPool()->getLPlayer()->getStructures();
+	//lPlayerStructurePool	= p::ccmap->getPlayerPool()->getLPlayer()->getStructures();
 	lPlayerNumbStructures	= p::ccmap->getPlayerPool()->getLPlayer()->getNumStructs();
 	lPlayerUnitPool		= p::ccmap->getPlayerPool()->getLPlayer()->getUnits();
 	lPlayerNumbUnits	= p::ccmap->getPlayerPool()->getLPlayer()->getNumUnits();

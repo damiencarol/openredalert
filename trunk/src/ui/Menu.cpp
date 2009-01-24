@@ -412,27 +412,26 @@ Menu::~Menu()
 
 void Menu::DrawMenuBackground()
 {
-    return ;
     
-	SDL_Rect dest;
-
-	dest.x = 0;
-	dest.y = 0;
-	dest.w = display->w;
-	dest.h = display->h;
-
-	//Black the screen
-	static Uint32 blackpix = SDL_MapRGB(display->format, 0, 0, 0);
-	SDL_FillRect(display, &dest, blackpix);
-
-	// Draw the menu background pixture
-	if (SDLlogo != 0) {
-		dest.x = (display->w - SDLlogo->w)/2;
-		dest.y = (display->h - SDLlogo->h)/2;
-
-		//printf ("dest.x = %i, dest.y = %i, logo.w = %i, logo.h = %i\n", dest.x, dest.y, SDLlogo->w, SDLlogo->h);
-		SDL_BlitSurface(SDLlogo, 0, display, &dest);
-	}
+    SDL_Rect dest;
+    
+    dest.x = 0;
+    dest.y = 0;
+    dest.w = display->w;
+    dest.h = display->h;
+    
+    //Black the screen
+    static Uint32 blackpix = SDL_MapRGB(display->format, 0, 0, 0);
+    SDL_FillRect(display, &dest, blackpix);
+    
+    // Draw the menu background pixture
+    if (SDLlogo != 0) {
+        dest.x = (display->w - SDLlogo->w)/2;
+        dest.y = (display->h - SDLlogo->h)/2;
+        
+        //printf ("dest.x = %i, dest.y = %i, logo.w = %i, logo.h = %i\n", dest.x, dest.y, SDLlogo->w, SDLlogo->h);
+        SDL_BlitSurface(SDLlogo, 0, display, &dest);
+    }
 }
 
 /**

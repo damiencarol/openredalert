@@ -652,16 +652,14 @@ bool CnCMap::canSpawnAt(Uint16 pos) const
  */
 bool CnCMap::isBuildableAt(Uint32 PlayerNumb, Uint16 pos, bool WaterBound) const
 {
-	//    UnitOrStructure* uos = 0;
-
-	// Can't build where you haven't explored
-	if (PlayerNumb == playerPool->getLPlayerNum())
-	{
-		if (!playerPool->getLPlayer()->getMapVis()[pos])
-		{
-			return false;
-		}
-	}
+    //    UnitOrStructure* uos = 0;
+    
+    // Can't build where you haven't explored
+    if (PlayerNumb == playerPool->getLPlayerNum()) {
+        if (playerPool->getLPlayer()->getMapVis()->at(pos) == false) {
+            return false;
+        }
+    }
 
 	// Can't build on tiberium
 	//    if (getTiberium(pos) != 0) {
@@ -707,7 +705,7 @@ bool CnCMap::isBuildableAt(Uint32 PlayerNumb, Uint16 pos, bool WaterBound) const
 bool CnCMap::isBuildableAt(Uint16 pos, Unit* excpUn) const
 {
 	// Can't build where you haven't explored
-	if (!playerPool->getLPlayer()->getMapVis()[pos])
+	if (!playerPool->getLPlayer()->getMapVis()->at(pos))
 	{
 		return false;
 	}
@@ -758,7 +756,7 @@ bool CnCMap::isBuildableAt(Uint32 PlayerNumb, Uint16 pos, Unit* excpUn) const
 	// Can't build where you haven't explored
 	if (PlayerNumb == playerPool->getLPlayerNum())
 	{
-		if (!playerPool->getLPlayer()->getMapVis()[pos])
+		if (!playerPool->getLPlayer()->getMapVis()->at(pos))
 		{
 			return false;
 		}
@@ -816,7 +814,7 @@ Uint16 CnCMap::getCost(Uint16 pos, Unit* excpUn) const
 	{
 		if (excpUn->getOwner() == playerPool->getLPlayerNum())
 		{
-			if ( !playerPool->getLPlayer()->getMapVis()[pos] && (excpUn == 0 || excpUn->getDist(pos)>1 ))
+			if ( !playerPool->getLPlayer()->getMapVis()->at(pos) && (excpUn == 0 || excpUn->getDist(pos)>1 ))
 			{
 				if (!excpUn->IsAirBound())
 					return 0;
@@ -829,7 +827,7 @@ Uint16 CnCMap::getCost(Uint16 pos, Unit* excpUn) const
 	}
 	else
 	{
-		if ( !playerPool->getLPlayer()->getMapVis()[pos] /*&& (excpUn == 0 || excpUn->getDist(pos)>1 )*/)
+		if ( !playerPool->getLPlayer()->getMapVis()->at(pos) /*&& (excpUn == 0 || excpUn->getDist(pos)>1 )*/)
 		{
 			return 0;
 		}
@@ -2192,6 +2190,8 @@ void CnCMap::advancedSections(INIFile *inifile)
     //
     // STRUCTURES
     //
+    // @FIXME Bug in owner reading
+    // @TODO refactoring this section to use the methods of the inifile
     // If their are a section called "STRUCTURES"
     if (inifile->isSection(string("STRUCTURES")) == true)
     {
@@ -2218,9 +2218,19 @@ void CnCMap::advancedSections(INIFile *inifile)
                         linenum = (tyd - y) * width + txd - x;
 
                         //printf("CnCMap::loadIni(%s)\n", owner);
-
-                        p::uspool->createStructure(type, linenum, playerPool->getPlayerNum(owner), health, facing, false, trigger);
-                        //                    printf ("%s line %i: createStructure STRUCTURE %s, trigger = %s\n", __FILE__, __LINE__, type, trigger);
+                        
+                        int playerNum = playerPool->getPlayerNum(string(owner));
+                        //Player* thePlayer = playerPool->getPlayer(playerNum);
+                        //if (thePlayer != 0)
+                        if (playerNum != -1)
+                        {
+                            // printf ("%s line %i: createStructure STRUCTURE %s, trigger = %s\n", __FILE__, __LINE__, type, trigger);
+                            p::uspool->createStructure(type, linenum, playerNum, health, facing, false, trigger);
+                        }
+                        else
+                        {
+                            logger->error("[cncmap::advancedscetion::STRUCTURES The owner %s is not found !!!!!!\n", owner);
+                        }
                     }
                 }
                 /*else if (maptype == GAME_TD)
@@ -2285,10 +2295,19 @@ void CnCMap::advancedSections(INIFile *inifile)
 						continue;
 					}
 					linenum = (ty-y)*width + tx - x;
-					// Create the unit
-					p::uspool->createUnit(type, linenum, 5, playerPool->getPlayerNum(owner), health, facing, UnitActionToNr(action), trigger);
-
-					//printf ("%s line %i: createUnit UNIT %s, trigger = %s\n", __FILE__, __LINE__, key->first.c_str(), trigger);
+                                        
+                                        // @FIXME owner is not correct
+                                        int playerNumber = playerPool->getPlayerNum(owner);
+                                        if (playerNumber != -1) 
+                                        {
+                                            // Create the unit
+                                            p::uspool->createUnit(type, linenum, 5, playerNumber, health, facing, UnitActionToNr(action), trigger);
+                                        }
+                                        else
+                                        {
+                                           	logger->error("ERROR DURING DECODE owner = %s\n", owner); 
+                                        }
+			//printf ("%s line %i: createUnit UNIT %s, trigger = %s\n", __FILE__, __LINE__, key->first.c_str(), trigger);
 				} else {
 					logger->error("ERROR DURING DECODE Line read in UNIT = %s\n", key->second.c_str());
 				}
@@ -2327,10 +2346,17 @@ void CnCMap::advancedSections(INIFile *inifile)
 				}
 				linenum = (ty-y)*width + tx - x;
 
-				p::uspool->createUnit(typeCustom, linenum, subpos, playerPool->getPlayerNum(owner), health, facing, UnitActionToNr(action), trigger);
-
+                                int playerNumber = playerPool->getPlayerNum(owner);
+                                if (playerNumber != -1)
+                                {
+				p::uspool->createUnit(typeCustom, linenum, subpos, playerNumber, health, facing, UnitActionToNr(action), trigger);
 				//printf ("%s line %i: createUnit INFANTRY, unit = %c%c%c, trigger = %s\n", __FILE__, __LINE__, type[0], type[1], type[2], trigger);
-		}
+                                }
+                                else
+                                {
+                                    logger->error("cncmap::advanced   Infantry   owner = %s", owner);
+                                }
+                             }
 	}
 
 	// Decode and create CellTriggers

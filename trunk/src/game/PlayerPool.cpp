@@ -57,6 +57,7 @@ PlayerPool::PlayerPool()
     playerpool.push_back(new Player("Turkey"));
     
     playerpool.push_back(new Player("GoodGuy"));
+    playerpool.push_back(new Player("Badguy"));
     playerpool.push_back(new Player("Neutral"));
     playerpool.push_back(new Player("Special"));
     
