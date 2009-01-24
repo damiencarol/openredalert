@@ -1334,13 +1334,17 @@ Uint16 UnitAndStructurePool::preMove(Unit *un, Uint8 dir, Sint8 *xmod, Sint8 *ym
 
 			// Check if we need to handle a trigger
 			if (unitandstructmat[newpos].flags & US_CELL_HAS_TRIGGER)
+                        {
 				//HandleGlobalTrigger ( TRIGGER_EVENT_ZONE_ENTRY, newpos );
+                        }
 		} else {
 			unitandstructmat[newpos].flags |= US_AIR_MOVING_HERE;
 
 			// Check if we need to handle a trigger
 			if (unitandstructmat[newpos].flags & US_CELL_HAS_TRIGGER)
+                        {
 				//HandleGlobalTrigger ( TRIGGER_EVENT_ZONE_ENTRY, newpos );
+                        }
 		}
 	}
 	return newpos;
@@ -2271,8 +2275,9 @@ Uint8 UnitAndStructurePool::unhideUnit(Unit* un, Uint16 newpos, bool unload)
 
 		// Check if we need to handle a trigger
 		if (unitandstructmat[newpos].flags & US_CELL_HAS_TRIGGER)
+                {
 			//HandleGlobalTrigger(TRIGGER_EVENT_ZONE_ENTRY, newpos );
-
+                }
 	} else {
 		// easier to assign directly than bitwise AND the compliment
 		// of US_MOVING_HERE then bitwise OR this value.
@@ -2295,7 +2300,9 @@ Uint8 UnitAndStructurePool::unhideUnit(Unit* un, Uint16 newpos, bool unload)
 
 				// Check if we need to handle a trigger
 				if (unitandstructmat[newpos].flags & US_CELL_HAS_TRIGGER)
+                                {
 					//HandleGlobalTrigger ( TRIGGER_EVENT_ZONE_ENTRY, newpos );
+                                }
 			}else{
 				unitandstructmat[newpos].flags &= ~(US_AIR_MOVING_HERE);
 				unitandstructmat[newpos].flags |= US_AIRUNIT_LOWER_RIGHT|US_IS_AIRUNIT;
@@ -2303,7 +2310,9 @@ Uint8 UnitAndStructurePool::unhideUnit(Unit* un, Uint16 newpos, bool unload)
 
 				// Check if we need to handle a trigger
 				if (unitandstructmat[newpos].flags & US_CELL_HAS_TRIGGER)
+                                {
 					//HandleGlobalTrigger ( TRIGGER_EVENT_ZONE_ENTRY, newpos );
+                                }
 			}
 #endif
 		}
