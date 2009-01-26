@@ -18,10 +18,14 @@
 #ifndef CPSIMAGE_H
 #define CPSIMAGE_H
 
+#include <string>
+
 #include "SDL/SDL_video.h"
 
 #include "include/imageproc.h"
 #include "CPSHeader.h"
+
+using std::string;
 
 /**
  * Image in .CPS format
@@ -48,7 +52,7 @@
 class CPSImage
 {
 public:
-    CPSImage(const char* fname, int scaleq);
+    CPSImage(string fname, int scaleq);
     ~CPSImage();
     
     /** Get a SDL_Surface of the image */

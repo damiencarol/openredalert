@@ -95,7 +95,7 @@ Menu::Menu() : StartNewGameButton()
 	if (win95_logo == NULL){
 		// failed to load the win95 logo -> try the dos logo
 		try {
-			dos_logo = new CPSImage("title.cps",1);
+			dos_logo = new CPSImage(string("title.cps"), 1);
 		} catch (ImageNotFound&) {
 			logger->error("Couldn't load startup graphic\n");
 			dos_logo = NULL;
