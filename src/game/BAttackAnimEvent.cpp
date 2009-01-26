@@ -48,7 +48,7 @@ extern Logger * logger;
  * @param p the priority of this event
  * @param str the attacking structure
  */
-BAttackAnimEvent::BAttackAnimEvent(Uint32 p, Structure *str) :
+BAttackAnimEvent::BAttackAnimEvent(unsigned int p, Structure *str) :
 	BuildingAnimEvent(p, str, 8)
 {
 	this->strct = str;
