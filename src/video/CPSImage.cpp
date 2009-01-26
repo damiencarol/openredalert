@@ -20,7 +20,7 @@
 #include <string>
 
 #include "misc/Compression.hpp"
-#include "vfs/vfs.h" // to use VFS_Open()
+#include "vfs/vfs.h" // to use VFSUtils::VFS_Open()
 #include "vfs/VFile.h" // to use VFile
 #include "video/ImageNotFound.h" // to use ImageNotFound
 
@@ -30,7 +30,7 @@ using std::string;
  * @param fname Name of the file to load
  * @param scaleq Scale factor, if caleq = -1 there are no scale factor
  */
-CPSImage::CPSImage(const char* fname, int scaleq) :
+CPSImage::CPSImage(string fname, int scaleq) :
 cpsdata(0), image(0) 
 {
     
@@ -38,10 +38,10 @@ cpsdata(0), image(0)
     this->scaleq = scaleq;
     
     // Open the image file
-    VFile* imgfile = VFSUtils::VFS_Open(fname);
+    VFile* imgfile = VFSUtils::VFS_Open(fname.c_str());
     // If no file loaded throw an error
     if (imgfile == 0) {
-        throw ImageNotFound("CPSImage: Image [" + string(fname) + "] not found.");
+        throw ImageNotFound("CPSImage: Image [" + fname + "] not found.");
     }
     
     // Get the size

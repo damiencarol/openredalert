@@ -46,7 +46,7 @@ LoadingScreen::LoadingScreen()
     lsmutex = SDL_CreateMutex();
     oldwidth = pc::msg->getWidth();
     try {
-        logo = new CPSImage("title.cps",1);
+        logo = new CPSImage(string("title.cps"), 1);
         pc::msg->setWidth(logo->getImage()->w / 4);
     } catch (ImageNotFound&) {
         logger->error("Couldn't load startup graphic\n");
