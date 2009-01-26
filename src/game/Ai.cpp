@@ -156,21 +156,18 @@ Ai::Ai()
 
 /**
  */
-Ai::~Ai()
-{
-	// Free ai rules
-	delete Rules;
+Ai::~Ai() {
+    // Free ai rules
+    delete Rules;
 }
 
 /**
  * @param diff Difficulty
  */
-void Ai::SetDifficulty(int diff)
-{
-	if (diff > 0 && diff <= 4)
-	{
-		this->Difficulty = diff;
-	}
+void Ai::SetDifficulty(int diff) {
+    if (diff > 0 && diff <= 4) {
+        this->Difficulty = diff;
+    }
 }
 
 /**
@@ -439,7 +436,7 @@ void Ai::handle()
 }
 
 void Ai::guideAttack (Player *Player, int PlayerNumb)
-{/*
+{
     int NumbUnits;
     int NumbStructures;
     int lPlayerNumbStructures;
@@ -507,31 +504,31 @@ void Ai::guideAttack (Player *Player, int PlayerNumb)
 				//for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++)
 				{
                                     unsigned i = 0;
-					//if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < NextTargetDist && lPlayerStructurePool[i]->isAlive()){
-						NextTargetDist = FirstUnit->getDist(lPlayerStructurePool[i]->getPos());
-						player_targets[PlayerNumb] = lPlayerStructurePool[i];
+					//if (FirstUnit->getDist(lPlayerStructurePool->at(i)->getPos()) < NextTargetDist && lPlayerStructurePool->at(i)->isAlive()){
+						NextTargetDist = FirstUnit->getDist(lPlayerStructurePool->at(i)->getPos());
+						player_targets[PlayerNumb] = lPlayerStructurePool->at(i);
 					//}
 				}
 
 				// Find the preferred targets
-				for (unsigned int i = 0; i < lPlayerStructurePool.size(); i++)
+				for (unsigned int i = 0; i < lPlayerStructurePool->size(); i++)
 				{
 					// Make a list of all nearby tesla's
-					if ((lPlayerStructurePool[i]->getType()->getName() == "TSLA") && lPlayerStructurePool[i]->isAlive()){
-						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
-							EnemyTeslaCoils.push_back(lPlayerStructurePool[i]);
+					if ((lPlayerStructurePool->at(i)->getType()->getName() == "TSLA") && lPlayerStructurePool->at(i)->isAlive()){
+						if (FirstUnit->getDist(lPlayerStructurePool->at(i)->getPos()) < 4 * NextTargetDist)
+							EnemyTeslaCoils.push_back(lPlayerStructurePool->at(i));
 					}
 
 					// Make a list of all nearby advanced power plants
-					if ((lPlayerStructurePool[i]->getType()->getName() == "APWR") && lPlayerStructurePool[i]->isAlive()){
-						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
-							EnemyPowerPlants.push_back(lPlayerStructurePool[i]);
+					if ((lPlayerStructurePool->at(i)->getType()->getName() == "APWR") && lPlayerStructurePool->at(i)->isAlive()){
+						if (FirstUnit->getDist(lPlayerStructurePool->at(i)->getPos()) < 4 * NextTargetDist)
+							EnemyPowerPlants.push_back(lPlayerStructurePool->at(i));
 					}
 
 					// Make a list of all nearby ore refinery's
-					if ((lPlayerStructurePool[i]->getType()->getName() == "PROC") && lPlayerStructurePool[i]->isAlive()){
-						if (FirstUnit->getDist(lPlayerStructurePool[i]->getPos()) < 4 * NextTargetDist)
-							EnemyOreRefs.push_back(lPlayerStructurePool[i]);
+					if ((lPlayerStructurePool->at(i)->getType()->getName() == "PROC") && lPlayerStructurePool->at(i)->isAlive()){
+						if (FirstUnit->getDist(lPlayerStructurePool->at(i)->getPos()) < 4 * NextTargetDist)
+							EnemyOreRefs.push_back(lPlayerStructurePool->at(i));
 					}
 				}
 
@@ -640,7 +637,7 @@ void Ai::guideAttack (Player *Player, int PlayerNumb)
 				}
 			}
 		}
-	}*/
+	}
 }
 
 /**
@@ -667,45 +664,45 @@ Uint32 Ai::getDist(Uint32 pos1, Uint32 pos2)
 
 bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
 {
-/*	Uint32 placeypos;
-	Uint32 placexpos;
-	Uint32 curpos;
-	Uint16 xpos;
-	Uint16 ypos;
-	Uint32	br;
-
+    Uint32 placeypos;
+    Uint32 placexpos;
+    Uint32 curpos;
+    Uint16 xpos;
+    Uint16 ypos;
+    Uint32	br;
+    
     p::ccmap->translateFromPos(pos, &xpos, &ypos);
-
-	StructureType* Type	= p::uspool->getStructureTypeByName(structname);
-
-	vector<bool>& buildable = p::ccmap->getPlayerPool()->getPlayer(PlayerNumb)->getMapBuildable();
-
-	// Check that we don't try to build outside the map (copied check from unitandstructurepool.cpp!!
-	br = pos + p::ccmap->getWidth()*(Type->getYsize()-1);
-	if (pos > p::ccmap->getSize() || (br > p::ccmap->getSize() && 0))
-		return false;
-
-	// Prevent wrapping around
-	if (xpos + Type->getXsize() > p::ccmap->getWidth())
-		return false;
-
-	for (placeypos = 0; placeypos < Type->getYsize(); placeypos++) {
-		for (placexpos = 0; placexpos < Type->getXsize(); placexpos++) {
-
+    
+    StructureType* Type	= p::uspool->getStructureTypeByName(structname);
+    
+    vector<bool>* buildable = p::ccmap->getPlayerPool()->getPlayer(PlayerNumb)->getMapBuildable();
+    
+    // Check that we don't try to build outside the map (copied check from unitandstructurepool.cpp!!
+    br = pos + p::ccmap->getWidth()*(Type->getYsize()-1);
+    if (pos > p::ccmap->getSize() || (br > p::ccmap->getSize() && 0))
+        return false;
+    
+    // Prevent wrapping around
+    if (xpos + Type->getXsize() > p::ccmap->getWidth())
+        return false;
+    
+    for (placeypos = 0; placeypos < Type->getYsize(); placeypos++) {
+        for (placexpos = 0; placexpos < Type->getXsize(); placexpos++) {
+            
             curpos = pos+placeypos*p::ccmap->getWidth()+placexpos;
-
-			if (!buildable[curpos])
-				return false;
-
-			if (p::uspool->getGroundUnitAt(curpos) != NULL || p::uspool->getFlyingAt(curpos) != NULL || p::uspool->getStructureAt(curpos) != NULL)    //p::uspool->getUnitAt(curpos+x) != NULL
-				return false;
-
-			if (!p::ccmap->isBuildableAt(PlayerNumb, curpos))
-				return false;
-
-		}
-	}*/
-	return true;
+            
+            if (!buildable->at(curpos))
+                return false;
+            
+            if (p::uspool->getGroundUnitAt(curpos) != NULL || p::uspool->getFlyingAt(curpos) != NULL || p::uspool->getStructureAt(curpos) != NULL)    //p::uspool->getUnitAt(curpos+x) != NULL
+                return false;
+            
+            if (!p::ccmap->isBuildableAt(PlayerNumb, curpos))
+                return false;
+            
+        }
+    }
+    return true;
 }
 
 /**
@@ -792,49 +789,47 @@ unsigned int Ai::FindClosesedTiberium(Unit *Unit)
 }
 
 
-void Ai::DefendStructures (Player *Player, int PlayerNumb)
-{/*
-//UnitOrStructure         *Enemy = NULL;
-int                     NumbStructures;
-Structure               *Structure;
-Unit                    *EnemyUnit;
-
-	//
-	// Make structures defend themselfes
-	//
-  //  vector<Structure*>* structurepool = Player->getStructures();
-	NumbStructures = Player->getNumStructs();
-
-	// For each structure from this player
-	for (int StructNumb = 0; StructNumb < NumbStructures; StructNumb++){
-		Structure = structurepool[StructNumb];
-
+void Ai::DefendStructures(Player *thePlayer, int PlayerNumb) 
+{
+    
+    //
+    // Make structures defend themselfes
+    //
+    const vector<Structure*>* structurepool = thePlayer->getStructures();
+    int NumbStructures = thePlayer->getNumStructs();
+    
+    // For each structure from this player
+    for (int StructNumb = 0; StructNumb < NumbStructures; StructNumb++){
+        Structure* theStructure = structurepool->at(StructNumb);
+        
 //        if (Structure->IsBuilding ())
 //            continue;
-
-		if (!Structure->canAttack())
-			continue;
-
-		// Check if we have enoug power
-		StructureType* st = (StructureType*)Structure->getType();
-		if ( st->getPowerInfo().powered){
-			if (Player->getPower() < Player->getPowerUsed()){
-				continue;
-			}
-		}
-
-		EnemyUnit = EnemyUnitInRange (PlayerNumb, Structure );
-
-		if (EnemyUnit != NULL && Structure->canAttack()){
-
-//			Enemy  = p::uspool->getUnitOrStructureAt(EnemyUnit->getPos(), EnemyUnit->getSubpos());
-
-//			if (Enemy != NULL && !Structure->IsAttacking ()){
-			if (!Structure->IsAttacking ()){
-				Structure->attack(EnemyUnit);
-			}
-		}
-	}*/
+        
+        if (!theStructure->canAttack())
+            continue;
+        
+        // Check if we have enoug power
+        StructureType* st = (StructureType*)theStructure->getType();
+        if (st->getPowerInfo().powered)
+        {
+            if (thePlayer->getPower() < thePlayer->getPowerUsed())
+            {
+                continue;
+            }
+        }
+        
+        Unit* EnemyUnit = EnemyUnitInRange(PlayerNumb, theStructure);
+        
+        if (EnemyUnit != 0 && theStructure->canAttack()){
+            
+// Enemy  = p::uspool->getUnitOrStructureAt(EnemyUnit->getPos(), EnemyUnit->getSubpos());
+            
+// if (Enemy != NULL && !Structure->IsAttacking ()){
+            if (!theStructure->IsAttacking()){
+                theStructure->attack(EnemyUnit);
+            }
+        }
+    }
 }
 
 void Ai::Build (Player *Player, int PlayerNumb)
