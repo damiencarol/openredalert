@@ -62,19 +62,16 @@ extern Logger * logger;
 UnitType::UnitType(const string& typeName, INIFile* unitini) :
 	UnitOrStructureType(),
 	shpnums(0),
-	deploytarget(0),
 	c4(false)
 {
     string tname = typeName;
     SHPImage* shpimage = 0;
-    Uint32 i;
+
     string shpname;
 
 	Uint32 shpnum;
 	Uint32 tmpspeed;
 
-	// Set deploy target to NULL
-	deploytarget = 0;
 
     // Ensure that there is a section in the ini file
     if (unitini->isSection(typeName) == false)
@@ -122,7 +119,7 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
 	pc::imagepool->push_back(shpimage);
 	shpnum <<= 16;
 
-	for( i = 0; i < numlayers; i++ )
+	for(unsigned int i = 0; i < numlayers; i++)
 	{
 		// get layer offsets from inifile
 		//shpnums[i] = pc::imagepool->size();
@@ -428,11 +425,6 @@ Uint8 UnitType::getTurnspeed() const
 armor_t UnitType::getArmor() const
 {
 	return armour;
-}
-
-const char* UnitType::getDeployTarget() const
-{
-	return deploytarget;
 }
 
 StructureType* UnitType::getDeployType() const
