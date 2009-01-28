@@ -81,7 +81,8 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
         imagenumbers[i] = facing;
         if (owner != 0xff)
         {
-            if (type->getDeployTarget() != 0) {
+            if (type->canDeploy() == true)
+            {
                 palettenum = (p::ccmap->getPlayerPool()->getStructpalNum(owner)<<11);
             } else {
                 palettenum = (p::ccmap->getPlayerPool()->getUnitpalNum(owner)<<11);
@@ -177,7 +178,7 @@ Unit::~Unit()
 				pc::sfxeng->PlaySound("hvydoor1.aud");
 			}
 		}
-        p::uspool->createStructure(type->getDeployTarget(),calcDeployPos(), this->getOwner(), (Uint16)(ratio*256.0f),0, true, "None");
+        p::uspool->createStructure(type->getDeployType(), calcDeployPos(), this->getOwner(), (Uint16)(ratio*256.0f),0, true, "None");
 /*
 	//printf ("Deploy\n");
 	if (!pc::sidebar->getVisible()){
@@ -764,14 +765,14 @@ void Unit::doRandTalk(TalkbackType ttype)
  */
 bool Unit::deploy()
 {
-	// error catching
-    //if (canDeploy())
+    // error catching
+    if (type->canDeploy())
     {
-        if (type->getDeployTarget() != 0)
+        //if (type->getDeployTarget() != 0)
         {
             deployed = true;
             p::uspool->removeUnit(this);
-	    	return true;
+            return true;
         }
     }
     return false;
@@ -783,18 +784,15 @@ bool Unit::deploy()
  */
 bool Unit::canDeploy(CnCMap* theMap)
 {
-	if (type->canDeploy())
+    if (type->canDeploy())
     {
-        if (type->getDeployTarget() != 0)
+        if (!deployed)
         {
-        	if (!deployed)
-        	{
-        		return checkDeployTarget(theMap, calcDeployPos());
-        	}
-        	return false;
+            return checkDeployTarget(theMap, calcDeployPos());
         }
+        return false;
     }
-	return false;
+    return false;
 }
 
 /**

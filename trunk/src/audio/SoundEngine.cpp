@@ -18,6 +18,7 @@
 #include "SoundEngine.h"
 
 #include <string>
+#include <algorithm>
 
 #include "SoundCacheCleaner.hpp"
 #include "SoundCommon.h"
@@ -29,6 +30,7 @@ extern Logger * logger;
 using std::string;
 using OpenRedAlert::Sound::SoundCacheCleaner;
 //using Sound::SoundBuffer;
+using std::for_each;
 
 namespace Sound
 {

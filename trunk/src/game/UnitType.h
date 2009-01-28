@@ -74,7 +74,7 @@ public:
 
     bool isWall() const;
     bool canDeploy() const;
-    const char* getDeployTarget() const;
+    string getDeployTarget() const;
     StructureType* getDeployType() const;
     Uint8 getBuildlevel() const;
 
@@ -115,7 +115,6 @@ private:
     /** <code>true</code> if this unit is an infantry */
     bool is_infantry;
     bool deployable;
-    char* deploytarget;
 
     /** this is used to check the unit can deploy */
     StructureType* deploytype;

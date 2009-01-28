@@ -853,10 +853,12 @@ void Input::clickMap(int mx, int my)
     curunit = p::uspool->getUnitAt(pos, subpos);
     curstructure = p::uspool->getStructureAt(pos, selected->getWall());
     InfantryGroup *ig = p::uspool->getInfantryGroupAt(pos);
-    if (ig && curunit == NULL) {
+    if (ig && curunit == 0)
+    {
         curunit = ig->GetNearest(subpos);
-        if (curunit->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum()) {
-            curunit = NULL;
+        if (curunit->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum()) 
+        {
+            curunit = 0;
         }
     }
 
@@ -864,8 +866,10 @@ void Input::clickMap(int mx, int my)
 	//
 	// Handle selling and repairing cursor states
 	//
-	if (pc::sidebar->getSpecialButtonState(1) == 2 ){
-               	if (curstructure != NULL){
+	if (pc::sidebar->getSpecialButtonState(1) == 2)
+        {
+               	if (curstructure != 0)
+                {
 			if (curstructure->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum()){
 				printf ("Repair curstructure\n");
 				curstructure->repair();
@@ -1270,7 +1274,7 @@ void Input::setCursorByPos(int mx, int my)
                             {
                                 pc::cursor->setCursor("deploy");
                             } else {
-                                pc::cursor->setCursor("nomove");
+                                pc::cursor->setCursor("nodeploy");
                             }
                             return;
                         } else {

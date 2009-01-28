@@ -61,6 +61,7 @@ using std::stringstream;
 using std::map;
 using std::runtime_error;
 using std::ostringstream;
+using std::for_each;
 
 using INI::KeyNotFound;
 
