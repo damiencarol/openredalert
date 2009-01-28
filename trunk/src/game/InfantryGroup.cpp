@@ -69,11 +69,11 @@ bool InfantryGroup::AddInfantry(Unit* inf, Uint8 subpos)
 	return true;
 }
 
-bool InfantryGroup::RemoveInfantry(Uint8 subpos)
+bool InfantryGroup::RemoveInfantry(unsigned int subpos)
 {
 	assert(subpos < 5);
 	assert(numinfantry > 0);
-	positions[subpos] = NULL;
+	positions[subpos] = 0;
 	--numinfantry;
 	return true;
 }
@@ -81,7 +81,7 @@ bool InfantryGroup::RemoveInfantry(Uint8 subpos)
 bool InfantryGroup::IsClear(Uint8 subpos)
 {
 	assert(subpos < 5);
-	return (positions[subpos] == NULL);
+	return (positions[subpos] == 0);
 }
 
 Uint8 InfantryGroup::GetNumInfantry() const

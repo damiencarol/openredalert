@@ -35,7 +35,7 @@ public:
     InfantryGroup();
     ~InfantryGroup();
     bool AddInfantry(Unit* inf, Uint8 subpos);
-    bool RemoveInfantry(Uint8 subpos);
+    bool RemoveInfantry(unsigned int subpos);
     bool IsClear(Uint8 subpos);
     Uint8 GetNumInfantry() const;
     bool IsAvailable() const;
