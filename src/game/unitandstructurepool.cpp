@@ -112,11 +112,12 @@ UnitAndStructurePool::~UnitAndStructurePool()
     std::pair<Is,Is> structpair;
     std::pair<Iu,Iu> unitpair;
 
-    for (int i = 0; i < unitpool.size(); i++ ) {
+    for (unsigned int i = 0; i < unitpool.size(); i++ ) 
+    {
         delete unitpool[i];
     }
 
-    for (int i = 0; i < unittypepool.size(); i++)
+    for (unsigned int i = 0; i < unittypepool.size(); i++)
     {
     	unitpair = unit_prereqs.equal_range(unittypepool[i]);
 
@@ -126,7 +127,7 @@ UnitAndStructurePool::~UnitAndStructurePool()
         delete unittypepool[i];
     }
 
-    for(int i = 0; i < structurepool.size(); i++) 
+    for(unsigned int i = 0; i < structurepool.size(); i++) 
     {
         //structurepool[i]->unrefer();
 		delete structurepool[i];
