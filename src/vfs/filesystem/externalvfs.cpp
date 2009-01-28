@@ -26,7 +26,7 @@
 //why is lean_mean needed???
 #include <windows.h>
 #else
-// #include <unistd.h>   // <-- Is this really needed ?
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
