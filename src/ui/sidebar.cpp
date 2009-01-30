@@ -486,11 +486,13 @@ void Sidebar::DrawButtonTooltip(Uint8 index)
 	}
 	unsigned int unit = ( function & sbo_unit );
 
-	UnitOrStructureType* type = 0;
+        string shortName = UnitOrStructureName.substr(0, 4);
+                
+        UnitOrStructureType* type = 0;
 	if (unit) {
-		type = p::uspool->getUnitTypeByName(UnitOrStructureName);
+		type = p::uspool->getUnitTypeByName(shortName);
 	} else {
-		type = p::uspool->getStructureTypeByName(UnitOrStructureName);
+		type = p::uspool->getStructureTypeByName(shortName);
 	}
 
 	// If no type found do nothing
