@@ -89,8 +89,8 @@ public:
 	/** Return the technology level required to build this [-1 means can't build] (def=-1)*/
 	int getTechLevel() const;
 
-	/** Cost to build object (in credits).*/
-	Uint16 getCost() const;
+    /** Cost to build object (in credits).*/
+    int getCost() const;
 
 	/** Speed is measured in artitrary units. */
 	Uint8 getSpeed() const;
@@ -125,7 +125,6 @@ protected:
 	armor_t armour;
 	Uint16 maxhealth;
 	Uint8 speed;
-	int cost;
 	/** Technology level required to build this [-1 means can't build] (default = -1) */
 	int techLevel;
 	vector<string> prereqs;
@@ -137,6 +136,7 @@ protected:
 
     void setPrimaryWeapon(Weapon* theWeapon);
     void setSecondaryWeapon(Weapon* theWeapon);
+    void setCost(int pCost);
 
 private:
     UnitOrStructureType(const UnitOrStructureType& orig);
@@ -150,6 +150,9 @@ private:
 
     /** Primary weapon of the Unit */
     Weapon* primary_weapon;
+    
+    /** Coest of the unit or structure */
+    int cost;
 };
 
 #endif //UNITORSTRUCTURETYPE_H

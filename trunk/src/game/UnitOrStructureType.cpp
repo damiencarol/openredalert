@@ -63,9 +63,9 @@ int UnitOrStructureType::getTechLevel() const
 	return techLevel;
 }
 
-Uint16 UnitOrStructureType::getCost() const
+int UnitOrStructureType::getCost() const
 {
-	return cost;
+    return cost;
 }
 
 Uint8 UnitOrStructureType::getSpeed() const
@@ -148,3 +148,7 @@ void UnitOrStructureType::setSecondaryWeapon(Weapon* value)
     this->secondary_weapon = value;
 }
 
+void UnitOrStructureType::setCost(int pCost)
+{
+    this->cost = pCost;
+}

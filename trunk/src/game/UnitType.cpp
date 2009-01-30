@@ -195,12 +195,13 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
 	talkback = p::uspool->getTalkback(talkmode.c_str());
 	
     maxhealth = unitini->readInt(tname, "health", 50);
-	cost = unitini->readInt(tname, "cost", 0);
-	if (0 == cost)
-	{
-		logger->error("\"%s\" has no cost, setting to 1\n", tname.c_str());
-		cost = 1;
-	}
+
+    setCost(unitini->readInt(tname, "cost", 0));
+    if (0 == getCost())
+    {
+        logger->error("\"%s\" has no cost, setting to 1\n", tname.c_str());
+	setCost(1);
+    }
 
 	// Set the turn speed
 	try

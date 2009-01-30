@@ -355,8 +355,8 @@ StructureType::StructureType(const string& typeName, INIFile* structini, INIFile
 		this->setSecondaryWeapon(0);
 	}
 
-	// Read the Cost of the Structure Type
-	cost = structini->readInt(typeName, "cost", 0);
+    // Read the Cost of the Structure Type
+    setCost(structini->readInt(typeName, "cost", 0));
 
     // Reading of the armor
     string armStr = structini->readString(typeName, "armour", "none");
