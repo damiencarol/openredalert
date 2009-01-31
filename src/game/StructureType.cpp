@@ -84,10 +84,10 @@ StructureType::StructureType(const string& typeName, INIFile* structini, INIFile
 	this->setName(typeName);
     
     // DEBUG
-    if (typeName == "WEAP")
-    {
-        int a = 0;
-    }
+    //if (typeName == "WEAP")
+    //{
+    //    int a = 0;
+    //}
 
     {
         // Read prerequiste
@@ -236,7 +236,7 @@ StructureType::StructureType(const string& typeName, INIFile* structini, INIFile
 		}
 		else
 		{
-                    shpname = tmp + ".shp";
+                    shpname = tmp;// + ".shp";
 		}
 
 		try

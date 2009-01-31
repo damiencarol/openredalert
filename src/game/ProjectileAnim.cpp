@@ -236,7 +236,7 @@ void ProjectileAnim::run()
     	// Play the anim for piff
     	Uint32 numPiffShp = pc::imgcache->loadImage("piff.shp", -1);
     	Uint32 numPiffPiffShp = pc::imgcache->loadImage("piffpiff.shp", -1);
-    	Uint32 numAtomShp = pc::imgcache->loadImage("atomsfx.shp", -1);
+    	//Uint32 numAtomShp = pc::imgcache->loadImage("atomsfx.shp", -1);
     	Uint32 type = weap->getWarhead()->getType()->getExplosion();
     	switch (type)
     	{

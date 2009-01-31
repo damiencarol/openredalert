@@ -383,8 +383,9 @@ void Input::handle()
                     p::ccmap->getPlayerPool()->getLPlayer()->setVictorious(true);
                     break;
                 case SDLK_F10:
-                	p::ccmap->getPlayerPool()->getLPlayer()->setVictorious(false);
-                	break;
+                	//p::ccmap->getPlayerPool()->getLPlayer()->setVictorious(false);
+                    p::ccmap->getPlayerPool()->getLPlayer()->setMoney(10000);
+                    break;
                 // Debug for blobals variables
                 case SDLK_F11:
                 	radarstat = 1;

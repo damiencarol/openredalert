@@ -198,7 +198,7 @@ void Player::LoadIni(INIFile *mapini)
 
     // this size is just to size matrixs
     //mapsize = p::ccmap->getWidth()*p::ccmap->getHeight();
-    unsigned int mapsize = mapini->readInt("Map", "Width", 255) * mapini->readInt("Map", "Height", 255);
+    //unsigned int mapsize = mapini->readInt("Map", "Width", 255) * mapini->readInt("Map", "Height", 255);
     //sightMatrix.resize(mapsize);
     //buildMatrix.resize(mapsize);
     //mapVisible.resize(mapsize);
@@ -678,7 +678,7 @@ void Player::lostStruct(Structure* str)
 {
     StructureType* st = (StructureType*)str->getType();
     std::list<Structure*>& sto = structures_owned[st];
-    Uint32 i;
+    //Uint32 i;
     removeSoB(str->getPos(), ((StructureType*)str->getType())->getXsize(), ((StructureType*)str->getType())->getYsize(), 1, SOB_BUILD);
     PowerInfo newpower = ((StructureType*)str->getType())->getPowerInfo();
 
