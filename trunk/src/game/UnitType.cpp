@@ -262,6 +262,11 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
         deployable = true;
         deploytype = p::uspool->getStructureTypeByName(deploytarget.c_str());
     }
+    else
+    {
+        deployable = false;
+        deploytype = 0;
+    }
     pipcolour = unitini->readInt(tname, "pipcolour", 0);
 
     // Read the armor
