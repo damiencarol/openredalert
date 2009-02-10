@@ -1,0 +1,144 @@
+
+      Westwood Studios' HiColor VQA (Vector Quantized Animation) Files
+
+                 by Gordan Ugarkovic (ugordan@yahoo.com)
+                 http://members.xoom.com/ugordan
+
+
+
+ This document describes how to view Westwood's HiColor VQA movies. These
+ are version 3 movies, but there are at least some version 2 VQAs that are
+ in this format. I will not describe the whole VQA layout here, I will
+ just explain how to display the VIDEO stream of the VQA, that is, how
+ to decompress the CBFZ and VPTR/VPRZ chunks.
+
+ First a little warning: I'm not sure which flag denotes the VQA is 8 bit
+ or 15 bit. I'm pretty convinced it's either bit 4 (0x10) or bit 2 (0x04)
+ of the Flags entry (see my VQA_INFO.TXT) in the header. Another way would 
+ be to check the Colors entry in the header, if it is 0 it could imply 
+ a HiColor movie.
+
+ There's a major difference between the old (8 bit, 256 color) and the new,
+ HiColor VQAs. Lookup tables are no longer split up into several CBP?
+ chunks, instead they come in one piece (a CBFZ chunk). Two lookup tables
+ can now be many frames apart, not just 8 (as usual). This is indicated
+ by the CBParts entry of the header (see VQA_INFO.TXT), which is set to 0.
+ Subsequent frames use the last lookup table loaded, of course.
+
+ Another thing: It appears the first CBFZ chunk comes inside the VQFR chunk
+ but the other ones seem to be located inside their own chunks,
+ called VQFL, which are followed by the usual VQFR chunks (containing
+ VPTR/VPRZ chunks).
+
+ Also, the movies are 15 bit, NOT 16 bit. There is a difference because
+ in 16 bit color depth there are 6 bits for the green channel, but
+ the VQAs use 5.
+
+ The CBFZ chunks:
+ ~~~~~~~~~~~~~~~~
+  These are a bit modified since the 8 bit VQAs. If the first byte of the
+  chunk is not NULL (0x00), it means the chunk is compressed using the
+  standard Format80 algorithm (see Vladan Bato's text on C&C file formats),
+  starting from that byte. If the first byte is NULL, the chunk is compressed
+  using a modified version of Format80 (see below), starting from the next
+  byte of the chunk. The original Format80 algorithm is used when the
+  amount of data to be compressed is less than 64 KB, otherwise the 'new'
+  algorithm is used.
+  When decompressed properly, a CBFZ chunk expands into 15 bit pixels packed
+  as shorts in normal Intel byte order. The red, green and blue values are
+  packed like this:
+
+  15      bit      0
+   0rrrrrgg gggbbbbb
+   HI byte  LO byte
+
+  The r,g,b values make up a pixel and they can range from 0-31.
+  As in the old CBFZ chunks, these pixels make up the block lookup table
+  (also called a codebook).
+
+
+ The VPTR chunks:
+ ~~~~~~~~~~~~~~~~
+  These chunks use some sort of differential, run-length algorithm that
+  only records changes from the previous frame. Therefore, the previous
+  frame bitmap must be maintained throughout all the frames (you could
+  just draw the blocks that changed, though). This makes dropping frames
+  (in case of bad performance) impossible.
+
+  When decoding, you take a short int (Intel) from the chunk and examine 
+  its 3 most significant bits (bits 15,14,13). These bits make up a 
+  code prefix that determines which action is to be done.
+
+  Here's a list of the prefixes I encountered and their description
+  (Val is the short int value):
+
+  BITS - MEANING
+
+   000 - Skip Count blocks. Count is (Val & 0x1fff).
+
+   001 - Write block number (Val & 0xff) Count times.
+         Count is (((Val/256) & 0x1f)+1)*2. Note that this can only
+         index the first 256 blocks.
+
+   010 - Write block number (Val & 0xff) and then write Count blocks
+         getting their indexes by reading next Count bytes from
+         the VPTR chunk. Count is (((Val/256) & 0x1f)+1)*2.
+         Again, the block numbers range from 0-255.
+
+   011 - Write block (Val & 0x1fff).
+
+   101 - Write block (Val & 0x1fff) Count times. Count is the next
+         byte from the VPTR chunk.
+
+  After this, you take the next short int and repeat the above process.
+
+  Every row of blocks is processed individually of others.
+  When you encounter the end of a row, proceed to the next row
+  (blocks are processed left to right, top to down).
+  Repeat this process until all blocks in the frame are covered and
+  that's it!
+
+  Note that the above implies an absolute maximum of 8192 blocks (0x1fff+1). 
+  Also note that prefix 100 is unused (at least in Tiberian Sun) but could
+  be used somewhere else...?
+
+  As for the VPRZ chunks, these are just VPTR chunks compressed with
+  the standard Format80 algorithm.
+
+
+ The modified Format80 scheme:
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  This is really only a small modification of the basic algorithm.
+  The only commands that are modified are commands (3) and (5)
+  (See Vladan's text). Instead of using offsets ABSOLUTE from
+  the start of the destination buffer, offsets RELATIVE to the
+  current destination pointer are used. If you ask me, I don't see
+  why this approach wasn't used in the first place as it would
+  suffer no disadvantage with the old files and it would be much
+  easier to compress even larger amounts of data. The guys at WW
+  were just careless, I guess... :-)
+
+  Anyway, in Vladan's algorithm, there is a line in
+  command (3) that says:
+    Posit:=Word(Source[SP]);
+  it should say:
+    Posit:=DP-Word(Source[SP]);
+
+  Likewise, for command (5):
+    Posit:=Word(Source[SP+2]);
+  it should be:
+    Posit:=DP-Word(Source[SP+2]);
+
+
+ Final note:
+ ~~~~~~~~~~~
+  That's about it. If you have any questions or corrections, please mail me...
+
+
+                   ---------------------------------------
+
+
+Gordan Ugarkovic (ugordan@yahoo.com)
+17 September, 2000
+
+[END-OF-FILE]
