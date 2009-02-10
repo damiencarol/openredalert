@@ -1,0 +1,143 @@
+    SHP file specifications for DUNE2 game (c) by WESTWOOD and VIRIN
+   ==================================================================
+			        (c) by Joachim Schiele <js@dune2.de>
+REVISION 1
+
+What are SHP files btw?
+=======================
+SHP is a method of saving multible graphics in one file and also be able
+to have some kind of compression. In this case "DUNE II" it's format80
+compression mode. The "DUNE II" code is a little bit different from the one
+of "Command and Conqueror" hacked by Vladan Bato. Major parts of this 
+informations are from him and only needed some little modifications to be
+compatible with the ones of "DUNE II". But in case you want to work with 
+this format i think it's better if it's function is documented.
+Explanations and example codes are in "c", see sandtools how to code a
+extractor/converter for shpfiles.
+
+============
+    HEAD
+============
+
+*** File: ../data/pak/dune/arrow.shp (hextype output)
+00000000 : 09 00 28 00 00 00 34 00-00 00 B3 00 00 00 36 01 : ................   
+00000001 : 00 00 A7 01 00 00 17 02-00 00 A0 02 00 00 21 03 : ................   
+00000002 : 00 00 B3 03 00 00 0A 04-00 00 02 00 01 01 00 01 : ................   
+00000003 : 0C 00 02 00 00 01 00 00-10 10 00 10 7F 00 B8 00 : ................   
+                                                  exampe 1
+
+(symbolized diagram)
+00000000 : XX XX YY YY YY YY YY YY-YY YY YY YY YY YY YY YY : ................   
+00000001 : YY YY YY YY YY YY YY YY-YY YY YY YY YY YY YY YY : ................   
+00000002 : YY YY YY YY YY YY EE EE-QQ QQ QQ QQ QQ QQ QQ QQ : ................  
+00000003 : QQ QQ QQ QQ QQ QQ QQ QQ-QQ QQ QQ QQ QQ QQ QQ QQ : ................
+
+The XXXX(short) field has the "number of images" in it, afterwards an array
+of "image offsets" is following. The "number of images" field has 2byte. The
+offsels after the "number of images" field take 4byte each. There are 
+"number of images" + one EOF (2byte) field. In example 1. the XXXX contains 
+0x0900(hex). So you have (9x 4byte + 2byte EOF) of offsetfields. 
+(Symboliced with 36x YY fields, and 2x EE EOF fileds)
+
+EXCEPTION:
+----------
+There are shpfiles which don't follow this stricktly rule. If the "number of
+images" field has exactly 1 image in it, it may be that there is no 4byte long
+offsetfield aftwerwards, it's only 2byte (not 4byte!). If this is the case
+there is only a 2byte Offsetfield and a 2byte EOF field afterwards. 
+But it depends, sometimes files with 1 image inside don't have this exception. 
+You have to check this or you get in trouble. (see example 2.)
+
+*** File: ../data/pak/finale/credit43.shp
+00000000 : 01 00 08 00 00 00 E8 1B-00 00 00 00 6E B6 00 6E : ................  
+00000001 : E0 1B 80 4D 83 9A 9A 99-C9 01 00 81 99 20 04 EA : ................  
+                                                  exampe 2
+
+00000000 : XX XX YY YY EE EE QQ QQ-QQ QQ QQ QQ QQ QQ QQ QQ : ................  
+00000001 : QQ QQ QQ QQ QQ QQ QQ QQ-QQ QQ QQ QQ QQ QQ QQ QQ : ................  
+
+In this example there is only 1 image inside (2byte "XX XX") for the 
+"number of images" field and followed by a (2byte "YY YY") offsetfield. 
+And the (2byte "EE EE") EndOfFile field.
+Afterwards the QQ fields (imagedata) follows.
+
+============
+    BODY
+============
+
+How to find the real start of a internal image in a shpfile?
+
+The body of a shpfile starts at the first "image offset" symbolized with
+"YY YY YY YY" (see ex. 1) in this case it would be at byte "28" and ends 
+at byte "34-1". The END- and START-offsets of a image stored in a shpfile is 
+calculated with the [StartOffset of the following image] - 1(byte).
+The "EE EE" (EndOfFile) field has the END-offset of the last image in the 
+shpfile.
+But becareful with this start- and endoffsets because a image inside the
+shpfile doesn't start at the startoffset nor does it end at a endoffset.
+The images starts at [startoffset+2byte] and it ends at [endoffset + 2].
+As you can see both offsets need to be moved 2byte on.
+
+Let's have a deeper look into this BODY:
+
+*** File: deathhand.shp
+00000000 : 07 00 20 00 00 00 85 00-00 00 DB 00 00 00 1F 01 : ................
+00000001 : 00 00 77 01 00 00 B9 01-00 00 0D 02 00 00 57 02 : ................ 
+00000002 : 00 00 00 00 10 10 00 10-65 00 6E 00 8E 0C 00 0F : ................ 
+00000003 : 0C 0C 00 0E 0C EA 0C 00-0D 0C B8 00 06 83 0C 0C : ................ 
+00000004 : E8 10 07 81 0B 00 07 10-08 81 0A 10 08 10 09 81 : ................ 
+00000005 : 09 20 09 10 0A 81 08 30-0A 10 0B 87 07 0C 0C 0C : ................ 
+00000006 : EC E8 E8 00 06 8F 00 07-00 03 0C E9 E8 EC 00 09 : ................ 
+00000007 : 00 04 EC E8 E9 00 26 82-00 04 00 28 30 08 10 20 : ................ 
+00000008 : 85 08 00 10 00 10 80 00-00 10 10 00 10 56 00 6B : ................
+                                                  exampe 3
+
+As you can see this shpfile stores 7 graphics. And the first image is at 0x20.
+
+00000002 : 00 00 00 00 10 10 00 10-65 00 6E 00 8E 0C 00 0F : ................ 
+00000002 : RR RR TT NN Y_ X_ NN Y_ SS SS CK CK QQ QQ QQ QQ : ................ 
+
+RR : belongs always to the last image's end. in this case it's the first image
+     in the shpfile so there can't be a EOF of a previous image.
+
+NN : simply nothing, or maybe i don't know but dune2 doesn't make use of it.
+TT : it's a type field, there are 4 different types:
+     0000: Start with format80 command	|| Always end with 0x80 command
+     0001: Always start with "0" 	|| Always end with 0x80 command 
+     0002: ??				|| ??
+     0003: can start with 0,1,2,3,4,6	|| Always end with "0"
+Y_ : it's the y dimension of the image [hight]
+     as you can see this field is there twice but i didn't find a reason why?
+     both fields always match, i tested it with all shpimages from DUNE II
+X_ : it's the x dimension of the image [width]
+SS : (read as unsigned short) 
+     it's the size of the first image of this shp file + 10 so if you want to
+     have the real size of the image it's "0x0065-a" in hex or 
+     "101-10=91" in dec.
+CK : (read as unsigned short)
+     it's the ckecksum of the image, if you add all counts while decode80 
+     together you get this value. 
+QQ : again, it's the imagedata
+                       
+00000008 : 85 08 00 10 00 10 80 00-00 10 10 00 10 56 00 6B : ................
+00000008 : QQ QQ QQ QQ QQ QQ QQ NN NN NN NN NN NN NN NN NN : ................
+
+QQ : imagedata
+NN : noting -> next image
+
+So here we can see that this image usually ends with 0x80, that's because it's
+format80 and 0x80 means command 1 with count=0 so EOF is reached ;-)
+But see format80 specification for further informations.
+
+============
+  CREDITS
+============
+
+I wish to thank especially Valadan Bato because of his work on CNC 
+-Vladan Bato (bat22@geocities.com)
+
+And also thanks to the following people :
+
+-Andrew Griffin (buggy@adam.com.au)
+-Aaron Glover (arn@ibm.net)
+ Denis Moeller (d.moeller@rendsburg.netsurf.de) for their work on .SHP files.

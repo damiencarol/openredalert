@@ -1,0 +1,32 @@
+//ID coding algorithm
+//
+//This algorithm is used to compute the 32-bit ID numbers that are used in MIX files instead of filenames.
+//The ID is computed from the filename, but it's impossible to work out the filename from the ID.
+// In Mix Manager I solved this problem by keeping a list of all filenames that are used in C&C and then checking each
+// one to see whether it gives the ID I'm interested in.
+
+#include <stdio.h>
+#include <ctype.h>
+
+#define ROL(n) ((n<<1) | ((n>>31) & 1))
+
+long calc_id(char *fname)
+{
+  long calc;
+  int i;
+  char buffer[13];
+  for (i=0; *fname!='\0' && i<12; i++)
+    buffer[i]=toupper(*(fname++));
+  while(i<13) buffer[i++]=0;
+
+  calc=0;
+  for(i=0;buffer[i]!=0;i+=4)
+    calc=ROL(calc)+*(long *)(buffer+i);
+  return calc;
+}
+
+void main()
+{
+  printf("ID = %lX\n",calc_id("B1.DES"));
+}
+

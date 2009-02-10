@@ -1,0 +1,504 @@
+
+         C&C And Red Alert *.VQA (Vector Quantized Animation) Files
+
+                 by Gordan Ugarkovic (ugordan@yahoo.com)
+                 http://members.xoom.com/ugordan
+
+
+ Command & Conquer is a trademark of Westwood Studios, Inc.
+ Command & Conquer is Copyright (C)1995 Westwood Studios, Inc.
+ Command & Conquer: Red Alert is a trademark of Westwood Studios, Inc.
+ Command & Conquer: Red Alert is Copyright (C)1995,1996 Westwood Studios, Inc.
+
+ Most of the information about VQA files is to be credited to Aaron Glover
+ (arn@ibm.net). I am only rewriting his document because I found out some
+ new info on these files and also because some of the facts in his document
+ weren't accurate.
+
+DESCRIPTION:
+ The *.VQA files in Command & Conquer as well as in C&C: Red Alert contain
+ all the movies, where fairly high compression is required in order to
+ store many of them on a single CD.
+ The compression technique used in these movies is called Vector Quantization,
+ and I suppose that's where the files got their name from. I won't describe
+ this compression scheme in detail, instead I will try to explain how to view
+ these movies.
+
+NOTE: Throughout the document, i will assume that:
+      CHAR is 1 byte in size,
+      INT is 2 bytes in size,
+      LONG INT is 4 bytes in size.
+
+ Each VQA file is comprised of a series of chunks. A chunk can contain
+ other sub-chunks nested in it. Every chunk has a 4 letter ID (all uppercase
+ letters) and a LONG INT written using Motorola byte ordering system (first
+ comes the Most Significant Byte), unlike the usual Intel system (Least
+ Significant Byte first).
+
+ For example, if you had a value 0x12345678 in hexadecimal, using the Intel
+ notation it would be written as 78 56 34 12, while using Motorola's 
+ 12 34 56 78.
+
+NOTE: Some chunk IDs start with a NULL byte (0x00) because of reasons
+      that will become apparent later. You should just skip this byte
+      and assume the next 4 letters hold the chunk ID.
+
+ Following the chunk header is the chunk data.
+
+ Here is a scheme of every VQA file (nested chunks are indented):
+
+ FORM
+   FINF       <-  Frame data positions
+   SND?    \  <-  First sound chunk, contains 1/2 second of sound
+   SND?     |     <- Contains 1 frame's worth of sound
+   VQFR     |     <- Contains various video data chunks
+     CBF?   | 1st frame data
+     CBP?   |
+     CPL?   |
+     VPT?  /
+   SND?    \
+   VQFR     | 2nd frame data
+     CBP?   |
+     VPT?  /
+   SND?    \
+   VQFR     | 3rd frame data
+     CBP?   |
+     VPT?  /
+ . . .
+
+NOTE: There can also be some other chunks included, but they are not
+      relevant (?!) for viewing the movie, so they can easily be skipped.
+
+FORM chunk:
+~~~~~~~~~~~
+ This chunk is the main chunk, containing all the other chunks. Its size 
+ is actually the size of the entire file minus size of chunk header (8 bytes).
+ 
+ The chunk data is structured like this (I will use C language notation) :
+
+ struct VQAHeader
+ {
+  char   Signature[8];  /* Always "WVQAVQHD"                          */
+  long   RStartPos;     /* Relative start position - Motorola format  */
+  int    Unknown1;
+  int    Unknown2;
+  int    NumFrames;     /* Number of frames                           */
+  int    Width;         /* Movie width                                */
+  int    Height;        /* Movie height                               */
+  char   Wx;            /* Width of each screen block                 */
+  char   Wy;            /* Height of each screen block                */
+  char   Unknown3[12];
+  int    Freq;          /* Sound sampling frequency                   */
+  char   Unknown4[16];
+ }
+
+ Width is usually 320, Height is usually 156 or 200 although one movie in
+ Red Alert is 640x400 in size (the start movie for the Win95 version).
+
+ Each frame of a VQA film is comprised of a series of blocks that are
+ Wx pixels in width and Wy pixels in height.
+
+ Wx is usually 4, Wy is usually 2, but one movie has this set to 4
+ (again, the start movie for the Win95 version).
+
+ Freq is always 22050 Hz.
+
+ Following the chunk data are the sub-chunks.
+
+FINF chunk:
+~~~~~~~~~~~
+ This chunk contains the positions (absolute from the start of the VQA)
+ of data for every frame (actually there is NumFrames-1 positions).
+ That means that it points to the SND? chunk associated with that frame,
+ which is followed by a VQFR chunk containing video frame data.
+
+ The positions are given as LONG INTs which are in normal Intel byte order.
+
+ NOTE: Some of the values seem to be 0x40000000 too large so you should
+       subtract 0x40000000 from them and you'll be OK.
+
+ NOTE #2: To get the actual position of the frame data you have to multiply
+          the value by 2. This is why some chunk IDs start with 0x00. Since
+          you multiply by 2, you can't get an odd chunk position so if the
+          chunk position would normally be odd, a 0x00 is inserted to make
+          it even.
+
+SND? chunk:     
+~~~~~~~~~~~
+ These chunks contain the sound data for the movie. The last byte of the ID
+ can be '0' or '2' so the actual IDs would be "SND0" and "SND2".
+ Unlike the first SND? chunk in the file, which contains about half
+ a second of the wave data, all the other chunks contain exactly 1/15th of a
+ second of sound which leads us to the frame rate of the VQA: 15 frames per
+ second.
+
+ SND0 chunk:
+ ~~~~~~~~~~~
+  This one contains the raw 16 bit signed PCM wave data. It's rarely used.
+
+ SND2 chunk:
+ ~~~~~~~~~~~
+  It contains the 16 bit signed sound data compressed using the IMA-ADPCM
+  algorithm which compresses 16 bits into 4. That's why the SND2 chunks
+  are 4 times smaller than SND0 chunks and they are used almost all
+  the time. For the description of the algorithm, see later in the document.
+
+  INTERESTING NOTE: Speaking of sound, the sound in all VQAs is 16 bit, but
+                    I have good reasons to believe that Red Alert for DOS
+                    as well as Command & Conquer use 8 bit sound output.
+                    I don't know why this sound quality decrease is the case
+                    (perhaps for performance improvement?). I don't have
+                    any information on Win95 version of Red Alert, however...
+
+VQFR chunk:
+~~~~~~~~~~~
+ A chunk that includes many nested sub-chunks which contain video data.
+ It doesn't contain any data itself so the sub-chunks follow immediately
+ after the VQFR chunk header.
+ All following sub-chunks are nested inside a VQFR chunk. They can all
+ contain '0' or 'Z' as the last byte of their ID.
+ * If the last byte is '0' it means that the chunk data is uncompressed.
+ * If the last byte is 'Z' it means that the data is compressed using
+   Format80 compression. For the description of the algorithm see below.
+
+CBF? chunk:
+~~~~~~~~~~~
+ Lookup table containing the screen block data as an array
+ of elements that each are Wx*Wy bytes long. It is always located
+ in the data for the first frame.
+
+ There can be max. 0x0f00 of these elements (blocks) at one time in normal
+ VQAs and 0x0ff00 in the hi-res VQAs (Red Alert 95 start movie) although
+ I seriously doubt that so many blocks (0x0ff00 = 65280 blocks) would 
+ ever be used.
+
+ The uncompressed version of these chunks ("CBF0") is used mainly in
+ the original Command & Conquer, while the compressed version ("CBFZ")
+ is used in C&C: Red Alert.
+
+CBP? chunk:
+~~~~~~~~~~~
+ Like CBF?, but it contains 1/8th of the lookup table, so to get the new
+ complete table you need to append 8 of these in frame order. Once you get
+ the complete table and display the current frame, replace the old table with
+ the new one.
+ As in CBF? chunk, the uncompressed chunks are used in C&C and the compressed
+ chunks are used in Red Alert.
+
+ NOTE: If the chunks are CBFZ, first you need to append 8 of them and then
+       decompress the data, NOT decompress each chunk individually.
+
+CPL? chunk:
+~~~~~~~~~~~
+ The simplest one of all... Contains a palette for the VQA. It is an
+ array of red, green and blue values (in that order, all have a size of
+ 1 byte). Seems that the values range from 0-255, but you should mask out
+ the bits 6 and 7 to get the correct palette (VGA hardware uses only
+ bits 0..5 anyway...).
+
+ CPL0 chunks - used in both C&C and Red Alert. I didn't check, but I
+               suppose these are the only ones used.
+ CPLZ chunks - compressed palette, don't know if it's ever used, but they
+               should work.
+
+VPT? chunk:
+~~~~~~~~~~~
+ This chunk contains the indexes into the block lookup table which contains
+ the data to display the frame.
+ These chunks are always compressed, but I assume the uncompressed ones
+ can also be used (although this would lower the overall compression achieved).
+
+ The size of this index table is (Width/Wx)*(Height/Wy)*2 bytes.
+ The index table is an array of bytes and is split into 2 parts - the top
+ half and the bottom half.
+
+ Now, if you want to diplay the block at coordinates (in block units),
+ say (bx,by) you should read two bytes from the table, one from the top
+ and one from the bottom half:
+
+ TopVal=Table[by*(Width/Wx)+bx]
+ LowVal=Table[(Width/Wx)*(Height/Wy)+by*(Width/Wx)+bx]
+
+ If LowVal=0x0f (0x0ff for the start movie of Red Alert 95) you should
+ simply fill the block with color TopVal, otherwise you should copy
+ the block with index number LowVal*256+TopVal from the lookup table.
+
+ Do that for every block on the screen (remember, there are Width/Wx
+ blocks in the horizontal direction and Height/Wy blocks in the vertical
+ direction) and you've decoded your first frame!
+
+A SHORT EXPLANATION OF THE COMPRESSION SCHEME
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Instead of writing whole frames you take 8 frames and divide them into
+ blocks. You then process these blocks and if you find (hopefully) many
+ similar blocks, you keep only one of them and delete the others. At the end
+ you have a number of blocks which is smaller than the number of all blocks
+ in 8 images. Then write these blocks to a CBF? chunk, or divide them into 8
+ CBP? chunks.
+ Now go through all the 8 images again. For an image you go through all
+ its blocks and for every block you find the most similar block in CBF? and
+ write its index to the VPT? chunk or if the block is of fairly uniform color
+ you write a special code (0x0f) and that color value.
+
+ So, that's how image compression is achieved: by reducing the number of
+ image blocks. The video quality of the movie can be controlled very easily,
+ by selecting how many blocks we will keep. The smaller the number, the higher
+ the compression and lower the overall image quality.
+
+                   --------------------------------------
+
+                         FORMAT80 COMPRESSION METHOD
+                    by Vladan Bato (bat22@geocities.com)
+
+There are several different commands, with different sizes : from 1 to 5
+bytes.
+The positions mentioned below always refer to the destination buffer (i.e.
+the uncompressed image). The relative positions are relative to the current
+position in the destination buffer, which is one byte beyond the last written
+byte.
+
+I will give some sample code at the end.
+
+(1) 1 byte
+      +---+---+---+---+---+---+---+---+
+      | 1 | 0 |   |   |   |   |   |   |
+      +---+---+---+---+---+---+---+---+
+              \_______________________/
+                         |
+                       Count
+
+      This one means : copy next Count bytes as is from Source to Dest.
+
+(2) 2 bytes
+  +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+  | 0 |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+  +---+---+---+---+---+---+---+---+   +---+---+---+---+---+---+---+---+
+      \___________/\__________________________________________________/
+            |                             |
+         Count-3                    Relative Pos.
+
+  This means copy Count bytes from Dest at Current Pos.-Rel. Pos. to
+  Current position.
+  Note that you have to add 3 to the number you find in the bits 4-6 of the
+  first byte to obtain the Count.
+  Note that if the Rel. Pos. is 1, that means repeat Count times the previous
+  byte.
+
+(3) 3 bytes
+  +---+---+---+---+---+---+---+---+   +---------------+---------------+
+  | 1 | 1 |   |   |   |   |   |   |   |               |               |
+  +---+---+---+---+---+---+---+---+   +---------------+---------------+
+          \_______________________/                  Pos
+                     |
+                 Count-3
+
+  Copy Count bytes from Pos, where Pos is absolute from the start of the
+  destination buffer. (Pos is a word, that means that the images can't be
+  larger than 64K)
+
+(4) 4 bytes
+  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+
+  | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 |   |       |       |  |       |
+  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+
+                                            Count          Color
+
+  Write Color Count times.
+  (Count is a word, color is a byte)
+
+(5) 5 bytes
+  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+-------+
+  | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |   |       |       |  |       |       |
+  +---+---+---+---+---+---+---+---+   +-------+-------+  +-------+-------+
+                                            Count               Pos
+
+  Copy Count bytes from Dest. starting at Pos. Pos is absolute from the start
+  of the Destination buffer.
+  Both Count and Pos are words.
+
+These are all the commands I found out. Maybe there are other ones, but I
+haven't seen them yet.
+
+All the images end with a 80h command.
+
+To make things more clearer here's a piece of code that will uncompress the
+image.
+
+  DP = destination pointer
+  SP = source pointer
+  Source and Dest are the two buffers
+
+
+  SP:=0;
+  DP:=0;
+  repeat
+    Com:=Source[SP];
+    inc(SP);
+    b7:=Com shr 7;  {b7 is bit 7 of Com}
+    case b7 of
+      0 : begin  {copy command (2)}
+            {Count is bits 4-6 + 3}
+            Count:=(Com and $7F) shr 4 + 3;
+            {Position is bits 0-3, with bits 0-7 of next byte}
+            Posit:=(Com and $0F) shl 8+Source[SP];
+            Inc(SP);
+            {Starting pos=Cur pos. - calculated value}
+            Posit:=DP-Posit;
+            for i:=Posit to Posit+Count-1 do
+            begin
+              Dest[DP]:=Dest[i];
+              Inc(DP);
+            end;
+          end;
+      1 : begin
+            {Check bit 6 of Com}
+            b6:=(Com and $40) shr 6;
+            case b6 of
+              0 : begin  {Copy as is command (1)}
+                    Count:=Com and $3F;  {mask 2 topmost bits}
+                    if Count=0 then break; {EOF marker}
+                    for i:=1 to Count do
+                    begin
+                      Dest[DP]:=Source[SP];
+                      Inc(DP);
+                      Inc(SP);
+                    end;
+                  end;
+              1 : begin  {large copy, very large copy and fill commands}
+                    {Count = (bits 0-5 of Com) +3}
+                    {if Com=FEh then fill, if Com=FFh then very large copy}
+                    Count:=Com and $3F;
+                    if Count<$3E then {large copy (3)}
+                    begin
+                      Inc(Count,3);
+                      {Next word = pos. from start of image}
+                      Posit:=Word(Source[SP]);
+                      Inc(SP,2);
+                      for i:=Posit to Posit+Count-1 do
+                      begin
+                        Dest[DP]:=Dest[i];
+                        Inc(DP);
+                      end;
+                    end
+                    else if Count=$3F then   {very large copy (5)}
+                    begin
+                      {next 2 words are Count and Pos}
+                      Count:=Word(Source[SP]);
+                      Posit:=Word(Source[SP+2]);
+                      Inc(SP,4);
+                      for i:=Posit to Posit+Count-1 do
+                      begin
+                        Dest[DP]:=Dest[i];
+                        Inc(DP);
+                      end;
+                    end else
+                    begin   {Count=$3E, fill (4)}
+                      {Next word is count, the byte after is color}
+                      Count:=Word(Source[SP]);
+                      Inc(SP,2);
+                      b:=Source[SP];
+                      Inc(SP);
+                      for i:=0 to Count-1 do
+                      begin
+                        Dest[DP]:=b;
+                        inc(DP);
+                      end;
+                    end;
+                  end;
+            end;
+          end;
+    end;
+  until false;
+
+Note that you won't be able to compile this code, because the typecasting
+won't work. (But I'm sure you'll be able to fix it).
+
+                   ---------------------------------------
+
+                          IMA-ADPCM DECOMPRESSION
+                    by Vladan Bato  (bat22@geocities.com)
+                 http://www.geocities.com/SiliconValley/8682
+
+Note that the current sample value and index into the Step Table should
+be initialized to 0 at the start and are mantained across the chunks
+(see below).
+
+============================
+ 3. IMA-ADPCM DECOMPRESSION
+============================
+
+It is the exact opposite of the above. It receives 4-bit codes in input
+and produce 16-bit samples in output.
+
+Again you have to mantain an Index into the Step Table an the current
+sample value.
+
+The tables used are the same as for compression.
+
+Here's the code :
+
+  Index:=0;
+  Cur_Sample:=0;
+
+  while there_is_more_data do
+  begin
+    Code:=Get_Next_Code;
+
+    if (Code and $8) <> 0 then Sb:=1 else Sb:=0;
+    Code:=Code and $7;
+    {Separate the sign bit from the rest}
+
+    Delta:=(Step_Table[Index]*Code) div 4 + Step_Table[Index] div 8;
+    {The last one is to minimize errors}
+
+    if Sb=1 then Delta:=-Delta;
+
+    Cur_Sample:=Cur_Sample+Delta;
+    if Cur_Sample>32767 then Cur_Sample:=32767
+    else if Cur_Sample<-32768 then Cur_Sample:=-32768;
+
+    Output_Sample(Cur_Sample);
+
+    Index:=Index+Index_Adjust[Code];
+    if Index<0 then Index:=0;
+    if Index>88 the Index:=88;
+  end;
+
+Again, this can be done more efficiently (no need for multiplication).
+
+The Get_Next_Code function should return the next 4-bit code. It must
+extract it from the input buffer (note that two 4-bit codes are stored
+in the same byte, the first one in the lower bits).
+
+The Output_Sample function should write the signed 16-bit sample to the
+output buffer.
+
+=========================================
+ Appendix A : THE INDEX ADJUSTMENT TABLE
+=========================================
+
+  Index_Adjust : array [0..7] of integer = (-1,-1,-1,-1,2,4,6,8);
+
+=============================
+ Appendix B : THE STEP TABLE
+=============================
+
+  Steps_Table : array [0..88] of integer =(
+        7,     8,     9,     10,    11,    12,     13,    14,    16,
+        17,    19,    21,    23,    25,    28,     31,    34,    37,
+        41,    45,    50,    55,    60,    66,     73,    80,    88,
+        97,    107,   118,   130,   143,   157,    173,   190,   209,
+        230,   253,   279,   307,   337,   371,    408,   449,   494,
+        544,   598,   658,   724,   796,   876,    963,   1060,  1166,
+        1282,  1411,  1552,  1707,  1878,  2066,   2272,  2499,  2749,
+        3024,  3327,  3660,  4026,  4428,  4871,   5358,  5894,  6484,
+        7132,  7845,  8630,  9493,  10442, 11487,  12635, 13899, 15289,
+        16818, 18500, 20350, 22385, 24623, 27086,  29794, 32767 );
+
+
+                   ---------------------------------------
+
+
+Gordan Ugarkovic (ugordan@yahoo.com)
+19-JUN-1999.
+
+[END-OF-FILE]

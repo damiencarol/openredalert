@@ -1,0 +1,34 @@
+//ID coding algorithm
+//
+//This algorithm is used to compute the 32-bit ID numbers that are used in MIX files instead of filenames.
+//The ID is computed from the filename, but it's impossible to work out the filename from the ID.
+// In Mix Manager I solved this problem by keeping a list of all filenames that are used in C&C and then checking each
+// one to see whether it gives the ID I'm interested in.
+
+function ROL(l:longint):longint;
+begin
+  ROL:=(l shl 1) or (l shr 31);
+end;
+
+function CalcID(name:string):longint;
+type PLong = ^longint;
+var l,i:integer;
+    Calc:longint;
+begin
+
+  l:=length(name);
+  if l>12 then l:=12;
+  for i:=1 to l do Name[i]:=UpCase(Name[i]);
+  for i:=l+1 to 13 do name[l]:=0;
+
+  Calc:=0;
+  l:=1;
+  while name[l]<>#0 do
+  begin
+    Calc:=ROL(Calc)+PLong(@name[l])^;
+    Inc(l,4);
+  end;
+
+  CalcID:=Calc;
+end;
+
