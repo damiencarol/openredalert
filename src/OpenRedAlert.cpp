@@ -241,7 +241,8 @@ int main(int argc, char** argv)
 /**
  * Wraps around a more verbose terminate handler and cleans up better
  */
-void fcnc_terminate_handler() {
+void fcnc_terminate_handler() 
+{
     cleanup();
 
 #if __GNUC__ == 3 && __GNUC_MINOR__ >= 1 && ! defined (__MORPHOS__)
@@ -265,7 +266,7 @@ void cleanup()
 
     // Free VFS
     VFSUtils::VFS_Destroy();
-    
+
     // Free SDL
     SDL_Quit();
 }
