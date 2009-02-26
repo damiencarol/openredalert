@@ -2784,6 +2784,9 @@ void CnCMap::unMapPack(INIFile *inifile)
 	bindata = 0;
 }
 
+/**
+ *
+ **/
 void CnCMap::parseBin(TileList* bindata)
 {
 	Uint32 index;
@@ -2805,25 +2808,32 @@ void CnCMap::parseBin(TileList* bindata)
 	tilematrix.resize(width*height);
 	terrainoverlay.resize(width*height);
 
-	for (unsigned int i = 0; i < terrainoverlay.size(); i++)
-		terrainoverlay[i] = 0;
+    // Initialize terrain overlay to 0
+    for (unsigned int i = 0; i < terrainoverlay.size(); i++)
+    {
+        terrainoverlay[i] = 0;
+    }
 
 	// Pallet name is missionData.theater
 	loadPal(missionData->theater, palette);
 	SHPBase::setPalette(palette);
 	SHPBase::calculatePalettes();
 
-	// Load the templates.ini
-	//templini = GetConfig("templates.ini");
-        INIFile* templini = new INIFile("templates.ini");
+    // Load the templates.ini
+    //templini = GetConfig("templates.ini");
+    INIFile* templini = new INIFile("templates.ini");
 
-	index = 0;
-	for (ytile = 0; ytile < height; ytile++)
-	{
-		for (xtile = 0; xtile < width; xtile++)
-		{
-			// Read template and tile
-			templ = bindata[index].templateNum;
+    index = 0;
+    for (ytile = 0; ytile < height; ytile++)
+    {
+        for (xtile = 0; xtile < width; xtile++)
+        {
+            // Read template and tile
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+            templ = SDL_Swap16(bindata[index].templateNum);
+#else
+            templ = bindata[index].templateNum;
+#endif
 			tile = bindata[index].tileNum;
 			index++;
 			// Template 0xff is an empty tile
@@ -2879,7 +2889,7 @@ void CnCMap::parseBin(TileList* bindata)
 		}
 	}
 
-	// @todo DEBUG
+/*	// @todo DEBUG
 	// @todo REMOVE THAT
 	Uint32 index2 = 0;
 	for (ytile = 0; ytile < height; ytile++)
@@ -2904,7 +2914,7 @@ void CnCMap::parseBin(TileList* bindata)
 			}
 		}
 		printf("\n");
-	}
+	}*/
 }
 
 /**
