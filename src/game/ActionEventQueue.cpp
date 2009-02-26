@@ -56,7 +56,7 @@ ActionEventQueue::~ActionEventQueue()
  */
 void ActionEventQueue::scheduleEvent(ActionEvent* event)
 {
-    // Check if event != NULL
+    // Check if event != 0
     if (event == 0)
     {
         // Return to avoid error
