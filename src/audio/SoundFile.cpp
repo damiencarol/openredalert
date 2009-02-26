@@ -115,8 +115,8 @@ void SoundFile::Close()
 {
     if (fileOpened)
     {
-    	/// Close the file in the VFS
-    	VFSUtils::VFS_Close(file);
+        /// Close the file in the VFS
+        VFSUtils::VFS_Close(file);
         fileOpened = false;
     }
 }
