@@ -1262,11 +1262,59 @@ private	int UnitActionToNr(String action) {
 	}
 	
 	/**
+	 * Functino to save all variables in the simple section of the map file
+	 * 
+	 * @param iniFile
+	 */
+	private void saveSimpleSection(IniFile mapIniFile) {
+
+		
+		// Write Basic/BRIEF
+		mapIniFile.node("Basic").put("Brief",  missionData.getBrief());
+
+		// Try to read Basic/ACTION
+		mapIniFile.node("Basic").put("Action", missionData.getAction());
+
+		// Try to read Basic/PLAYER
+		/*missionData.setPlayer(inifile.node("Basic").get( "Player", ""));
+
+		// Try to read Basic/THEME
+		missionData.setTheme(inifile.node("Basic").get( "Theme", "No theme"));
+
+		// Try to read Basic/WIN
+		missionData.setWinmov(inifile.node("Basic").get(  "Win", "<none>"));
+
+		// Try to read Basic/LOSE
+		missionData.setLosemov(inifile.node("Basic").get( "Lose", "<none>"));
+
+		// Try to read MAP/HEIGHT
+		setHeight(inifile.node("Map").getInt(  "Height", -1));
+
+		// Try to read Width
+		setWidth(inifile.node("Map").getInt(  "Width", -1));
+
+		// Try to read x coordinates in the map
+		x = inifile.node("Map").getInt("X", -1);
+
+		// Try to read y coordinates in the map
+		y = inifile.node("Map").getInt("Y", -1);
+
+		// Try to read the theme
+		missionData.setTheater(inifile.node("Map").get("Theater", ""));
+
+		// Save if it's the last mission
+		if (inifile.node("Basic").get("EndOfGame", "No").equals("Yes")) {
+			missionData.setEndOfGame(true);
+		} else {
+			missionData.setEndOfGame(false);*/
+	}
+	
+	/**
 	 * Function to load all vars in the simple sections of the inifile
 	 * 
 	 * TODO add key name in the log (to throw LoadMapError
 	 * 
-	 * @param pointer
+	 * @param inifile pointer
 	 *            to the inifile
 	 * @throws LoadMapError
 	 */
@@ -1897,9 +1945,17 @@ private	int UnitActionToNr(String action) {
 	/**
 	 * Save a map to a file
 	 * @param string
+	 * @throws BackingStoreException 
 	 */
-	public void save(String string) {
-		// Save a 
+	public void save(File mapFile) throws BackingStoreException {
+		
+		IniFile iniFile = new IniFile(mapFile);
+		// Clear all values
+		iniFile.clear();
+		
+		// Save the simple section
+		saveSimpleSection(iniFile);
+		
 		
 	}
 
