@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_07"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/ini4j-0.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/openra.data.jar"/>
+	<classpathentry kind="lib" path="lib/sdljava.jar" sourcepath="C:/sdljava-0.9.1/sdljava-0.9.1-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/sdljava-0.9.1/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

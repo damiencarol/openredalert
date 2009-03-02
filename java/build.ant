@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     8 janv. 2009 16:52:29                                                        
+
+     openra    
+     Remake of Westwood CnC Red Alert Game Engine
+                   
+     D.Carol                                                                
+     ====================================================================== -->
+<project name="openra" default="default">
+	<description>Remake of Westwood CnC Red Alert Game Engine</description>
+
+	<!-- ================================= 
+          target: default              
+         ================================= -->
+	<target name="default" depends="depends" description="Remake of Westwood CnC Red Alert Game Engine">
+
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: depends                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="depends">
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: openra.data                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="openra.data">
+		<jar destfile="openra.data.jar">
+			<fileset dir="data">
+				<include name="*">
+				</include>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="openra">
+		<javac srcdir="src" destdir="bin" classpath="openra.data.jar" debug="off" >
+			<include name="openra/core/**"/>
+			    
+		</javac>
+		<jar destfile="openra.jar">
+			<fileset dir="bin">
+							<include name="*">
+							</include>
+						</fileset>
+		</jar>
+	</target>
+</project>
