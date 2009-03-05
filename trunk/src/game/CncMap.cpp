@@ -22,7 +22,7 @@
 #include <vector>
 #include <stdexcept>
 
-#include <SDL\SDL_endian.h> // For use of SDL_SwapLE16()
+#include "SDL/SDL_endian.h" // For use of SDL_SwapLE16()
 
 #include "Player.h"
 #include "UnitAndStructurePool.h"
