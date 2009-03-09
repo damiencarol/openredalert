@@ -670,36 +670,36 @@ bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
     Uint16 xpos;
     Uint16 ypos;
     Uint32	br;
-    
+
     p::ccmap->translateFromPos(pos, &xpos, &ypos);
-    
+
     StructureType* Type	= p::uspool->getStructureTypeByName(structname);
-    
+
     vector<bool>* buildable = p::ccmap->getPlayerPool()->getPlayer(PlayerNumb)->getMapBuildable();
-    
+
     // Check that we don't try to build outside the map (copied check from unitandstructurepool.cpp!!
     br = pos + p::ccmap->getWidth()*(Type->getYsize()-1);
     if (pos > p::ccmap->getSize() || (br > p::ccmap->getSize() && 0))
         return false;
-    
+
     // Prevent wrapping around
     if (xpos + Type->getXsize() > p::ccmap->getWidth())
         return false;
-    
+
     for (placeypos = 0; placeypos < Type->getYsize(); placeypos++) {
         for (placexpos = 0; placexpos < Type->getXsize(); placexpos++) {
-            
+
             curpos = pos+placeypos*p::ccmap->getWidth()+placexpos;
-            
+
             if (!buildable->at(curpos))
                 return false;
-            
+
             if (p::uspool->getGroundUnitAt(curpos) != NULL || p::uspool->getFlyingAt(curpos) != NULL || p::uspool->getStructureAt(curpos) != NULL)    //p::uspool->getUnitAt(curpos+x) != NULL
                 return false;
-            
+
             if (!p::ccmap->isBuildableAt(PlayerNumb, curpos))
                 return false;
-            
+
         }
     }
     return true;
@@ -789,46 +789,42 @@ unsigned int Ai::FindClosesedTiberium(Unit *Unit)
 }
 
 
-void Ai::DefendStructures(Player *thePlayer, int PlayerNumb) 
+void Ai::DefendStructures(Player *thePlayer, int PlayerNumb)
 {
-    
+
     //
-    // Make structures defend themselfes
+    // Make structures defend themselves
     //
     const vector<Structure*>* structurepool = thePlayer->getStructures();
-    int NumbStructures = thePlayer->getNumStructs();
-    
+    vector<Structure*>::const_iterator theStructure = structurepool->begin();
+
     // For each structure from this player
-    for (int StructNumb = 0; StructNumb < NumbStructures; StructNumb++){
-        Structure* theStructure = structurepool->at(StructNumb);
-        
-//        if (Structure->IsBuilding ())
-//            continue;
-        
-        if (!theStructure->canAttack())
-            continue;
-        
-        // Check if we have enoug power
-        StructureType* st = (StructureType*)theStructure->getType();
-        if (st->getPowerInfo().powered)
-        {
-            if (thePlayer->getPower() < thePlayer->getPowerUsed())
-            {
-                continue;
-            }
-        }
-        
-        Unit* EnemyUnit = EnemyUnitInRange(PlayerNumb, theStructure);
-        
-        if (EnemyUnit != 0 && theStructure->canAttack()){
-            
-// Enemy  = p::uspool->getUnitOrStructureAt(EnemyUnit->getPos(), EnemyUnit->getSubpos());
-            
-// if (Enemy != NULL && !Structure->IsAttacking ()){
-            if (!theStructure->IsAttacking()){
-                theStructure->attack(EnemyUnit);
-            }
-        }
+    for (theStructure=structurepool->begin(); theStructure != structurepool->end(); theStructure++)
+    {
+    	// We should ensure that the structurepool is always consistent,
+    	// in order to avoid segfaults due to the presence of NULL elements in the vector
+    	// Using list instead of vector would solve the problem
+		if((*theStructure) != NULL)
+		{
+			Unit* EnemyUnit = EnemyUnitInRange(PlayerNumb, (*theStructure));
+			StructureType* st = dynamic_cast<StructureType*>((*theStructure)->getType());
+
+			// If there is no valid enemy
+			// OR the structure is a building
+			// OR the structure can't attack
+			// OR we don't have enough power
+			// OR the structure is already attacking
+			if( EnemyUnit == 0 ||
+					(*theStructure)->IsBuilding() ||
+					!(*theStructure)->canAttack() ||
+					(st->getPowerInfo().powered && (thePlayer->getPower() < thePlayer->getPowerUsed()) ) ||
+					(*theStructure)->IsAttacking() )
+			{
+				continue;
+			}
+
+			(*theStructure)->attack(EnemyUnit);
+		}
     }
 }
 
@@ -1125,13 +1121,13 @@ Unit* Ai::EnemyUnitInRange(int MyPlayerNumb, Unit* MyUnit, int AttackRange)
 		// Don't find my own units
 		if (MyPlayerNumb == i)
 			continue;
-			
+
 		Player* EnemyPlayer = p::ccmap->getPlayerPool()->getPlayer(i);
 
 		Player* MyPlayer = p::ccmap->getPlayerPool()->getPlayer(MyPlayerNumb);
-		
-		Player* localPl = p::ccmap->getPlayerPool()->getLPlayer(); 
-		
+
+		Player* localPl = p::ccmap->getPlayerPool()->getLPlayer();
+
 		// Check to see if these are both ai players and if ai players are allied
 		if ((MyPlayer != localPl) && (EnemyPlayer != localPl) && Rules->AlwaysAlly)
 			continue;
@@ -1143,7 +1139,7 @@ Unit* Ai::EnemyUnitInRange(int MyPlayerNumb, Unit* MyUnit, int AttackRange)
 
 		vector<Unit*> Enemyunitpool = EnemyPlayer->getUnits();
 		unsigned int EnemyNumbUnits = EnemyPlayer->getNumUnits();
-		
+
 
 		// For each unit from this player
 		for (unsigned int UnitNumb = 0; UnitNumb < EnemyNumbUnits; UnitNumb++)
@@ -1164,7 +1160,7 @@ Unit* Ai::EnemyUnitInRange(int MyPlayerNumb, Unit* MyUnit, int AttackRange)
 			}
 		}
 	}
-	
+
 	// Return NULL
 	return 0;
 }
@@ -1188,7 +1184,7 @@ Unit* Ai::EnemyUnitInRange (int MyPlayerNumb, Structure* MyStructure, int Attack
         Weapon* theWeapon = theType->getWeapon(true);
 		AttackRange = theWeapon->getRange();
     }
-    
+
 	for (int i = 0; i < this->NumbPlayers; i++)
 	{
 		// Don't defend against my own units
@@ -1259,7 +1255,7 @@ Structure* Ai::EnemyStructureInRange (int MyPlayerNumb, Unit* MyUnit, int Attack
         EnemyPlayer = p::ccmap->getPlayerPool()->getPlayer(i);
 
         MyPlayer = p::ccmap->getPlayerPool()->getPlayer(MyPlayerNumb);
-        
+
         Player* localPl = p::ccmap->getPlayerPool()->getLPlayer();
 
 	// Check to see if these are both ai players and if ai players are allied
