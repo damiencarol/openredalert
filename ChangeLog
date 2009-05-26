@@ -1,0 +1,4 @@
+2009-05-26  Damien Carol  <damien.carol@gmail.com>
+
+  * Removed many call to assert() function
+  * Removed many references to C libraries
