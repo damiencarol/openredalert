@@ -17,7 +17,6 @@
 
 #include "BQueue.h"
 
-#include <cassert>
 #include <stdexcept>
 #include <string>
 
@@ -247,9 +246,22 @@ const UnitOrStructureType * BQueue::getCurrentType() const
 
 void BQueue::next() 
 {
-    assert(!queue.empty());
+    // Check that queue is not empty
+    if (queue.empty())
+    {
+        logger->error("[BQueue::next()] queue is empty !");
+        return;
+    }
+    
     Production::iterator it = production.find(getCurrentType());
-    assert(it != production.end());
+    
+    // Check that it is not at the end
+    if (it == production.end())
+    {
+        logger->error("[BQueue::next()] iterator is at the end !");
+        return;
+    }
+    
     if (it->second <= 1) {
         production.erase(it);
         queue.pop_front();
@@ -261,7 +273,13 @@ void BQueue::next()
             // the next item in the queue and start building
             status = BQ_RUNNING;
             it = production.find(getCurrentType());
-            assert(it != production.end());
+            
+            // Check that it is not at the end
+            if (it == production.end())
+            {
+                logger->error("[BQueue::next()] iterator is at the end !");
+                return;
+            }
         }
     } else {
         --it->second;
