@@ -19,7 +19,6 @@
 
 #include <cmath>
 #include <algorithm>
-#include <cassert>
 #include <cstring>
 #include <map>
 
@@ -690,18 +689,18 @@ void Player::lostStruct(Structure* str)
 //    printf ("Structure = %c%c%c%c, pointer = %i\n", str->getType()->getTName()[0], str->getType()->getTName()[1], str->getType()->getTName()[2], str->getType()->getTName()[3],(int)str);
 //    logger->gameMsg("%s has %d structs and %d units", playername, (Uint32)structurepool.size()-1, (Uint32)unitpool.size());
     std::list<Structure*>::iterator it = std::find(sto.begin(), sto.end(), str);
-    assert(it != sto.end());
+    //assert(it != sto.end());
     sto.erase(it);
     if (st->primarySettable() /*&& (st->getPType() != 0)*/) {
         std::list<Structure*>& prg = production_groups[st->getPType()];
         it = std::find(prg.begin(), prg.end(), str);
-        assert(it != prg.end());
+        //assert(it != prg.end());
         prg.erase(it);
         if (str == getPrimary(str->getType())) {
             if (prg.empty()) {
                 getPrimary(str->getType()) = 0;
                 map<Uint8, BQueue*>::iterator it = queues.find(st->getPType());
-                assert(it != queues.end());
+                //assert(it != queues.end());
 				if ((*it).second != NULL)
 					delete (*it).second;
 				(*it).second = NULL;
