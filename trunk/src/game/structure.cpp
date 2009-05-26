@@ -1,6 +1,5 @@
 // Structure.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -16,9 +15,6 @@
 //    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Structure.h"
-
-#include <cstdlib>
-#include <cstring>
 
 #include "SDL/SDL_timer.h"
 
@@ -745,7 +741,13 @@ void Structure::ChangeHealth (Sint16 amount)
 bool Structure::CreateUnitAnimation(UnitType* UnType, Uint8 owner)
 {
     Player* player = p::ccmap->getPlayerPool()->getPlayer(owner);
-    assert(player != 0);
+    // check that player is not null
+    if (player == 0)
+    {
+        logger->error("[Structure::CreateUnitAnimation] player with owner = %d is null !", owner);
+        return false;
+    }
+    
     Structure* tmpstruct = player->getPrimary(type);
 	if (tmpstruct != this)
 	{
