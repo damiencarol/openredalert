@@ -17,8 +17,6 @@
 
 #include "InfantryGroup.h"
 
-#include <cstdlib>
-#include <cstring>
 #include <string>
 #include <math.h>
 
@@ -35,6 +33,8 @@
 
 using std::string;
 using std::vector;
+
+extern Logger * logger;
 
 InfantryGroup::InfantryGroup()
 {
@@ -62,8 +62,19 @@ const Sint8 InfantryGroup::unitoffsets[10] = {
 
 bool InfantryGroup::AddInfantry(Unit* inf, Uint8 subpos)
 {
-	assert(subpos < 5);
-	assert(numinfantry < 5);
+    // Check that sub-position in beetween 0 and 4
+	if (subpos > 4)
+    {
+        logger->error("[InfantryGroup::AddInfantry] subpos is not 0,1,2,3 or 4");
+        return false;
+    }
+    // Check that their are not already 5 infantry
+    if (numinfantry > 4)
+	{
+        logger->error("[InfantryGroup::AddInfantry] numinfantry is not 0,1,2,3 or 4");
+        return false;
+    }
+    
 	positions[subpos] = inf;
 	++numinfantry;
 	return true;
@@ -71,8 +82,18 @@ bool InfantryGroup::AddInfantry(Unit* inf, Uint8 subpos)
 
 bool InfantryGroup::RemoveInfantry(unsigned int subpos)
 {
-	assert(subpos < 5);
-	assert(numinfantry > 0);
+	// Check that sub-position in beetween 0 and 4
+	if (subpos < 0 || subpos > 4)
+    {
+        logger->error("[InfantryGroup::RemoveInfantry] subpos is not 0,1,2,3 or 4");
+        return false;
+    }
+	// Check that their are at least 1 infantry
+    if (!(numinfantry > 0))
+	{
+        logger->error("[InfantryGroup::RemoveInfantry] their are no infantry to remove");
+        return false;
+    }
 	positions[subpos] = 0;
 	--numinfantry;
 	return true;
@@ -80,7 +101,13 @@ bool InfantryGroup::RemoveInfantry(unsigned int subpos)
 
 bool InfantryGroup::IsClear(Uint8 subpos)
 {
-	assert(subpos < 5);
+	// Check that sub-position in beetween 0 and 4
+	if (subpos > 4)
+    {
+        logger->error("[InfantryGroup::IsClear] subpos is not 0,1,2,3 or 4");
+        return false;
+    }
+    
 	return (positions[subpos] == 0);
 }
 
@@ -106,7 +133,12 @@ Uint8 InfantryGroup::GetFreePos() const
 
 Unit* InfantryGroup::UnitAt(Uint8 subpos)
 {
-	assert(subpos < 5);
+	// Check that sub-position in beetween 0 and 4
+	if (subpos > 4)
+    {
+        logger->error("[InfantryGroup::UnitAt] subpos is not 0,1,2,3 or 4");
+        return 0;
+    }
 	return positions[subpos];
 }
 
