@@ -1,6 +1,5 @@
 // Logger.cpp
-// 1.2
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -15,6 +14,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with OpenRedAlert.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream> // for use of 'cout'
+
 #include <cstdarg> // for use fct like 'printf'
 
 #include <cstdio>
@@ -25,6 +26,8 @@
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 
+using std::cout;
+
 namespace pc {
 	extern MessagePool * msg;
 }
@@ -33,7 +36,7 @@ Logger::Logger(const char *logname, int threshold)
 {
     logfile = VFSUtils::VFS_Open(logname, "w");
 #if !defined _WIN32
-    if( logfile == NULL ) {
+    if (logfile == 0) {
         printf("Unable to open logfile \"%s\" for writing, using stdout instead\n", logname);
     }
 #endif
@@ -72,19 +75,25 @@ void Logger::unindent(){
 
 void Logger::error(const char *txt, ...)
 {
+    // Parse parameters
     va_list ap, aq;
     va_start(ap, txt);
     va_start(aq, txt);
+    
+    // Log to file
     if (logfile != NULL) {
         logfile->vfs_printf("%sERROR: ", indentString);
         logfile->vfs_vprintf(txt, aq);
         logfile->flush();
     }
-//#if !defined _WIN32
+
+    // Log to the console
     printf("%sERROR: ", indentString);
     vprintf(txt, ap);
-    fflush(stdout);
-//#endif
+    cout.flush();
+
+
+    // End of parsing
     va_end(aq);
     va_end(ap);
 }
@@ -94,16 +103,20 @@ void Logger::debug(const char *txt, ...)
     va_list ap, aq;
     va_start(ap, txt);
     va_start(aq, txt);
-    if (logfile != NULL) {
+    
+    // Log to file
+    if (logfile != 0) {
         logfile->vfs_printf("%sDEBUG: ", indentString);
         logfile->vfs_vprintf(txt, aq);
         logfile->flush();
     }
+    
 #if !defined _WIN32
     printf("%sDEBUG: ", indentString);
     vprintf(txt, ap);
-    fflush(stdout);
+    cout.flush();
 #endif
+
     va_end(aq);
     va_end(ap);
 }
@@ -122,7 +135,7 @@ void Logger::warning(const char *txt, ...)
     if (threshold > 0) {
         printf("%sWARNING: ", indentString);
         vprintf(txt,ap);
-        fflush(stdout);
+        cout.flush();
     }
 #endif
     va_end(aq);
@@ -143,7 +156,7 @@ void Logger::note(const char *txt, ...)
     if (threshold > 1) {
         printf("%s", indentString);
         vprintf(txt,ap);
-        fflush(stdout);
+        cout.flush();
     }
 #endif
     va_end(aq);
@@ -154,7 +167,9 @@ void Logger::gameMsg(const char *txt, ...)
 {
     va_list ap;
     va_start(ap, txt);
-    if (logfile != NULL) {
+    
+    if (logfile != 0) 
+    {
         logfile->vfs_printf("%sGame: ", indentString);
         logfile->vfs_vprintf(txt, ap);
         logfile->vfs_printf("\n");
@@ -162,7 +177,8 @@ void Logger::gameMsg(const char *txt, ...)
     }
     va_end(ap);
 
-    if(rendergamemsg && (pc::msg != NULL)) {
+    if (rendergamemsg && (pc::msg != 0))
+    {
         char msgstring[64];
         va_start(ap, txt);
         #ifdef _MSC_VER
@@ -172,19 +188,25 @@ void Logger::gameMsg(const char *txt, ...)
         #endif
         va_end(ap);
         pc::msg->postMessage(msgstring);
-    } else {
+    } 
+    else
+    {
 #if !defined _WIN32
         va_start(ap, txt);
         printf("%s",indentString);
         vprintf(txt,ap);
         va_end(ap);
         printf("\n");
-        fflush(stdout);
+        cout.flush();
 #endif
     }
 }
 
-void Logger::renderGameMsg(bool r)    {
+/**
+ * Set if we must render message in game
+ */
+void Logger::renderGameMsg(bool r)
+{
     rendergamemsg = r;
 }
 
