@@ -1,6 +1,5 @@
 // Selection.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -17,11 +16,10 @@
 
 #include "Selection.h"
 
-#include <cassert>
-#include <cstdlib>
 #include <functional>
 #include <map>
 #include <algorithm>
+#include <exception>
 
 #include "include/Logger.h"
 #include "game/Dispatcher.h"
@@ -48,6 +46,7 @@ using std::ptr_fun;
 using std::unary_function;
 using std::find_if;
 using std::find;
+using std::exception;
 
 /** @todo Some stuff still uses the "for (i = begin; i != end; ++i)" pattern.
  * @todo Some of the functions in the namespace can be replaced by further STL
@@ -360,23 +359,28 @@ void Selection::attackStructure(Structure *target)
 
 void Selection::checkSelection()
 {
-	tm		*Tm;
-	time_t  Now_epoch;
-
+	
     //remove_if(sel_units.begin(), sel_units.end(), logical_not(mem_fun(&UnitOrStructure::isAlive)));
 
-    for (list<Unit*>::iterator it = sel_units.begin(); it != sel_units.end(); ++it) {
-        assert(*it != 0);
+    for (list<Unit*>::iterator it = sel_units.begin(); it != sel_units.end(); ++it) 
+    {
+        if (*it == 0)
+        {
+            logger->error("Selection::checkSelection() *it si null");
+            return;
+        }
+        
         if (!(*it)->isAlive()) {
             Unit* unit = *it--;
             purge(unit);
             removeUnit(unit);
 
+            tm		*Tm;
+            time_t  Now_epoch;
 
-			Now_epoch = time(0);
-			Tm = localtime (&Now_epoch);
-			logger->warning ("%s line %i: %02i:%02i:%02i removeUnit (Selection)\n", __FILE__, __LINE__, Tm->tm_hour, Tm->tm_min, Tm->tm_sec);
-
+            Now_epoch = time(0);
+            Tm = localtime (&Now_epoch);
+            logger->warning ("%s line %i: %02i:%02i:%02i removeUnit (Selection)\n", __FILE__, __LINE__, Tm->tm_hour, Tm->tm_min, Tm->tm_sec);
         }
     }
     for (list<Structure*>::iterator it = sel_structs.begin(); it != sel_structs.end(); ++it) {
@@ -471,10 +475,19 @@ bool Selection::mergeSelection(Uint8 loadpos)
 
 Uint8 Selection::getOwner() const
 {
-    if (sel_units.empty()) {
-        assert(!sel_structs.empty());
+    if (sel_units.empty()) 
+    {
+        // Check that something is selected
+        if (sel_structs.empty())
+        {
+            logger->error("[Selection::getOwner()] sel_units and sel_structs internal lists are empty !");
+            throw new exception();
+        }
+        
         return (*sel_structs.begin())->getOwner();
     }
+
+    // If unit list is not empty retur nthe owner of the first unit
     return (*sel_units.begin())->getOwner();
 }
 
