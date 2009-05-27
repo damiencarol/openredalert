@@ -69,6 +69,7 @@ void PrintUsage()
     printf("  -side <GDI or NOD> - sets your side for multiplayer\n");
     printf("  -server address    - Address of the server for multiplayer.\n");
     printf("  -port number       - Port to which a connection should be made.\n\n");
+    printf("  -v, --version      - Print the version.\n\n");
 }
 
 const ConfigType& getConfig()
