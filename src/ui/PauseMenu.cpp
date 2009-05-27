@@ -35,7 +35,9 @@
 #include "misc/StringTableFile.h"
 #include "game/CnCMap.h"
 
-#define VERSION "439"
+#ifndef VERSION
+#define VERSION "6xx"
+#endif
 
 using Sound::SoundEngine;
 
