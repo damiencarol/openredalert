@@ -1,6 +1,5 @@
 // ExternalFiles.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -452,8 +451,8 @@ bool isdir(const string& path)
     if (-1 == chdir(path.c_str())) {
         return false;
     }
-    int res = fchdir(curdirfd);
-    close(curdirfd);
+    //int res = fchdir(curdirfd);
+    //close(curdirfd);
 #endif
     return true;
 }
