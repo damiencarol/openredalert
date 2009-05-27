@@ -327,7 +327,8 @@ int ExternalFiles::vfs_printf(Uint32 file, const char* fmt, va_list ap)
     return ret;
 }
 
-void ExternalFiles::flush(Uint32 file) {
+void ExternalFiles::flush(Uint32 file) 
+{
     fflush(openfiles[file].file);
 }
 
@@ -352,7 +353,8 @@ Uint32 ExternalFiles::getPos(Uint32 file) const
     return 0;
 }
 
-Uint32 ExternalFiles::getSize(Uint32 file) const {
+Uint32 ExternalFiles::getSize(Uint32 file) const 
+{
     // @todo Abstract this const implementation of operator[].
     openfiles_t::const_iterator i = openfiles.find(file);
     if (openfiles.end() != i) {
@@ -362,7 +364,8 @@ Uint32 ExternalFiles::getSize(Uint32 file) const {
     return 0;
 }
 
-const char* ExternalFiles::getPath(Uint32 file) const {
+const char* ExternalFiles::getPath(Uint32 file) const 
+{
     // @todo Abstract this const implementation of operator[].
     openfiles_t::const_iterator i = openfiles.find(file);
     if (openfiles.end() != i) {
@@ -374,10 +377,14 @@ const char* ExternalFiles::getPath(Uint32 file) const {
 
 const char *ExternalFiles::getArchiveType() const 
 {
-        return "external file";
+    return "external file";
 }
 
-Uint32 ExternalFiles::getFile(const char* fname) {return getFile(fname, "rb");}
+Uint32 ExternalFiles::getFile(const char* fname)
+{
+    return getFile(fname, "rb");
+}
+
 namespace ExtPriv {
 
 FILE* fcaseopen(string* name, const char* mode, Uint32 caseoffset) throw()
@@ -424,25 +431,28 @@ FILE* ret;
 bool isdir(const string& path) 
 {
 	
-#ifdef _WIN32
+#ifdef _MSC_VER
     DWORD length = GetCurrentDirectory(0, 0);
-    char* orig_path = new char[length];
+    LPWSTR orig_path = new WCHAR[length];
     GetCurrentDirectory(length, orig_path);
-    if (!SetCurrentDirectory(path.c_str())) {
-		if (orig_path != NULL)
+    /*if (!SetCurrentDirectory(path.c_str())) {
+		if (orig_path != 0)
 			delete[] orig_path;
-		orig_path = NULL;
+		orig_path = 0;
         return false;
-    }
+    }*/
     SetCurrentDirectory(orig_path);
 	if (orig_path != NULL)
 		delete[] orig_path;
-	orig_path = NULL;
+	orig_path = 0;
     return true;
+
 #elif defined (__MORPHOS__)
-        struct stat fileinfo;
+    // TODO : need to chdir in directory
+    struct stat fileinfo;
 	stat( path.c_str(), &fileinfo );
 	return S_ISDIR( fileinfo.st_mode );
+
 #else
     int curdirfd = open("./", O_RDONLY);
     if (-1 == curdirfd) {
@@ -451,10 +461,9 @@ bool isdir(const string& path)
     if (-1 == chdir(path.c_str())) {
         return false;
     }
-    //int res = fchdir(curdirfd);
-    //close(curdirfd);
-#endif
     return true;
+
+#endif
 }
 
 } // namespace ExtPriv

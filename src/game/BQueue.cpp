@@ -1,6 +1,5 @@
 // BQueue.cpp
-// 1.4
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
