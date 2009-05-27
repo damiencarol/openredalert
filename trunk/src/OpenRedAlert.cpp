@@ -95,6 +95,15 @@ int main(int argc, char** argv)
         PrintUsage();
         return EXIT_SUCCESS;
     }
+    
+    // Check if version wanted
+    if ((argc > 1) && ( string(argv[1]) == "-v" ||
+            string(argv[1]) == "--version" ))
+    {
+        // Print version
+        printf("openredalert %s", VERSION);
+        return EXIT_SUCCESS;
+    }
 
     
     const string& binpath = determineBinaryLocation(argv[0]);
