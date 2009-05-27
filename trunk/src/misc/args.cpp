@@ -27,7 +27,9 @@
 #include "misc/INIFile.h"
 #include "include/Logger.h"
 
+#ifndef VERSION
 #define VERSION "438"
+#endif
 
 using std::cout;
 using std::endl;

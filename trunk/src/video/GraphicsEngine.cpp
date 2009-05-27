@@ -47,7 +47,9 @@
 #include "ImageCacheEntry.h"
 #include "Dune2Image.h"
 
-#define VERSION "439"
+#ifndef VERSION
+#define VERSION "6xx"
+#endif
 
 using std::string;
 using std::runtime_error;
