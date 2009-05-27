@@ -1,6 +1,5 @@
 // Dispatcher.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -22,7 +21,6 @@
 #include "ActionEventQueue.h"
 #include "CnCMap.h"
 #include "misc/common.h"
-#include "misc/config.h"
 #include "include/Logger.h"
 #include "PlayerPool.h"
 #include "Unit.hpp"
