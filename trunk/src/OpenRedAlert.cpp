@@ -47,6 +47,8 @@ using std::map;
 using std::set_terminate;
 using std::string;
 using std::runtime_error;
+using std::cout;
+using std::endl;
 
 using Sound::SoundEngine;
 
@@ -72,20 +74,29 @@ using VQA::VQAMovie;
 
 int main(int argc, char** argv)
 {
+    // Log to the console the GPL license
+    cout << "OpenRedAlert  Copyright (C) 2009  Damien Carol" << endl;
+    cout << "This program comes with ABSOLUTELY NO WARRANTY;" << endl;
+    cout << "This is free software, and you are welcome to redistribute it" << endl;
+    cout << "under certain conditions; see 'COPYING' for details." << endl;
+    cout.flush();
+
+    // Register end functions
     atexit(cleanup);
     set_terminate(fcnc_terminate_handler);
 
     // Correct the way that floats are readed
     setlocale(LC_ALL, "C");
 
-    // Loads arguments
-    if ((argc > 1) && ( string(argv[1]) == "-help" ||
+    // Check if help wanted
+    if ((argc > 1) && ( string(argv[1]) == "-h" ||
             string(argv[1]) == "--help" || string(argv[1]) == "-?"))
     {
         PrintUsage();
         return EXIT_SUCCESS;
     }
 
+    
     const string& binpath = determineBinaryLocation(argv[0]);
     string lf(binpath);
     lf += "/debug.log";
@@ -93,6 +104,8 @@ int main(int argc, char** argv)
     VFSUtils::VFS_PreInit(binpath.c_str());
     // Log level is so that only errors are shown on stdout by default
     logger = new Logger(lf.c_str(), 0);
+    
+    // Loads arguments
     if (!parse(argc, argv)) {
         return 1;
     }
