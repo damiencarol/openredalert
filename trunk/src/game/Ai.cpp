@@ -84,40 +84,42 @@ Ai::Ai()
 	INIFile *rules_ini = GetConfig("rules.ini");
 	if (rules_ini != 0)
 	{
-		Rules->AttackInterval = rules_ini->readInt	("AI", "AttackInterval", 3);
-		Rules->AttackDelay	= rules_ini->readInt	("AI", "AttackDelay", 5);
-		Rules->PatrolScan	= rules_ini->readFloat	("AI", "PatrolScan", .016);
-		Rules->CreditReserve	= rules_ini->readInt	("AI", "CreditReserve", 100);
-		Rules->PathDelay		= rules_ini->readFloat	("AI", "PathDelay", .01);
-		Rules->OreNearScan	= rules_ini->readInt	("AI", "OreNearScan", 6);
-		Rules->OreFarScan	= rules_ini->readInt	("AI", "OreFarScan", 48);
-		Rules->AutocreateTime	= rules_ini->readInt	("AI", "AutocreateTime", 5);
-		Rules->InfantryReserve	= rules_ini->readInt	("AI", "InfantryReserve", 3000);
-		Rules->InfantryBaseMult	= rules_ini->readInt	("AI", "InfantryBaseMult", 1);
-		Rules->PowerSurplus	= rules_ini->readInt	("AI", "PowerSurplus", 50);
-		Rules->BaseSizeAdd	= rules_ini->readInt	("AI", "BaseSizeAdd", 3);
-		Rules->RefineryRatio	= rules_ini->readFloat	("AI", "RefineryRatio", .16);
-		Rules->RefineryLimit	= rules_ini->readInt	("AI", "RefineryLimit", 4);
-		Rules->BarracksRatio	= rules_ini->readFloat	("AI", "BarracksRatio", .16);
-		Rules->BarracksLimit	= rules_ini->readInt	("AI", "BarracksLimit", 2);
-		Rules->WarRatio		= rules_ini->readFloat	("AI", "WarRatio", .1);
-		Rules->WarLimit		= rules_ini->readInt	("AI", "WarLimit", 2);
-		Rules->DefenseRatio	= rules_ini->readFloat	("AI", "DefenseRatio", .4);
-		Rules->DefenseLimit	= rules_ini->readInt	("AI", "DefenseLimit", 40);
-		Rules->AARatio		= rules_ini->readFloat	("AI", "AARatio", .14);
-		Rules->AALimit		= rules_ini->readInt	("AI", "AALimit", 10);
-		Rules->TeslaRatio	= rules_ini->readFloat	("AI", "TeslaRatio", .16);
-		Rules->TeslaLimit	= rules_ini->readInt	("AI", "TeslaLimit", 10);
-		Rules->HelipadRatio	= rules_ini->readFloat	("AI", "HelipadRatio", .12);
-		Rules->HelipadLimit	= rules_ini->readInt	("AI", "HelipadLimit", 5);
-		Rules->AirstripRatio	= rules_ini->readFloat	("AI", "AirstripRatio", .12);
-		Rules->AirstripLimit	= rules_ini->readInt	("AI", "AirstripLimit", 5);
+		Rules->AttackInterval = rules_ini->readInt("AI", "AttackInterval", 3);
+		Rules->AttackDelay = rules_ini->readInt("AI", "AttackDelay", 5);
+		Rules->PatrolScan = rules_ini->readFloat("AI", "PatrolScan", .016);
+		Rules->CreditReserve = rules_ini->readInt("AI", "CreditReserve", 100);
+		Rules->PathDelay = rules_ini->readFloat("AI", "PathDelay", .01);
+		Rules->OreNearScan = rules_ini->readInt("AI", "OreNearScan", 6);
+		Rules->OreFarScan = rules_ini->readInt("AI", "OreFarScan", 48);
+		Rules->AutocreateTime	= rules_ini->readInt("AI", "AutocreateTime", 5);
+		Rules->InfantryReserve	= rules_ini->readInt("AI", "InfantryReserve", 3000);
+		Rules->InfantryBaseMult	= rules_ini->readInt("AI", "InfantryBaseMult", 1);
+		Rules->PowerSurplus	= rules_ini->readInt("AI", "PowerSurplus", 50);
+		Rules->BaseSizeAdd	= rules_ini->readInt("AI", "BaseSizeAdd", 3);
+		Rules->RefineryRatio	= rules_ini->readFloat("AI", "RefineryRatio", .16);
+		Rules->RefineryLimit	= rules_ini->readInt("AI", "RefineryLimit", 4);
+		Rules->BarracksRatio	= rules_ini->readFloat("AI", "BarracksRatio", .16);
+		Rules->BarracksLimit	= rules_ini->readInt("AI", "BarracksLimit", 2);
+		Rules->WarRatio		= rules_ini->readFloat("AI", "WarRatio", .1);
+		Rules->WarLimit		= rules_ini->readInt("AI", "WarLimit", 2);
+		Rules->DefenseRatio	= rules_ini->readFloat("AI", "DefenseRatio", .4);
+		Rules->DefenseLimit	= rules_ini->readInt("AI", "DefenseLimit", 40);
+		Rules->AARatio		= rules_ini->readFloat("AI", "AARatio", .14);
+		Rules->AALimit		= rules_ini->readInt("AI", "AALimit", 10);
+		Rules->TeslaRatio	= rules_ini->readFloat("AI", "TeslaRatio", .16);
+		Rules->TeslaLimit	= rules_ini->readInt("AI", "TeslaLimit", 10);
+		Rules->HelipadRatio	= rules_ini->readFloat("AI", "HelipadRatio", .12);
+		Rules->HelipadLimit	= rules_ini->readInt("AI", "HelipadLimit", 5);
+		Rules->AirstripRatio	= rules_ini->readFloat("AI", "AirstripRatio", .12);
+		Rules->AirstripLimit	= rules_ini->readInt("AI", "AirstripLimit", 5);
 //		Rules->CompEasyBonus	= rules_ini->readInt("AI", "CompEasyBonus", true);
 //		Rules->Paranoid		= rules_ini->readInt("AI", "Paranoid", true);
 		Rules->CompEasyBonus	= true; // @todo read this value from the config file
 		Rules->Paranoid		= true; // @todo read this value from the config file
 		Rules->PowerEmergency	= rules_ini->readInt	("AI", "PowerEmergency", 75);
-	}else{
+	}
+    else
+    {
 		Rules->AttackInterval	= 3;
 		Rules->AttackDelay	= 5;
 		Rules->PatrolScan	=.016;
@@ -708,7 +710,7 @@ bool Ai::CanBuildAt (Uint8 PlayerNumb, const char *structname, Uint32 pos)
 /**
  *
  */
-bool Ai::BuildStructure (Player *Player, int PlayerNumb, const char *structname, Uint32 ConstYardPos)
+bool Ai::BuildStructure(Player *Player, int PlayerNumb, const char *structname, Uint32 ConstYardPos)
 {
 	Uint32 pos = 0;
 	Uint16 ConstYard_x;
@@ -757,7 +759,7 @@ bool Ai::BuildStructure (Player *Player, int PlayerNumb, const char *structname,
 	}
 
 #endif
-	logger->error("%s line %i: Failed to find free pos\n", __FILE__, __LINE__);
+	logger->error("Ai::BuildStructure line 762: Failed to find free pos\n");
 	return false;
 }
 
@@ -1318,7 +1320,7 @@ void Ai::Harvest(Player *Player, int PlayerNumb)
  * For now the AI assumes that all non local players are computer players
  * This means no support for multiplayer with computer players mix.
  */
-void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
+void Ai::patrolAndAttack(Player *Player, int PlayerNumb)
 {
     int NumbUnits;
     int NumbStructures;
@@ -1354,7 +1356,8 @@ void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
 	lPlayerNumbUnits	= p::ccmap->getPlayerPool()->getLPlayer()->getNumUnits();
 
 	// First find a good target
-	if (lPlayerNumbStructures > 0){
+	if (lPlayerNumbStructures > 0)
+    {
 		RndStr = (int) ((double)lPlayerNumbStructures*rand()/(RAND_MAX));
 
 		if (PreferLastStructures){
@@ -1399,7 +1402,7 @@ void Ai::patrolAndAttack (Player *Player, int PlayerNumb)
 			{
 				if (Unit->getType()->getName() == "HARV")
 				{
-					logger->error ("%s line %i: !!!!!!!!!!Error harvesters can't attack\n", __FILE__, __LINE__);
+					logger->error ("Ai::patrolAndAttack  line 1404 : !!!!!!!!!!Error harvesters can't attack\n");
 				}
 				else
 				{

@@ -62,7 +62,7 @@ private:
     vector<Uint32> LastAttackTickCount;
     vector<Uint32> LastBuildTickCount;
     vector<Uint32> LastGuideGatherTickCount;
-    int NumbPlayers;
+    unsigned int NumbPlayers;
     int HumanPlayerNumb;
     int Difficulty;
     vector<Uint32> LastGuideTickCount;
