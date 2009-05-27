@@ -30,7 +30,6 @@ AC_CHECK_LIB(SDL_mixer, Mix_OpenAudio, , AC_MSG_ERROR([
 
 AC_CONFIG_FILES([
     Makefile
-    src/Makefile
 ])
 
 AC_OUTPUT
