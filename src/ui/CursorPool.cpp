@@ -1,6 +1,5 @@
 // CursorPool.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -23,10 +22,7 @@
 
 #include "misc/INIFile.h"
 #include "include/Logger.h"
-#include "misc/config.h"
 #include "CursorInfo.h"
-
-#include "misc/INIFile.h"
 
 using std::string;
 
