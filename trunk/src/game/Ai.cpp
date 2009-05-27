@@ -1,6 +1,5 @@
 // Ai.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -35,7 +34,6 @@
 #include "AiRules.h"
 #include "Unit.hpp"
 #include "include/Logger.h"
-#include "misc/config.h"
 #include "misc/INIFile.h"
 #include "audio/SoundEngine.h"
 #include "video/Renderer.h"
@@ -81,7 +79,7 @@ Ai::Ai()
 
 
 	/// Load the sounds ini file
-	INIFile *rules_ini = GetConfig("rules.ini");
+	INIFile *rules_ini = new INIFile("rules.ini");
 	if (rules_ini != 0)
 	{
 		Rules->AttackInterval = rules_ini->readInt("AI", "AttackInterval", 3);
