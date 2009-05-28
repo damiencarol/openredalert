@@ -1,6 +1,5 @@
 // TemplateImage.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -28,7 +27,6 @@
 #include "misc/INIFile.h"
 #include "include/Logger.h"
 #include "video/ImageNotFound.h"
-#include "misc/config.h"
 #include "video/headerformats.h"
 #include "SHPImage.h"
 #include "vfs/VFile.h"
