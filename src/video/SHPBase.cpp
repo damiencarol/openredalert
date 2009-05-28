@@ -1,6 +1,5 @@
 // SHPBase.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -29,16 +28,11 @@
 #include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "video/ImageNotFound.h"
-#include "misc/config.h"
 #include "video/headerformats.h"
 #include "Palettes.h"
 
 using std::string;
 using std::runtime_error;
-
-namespace pc {
-	extern ConfigType Config;
-}
 
 //-----------------------------------------------------------------------------
 // SHPBase
