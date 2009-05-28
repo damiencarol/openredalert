@@ -24,7 +24,6 @@
 #include "video/CPSImage.h"
 #include "video/SHPImage.h"
 #include "misc/common.h"
-#include "misc/config.h"
 #include "video/GraphicsEngine.h"
 #include "video/ImageCache.h"
 #include "include/sdllayer.h"
@@ -34,7 +33,6 @@
 using std::string;
 
 namespace pc {
-    extern ConfigType Config;
     extern GraphicsEngine * gfxeng;
     extern ImageCache* imgcache;
 }
@@ -405,9 +403,8 @@ void RaWindow::ResizeWindow (int Width, int Heigth)
 	SDL_FreeSurface(WindowSurface);
 	WindowSurface = tmp;
 
-	if (pc::Config.gamenum == GAME_RA){
-		this->DrawRaBackground();
-	}
+    // Draw the background
+	this->DrawRaBackground();
 }
 
 void RaWindow::GetWindowPosition (int *Xpos, int *Ypos)
@@ -440,52 +437,47 @@ void RaWindow::SetupWindow (int Xpos, int Ypos, int Width, int Heigth)
 
 	WindowSurface = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCCOLORKEY, Width, Heigth, 16, 0, 0, 0, 0);
 
-	if (pc::Config.gamenum == GAME_RA){
-/**
- * 		The image cache somehow gets corrupted by this --> the imagecache is destroyed and recreated in maps.cpp
-*/
+    // The image cache somehow gets corrupted by this --> the imagecache is destroyed and recreated in maps.cpp
+    int scaleq = -1;
 
-		int scaleq = -1;
-
-		// Load window images
-        	try {
-			Background	= pc::imgcache->loadImage("dd-bkgnd.shp", scaleq);
-		}catch (ImageNotFound&){
-			printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
-		}
-
-        	try {
-			LeftBorder	= pc::imgcache->loadImage("dd-left.shp", scaleq);
-		}catch (ImageNotFound&){
-			printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
-		}
-
-        	try {
-			RightBorder	= pc::imgcache->loadImage("dd-right.shp", scaleq);
-		}catch (ImageNotFound&){
-			printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
-		}
-
-        	try {
-			TopBorder	= pc::imgcache->loadImage("dd-top.shp", scaleq);
-		}catch (ImageNotFound&){
-			printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
-		}
-
-        	try {
-			BottomBorder	= pc::imgcache->loadImage("dd-botm.shp", scaleq);
-		}catch (ImageNotFound&){
-			printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
-		}
-
-        	try {
-			Corner		= pc::imgcache->loadImage("dd-crnr.shp", scaleq);
-		}catch (ImageNotFound&){
-			printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
-		}
-
-		this->DrawRaBackground ();
+    // Load window images
+    try {
+        Background	= pc::imgcache->loadImage("dd-bkgnd.shp", scaleq);
+	} catch (ImageNotFound&){
+        printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
 	}
+
+   	try {
+        LeftBorder	= pc::imgcache->loadImage("dd-left.shp", scaleq);
+	} catch (ImageNotFound&){
+		printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
+	}
+
+    try {
+        RightBorder	= pc::imgcache->loadImage("dd-right.shp", scaleq);
+    }catch (ImageNotFound&){
+        printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
+    }
+
+    try {
+        TopBorder	= pc::imgcache->loadImage("dd-top.shp", scaleq);
+    }catch (ImageNotFound&){
+        printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
+    }
+
+    try {
+        BottomBorder	= pc::imgcache->loadImage("dd-botm.shp", scaleq);
+    }catch (ImageNotFound&){
+        printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
+    }
+
+    try {
+        Corner		= pc::imgcache->loadImage("dd-crnr.shp", scaleq);
+    }catch (ImageNotFound&){
+        printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
+    }               
+
+	this->DrawRaBackground ();	
 }
 
 void RaWindow::DrawWindow()
@@ -498,8 +490,7 @@ SDL_Rect dest;
 	dest.w = WindowSurface->w;
 	dest.h = WindowSurface->h;
 */
-	SDL_BlitSurface(WindowSurface, NULL, DisplaySurface, &SizeAndPosition);
-
+	SDL_BlitSurface(WindowSurface, 0, DisplaySurface, &SizeAndPosition);
 }
 
 SDL_Surface* RaWindow::ReadShpImage (char *Name, int ImageNumb, Uint8 palnum)
@@ -512,7 +503,7 @@ SDL_Surface* RaWindow::ReadShpImage (char *Name, int ImageNumb, Uint8 palnum)
 		TempPic = new SHPImage(Name, -1);
 	} catch (ImageNotFound&) {
 		printf ("%s line %i: Image not found\n", __FILE__, __LINE__);
-		return NULL;
+		return 0;
 	}
 
 //	printf ("%s line %i: %s has %i images\n", __FILE__, __LINE__, Name, TempPic->getNumImg());
