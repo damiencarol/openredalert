@@ -1,6 +1,5 @@
 // LoadingScreen.cpp
-// 1.0
-
+//
 //    This file is part of OpenRedAlert.
 //
 //    OpenRedAlert is free software: you can redistribute it and/or modify
@@ -20,7 +19,6 @@
 #include "SDL/SDL_timer.h"
 #include "SDL/SDL_events.h"
 
-#include "misc/config.h"
 #include "video/CPSImage.h"
 #include "video/GraphicsEngine.h"
 #include "include/Logger.h"
