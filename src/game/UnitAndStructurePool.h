@@ -137,7 +137,7 @@ public:
 
 
 	bool cellOccupied (Uint32 cell);
-	Unit* getGroundUnitAt ( Uint32 cell, Uint8 subcell = 0 );
+	Unit* getGroundUnitAt(unsigned int cell, Uint8 subcell = 0 );
 	Unit* getFlyingAt ( Uint32 cell, Uint8 subcell = 0 );
 	Structure* getStructureAt(Uint32 cell, Uint8 subcell = 0, bool wall = false);
 

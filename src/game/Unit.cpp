@@ -282,7 +282,7 @@ UnitOrStructureType* Unit::getType()
     return this->type;
 }
 
-Uint16 Unit::getPos() const
+unsigned int Unit::getPos() const
 {
 	return cellpos;
 }
@@ -292,7 +292,7 @@ Uint16 Unit::getBPos(Uint16 pos) const
 	return cellpos;
 }
 
-Uint16 Unit::getSubpos() const
+unsigned int Unit::getSubpos() const
 {
 	return subpos;
 }

@@ -89,9 +89,10 @@ public:
     void setYoffset(Sint8 yo);
     UnitOrStructureType * getType();
 
-    Uint16 getPos() const;
+    unsigned int getPos() const;
+    unsigned int getSubpos() const;
+    
     Uint16 getBPos(Uint16 pos) const;
-    Uint16 getSubpos() const;
     Uint32 getNum() const;
     void setUnitnum(Uint32 unum);
 

@@ -108,9 +108,9 @@ public:
     unsigned int getOwner() const;
 
 
-    virtual Uint16 getPos() const = 0;
+    virtual unsigned int getPos() const = 0;
 
-    virtual Uint16 getSubpos() const = 0;
+    virtual unsigned int getSubpos() const = 0;
 
     /** 
      * get the first blocked cell in structure.

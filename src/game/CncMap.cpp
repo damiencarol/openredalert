@@ -1261,7 +1261,7 @@ RA_Tiggers* CnCMap::getTriggerByName(string TriggerName)
     transform(name.begin(), name.end(), name.begin(), toupper);
 
     // Parse all triggers to found one
-    for (int j = 0; j < RaTriggers.size(); j++)
+    for (unsigned int j = 0; j < RaTriggers.size(); j++)
     {
         // Upper the string of the trigger
         string UpTrig = RaTriggers[j]->name;
@@ -1967,8 +1967,7 @@ void CnCMap::advancedSections(INIFile *inifile)
     overlaymatrix.resize(width*height, 0);
 
     // Loading of art.ini (use in TERRAIN loading)
-    INIFile* arts = 0;
-    arts = GetConfig("art.ini");
+    INIFile* arts = new INIFile("art.ini");
 
     // Loading of [TERRAIN] section of the inifile
     int numKeys = inifile->getNumberOfKeysInSection("TERRAIN");
