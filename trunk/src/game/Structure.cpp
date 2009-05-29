@@ -924,12 +924,12 @@ Uint32 Structure::getNum() const
         return structnum;
 }
 
-Uint16 Structure::getPos() const
+unsigned int Structure::getPos() const
 {
 	return cellpos;
 }
 
-Uint16 Structure::getSubpos() const 
+unsigned int Structure::getSubpos() const 
 {
 	return 0;
 }

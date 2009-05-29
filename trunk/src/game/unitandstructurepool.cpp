@@ -1029,10 +1029,9 @@ bool UnitAndStructurePool::cellOccupied (Uint32 cell)
  * @param subcell The subposition of the cell to be examined (only valid for infantry).  Bitwise or with 128 to get the nearest infantry unit to that subpos.
  * @return the Unit at the position
  */
-Unit* UnitAndStructurePool::getGroundUnitAt( Uint32 cell, Uint8 subcell)
+Unit* UnitAndStructurePool::getGroundUnitAt(unsigned int cell, Uint8 subcell)
 {
-	Unit* un = 0;
-
+	// Check that the cell is in the map
 	if (cell >= p::ccmap->getSize())
 	{
 		// Return NULL
@@ -1041,7 +1040,7 @@ Unit* UnitAndStructurePool::getGroundUnitAt( Uint32 cell, Uint8 subcell)
 
 	if (unitandstructmat[cell].flags & US_IS_UNIT)
 	{
-		un = getUnit(unitandstructmat[cell].unitnumb);
+		Unit* un = getUnit(unitandstructmat[cell].unitnumb);
 		if (un != 0)
 		{
 			if (dynamic_cast<UnitType *>(un->getType())->isInfantry() )

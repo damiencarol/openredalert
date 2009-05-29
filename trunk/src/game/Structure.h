@@ -59,11 +59,13 @@ public:
 	UnitOrStructureType* getType();
 	void setStructnum(Uint32 stn);
 	Uint32 getNum() const;
-	Uint16 getPos() const;
 	Uint16 getBPos(Uint16 curpos) const;
 	Uint16 getFreePos(Uint8* subpos, bool findsubpos);
 	void remove();
-	Uint16 getSubpos() const;
+
+	unsigned int getPos() const;
+	unsigned int getSubpos() const;
+
 	void applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker);
 	void runAnim(Uint32 mode);
 	void runSecAnim(Uint32 param, bool extraParam = false);
@@ -131,7 +133,7 @@ private:
 	Uint32 structnum;
 	Uint16 *imagenumbers;
 
-	Uint16 cellpos;
+	unsigned int cellpos;
 	Uint16 bcellpos;
 	Uint16 health;
 

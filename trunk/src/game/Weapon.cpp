@@ -18,7 +18,6 @@
 #include "Weapon.h"
 
 #include <algorithm>
-#include <cctype>
 #include <vector>
 
 #include "Projectile.h"
@@ -36,8 +35,6 @@
 #include "InfantryGroup.h"
 #include "ProjectileAnim.h"
 #include "RedAlertDataLoader.h"
-
-#include "misc/common.h"
 
 using std::vector;
 using std::for_each;

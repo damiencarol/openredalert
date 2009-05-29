@@ -17,7 +17,7 @@
 #include "Ai.h"
 
 #include <stdexcept>
-#include <math.h>
+#include <cmath>
 
 #include "SDL/SDL_timer.h"
 
@@ -84,9 +84,9 @@ Ai::Ai()
 	{
 		Rules->AttackInterval = rules_ini->readInt("AI", "AttackInterval", 3);
 		Rules->AttackDelay = rules_ini->readInt("AI", "AttackDelay", 5);
-		Rules->PatrolScan = rules_ini->readFloat("AI", "PatrolScan", .016);
+		Rules->PatrolScan = rules_ini->readFloat("AI", "PatrolScan", .016f);
 		Rules->CreditReserve = rules_ini->readInt("AI", "CreditReserve", 100);
-		Rules->PathDelay = rules_ini->readFloat("AI", "PathDelay", .01);
+		Rules->PathDelay = rules_ini->readFloat("AI", "PathDelay", .01f);
 		Rules->OreNearScan = rules_ini->readInt("AI", "OreNearScan", 6);
 		Rules->OreFarScan = rules_ini->readInt("AI", "OreFarScan", 48);
 		Rules->AutocreateTime	= rules_ini->readInt("AI", "AutocreateTime", 5);
@@ -94,21 +94,21 @@ Ai::Ai()
 		Rules->InfantryBaseMult	= rules_ini->readInt("AI", "InfantryBaseMult", 1);
 		Rules->PowerSurplus	= rules_ini->readInt("AI", "PowerSurplus", 50);
 		Rules->BaseSizeAdd	= rules_ini->readInt("AI", "BaseSizeAdd", 3);
-		Rules->RefineryRatio	= rules_ini->readFloat("AI", "RefineryRatio", .16);
+		Rules->RefineryRatio	= rules_ini->readFloat("AI", "RefineryRatio", .16f);
 		Rules->RefineryLimit	= rules_ini->readInt("AI", "RefineryLimit", 4);
-		Rules->BarracksRatio	= rules_ini->readFloat("AI", "BarracksRatio", .16);
+		Rules->BarracksRatio	= rules_ini->readFloat("AI", "BarracksRatio", .16f);
 		Rules->BarracksLimit	= rules_ini->readInt("AI", "BarracksLimit", 2);
-		Rules->WarRatio		= rules_ini->readFloat("AI", "WarRatio", .1);
+		Rules->WarRatio		= rules_ini->readFloat("AI", "WarRatio", .1f);
 		Rules->WarLimit		= rules_ini->readInt("AI", "WarLimit", 2);
-		Rules->DefenseRatio	= rules_ini->readFloat("AI", "DefenseRatio", .4);
+		Rules->DefenseRatio	= rules_ini->readFloat("AI", "DefenseRatio", .4f);
 		Rules->DefenseLimit	= rules_ini->readInt("AI", "DefenseLimit", 40);
-		Rules->AARatio		= rules_ini->readFloat("AI", "AARatio", .14);
+		Rules->AARatio		= rules_ini->readFloat("AI", "AARatio", .14f);
 		Rules->AALimit		= rules_ini->readInt("AI", "AALimit", 10);
-		Rules->TeslaRatio	= rules_ini->readFloat("AI", "TeslaRatio", .16);
+		Rules->TeslaRatio	= rules_ini->readFloat("AI", "TeslaRatio", .16f);
 		Rules->TeslaLimit	= rules_ini->readInt("AI", "TeslaLimit", 10);
-		Rules->HelipadRatio	= rules_ini->readFloat("AI", "HelipadRatio", .12);
+		Rules->HelipadRatio	= rules_ini->readFloat("AI", "HelipadRatio", .12f);
 		Rules->HelipadLimit	= rules_ini->readInt("AI", "HelipadLimit", 5);
-		Rules->AirstripRatio	= rules_ini->readFloat("AI", "AirstripRatio", .12);
+		Rules->AirstripRatio	= rules_ini->readFloat("AI", "AirstripRatio", .12f);
 		Rules->AirstripLimit	= rules_ini->readInt("AI", "AirstripLimit", 5);
 //		Rules->CompEasyBonus	= rules_ini->readInt("AI", "CompEasyBonus", true);
 //		Rules->Paranoid		= rules_ini->readInt("AI", "Paranoid", true);
@@ -120,9 +120,9 @@ Ai::Ai()
     {
 		Rules->AttackInterval	= 3;
 		Rules->AttackDelay	= 5;
-		Rules->PatrolScan	=.016;
+		Rules->PatrolScan	=.016f;
 		Rules->CreditReserve	=100;
-		Rules->PathDelay		=.01;
+		Rules->PathDelay		=.01f;
 		Rules->OreNearScan	= 6;
 		Rules->OreFarScan	= 48;
 		Rules->AutocreateTime	=5;
@@ -130,21 +130,21 @@ Ai::Ai()
 		Rules->InfantryBaseMult	= 1;
 		Rules->PowerSurplus	= 50;
 		Rules->BaseSizeAdd	= 3;
-		Rules->RefineryRatio	= .16;
+		Rules->RefineryRatio	= .16f;
 		Rules->RefineryLimit	= 4;
-		Rules->BarracksRatio	= .16;
+		Rules->BarracksRatio	= .16f;
 		Rules->BarracksLimit	= 2;
-		Rules->WarRatio		=.1;
+		Rules->WarRatio		=.1f;
 		Rules->WarLimit		= 2;
-		Rules->DefenseRatio	= .4;
+		Rules->DefenseRatio	= .4f;
 		Rules->DefenseLimit	= 40;
-		Rules->AARatio		=.14;
+		Rules->AARatio		=.14f;
 		Rules->AALimit		= 10;
-		Rules->TeslaRatio	= .16;
+		Rules->TeslaRatio	= .16f;
 		Rules->TeslaLimit = 10;
-		Rules->HelipadRatio = .12;
+		Rules->HelipadRatio = .12f;
 		Rules->HelipadLimit = 5;
-		Rules->AirstripRatio = .12;
+		Rules->AirstripRatio = .12f;
 		Rules->AirstripLimit = 5;
 		Rules->CompEasyBonus = true;
 		Rules->Paranoid = true;
@@ -156,7 +156,8 @@ Ai::Ai()
 
 /**
  */
-Ai::~Ai() {
+Ai::~Ai()
+{
     // Free ai rules
     delete Rules;
 }
@@ -164,8 +165,10 @@ Ai::~Ai() {
 /**
  * @param diff Difficulty
  */
-void Ai::SetDifficulty(int diff) {
-    if (diff > 0 && diff <= 4) {
+void Ai::SetDifficulty(int diff)
+{
+    if (diff > 0 && diff <= 4)
+    {
         this->Difficulty = diff;
     }
 }
@@ -175,7 +178,6 @@ void Ai::SetDifficulty(int diff) {
  */
 void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 {
-	UnitOrStructure     *lEnemy = NULL;
 	int                 lNumbUnits;
 	vector<Unit*>	lUnitpool;
 	Unit                *lUnit;
@@ -213,16 +215,16 @@ void Ai::DefendUnits(Player* pPlayer, int pPlayerNumb)
 			}
 
 //			Enemy  = p::uspool->getUnitOrStructureAt(EnemyUnit->getPos(), EnemyUnit->getSubpos());
-			lEnemy  = (UnitOrStructure*) p::uspool->getGroundUnitAt ( lEnemyUnit->getPos(), lEnemyUnit->getSubpos() );
+			UnitOrStructure* lEnemy = (UnitOrStructure*) p::uspool->getGroundUnitAt(lEnemyUnit->getPos(), lEnemyUnit->getSubpos());
 
-			if (lEnemy == NULL)
+			if (lEnemy == 0)
 				lEnemy  = (UnitOrStructure*) p::uspool->getFlyingAt ( lEnemyUnit->getPos(), lEnemyUnit->getSubpos() );
 
-			if (lEnemy == NULL)
+			if (lEnemy == 0)
 				lEnemy  = (UnitOrStructure*) p::uspool->getStructureAt ( lEnemyUnit->getPos(), lEnemyUnit->getSubpos(), false );
 
 
-			if (lEnemy != NULL){
+			if (lEnemy != 0){
 				lUnit->attack(lEnemy);
 				return;
 			}
@@ -380,7 +382,8 @@ void Ai::handle()
 
 	// This part of the AI takes care of the computer player attacking a enemy within range
 	// and of the human player fighting back when attacked.
-	for (int PlayerNumb = 0; PlayerNumb < this->NumbPlayers; PlayerNumb++){
+	for (unsigned int PlayerNumb = 0; PlayerNumb < this->NumbPlayers; PlayerNumb++)
+    {
 
 		CurPlayer = p::ccmap->getPlayerPool()->getPlayer(PlayerNumb);
 
@@ -1116,11 +1119,12 @@ Unit* Ai::EnemyUnitInRange(int MyPlayerNumb, Unit* MyUnit, int AttackRange)
 
 
 
-	for (int i = 0; i < this->NumbPlayers; i++)
+	for (unsigned int i = 0; i < this->NumbPlayers; i++)
 	{
 		// Don't find my own units
-		if (MyPlayerNumb == i)
+        if (MyPlayerNumb == i){
 			continue;
+        }
 
 		Player* EnemyPlayer = p::ccmap->getPlayerPool()->getPlayer(i);
 
@@ -1185,11 +1189,13 @@ Unit* Ai::EnemyUnitInRange (int MyPlayerNumb, Structure* MyStructure, int Attack
 		AttackRange = theWeapon->getRange();
     }
 
-	for (int i = 0; i < this->NumbPlayers; i++)
+	for (unsigned int i = 0; i < this->NumbPlayers; i++)
 	{
 		// Don't defend against my own units
 		if (MyPlayerNumb == i)
+        {
 			continue;
+        }
 
 		Player* enemyPlayer = p::ccmap->getPlayerPool()->getPlayer(i);
 

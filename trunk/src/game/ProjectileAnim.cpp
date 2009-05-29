@@ -101,7 +101,7 @@ ProjectileAnim::ProjectileAnim(Uint32 p, Weapon *weap, UnitOrStructure* owner,
             target->referTo();
         }
     } else {
-        target = NULL;
+        target = 0;
     }
     // speed == 100 -> instant hit.
     if( (weap->getSpeed() < 100 ) && (dest != owner->getPos()) ) {
@@ -126,7 +126,7 @@ ProjectileAnim::ProjectileAnim(Uint32 p, Weapon *weap, UnitOrStructure* owner,
             } else {
                 alpha = atan((float)ydiff/(float)xdiff);
                 if( xdiff < 0 ) {
-                    alpha = M_PI+alpha;
+                    alpha = M_PI + alpha;
                 }
             }
             facing = (40-(Sint8)(alpha*16/M_PI))&0x1f;

@@ -306,10 +306,10 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
 #endif
 
     // Read the C4 caract
-    this->c4 = unitini->readYesNo(typeName, "C4", 0);
+    this->c4 = (unitini->readYesNo(typeName, "C4", 0) == 1);
 
     // Read the Infiltrate caracteristic
-    this->infiltrate = unitini->readYesNo(typeName, "Infiltrate", 0);
+    this->infiltrate = (unitini->readYesNo(typeName, "Infiltrate", 0) == 1);
 }
 
 /**
