@@ -1,6 +1,6 @@
 #! /bin/sh
 
-aclocal
+aclocal -I acinclude
 autoconf
 automake -a -c
 ./configure
