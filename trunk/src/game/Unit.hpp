@@ -21,7 +21,6 @@
 #define LOOPEND_TURN
 
 #include <string>
-#include <cassert>
 #include <map>
 #include <vector>
 #include <stack>
