@@ -76,8 +76,7 @@ UnitAndStructurePool::UnitAndStructurePool(const char* theTheater) :
 	numdeletedstruct(0)
 {
 	// Some STRUCTURE ARE VARIABLE WITH TEATHER    
-	strcpy(this->theaterext, ".");
-	strncat(this->theaterext, theTheater, 3);
+	this->theaterext = "." + string(theTheater).substr(0, 3);
 
 	// needed for populate by structures
 	unitandstructmat.resize((p::ccmap->getWidth()+10) * (p::ccmap->getHeight()+10));
