@@ -196,7 +196,7 @@ private:
 	void updateWalls(Structure* st, bool add, CnCMap* theMap);
 	    
 	/** String which keep 5 lettres of the theater. Many Graphics depends of theater */
-	char theaterext[5];
+	string theaterext;
 	    
     vector<UnitAndStructureMat> unitandstructmat;
 
