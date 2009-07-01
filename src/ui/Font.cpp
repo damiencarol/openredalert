@@ -329,7 +329,6 @@ void Font::Load(string FontName)
 	Uint8 fnmaxw;
 	Uint32 fntotalw;
 	Uint32 ypos;
-	Uint32 i;
 	Uint32 pos;
 	Uint32 curchar;
 	Uint8		data;
@@ -379,7 +378,8 @@ void Font::Load(string FontName)
 	chrdest.resize(nchars);
 
 	fntotalw = 0;
-	for( i = 0 ; i<nchars; i++ ) {
+	for(unsigned int i = 0 ; i < nchars; i++)
+    {
 		chrdest[i].x = fntotalw;
 		chrdest[i].y = 0;
 		chrdest[i].h = fnheight;
@@ -388,11 +388,14 @@ void Font::Load(string FontName)
 	}
 	vector<Uint8> chardata(fnheight*fntotalw);
 
-	for( curchar = 0; curchar < nchars; curchar++ ) {
+	for( curchar = 0; curchar < nchars; curchar++ )
+    {
 		fontfile->seekSet(dataoffsets[curchar]);
-		for( ypos = hchar[curchar<<1]; ypos < (Uint32)(hchar[curchar<<1]+hchar[(curchar<<1)+1]); ypos++ ) {
+		for( ypos = hchar[curchar<<1]; ypos < (Uint32)(hchar[curchar<<1]+hchar[(curchar<<1)+1]); ypos++ )
+        {
 			pos = chrdest[curchar].x+ypos*fntotalw;
-			for( i = 0; i < wchar[curchar]; i+=2 ) {
+			for(unsigned int i = 0; i < wchar[curchar]; i+=2 )
+            {
 				fontfile->readByte( &data, 1 );
 #if 1
 				/* Each 4 bits contain a index to the pallete */
