@@ -53,7 +53,11 @@ SoundFile::SoundFile() : fileOpened(false)
     }
 }
 
-SoundFile::~SoundFile(){
+/**
+ *
+ */
+SoundFile::~SoundFile()
+{
     Close();
 }
 
