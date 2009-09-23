@@ -23,6 +23,7 @@ public class MissionData {
 	private String theater;
 	/** True if it's the last mission */
 	private boolean endOfGame;
+	private String intro;
 
 	/**
 	 * @param theater
@@ -150,5 +151,13 @@ public class MissionData {
 	 */
 	public void setEndOfGame(boolean endOfGame) {
 		this.endOfGame = endOfGame;
+	}
+
+	public String getIntro() {
+		return this.intro;
+	}
+
+	public void setName(String string) {
+		this.mapname = string;
 	}
 }
