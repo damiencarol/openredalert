@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.prefs.BackingStoreException;
 
 import openra.core.CncMap;
@@ -14,6 +16,7 @@ import openra.core.LoadMapError;
 import openra.core.Trigger;
 
 import org.ini4j.IniFile;
+import org.ini4j.InvalidIniFormatException;
 import org.ini4j.IniFile.Mode;
 import org.junit.Test;
 
@@ -584,7 +587,7 @@ public class CncMapTest {
 	}
 	
 	@Test
-	public void testSaveMapAllies1a() throws LoadMapError, BackingStoreException {
+	public void testSaveMapAllies1a() throws LoadMapError, BackingStoreException, InvalidIniFormatException, FileNotFoundException, IOException {
 		// Try to Load a new map
 		CncMap mapAllies1a = CncMap.loadMap(new File("data/main/general/SCG01EA.INI"));
 		assertNotNull(mapAllies1a);
@@ -599,4 +602,19 @@ public class CncMapTest {
 		assertTrue(file1.equals(file2));
 	}
 
+	@Test
+	public void getTeamTypesTest() throws LoadMapError, BackingStoreException, InvalidIniFormatException, FileNotFoundException, IOException {
+	
+		// Try to Load a new map
+		CncMap map = CncMap.loadMap(new File("data/main/general/scg01ea.ini"));
+		assertNotNull(map);
+		// Initiate the map
+		map.Init(null, GameMode.GAME_MODE_SINGLE_PLAYER);
+	
+		// Test the teamtypes
+		assertEquals(12, map.getTeamTypes().size());
+		
+		assertEquals("sov1", map.getTeamTypes().get(0).getName());
+		
+	}
 }

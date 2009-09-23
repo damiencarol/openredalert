@@ -2,7 +2,9 @@ package openra.core;
 
 import java.awt.Point;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -12,11 +14,14 @@ import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import org.ini4j.Ini;
 import org.ini4j.IniFile;
+import org.ini4j.InvalidIniFormatException;
 
 import sun.io.ByteToCharASCII;
 
@@ -37,6 +42,8 @@ public class CncMap {
 	 */
 	private int[] waypoints = new int[100];
 	private ArrayList<TileData> mapPackDataList;
+	private String digest;
+	private ArrayList<TeamTypeData> teamtypeData;
 	
 	public CncMap() {
 		// Clear the waypoints
@@ -140,7 +147,14 @@ public class CncMap {
 				theUnit.setSubPos(theData.getSubPos());
 			}
 			
-			
+			this.RaTeamtypes = new Vector<RA_Teamtype>();
+			// Create team types
+			for (int i=0; i<this.teamtypeData.size() ; i++)
+			{
+				TeamTypeData theData = this.teamtypeData.get(i);
+				
+				this.RaTeamtypes.add(new RA_Teamtype(theData.getName()));
+			}
 		}
 	}
 	
@@ -589,6 +603,11 @@ private	int UnitActionToNr(String action) {
 			// Load and decode the Map pack section
 			loadMapPackSection(inifile);
 			
+			loadBreifing(inifile);
+			
+			// Load the digest
+			loadDigest(inifile);
+			
 		} catch (BackingStoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -664,6 +683,45 @@ private	int UnitActionToNr(String action) {
 
 	    //printf("moveflsh = %s   nmu = %d\n", moveflsh, flashnum);
 	    //printf("pips =    nmu = %d\n", pipsnum);
+	}
+
+	private void loadDigest(IniFile inifile) throws BackingStoreException {
+
+		if (inifile.nodeExists("Digest") == true)
+		{
+			// Go to the units section
+			Preferences section = inifile.node("Digest");
+		
+			this.digest = section.get("1", "");
+		}			
+	}
+	
+	private void loadBreifing(final IniFile inifile) throws BackingStoreException {
+
+		if (inifile.nodeExists("Briefing") == true)
+		{		
+			// Load the section
+			Preferences toto = inifile.node("Briefing");
+			String[] waypointsLine = toto.keys();
+			this.briefing = "";
+			// For each key found
+			for (int i = 0; i < waypointsLine.length; i++)
+			{
+				// Decode the waypoint
+				String strToDecode = toto.get(waypointsLine[i], "");
+				int waypointNumber = Integer.parseInt(waypointsLine[i]);
+				//int lineNum = Integer.parseInt(strToDecode);
+
+				//int number = 71 - strToDecode.length();
+				
+				if (i != 0) {
+					strToDecode = " " + strToDecode;
+				}
+				
+				// Store it
+				this.briefing += strToDecode;
+			}
+		}			
 	}
 
 	/**
@@ -1266,21 +1324,37 @@ private	int UnitActionToNr(String action) {
 	 * 
 	 * @param iniFile
 	 */
-	private void saveSimpleSection(IniFile mapIniFile) {
+	private void saveSimpleSection(Ini mapIniFile) {
 
+		Ini.Section basicSection = mapIniFile.add("Basic");
 		
-		// Write Basic/BRIEF
-		mapIniFile.node("Basic").put("Brief",  missionData.getBrief());
+		// Write Basic/Name
+		basicSection.put("Name",  missionData.getMapname());
+		
+		// Write Basic/Intro
+		String intro = missionData.getIntro();
+		if (intro == null) {
+			basicSection.put("Intro", "<none>");
+		} else {
+			basicSection.put("Intro", missionData.getIntro());
+		}
 
-		// Try to read Basic/ACTION
-		mapIniFile.node("Basic").put("Action", missionData.getAction());
+		// Write Brief
+		basicSection.put("Brief",  missionData.getBrief());
 
-		// Try to read Basic/PLAYER
-		/*missionData.setPlayer(inifile.node("Basic").get( "Player", ""));
+		// Write Win
+		basicSection.put("Win", missionData.getWinmov());
+		// Write Lose
+		basicSection.put("Lose", missionData.getLosemov());
+		// Write Action
+		basicSection.put("Action", missionData.getAction());
 
-		// Try to read Basic/THEME
-		missionData.setTheme(inifile.node("Basic").get( "Theme", "No theme"));
+		// Write Player
+		basicSection.put("Player", missionData.getPlayer());
 
+		// Write Theme
+		basicSection.put("Theme", missionData.getTheme());
+/*
 		// Try to read Basic/WIN
 		missionData.setWinmov(inifile.node("Basic").get(  "Win", "<none>"));
 
@@ -1309,6 +1383,14 @@ private	int UnitActionToNr(String action) {
 			missionData.setEndOfGame(false);*/
 	}
 	
+	private void saveDigest(final Ini mapIniFile) {
+
+		Ini.Section basicSection = mapIniFile.add("Digest");
+		
+		// Write Basic/Name
+		basicSection.put("1",  this.digest);
+	}
+	
 	/**
 	 * Function to load all vars in the simple sections of the inifile
 	 * 
@@ -1320,6 +1402,12 @@ private	int UnitActionToNr(String action) {
 	 */
 	private void simpleSections(IniFile inifile) throws LoadMapError {
 		try {
+			// Try to read Basic/Name
+			missionData.setName(inifile.node("Basic").get("Name", "<none>"));
+			
+			// Try to read Basic/BRIEF
+			missionData.setBrief(inifile.node("Basic").get("Brief", "<none>"));
+			
 			// Try to read Basic/BRIEF
 			missionData.setBrief(inifile.node("Basic").get("Brief", "<none>"));
 
@@ -1771,8 +1859,25 @@ private	int UnitActionToNr(String action) {
 	private void unOverlayPack(IniFile inifile) {
 	}
 
-	/** Load RA TeamTypes */
-	private void loadTeamTypes(IniFile fileIni) {
+	/** Load RA TeamTypes 
+	 * @throws BackingStoreException */
+	private void loadTeamTypes(IniFile file) throws BackingStoreException {
+		
+		this.teamtypeData = new ArrayList<TeamTypeData>();
+		
+		
+		// Load the section
+		Preferences toto = file.node("TeamTypes");
+		String[] teamTypesNames = toto.keys();
+		
+		for (int i = 0; i < teamTypesNames.length; i++)
+		{
+			String strToDecode = toto.get(teamTypesNames[i], "");
+			//String[] values = strToDecode.split(",");
+			
+			TeamTypeData theData = new TeamTypeData(teamTypesNames[i], strToDecode);
+			this.teamtypeData.add(theData);
+		}
 	}
 
 	/**
@@ -1894,6 +1999,7 @@ private	int UnitActionToNr(String action) {
 
 	/** Pool of the player of the map */
 	private PlayerPool playerPool;
+	private String briefing;
 
 	/**
 	 * Indicates if the map match with Interior theme.  
@@ -1946,17 +2052,64 @@ private	int UnitActionToNr(String action) {
 	 * Save a map to a file
 	 * @param string
 	 * @throws BackingStoreException 
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 * @throws InvalidIniFormatException 
 	 */
-	public void save(File mapFile) throws BackingStoreException {
+	public void save(File mapFile) throws BackingStoreException, InvalidIniFormatException, FileNotFoundException, IOException {
 		
-		IniFile iniFile = new IniFile(mapFile);
-		// Clear all values
-		iniFile.clear();
+		Ini ini = new Ini();
+
+        //ini.load(new FileReader(mapFile));
 		
 		// Save the simple section
-		saveSimpleSection(iniFile);
+		saveSimpleSection(ini);
 		
+		saveTeamTypes(ini);
 		
+		// Save Briefing
+		saveBreifing(ini);
+		
+		// Save the digest
+		saveDigest(ini);
+		
+		ini.store(new FileWriter(mapFile));
+	}
+
+	private void saveTeamTypes(Ini ini) {
+		
+		Ini.Section teamTypesSection = ini.add("TeamTypes");
+		
+		for (int i=0; i<this.teamtypeData.size(); i++)
+		{
+			// Write team type
+			teamTypesSection.put(this.teamtypeData.get(i).getName(), this.teamtypeData.get(i).getData());
+		}		
+	}
+
+	private void saveBreifing(Ini ini) {
+		
+		Ini.Section basicSection = ini.add("Briefing");
+		String str = this.briefing;
+		String[] strSplit = str.split(" ");
+		String dat = "";
+		int j = 0;
+		for (int i=0; i < strSplit.length; i++)
+		{
+			if (dat.trim().length() + strSplit[i].length() > 71)
+			{				
+				// Write Basic/Name
+				basicSection.put(Integer.toString(j), dat.trim());
+				dat = "";
+				j++;
+			}
+			
+			if (i != 0)
+				dat += " ";
+			dat += strSplit[i];
+		}
+		// Write Basic/Name
+		basicSection.put(Integer.toString(j), dat.trim());
 	}
 
 	/**
@@ -1965,5 +2118,9 @@ private	int UnitActionToNr(String action) {
 	@Deprecated
 	public ArrayList<TileData> getMapPackDataList() {
 		return mapPackDataList;
+	}
+
+	public Vector<RA_Teamtype> getTeamTypes() {
+		return this.RaTeamtypes;
 	}
 }
