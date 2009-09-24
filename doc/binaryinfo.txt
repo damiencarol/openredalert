@@ -1,0 +1,5 @@
+
+Original RA was compiled with version 10.6 of WATCOM C/C++ compiler.
+
+
+It use Direct X    4.06.00.0318
