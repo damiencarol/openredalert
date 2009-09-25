@@ -2,35 +2,32 @@ package openra.core;
 
 public class TileData {
 	
-	private int templateNumber;
+	private byte templateNumber1;
+	private byte templateNumber2;
 	
-	private int tileNumber;
+	private byte tileNumber;
 
-	/**
-	 * @return the template number
-	 */
-	public int getTemplateNumber() {
-		return templateNumber;
+	public byte getTemplateNumber1() {
+		return templateNumber1;
 	}
 
-	/**
-	 * @param templateNumber the template number to set
-	 */
-	public void setTemplateNumber(int templateNumber) {
-		this.templateNumber = templateNumber;
+	public void setTemplateNumber1(byte templateNumber1) {
+		this.templateNumber1 = templateNumber1;
 	}
 
-	/**
-	 * @return the tile number
-	 */
-	public int getTileNumber() {
+	public byte getTemplateNumber2() {
+		return templateNumber2;
+	}
+
+	public void setTemplateNumber2(byte templateNumber2) {
+		this.templateNumber2 = templateNumber2;
+	}
+
+	public byte getTileNumber() {
 		return tileNumber;
 	}
 
-	/**
-	 * @param tileNumber the tile number to set
-	 */
-	public void setTileNumber(int tileNumber) {
+	public void setTileNumber(byte tileNumber) {
 		this.tileNumber = tileNumber;
 	}
 
