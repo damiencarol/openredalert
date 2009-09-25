@@ -15,15 +15,30 @@
 */
 package openra.core;
 
-import java.io.File;
-import java.util.prefs.BackingStoreException;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
-import org.ini4j.IniFile;
+import org.ini4j.Ini;
+import org.ini4j.InvalidIniFormatException;
 
-public class ORAIniFile extends IniFile{
-	
-	public ORAIniFile(String fileName) throws BackingStoreException {
-		super(new File(fileName));
+public class IniFile extends Ini {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 145390873810423731L;
+
+	public IniFile(String fileName) throws InvalidIniFormatException, FileNotFoundException, IOException {
+		super(new FileReader(fileName));
+	}
+
+	public static void putYesNo(Ini mapIniFile, String string, String string2,
+			boolean value) {
+		if (value) {
+			mapIniFile.get(string).put(string2, "yes");
+		} else {
+			 mapIniFile.get(string).put(string2, "no");
+		}
 	}
 
 /*	public ORAIniFile(File file) throws BackingStoreException {
@@ -31,9 +46,5 @@ public class ORAIniFile extends IniFile{
 		// TODO Auto-generated constructor stub
 	}*/
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 145390873810423731L;
-
+	
 }

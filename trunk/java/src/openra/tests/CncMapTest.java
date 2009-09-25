@@ -593,11 +593,11 @@ public class CncMapTest {
 		assertNotNull(mapAllies1a);
 		
 		// Try to save the map
-		mapAllies1a.save(new File("SCG01EA.INI"));
+		mapAllies1a.save(new File("bin/SCG01EA.INI"));
 		
 		// Compare two maps
 		IniFile file1 = new IniFile(new File("data/main/general/SCG01EA.INI"));
-		IniFile file2 = new IniFile(new File("SCG01EA.INI"), Mode.RW);
+		IniFile file2 = new IniFile(new File("bin/SCG01EA.INI"), Mode.RW);
 		
 		assertTrue(file1.equals(file2));
 	}

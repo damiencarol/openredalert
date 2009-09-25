@@ -4,17 +4,14 @@ import java.awt.Point;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -23,7 +20,6 @@ import org.ini4j.Ini;
 import org.ini4j.IniFile;
 import org.ini4j.InvalidIniFormatException;
 
-import sun.io.ByteToCharASCII;
 
 public class CncMap {
 	private ArrayList<UnitData> unitDataList;
@@ -44,6 +40,8 @@ public class CncMap {
 	private ArrayList<TileData> mapPackDataList;
 	private String digest;
 	private ArrayList<TeamTypeData> teamtypeData;
+	private double carryOverMoney;
+	private boolean toCarryOver;
 	
 	public CncMap() {
 		// Clear the waypoints
@@ -1305,12 +1303,14 @@ private	int UnitActionToNr(String action) {
 			{
 				for (int xtile = 0; xtile < 128; xtile++)
 				{
-					int templateNumber = dataDest3[(ytile*128 + xtile)*2] + dataDest3[1 + (ytile*128 + xtile)*2];
-					int tileNumber = dataDest3[ytile*128 + xtile + (128*128*2)];
+					byte templateNumber1 = dataDest3[(ytile*128 + xtile)*2];
+					byte templateNumber2 = dataDest3[1 + (ytile*128 + xtile)*2];
+					byte tileNumber = dataDest3[ytile*128 + xtile + (128*128*2)];
 					
 					// Create new Tile data information
 					TileData theTileData = new TileData();
-					theTileData.setTemplateNumber(templateNumber);
+					theTileData.setTemplateNumber1(templateNumber1);
+					theTileData.setTemplateNumber2(templateNumber2);
 					theTileData.setTileNumber(tileNumber);
 					
 					this.mapPackDataList.add(theTileData);
@@ -1320,7 +1320,7 @@ private	int UnitActionToNr(String action) {
 	}
 	
 	/**
-	 * Functino to save all variables in the simple section of the map file
+	 * Function to save all variables in the simple section of the map file
 	 * 
 	 * @param iniFile
 	 */
@@ -1354,33 +1354,13 @@ private	int UnitActionToNr(String action) {
 
 		// Write Theme
 		basicSection.put("Theme", missionData.getTheme());
-/*
-		// Try to read Basic/WIN
-		missionData.setWinmov(inifile.node("Basic").get(  "Win", "<none>"));
 
-		// Try to read Basic/LOSE
-		missionData.setLosemov(inifile.node("Basic").get( "Lose", "<none>"));
-
-		// Try to read MAP/HEIGHT
-		setHeight(inifile.node("Map").getInt(  "Height", -1));
-
-		// Try to read Width
-		setWidth(inifile.node("Map").getInt(  "Width", -1));
-
-		// Try to read x coordinates in the map
-		x = inifile.node("Map").getInt("X", -1);
-
-		// Try to read y coordinates in the map
-		y = inifile.node("Map").getInt("Y", -1);
-
-		// Try to read the theme
-		missionData.setTheater(inifile.node("Map").get("Theater", ""));
-
-		// Save if it's the last mission
-		if (inifile.node("Basic").get("EndOfGame", "No").equals("Yes")) {
-			missionData.setEndOfGame(true);
-		} else {
-			missionData.setEndOfGame(false);*/
+		// Write CarryOverMoney
+		basicSection.put("CarryOverMoney", Double.toString(this.carryOverMoney));
+		
+		// Write ToCarryOver
+		openra.core.IniFile.putYesNo(mapIniFile, "Basic", "ToCarryOver", this.toCarryOver);
+		
 	}
 	
 	private void saveDigest(final Ini mapIniFile) {
@@ -1447,6 +1427,11 @@ private	int UnitActionToNr(String action) {
 			} else {
 				missionData.setEndOfGame(false);
 			}
+			
+			// Try to read the carry over money value
+			this.carryOverMoney = inifile.node("Basic").getDouble("CarryOverMoney", -1);
+			if (this.carryOverMoney < 0)
+				throw new Exception("carryOverMoney < 0");
 		}
 		catch (Exception ex)
 		{
@@ -2065,7 +2050,23 @@ private	int UnitActionToNr(String action) {
 		// Save the simple section
 		saveSimpleSection(ini);
 		
+		// Save the team types
 		saveTeamTypes(ini);
+		
+		// Save the triggers
+		saveTriggers(ini);
+		
+		// Save the map settings
+		saveMap(ini);
+		
+		// Save the waypoints
+		saveWaypoints(ini);
+		
+		// Save the cell triggers
+		saveCellTrigger(ini);
+		
+		// Save the map pack
+		saveMapPack(ini);
 		
 		// Save Briefing
 		saveBreifing(ini);
@@ -2074,6 +2075,108 @@ private	int UnitActionToNr(String action) {
 		saveDigest(ini);
 		
 		ini.store(new FileWriter(mapFile));
+	}
+
+	private void saveMapPack(Ini ini) {
+		
+		Ini.Section mapPackSection = ini.add("MapPack");
+		
+		
+		byte[] dataDest3 = new byte[49152];
+		
+		for (int ytile = 0; ytile < 128; ytile++)
+		{
+			for (int xtile = 0; xtile < 128; xtile++)
+			{
+				/*int templateNumber = dataDest3[(ytile*128 + xtile)*2] + dataDest3[1 + (ytile*128 + xtile)*2];
+				int tileNumber = dataDest3[ytile*128 + xtile + (128*128*2)];
+				
+				// Create new Tile data information
+				TileData theTileData = new TileData();
+				theTileData.setTemplateNumber(templateNumber);
+				theTileData.setTileNumber(tileNumber);
+				
+				this.mapPackDataList.add(theTileData);*/
+				
+				TileData theTileData = this.mapPackDataList.get(xtile + 128*ytile);
+				dataDest3[ytile*128 + xtile + (128*128*2)] = theTileData.getTileNumber();
+				
+				if (theTileData.getTemplateNumber1() == -128 && theTileData.getTemplateNumber2() == -128) {
+					dataDest3[(ytile*128 + xtile)*2] = 44;
+					dataDest3[1 + (ytile*128 + xtile)*2] = 44;
+				} else {
+					dataDest3[(ytile*128 + xtile)*2] = theTileData.getTemplateNumber1();
+					dataDest3[1 + (ytile*128 + xtile)*2] = theTileData.getTemplateNumber2();
+				}
+			}
+		}
+		
+		// Debug
+		ByteBuffer bbuf2 = ByteBuffer.wrap(dataDest3);
+		File file2 = new File("jdecoded_save.dat");
+		try {
+	        // Create a writable file channel
+	        FileChannel wChannel = new FileOutputStream(file2, false).getChannel();		    
+	        // Write the ByteBuffer contents; the bytes between the ByteBuffer's
+	        // position and the limit is written to the file
+	        wChannel.write(bbuf2);		    
+	        // Close the file
+	        wChannel.close();
+	    } catch (IOException e) {
+	    }
+	}
+
+	private void saveCellTrigger(Ini ini) {
+		
+		Ini.Section cellTriggerSection = ini.add("CellTriggers");
+		
+		for (int i=0; i < this.cellTriggerDataList.size(); i++)
+		{
+			CellTriggerData theData = this.cellTriggerDataList.get(i);
+			
+			cellTriggerSection.put(Integer.toString(theData.getLineNum()), theData.getTrigger());
+		}
+	}
+
+	private void saveWaypoints(Ini ini) {
+		
+		Ini.Section waypointsSection = ini.add("Waypoints");
+		
+		for (int i=0; i < this.waypoints.length; i++)
+		{
+			if (this.waypoints[i] != -1)
+				waypointsSection.put(Integer.toString(i), Integer.toString(this.waypoints[i]));
+		}
+	}
+
+	private void saveMap(Ini ini) {
+		
+		Ini.Section trigsSection = ini.add("Map");
+		
+		// Write theater
+		// TODO : change that
+		trigsSection.put("Theater", this.missionData.getTheater());
+		
+		// Write abscisse
+		trigsSection.put("X", Integer.toString(this.x));
+		// Write ordinate
+		trigsSection.put("Y", Integer.toString(this.y));
+		// Write Width
+		trigsSection.put("Width", Integer.toString(this.width));
+		// Write Height
+		trigsSection.put("Height", Integer.toString(this.height));
+	}
+
+	private void saveTriggers(Ini ini) {
+		Ini.Section trigsSection = ini.add("Trigs");
+		
+		for (int i=0; i<this.triggerDataList.size(); i++)
+		{
+			TriggerData data = triggerDataList.get(i);
+			
+			// Write a trigger
+			data.put(trigsSection);
+		}	
 	}
 
 	private void saveTeamTypes(Ini ini) {

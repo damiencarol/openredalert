@@ -1,5 +1,7 @@
 package openra.core;
 
+import org.ini4j.Ini.Section;
+
 /**
  *  Trigger in RedAlert missions
  * @author D.Carol
@@ -7,7 +9,21 @@ package openra.core;
  */
 public class TriggerData {
 	private String  name;
-	/**   */
+	/** The first number tells RA whether this is a repeating trigger or not.
+  If it has the value 0, then the trigger will only ever be activated once
+  (not strictly true as the trigger can be fired again if associated with
+  a teamtype).  If it has a value greater than 0, then the trigger is a
+  repeating trigger (ie it will be fired more than once).
+    For repeating triggers, there are two types.  When the repeating
+  trigger has a value of 1, the trigger will only occur once the trigger
+  event has happened to all items (units and buildings) to which this
+  trigger has been attached.  This is useful if you want, for example,
+  some action to occur after a specific set of buildings have been
+  destroy.
+    The second type of repeating trigger is the free repeater.  When this
+  item has the value of 2, it will continue to repeat itself whenever its
+  trigger event is true.  This is of use if you want, for example, to have
+  the trigger activate every 20 time units.  */
     private int repeatable;
     /** which country trigger applies to */
     private int country;
@@ -281,5 +297,52 @@ public class TriggerData {
 	 */
 	public void setTrigger2Param2(int trigger2Param2) {
 		this.trigger2Param2 = trigger2Param2;
+	}
+	public void put(Section trigsSection) {
+		
+		String value = "";
+		
+		value += Integer.toString(this.repeatable);
+		value += ",";
+		value += Integer.toString(this.country);
+		value += ",";
+		value += Integer.toString(this.activate);
+		value += ",";
+		value += Integer.toString(this.actions);
+		value += ",";
+		
+		value += Integer.toString(this.trigger1);
+		value += ",";
+		value += Integer.toString(this.trigger1Param1);
+		value += ",";
+		value += Integer.toString(this.trigger1Param2);
+		value += ",";
+		
+		value += Integer.toString(this.trigger2);
+		value += ",";
+		value += Integer.toString(this.trigger2Param1);
+		value += ",";
+		value += Integer.toString(this.trigger2Param2);
+		value += ",";	
+		
+		value += Integer.toString(this.action1);
+		value += ",";
+		value += Integer.toString(this.action1Param1);
+		value += ",";
+		value += Integer.toString(this.action1Param2);
+		value += ",";
+		value += Integer.toString(this.action1Param3);
+		value += ",";
+		
+		value += Integer.toString(this.action2);
+		value += ",";
+		value += Integer.toString(this.action2Param1);
+		value += ",";
+		value += Integer.toString(this.action2Param2);
+		value += ",";
+		value += Integer.toString(this.action2Param3);
+		
+		
+		trigsSection.put(this.name, value);
 	}
 }
