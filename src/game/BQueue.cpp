@@ -18,6 +18,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <algorithm> // for find()
 
 #include "audio/SoundEngine.h"
 #include "Dispatcher.h"
