@@ -30,7 +30,7 @@ namespace Sound
 {
     
 SoundError::SoundError(const string& msg) :
-	std::runtime_error(msg)
+    std::runtime_error(msg)
 {
 }
 
