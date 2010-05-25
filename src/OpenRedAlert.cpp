@@ -75,7 +75,7 @@ using VQA::VQAMovie;
 int main(int argc, char** argv)
 {
     // Log to the console the GPL license
-    cout << "OpenRedAlert  Copyright (C) 2009  Damien Carol" << endl;
+    cout << "OpenRedAlert  Copyright (C) 2008-2010  Damien Carol" << endl;
     cout << "This program comes with ABSOLUTELY NO WARRANTY;" << endl;
     cout << "This is free software, and you are welcome to redistribute it" << endl;
     cout << "under certain conditions; see 'COPYING' for details." << endl;
@@ -121,7 +121,6 @@ int main(int argc, char** argv)
     pc::Config = getConfig();
 
     pc::Config.binpath = binpath;
-    //printf ("Binpath = %s\n",pc::Config.binpath.c_str());
 
     // Init with the path of the binaries
     VFSUtils::VFS_Init(binpath.c_str());
