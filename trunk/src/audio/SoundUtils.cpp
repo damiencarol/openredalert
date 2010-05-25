@@ -27,9 +27,9 @@ using std::copy;
 Uint8 SoundUtils::Clip (int value)
 {
     if (value > 255)
-	    return 255;
-	if (value < 0)
-	    return 0;
+        return 255;
+    if (value < 0)
+        return 0;
 
     return (Uint8) value;
 }
@@ -38,9 +38,9 @@ Uint8 SoundUtils::Clip (int value)
 Uint8 SoundUtils::Clip (int value, int min, int max)
 {
     if (value > max)
-	    return (Uint8)max;
-	if (value < min)
-	    return (Uint8)min;
+        return (Uint8)max;
+    if (value < min)
+        return (Uint8)min;
 
     return (Uint8) value;
 }
@@ -104,9 +104,9 @@ void SoundUtils::IMADecode(Uint8 *output, Uint8 *input, Uint16 compressed_size, 
 //            sample = Delta;
 
         if (sample > 32767)
-	        sample = 32767;
-	    if (sample < -32768)
-	        sample = -32768;
+            sample = 32767;
+        if (sample < -32768)
+            sample = -32768;
 
         // @todo I'm not happy with this, if we do sample = 0 or sample -= 0x7FFF we get
         // popping noises. sample = Delta seems to have the smallest pop
@@ -141,8 +141,8 @@ void SoundUtils::WSADPCM_Decode(Uint8 *output, Uint8 *input, Uint16 compressed_s
 
     if (compressed_size==uncompressed_size)
     {
-    	copy(input, input+uncompressed_size, output);
-    	return;
+        copy(input, input+uncompressed_size, output);
+        return;
     }
 
     CurSample=0x80;

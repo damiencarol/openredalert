@@ -61,8 +61,8 @@ namespace Sound {
 
 //const int Indexes[8] = {-1,-1,-1,-1,2,4,6,8};
 const int Indexes[16] = {
-		-1, -1, -1, -1, 2, 4, 6, 8,
-		-1, -1, -1, -1, 2, 4, 6, 8
+        -1, -1, -1, -1, 2, 4, 6, 8,
+        -1, -1, -1, -1, 2, 4, 6, 8
 };
 
 // Decode Westwood's ADPCM format.  Original code from ws-aud.txt by Asatur V. Nazarian

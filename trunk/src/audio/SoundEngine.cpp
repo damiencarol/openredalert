@@ -38,17 +38,17 @@ namespace Sound
 /**
  */
 SoundEngine::SoundEngine(bool disableSound) :
-	nosound(disableSound),
-	mutesound(false),
-	musicFinished(true),
-	currentTrack(playlist.begin())
+    nosound(disableSound),
+    mutesound(false),
+    musicFinished(true),
+    currentTrack(playlist.begin())
 {
     if (nosound){
         return;
     }
 
 
-	// Warning the Mix_OpenAudio uses libmikmod witch seems to create the music.raw file
+    // Warning the Mix_OpenAudio uses libmikmod witch seems to create the music.raw file
     if (Mix_OpenAudio(SOUND_FREQUENCY, SOUND_FORMAT, SOUND_CHANNELS, 1024 /*4096*/) < 0) {
         logger->error("%s line %i: Unable to open sound: %s\n", __FILE__, __LINE__, Mix_GetError());
         nosound = true;
@@ -82,40 +82,40 @@ SoundEngine::~SoundEngine()
  */
 bool SoundEngine::CreatePlaylist()
 {
-	// If no sound needed create nothing
-	if (nosound){
-		return true;
-	}
+    // If no sound needed create nothing
+    if (nosound){
+        return true;
+    }
 
-	// Clear the list
-	playlist.clear();
+    // Clear the list
+    playlist.clear();
 
-	// Create the amazing playlist
-	playlist.push_back("bigf226m.aud");
-	playlist.push_back("crus226m.aud");
-	playlist.push_back("fac1226m.aud");
-	playlist.push_back("hell226m.aud");
-	playlist.push_back("fac2226m.aud");
-	playlist.push_back("run1226m.aud");
-	playlist.push_back("tren226m.aud");
-	playlist.push_back("work226m.aud");
-	playlist.push_back("await.aud");
-	playlist.push_back("dense_r.aud");
-	playlist.push_back("fogger1a.aud");
-	playlist.push_back("mud1a.aud");
-	playlist.push_back("radio2.aud");
-	playlist.push_back("rollout.aud");
-	playlist.push_back("snake.aud");
-	playlist.push_back("terminat.aud");
-	playlist.push_back("twin.aud");
-	playlist.push_back("vector1a.aud");
-	playlist.push_back("smsh226m.aud");
+    // Create the amazing playlist
+    playlist.push_back("bigf226m.aud");
+    playlist.push_back("crus226m.aud");
+    playlist.push_back("fac1226m.aud");
+    playlist.push_back("hell226m.aud");
+    playlist.push_back("fac2226m.aud");
+    playlist.push_back("run1226m.aud");
+    playlist.push_back("tren226m.aud");
+    playlist.push_back("work226m.aud");
+    playlist.push_back("await.aud");
+    playlist.push_back("dense_r.aud");
+    playlist.push_back("fogger1a.aud");
+    playlist.push_back("mud1a.aud");
+    playlist.push_back("radio2.aud");
+    playlist.push_back("rollout.aud");
+    playlist.push_back("snake.aud");
+    playlist.push_back("terminat.aud");
+    playlist.push_back("twin.aud");
+    playlist.push_back("vector1a.aud");
+    playlist.push_back("smsh226m.aud");
 
-	// Set the current track to the first track
-	currentTrack = playlist.begin();
+    // Set the current track to the first track
+    currentTrack = playlist.begin();
 
-	// Return true to indicate success in playlist loading
-	return true;
+    // Return true to indicate success in playlist loading
+    return true;
 }
 
 /**
@@ -131,9 +131,9 @@ void SoundEngine::SetSoundVolume(int volume)
     // if the sound volume asked is > to the sound volume MAX
     // from the SDL_mixer constantes then the sound is set to max :)
     if (volume > MIX_MAX_VOLUME) {
-    	volume = MIX_MAX_VOLUME;
+        volume = MIX_MAX_VOLUME;
     } else if (volume < 0) {
-    	volume = 0;
+        volume = 0;
     }
 
     // Set the volume of all channel (-1)
@@ -147,11 +147,11 @@ void SoundEngine::SetSoundVolume(int volume)
  */
 void SoundEngine::PlaySound(const string& sound)
 {
-	if (sound.empty()){
-		return;
-	}
+    if (sound.empty()){
+        return;
+    }
 
-	// Play this sound looped just 1 time
+    // Play this sound looped just 1 time
     PlayLoopedSound(sound, 1);
 }
 
@@ -228,7 +228,7 @@ void SoundEngine::SetMusicVolume(int volume)
     // if the sound volume asked is > to the sound volume MAX
     // from the SDL_mixer constantes then the sound is set to max :)
     if (volume > MIX_MAX_VOLUME) {
-    	volume = MIX_MAX_VOLUME;
+        volume = MIX_MAX_VOLUME;
     }
 
     Mix_VolumeMusic(volume);
@@ -269,7 +269,7 @@ void SoundEngine::StopMusic()
     if (nosound)
     {
         return;
-	}
+    }
     Mix_HookMusic(NULL, NULL);
     musicDecoder.Close();
 }
@@ -394,9 +394,12 @@ SoundBuffer* SoundEngine::LoadSoundImpl(const string& sound)
     return buffer;
 }
 
+/**
+ * Return true if there are no sound.
+ */
 bool SoundEngine::NoSound() const
 {
-	return nosound;
+    return nosound;
 }
 
 }
