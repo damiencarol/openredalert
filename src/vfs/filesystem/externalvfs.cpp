@@ -20,7 +20,7 @@
 #include <cctype>
 #include <cerrno>
 #include <string>
-#ifdef _WIN32
+#ifdef MSVC
 #define WIN32_LEAN_AND_MEAN
 //why is lean_mean needed???
 #include <windows.h>
@@ -29,6 +29,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <dirent.h>
 #endif
 
 #include "SDL/SDL_endian.h"
@@ -430,7 +431,6 @@ FILE* ret;
  */
 bool isdir(const string& path) 
 {
-	
 #ifdef _MSC_VER
     DWORD length = GetCurrentDirectory(0, 0);
     LPWSTR orig_path = new WCHAR[length];
@@ -454,13 +454,12 @@ bool isdir(const string& path)
 	return S_ISDIR( fileinfo.st_mode );
 
 #else
-    int curdirfd = open("./", O_RDONLY);
-    if (-1 == curdirfd) {
+    // Try to open dir
+    DIR *dir = opendir(path.c_str());
+    if (NULL == dir) {
         return false;
     }
-    if (-1 == chdir(path.c_str())) {
-        return false;
-    }
+    closedir(dir);
     return true;
 
 #endif
