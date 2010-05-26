@@ -19,7 +19,6 @@
 
 #include "SDL/SDL_timer.h"
 
-#include "include/Logger.h"
 #include "ActionEvent.h"
 #include "Comp.h"
 

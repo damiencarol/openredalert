@@ -17,6 +17,7 @@
 
 #include "SoundFile.h"
 
+#include <sstream>
 #include <limits>
 #include <memory>
 #include <string>
@@ -26,13 +27,12 @@
 #include "SOUND_DECODE_STATE.h"
 #include "SoundCommon.h"
 #include "SoundUtils.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 
-extern Logger * logger;
-
 using std::string;
+using std::stringstream;
 
 /**
  */
@@ -41,12 +41,12 @@ SoundFile::SoundFile() : fileOpened(false)
     if (!initconv)
     {
         if (SDL_BuildAudioCVT(&eightbitconv, AUDIO_U8, 1, 22050, SOUND_FORMAT, SOUND_CHANNELS, SOUND_FREQUENCY) < 0) {
-            logger->error("Could not build 8bit->16bit conversion filter\n");
+            Logger::getInstance()->Error("Could not build 8bit->16bit conversion filter.");
             return;
         }
 
         if (SDL_BuildAudioCVT(&monoconv, AUDIO_S16SYS, 1, 22050, SOUND_FORMAT, SOUND_CHANNELS, SOUND_FREQUENCY) < 0) {
-            logger->error("Could not build mono->stereo conversion filter\n");
+            Logger::getInstance()->Error("Could not build mono->stereo conversion filter.");
             return;
         }
         initconv = true;
@@ -71,12 +71,12 @@ bool SoundFile::Open(const string& filename)
     // Open file
     file = VFSUtils::VFS_Open(filename.c_str());
     if (file == 0) {
-        logger->error("Sound: Could not open file \"%s\".\n", filename.c_str());
+        Logger::getInstance()->Error("Sound: Could not open file " + filename);
         return false;
     }
 
     if (file->fileSize() < 12) {
-        logger->error("Sound: Could not open file \"%s\": Invalid file size.\n", filename.c_str());
+        Logger::getInstance()->Error("Sound: Could not open file " + filename + " Invalid file size.");
     }
 
     // Parse header
@@ -93,13 +93,18 @@ bool SoundFile::Open(const string& filename)
     } else if (type == 99) {
         conv = &monoconv;
     } else {
-        logger->error("Sound: Could not open file \"%s\": Corrupt header (Unknown type: %i).\n", filename.c_str(), type);
+        stringstream message;
+        message << "Sound: Could not open file '" << filename << "': Corrupt header (Unknown type: " << type << ").";
+        Logger::getInstance()->Error(message.str());
         return false;
     }
 
     if (frequency != 22050)
     {
-        logger->warning("Sound: \"%s\" needs converting from %iHz (should be 22050Hz)\n", filename.c_str(), frequency);
+        stringstream message;
+        message << "Sound: '" << filename << "' needs converting from " 
+            << frequency << "Hz (should be 22050Hz)";
+        Logger::getInstance()->Warning(message.str());
     }
 
     imaSample = 0;
@@ -136,7 +141,7 @@ Uint32 SoundFile::Decode(SampleBuffer& buffer, Uint32 length)
     // Check that the buffer is empty
     if (!buffer.empty())
     {
-        logger->error("[SoundFile::Decode()] the buffer to decode in is not empty !");
+        Logger::getInstance()->Error("[SoundFile::Decode()] the buffer to decode in is not empty !");
         return SOUND_DECODE_ERROR;
     }
 
@@ -159,13 +164,17 @@ Uint32 SoundFile::Decode(SampleBuffer& buffer, Uint32 length)
         file->readDWord(&ID, 1);
 
         if (comp_sample_size > (SOUND_MAX_CHUNK_SIZE)) {
-            logger->warning("Size data for current sample too large\n");
+            Logger::getInstance()->Warning("Size data for current sample too large.");
             return SOUND_DECODE_ERROR;
         }
 
-        // abort if id was wrong */
-        if (ID != 0xDEAF) {
-            logger->warning("Sample had wrong ID: %x\n", ID);
+        // abort if id was wrong
+        // HACK : ID = 0xDEAF ???
+        if (ID != 0xDEAF)
+        {
+            stringstream message;
+            message << "Sample had wrong ID:" << ID;
+            Logger::getInstance()->Warning(message.str());
             return SOUND_DECODE_ERROR;
         }
 
@@ -186,7 +195,8 @@ Uint32 SoundFile::Decode(SampleBuffer& buffer, Uint32 length)
         conv->buf = tmpbuff;
         conv->len = uncomp_sample_size;
         if (SDL_ConvertAudio(conv) < 0) {
-            logger->warning("Could not run conversion filter: %s\n", SDL_GetError());
+            Logger::getInstance()->Warning("Could not run conversion filter.");
+            Logger::getInstance()->Warning(SDL_GetError());
             return SOUND_DECODE_ERROR;
         }
         memcpy(&buffer[written], tmpbuff, uncomp_sample_size*conv->len_mult);

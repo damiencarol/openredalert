@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <exception>
 
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "game/Dispatcher.h"
 #include "game/Player.h"
 #include "game/PlayerPool.h"
@@ -36,7 +36,6 @@ namespace p {
 	extern Dispatcher* dispatcher;
 	extern CnCMap* ccmap;
 }
-extern Logger * logger;
 
 using std::map;
 using std::list;
@@ -366,7 +365,7 @@ void Selection::checkSelection()
     {
         if (*it == 0)
         {
-            logger->error("Selection::checkSelection() *it si null");
+            Logger::getInstance()->Error("Selection::checkSelection() *it si null");
             return;
         }
         
@@ -380,7 +379,7 @@ void Selection::checkSelection()
 
             Now_epoch = time(0);
             Tm = localtime (&Now_epoch);
-            logger->warning ("%s line %i: %02i:%02i:%02i removeUnit (Selection)\n", __FILE__, __LINE__, Tm->tm_hour, Tm->tm_min, Tm->tm_sec);
+            Logger::getInstance()->Warning ("%s line %i: %02i:%02i:%02i removeUnit (Selection)\n");//, __FILE__, __LINE__, Tm->tm_hour, Tm->tm_min, Tm->tm_sec);
         }
     }
     for (list<Structure*>::iterator it = sel_structs.begin(); it != sel_structs.end(); ++it) {
@@ -473,6 +472,10 @@ bool Selection::mergeSelection(Uint8 loadpos)
     return true;
 }
 
+/**
+ *
+ * @return owner of the selection.
+ */
 Uint8 Selection::getOwner() const
 {
     if (sel_units.empty()) 
@@ -480,7 +483,7 @@ Uint8 Selection::getOwner() const
         // Check that something is selected
         if (sel_structs.empty())
         {
-            logger->error("[Selection::getOwner()] sel_units and sel_structs internal lists are empty !");
+            Logger::getInstance()->Error("[Selection::getOwner()] sel_units and sel_structs internal lists are empty !");
             throw new exception();
         }
         

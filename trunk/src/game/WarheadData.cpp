@@ -22,15 +22,12 @@
 #include "SDL/SDL_types.h"
 
 #include "misc/INIFile.h"
-#include "include/Logger.h"
 #include "misc/common.h"
 
 #include "misc/INIFile.h"
 
 using std::cout;
 using std::endl;
-
-extern Logger *logger;
 
 Uint32 WarheadData::getSpread()
 {

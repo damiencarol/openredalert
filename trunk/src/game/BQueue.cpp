@@ -16,13 +16,14 @@
 
 #include "BQueue.h"
 
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <algorithm> // for find()
 
+#include "Logger.hpp"
 #include "audio/SoundEngine.h"
 #include "Dispatcher.h"
-#include "include/Logger.h"
 #include "PlayerPool.h"
 #include "UnitAndStructurePool.h"
 #include "ActionEvent.h"
@@ -44,16 +45,16 @@ namespace p {
 	extern ActionEventQueue* aequeue;
 	extern CnCMap* ccmap;
 }
-extern Logger * logger;
 
 using std::min;
+using std::stringstream;
 
 /**
  * 
  */
 BQueue::BQueue(Player* pPlayer) : 
-	player(pPlayer), 
-	status(BQ_EMPTY) 
+    player(pPlayer), 
+    status(BQ_EMPTY) 
 {
     timer = new BQTimer(this, &timer);
 }
@@ -68,13 +69,21 @@ BQueue::~BQueue()
 
 bool BQueue::Add(const UnitOrStructureType * type) 
 {
-	switch (status) {
+    switch (status) 
+    {
         case BQ_INVALID:
-            logger->error("Queue %p in invalid state\n", this);
+            {
+                stringstream message;
+                message << "Queue '" << this << "' is  in invalid state";
+                Logger::getInstance()->Error(__FILE__ , __LINE__, message.str());
+            }
             break;
         case BQ_EMPTY:        
-            if (0 == (left = type->getCost())) {
-                logger->error("Type \"%s\" has no cost\n", type->getName().c_str());
+            if (0 == (left = type->getCost()))
+            {
+                stringstream message;
+                message << "Type '" << type->getName() << "' has no cost";
+                Logger::getInstance()->Error(__FILE__ , __LINE__, message.str());
             }
             last = p::aequeue->getCurtick();
             production.insert(Production::value_type(type, 1));
@@ -97,8 +106,10 @@ bool BQueue::Add(const UnitOrStructureType * type)
             if (!type->isStructure()) {
                 if (p::dispatcher->unitSpawn((UnitType *) type, player->getPlayerNum())) {
                     Placed();
-                } else {
-                    logger->debug("Didn't spawn %s...\n", type->getName().c_str());
+                } 
+                else 
+                {
+                    Logger::getInstance()->Debug("Didn't spawn " + type->getName());
                 }
             }
             return false;
@@ -114,7 +125,9 @@ bool BQueue::Add(const UnitOrStructureType * type)
                     // This type is new to the queue
                     if (0 == type->getCost()) {
                         // We divide by cost, so must not be zero.
-                        logger->error("Type \"%s\" has no cost\n", type->getName().c_str());
+                        stringstream message;
+                        message << "Type '" << type->getName() << "' has no cost";
+                        Logger::getInstance()->Error(__FILE__ , __LINE__, message.str());
                         return false;
                     }
                     production.insert(Production::value_type(type, 1));
@@ -125,7 +138,11 @@ bool BQueue::Add(const UnitOrStructureType * type)
             return false;
             break;
         default:
-            logger->error("Queue %p in /really/ invalid state (%i)\n", this, status);
+            {
+                stringstream message;
+                message << "Queue '" << this << "' in /really/ invalid state " << status;
+                Logger::getInstance()->Error(__FILE__ , __LINE__, message.str());
+            }
             break;
     }
     return false;
@@ -249,7 +266,7 @@ void BQueue::next()
     // Check that queue is not empty
     if (queue.empty())
     {
-        logger->error("[BQueue::next()] queue is empty !");
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "[BQueue::next()] queue is empty !");
         return;
     }
     
@@ -258,7 +275,7 @@ void BQueue::next()
     // Check that it is not at the end
     if (it == production.end())
     {
-        logger->error("[BQueue::next()] iterator is at the end !");
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "[BQueue::next()] iterator is at the end !");
         return;
     }
     
@@ -277,7 +294,7 @@ void BQueue::next()
             // Check that it is not at the end
             if (it == production.end())
             {
-                logger->error("[BQueue::next()] iterator is at the end !");
+                Logger::getInstance()->Error("[BQueue::next()] iterator is at the end !");
                 return;
             }
         }

@@ -18,8 +18,6 @@
 #ifndef ARCHIVE_H
 #define ARCHIVE_H
 
-#include <cstdarg> // for use fct like 'printf'
-
 #include "SDL/SDL_types.h"
 
 class VFile;
@@ -42,13 +40,13 @@ public:
     virtual Uint32 readThree(Uint32 file, Uint32 *databuf, Uint32 numThrees) = 0;
     virtual Uint32 readDWord(Uint32 file, Uint32 *databuf, Uint32 numDWords) = 0;
 
-	 /**
-	 * Read a line of file.
-	 * \param file id of the file in archive
-	 * \param databuf will contain the read  line
-	 * \param buflen size of the buffer
-	 */
-	virtual char* readLine(Uint32 file, char *databuf, Uint32 buflen) = 0;
+    /**
+     * Read a line of file.
+     * \param file id of the file in archive
+     * \param databuf will contain the read  line
+     * \param buflen size of the buffer
+     */
+    virtual char* readLine(Uint32 file, char *databuf, Uint32 buflen) = 0;
 
     /* Since only external files can write, we provide stubs here for the other
      * plugins.
@@ -58,7 +56,7 @@ public:
     virtual Uint32 writeThree(Uint32 file, const Uint32* databuf, Uint32 numThrees) {return 0;}
     virtual Uint32 writeDWord(Uint32 file, const Uint32* databuf, Uint32 numDWords) {return 0;}
     virtual void writeLine(Uint32 file, const char* databuf) {}
-    virtual int vfs_printf(Uint32 file, const char* fmt, va_list ap) {return 0;}
+    
     virtual void flush(Uint32 file) {}
 
     virtual void seekSet(Uint32 file, Uint32 pos) = 0;

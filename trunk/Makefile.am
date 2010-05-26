@@ -2,7 +2,9 @@
 bin_PROGRAMS=openredalert
 
 openredalert_SOURCES= \
-	src/OpenRedAlert.cpp \
+    src/OpenRedAlert.cpp \
+    src/Logger.cpp \
+    src/Logger.hpp \
     src/audio/SoundBuffer.h \
     src/audio/SoundCache.h \
     src/audio/SoundCacheCleaner.hpp \
@@ -133,7 +135,7 @@ openredalert_SOURCES= \
     src/game/RQstate.h \
     src/game/SnowMissionTheater.cpp \
     src/game/SnowMissionTheater.h \
-    src/game/structure.cpp \
+    src/game/Structure.cpp \
     src/game/Structure.h \
     src/game/StructureType.cpp \
     src/game/StructureType.h \
@@ -194,7 +196,6 @@ openredalert_SOURCES= \
     src/include/fcnc_endian.h \
     src/include/fibheap.h \
     src/include/imageproc.h \
-    src/include/Logger.h \
     src/include/sdllayer.h \
     src/misc/args.cpp \
     src/misc/common.cpp \
@@ -233,7 +234,6 @@ openredalert_SOURCES= \
     src/ui/ListboxClass.cpp \
     src/ui/ListboxClass.h \
     src/ui/ListBoxLine.h \
-    src/ui/logger.cpp \
     src/ui/MapAnimationMenu.cpp \
     src/ui/MapAnimationMenu.hpp \
     src/ui/Menu.cpp \
@@ -323,7 +323,7 @@ openredalert_SOURCES= \
     src/video/WSAMovie.h
     
 openredalert_LDFLAGS = $(SDL_CFLAGS)
-openredalert_LDADD = $(SDL_LIBS)
+openredalert_LDADD = $(SDL_LIBS) -lSDL_Mixer
 
 INCLUDES = -Isrc/
 

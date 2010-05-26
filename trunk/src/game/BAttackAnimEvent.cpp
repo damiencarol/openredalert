@@ -16,8 +16,10 @@
 
 #include "BAttackAnimEvent.h"
 
-#include <cmath>
+#include <sstream>
+#include <cmath> // TODO : kill that
 
+#include "Logger.hpp"
 #include "BTurnAnimEvent.h"
 #include "CnCMap.h"
 #include "PlayerPool.h"
@@ -33,7 +35,8 @@
 #include "Structure.h"
 #include "misc/common.h"
 #include "audio/SoundEngine.h"
-#include "include/Logger.h"
+
+using std::stringstream;
 
 namespace p {
     extern ActionEventQueue * aequeue;
@@ -42,7 +45,6 @@ namespace p {
 namespace pc {
     extern Sound::SoundEngine* sfxeng;
 }
-extern Logger * logger;
 
 /**
  * @param p the priority of this event
@@ -110,7 +112,9 @@ void BAttackAnimEvent::run()
 			}
 			else
 			{
-				logger->error("%s line %i: Failed to set frame %i\n",__FILE__ , __LINE__, frame);
+                stringstream message;
+                message << "Failed to set frame " << frame;
+                Logger::getInstance()->Error(__FILE__ , __LINE__, message.str());
 			}
 		}
 		delete this;
@@ -140,7 +144,9 @@ void BAttackAnimEvent::run()
 			}
 			else
 			{
-				logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, frame);
+				stringstream message;
+                message << "Failed to set frame " << frame;
+                Logger::getInstance()->Error(__FILE__ , __LINE__, message.str());
 			}
 		}
 		delete this;
@@ -203,7 +209,9 @@ void BAttackAnimEvent::run()
 			}
 			else
 			{
-				logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, frame);
+                stringstream message;
+                message << "Failed to set frame " << frame;
+                Logger::getInstance()->Error(__FILE__ , __LINE__, message.str());
 			}
 			frame++;
 			// Reschedule this..
@@ -217,8 +225,10 @@ void BAttackAnimEvent::run()
 			strct->setImageNum(frame,0);
 		}
 		else
-		{
-			logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, frame);
+        {
+            stringstream message;
+            message << "Failed to set frame " << frame;
+            Logger::getInstance()->Error(__FILE__ , __LINE__, message.str());
 		}
 		NeedToCharge = true;
 	}

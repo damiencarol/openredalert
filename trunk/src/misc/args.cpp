@@ -25,7 +25,7 @@
 #include "video/Renderer.h"
 #include "config.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 
 #ifndef VERSION
 #define VERSION "438"
@@ -42,7 +42,6 @@ namespace {
 namespace pc {
     extern ConfigType Config;
 }
-extern Logger * logger;
 
 
 /**
@@ -95,7 +94,7 @@ extern bool parse(int argc, char **argv)
         freecnc_ini = GetConfig("freecnc.ini");
         internal_ini = GetConfig("internal-global.ini");
     } catch(runtime_error& e) {
-        logger->error("%s\n",e.what());
+        Logger::getInstance()->Error(e.what());
         return false;
     }
 
@@ -294,7 +293,7 @@ extern bool parse(int argc, char **argv)
             PrintUsage();
             return false;
         }
-        logger->error("Unknown argument: %s, exiting\n",argv[i]);
+        Logger::getInstance()->Error("Unknown argument: %s, exiting\n" + string(argv[i]));
         return false;
     }
     // @todo FULLSCREEN

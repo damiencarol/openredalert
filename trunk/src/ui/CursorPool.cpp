@@ -21,7 +21,6 @@
 #include "SDL/SDL_types.h"
 
 #include "misc/INIFile.h"
-#include "include/Logger.h"
 #include "CursorInfo.h"
 
 using std::string;

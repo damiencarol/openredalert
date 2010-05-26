@@ -19,7 +19,6 @@
 
 #include "SDL/SDL_types.h"
 
-#include "include/Logger.h"
 #include "PlayerPool.h"
 #include "ProjectileAnim.h"
 #include "audio/SoundEngine.h"
@@ -29,15 +28,14 @@
 #include "Structure.h"
 #include "CnCMap.h"
 
-//extern Logger * logger;
 namespace p {
-	extern CnCMap* ccmap;
+    extern CnCMap* ccmap;
 }
 
 RefineAnimEvent::RefineAnimEvent(Uint32 p, Structure* str, Uint8 bails) : BuildingAnimEvent(p, str, 7)
 {
-	updateDamaged();
-	
+    updateDamaged();
+
     this->bails = bails;
     this->str = str;
     frame = framestart;

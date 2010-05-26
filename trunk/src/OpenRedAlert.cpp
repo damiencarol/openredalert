@@ -28,7 +28,7 @@
 #include "audio/SoundEngine.h"
 #include "game/Game.h"
 #include "game/GameError.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "vfs/vfs.h"
 #include "video/GraphicsEngine.h"
 #include "video/VideoError.h"
@@ -110,9 +110,8 @@ int main(int argc, char** argv)
     string lf(binpath);
     lf += "/debug.log";
 
+    // Initialize the Virtual File System
     VFSUtils::VFS_PreInit(binpath.c_str());
-    // Log level is so that only errors are shown on stdout by default
-    logger = new Logger(lf.c_str(), 0);
     
     // Loads arguments
     if (!parse(argc, argv)) {
@@ -126,8 +125,7 @@ int main(int argc, char** argv)
     VFSUtils::VFS_Init(binpath.c_str());
     VFSUtils::VFS_LoadGame(pc::Config.gamenum);
     // Log success of loading RA gmae
-    logger->note(".MIX archives loading ok\n");
-
+    Logger::getInstance()->Info(".MIX archives loading ok\n");
 
     // Test loading multi-player map
     //logger->note("Test loading multi-player map\n");
@@ -137,18 +135,18 @@ int main(int argc, char** argv)
 
 
     // Load the start
-    logger->note("Please wait, OpenRedAlert %s is starting\n", VERSION);
+    Logger::getInstance()->Info("Please wait, OpenRedAlert " + string(VERSION) + " is starting\n");
 
     try {
         if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_TIMER) < 0) {
-            logger->error("Couldn't initialize SDL: %s\n", SDL_GetError());
+            Logger::getInstance()->Error("Couldn't initialize SDL: " + string(SDL_GetError()));
             exit(1);
         }
 
         if (pc::Config.debug) {
             // Don't hide if we're debugging as the lag when running inside
             // valgrind is really irritating.
-            logger->debug("Debug mode is enabled\n");
+            Logger::getInstance()->Debug("Debug mode is enabled.");
         }
         else {
             // Hide the cursor since we have our own.
@@ -157,35 +155,36 @@ int main(int argc, char** argv)
 
         // Initialize Video
         try {
-            logger->note("Initializing the graphics engine...");
+            Logger::getInstance()->Info("Initializing the graphics engine...");
             pc::gfxeng = new GraphicsEngine();
-            logger->note("done\n");
+            Logger::getInstance()->Info("Done.");
         }
         catch (VideoError& ex) {
-            logger->note("failed.  %s \n", ex.what());
+            Logger::getInstance()->Error("Failed.");
+            Logger::getInstance()->Error(ex.what());
             throw runtime_error("Unable to Initialize the graphics engine");
         }
 
         // Initialize Sound
-        logger->note("Initializing the sound engine...");
+        Logger::getInstance()->Info("Initializing the sound engine...");
         pc::sfxeng = new SoundEngine(pc::Config.nosound);
-        logger->note("done\n");
+        Logger::getInstance()->Info("done\n");
 
         // "Standalone" VQA Player
         if (pc::Config.playvqa) {
-            logger->note("Now playing %s\n", pc::Config.vqamovie.c_str());
+            Logger::getInstance()->Info(string("Now playing ") + pc::Config.vqamovie);
             try {
                 VQA::VQAMovie mov(pc::Config.vqamovie.c_str());
                 mov.play();
             }
             catch (runtime_error&) {
-                logger->note("%s line %i: Failed to play movie: %s\n", __FILE__, __LINE__, pc::Config.vqamovie.c_str());
+                Logger::getInstance()->Info("Failed to play movie: " + pc::Config.vqamovie);
             }
         }
 
         // Play the intro if requested
         if (pc::Config.intro) {
-            logger->note("Now playing the Introduction movie");
+            Logger::getInstance()->Info("Now playing the Introduction movie");
             try {
                 VQAMovie mov("logo");
                 mov.play();
@@ -203,20 +202,20 @@ int main(int argc, char** argv)
 
         // "Standalone" VQA Player
         if (pc::Config.gamenum == GAME_RA) {
-            //logger->note("Now playing %s\n", pc::Config.vqamovie.c_str());
+            //Logger::getInstance()->Info("Now playing %s\n", pc::Config.vqamovie.c_str());
             try {
                 VQAMovie mov("english");
                 mov.play();
             }
             catch (runtime_error&) {
                 // Oke, failed to read the redalert intro, try the demo intro
-                logger->note("%s line %i: Failed to play movie: english.vqa --> trying redintro.vqa\n", __FILE__, __LINE__);
+                Logger::getInstance()->Info("%s line %i: Failed to play movie: english.vqa --> trying redintro.vqa\n");
                 try {
                     VQAMovie mov("redintro.vqa");
                     mov.play();
                 }
                 catch (runtime_error&) {
-                    logger->note("%s line %i: Failed to play movie: redintro.vqa\n", __FILE__, __LINE__);
+                    Logger::getInstance()->Info("%s line %i: Failed to play movie: redintro.vqa\n");
                 }
             }
         }
@@ -236,23 +235,23 @@ int main(int argc, char** argv)
 
         try {
             // Initialize game engine
-            logger->note("Initializing game engine:\n");
+            Logger::getInstance()->Info("Initializing game engine.");
             Game gsession;
             // Start the game engine
-            logger->note("Starting game\n");
+            Logger::getInstance()->Info("Starting game.");
             // Play the session
             gsession.play();
             // Log end off session
-            logger->note("Shutting down\n");
+            Logger::getInstance()->Info("Shutting down.");
         }
         catch (GameError&) {
             // Log it
-            logger->error("Error during game\n");
+            Logger::getInstance()->Error("Error during game.");
         }
        
     }
     catch (runtime_error& e) {
-        logger->error("%s\n", e.what());
+        Logger::getInstance()->Error(e.what());
         //#if _WIN32
         //MessageBox(0, e.what(), "Fatal error", MB_ICONERROR|MB_OK);
         //#endif
@@ -280,11 +279,9 @@ void fcnc_terminate_handler()
  */
 void cleanup()
 {
-    if (logger != 0)
-    {
-        delete logger;
-    }
-    logger = 0;
+    // Free logger singleton
+    Logger::freeSingleton();
+
 
     // Free VFS
     VFSUtils::VFS_Destroy();

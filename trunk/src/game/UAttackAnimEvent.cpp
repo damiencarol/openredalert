@@ -21,6 +21,7 @@
 
 #include "SDL/SDL_types.h"
 
+#include "Logger.hpp"
 #include "ActionEventQueue.h"
 #include "UnitOrStructure.h"
 #include "TurnAnimEvent.h"
@@ -31,7 +32,6 @@
 #include "PlayerPool.h"
 #include "game/Unit.hpp"
 #include "CnCMap.h"
-#include "include/Logger.h"
 #include "Unit.hpp"
 #include "UnitType.h"
 
@@ -40,11 +40,9 @@ namespace p {
 	extern ActionEventQueue * aequeue;
 	extern CnCMap * ccmap;
 }
-extern Logger * logger;
 
 UAttackAnimEvent::UAttackAnimEvent(Uint32 p, Unit *un) : UnitAnimEvent(p,un)
 {
-    //logger->debug("UAttack cons\n");
     this->un = un;
     this->target = un->getTarget();
     stopping = false;
@@ -84,7 +82,7 @@ UAttackAnimEvent::UAttackAnimEvent(Uint32 p, Unit *un) : UnitAnimEvent(p,un)
 				}
 				break;
 			default:
-				logger->error ("%s line %i: ERROR unknown unit type %i\n", __FILE__, __LINE__, ((Unit*)target)->getType()->getPType());
+				Logger::getInstance()->Error(__FILE__, __LINE__, "Unknown unit type."); //,  ((Unit*)target)->getType()->getPType());
 				break;
 		}
 	}else{
@@ -98,7 +96,7 @@ UAttackAnimEvent::UAttackAnimEvent(Uint32 p, Unit *un) : UnitAnimEvent(p,un)
 	if (UsePrimaryWeapon == false){
 //		printf ("%s line %i: Using secundary weapon\n", __FILE__, __LINE__);
 		if (un->getType()->getWeapon(UsePrimaryWeapon) == NULL){
-			logger->error ("Primary weapon not oke, secundary weapon not available\n");
+			Logger::getInstance()->Error ("Primary weapon not oke, secundary weapon not available\n");
 			UsePrimaryWeapon = true;
 			if (un->getType()->getWeapon(UsePrimaryWeapon) == NULL){
 				stop();
@@ -118,7 +116,7 @@ UAttackAnimEvent::~UAttackAnimEvent()
 void UAttackAnimEvent::stop()
 {
     if (un == NULL) {
-        logger->error("UAttackAnimEvent::stop: un is NULL!?\n");
+        Logger::getInstance()->Error("UAttackAnimEvent::stop: un is NULL!?\n");
         abort();
     }
     stopping = true;

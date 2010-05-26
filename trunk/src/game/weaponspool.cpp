@@ -22,7 +22,6 @@
 #include <algorithm>
 
 #include "misc/INIFile.h"
-#include "include/Logger.h"
 #include "ProjectileAnim.h"
 #include "audio/SoundEngine.h"
 #include "misc/config.h"

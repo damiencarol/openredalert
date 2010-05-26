@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "misc/config.h"
@@ -34,8 +34,6 @@
 #endif
 
 using std::string;
-
-extern Logger * logger;
 
 /**
  */
@@ -57,20 +55,20 @@ MultiPlayerMaps::~MultiPlayerMaps()
 
 bool MultiPlayerMaps::getMapDescription (unsigned int Index, string & description)
 {
-	if ( Index < MapDescriptions.size() ){
-		description = MapDescriptions[Index];
-		return true;
-	}
-	return false;
+    if ( Index < MapDescriptions.size() ){
+        description = MapDescriptions[Index];
+        return true;
+    }
+    return false;
 }
 
 bool MultiPlayerMaps::getMapName(unsigned int Index, string & Name)
 {
-	if ( Index < MapNames.size() ){
-		Name = MapNames[Index];
-		return true;
-	}
-	return false;
+    if ( Index < MapNames.size() ){
+        Name = MapNames[Index];
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -78,83 +76,89 @@ bool MultiPlayerMaps::getMapName(unsigned int Index, string & Name)
  */
 void MultiPlayerMaps::readMapData()
 {
-	VFile*	MapFile;
-	char	Line[255];
-	string	tmpString;
-	Uint32	pos;
-	Uint32	pos1;
+    char    Line[255];
+    string  tmpString;
+    Uint32  pos;
+    Uint32  pos1;
 
     // Try to load file in /data/maps/
     loadMapsFolder();
 
-	// Test the ABANDON1.mpr file
-	MapFile = VFSUtils::VFS_Open("ABANDON1.INI");
-	// Return with error
-	if (MapFile == 0) 
-	{
-		// Logg it
-		logger->error("Unable to locate ABANDON1.INI file!\n");
-	}
-	else
-	{	// Logg it
-		logger->note("Load ABANDON1.INI file\n");
-		MapNames.push_back(string("ABANDON1"));
-		MapDescriptions.push_back(string("Abandoned Battlefield (Med)"));										
-	}
+    // Test the ABANDON1.mpr file
+    Logger::getInstance()->Debug("Loading ABANDON1.INI maps");
+    VFile* MapFile = VFSUtils::VFS_Open("ABANDON1.INI");
+    // Return with error
+    if (MapFile == 0) 
+    {
+        // Logg it
+        Logger::getInstance()->Error("Unable to locate ABANDON1.INI file!\n");
+    }
+    else
+    {
+        Logger::getInstance()->Info("Load ABANDON1.INI file\n");
+        MapNames.push_back(string("ABANDON1"));
+        MapDescriptions.push_back(string("Abandoned Battlefield (Med)"));
+    }
+    Logger::getInstance()->Debug("OK");
 
 
+    // Open the MP map description file "missions.pkt"
+    MapFile = VFSUtils::VFS_Open("missions.pkt");
+    // Return with error
+    if (MapFile == 0) {
+        // Logg it
+        Logger::getInstance()->Error("Unable to locate mission.pkt file!\n");
+        return;
+    }
 
- 	// Open the MP map description file "missions.pkt"
-	MapFile = VFSUtils::VFS_Open("missions.pkt");
-	// Return with error
-	if (MapFile == 0) {
-		// Logg it
-		logger->error("Unable to locate mission.pkt file!\n");
-		return;
-	}
+    // While there are lines Read one and save
+    while (MapFile->getLine(Line, sizeof (Line)))
+    {
+        Logger::getInstance()->Debug("Line = " + string(Line));
 
-	// While there are lines Read one and save
-	while (MapFile->getLine(Line, sizeof (Line)))
-	{
-		// Copy the line
-		tmpString = Line; 
+        // Copy the line
+        tmpString = Line; 
 
-		//int i = 0;		while (tmpString[i] != '\0')	//VS runtime checks wont like if you check on something that position.... it will trigger an assert
-		for (unsigned int i = 0 ; i < tmpString.size(); i++)
-		{
-			if (tmpString[i] == '[' || tmpString[i] == ']')
-			{
-				tmpString.erase(i,i+1);
-			}
-			i++;
-		}
+        //int i = 0;
+        //while (tmpString[i] != '\0')
+        //VS runtime checks wont like if you check on something that position.... it will trigger an assert
+        for (unsigned int i = 0 ; i < tmpString.size(); i++)
+        {
+            if (tmpString[i] == '[' || tmpString[i] == ']')
+            {
+                tmpString.erase(i,i+1);
+            }
+            i++;
+        }
 
-		// Save MP map Name
-		if ((pos = tmpString.find (".INI",0)) != (Uint32)string::npos){
-			//tmpString.erase (pos, pos+3);
-			if (pos < tmpString.size()){
-				MapNames.push_back (tmpString.substr (0, pos));
-				//logger->debug("MP mpa found: %s\n", tmpString.substr (0, pos).c_str());
-			}
-		}
+        // Save MP map Name
+        if ((pos = tmpString.find (".INI",0)) != (Uint32)string::npos){
+            //tmpString.erase (pos, pos+3);
+            if (pos < tmpString.size()){
+                MapNames.push_back (tmpString.substr (0, pos));
+                //logger->debug("MP mpa found: %s\n", tmpString.substr (0, pos).c_str());
+            }
+        }
 
-		// Save MP map Description
-		if ((pos = tmpString.find ("=",0)) != (Uint32)string::npos){
-			if ((pos1 = tmpString.find (")",0)) != (Uint32)string::npos){
-				//tmpString.erase (pos, pos+3);
-				if (pos < tmpString.size()){
-					MapDescriptions.push_back (tmpString.substr (pos+1, tmpString.size()-(pos+1)-2));
-					//logger->debug("MP map name: %s\n", tmpString.substr (pos+1, tmpString.size()-(pos+1)-2).c_str());
-				}
-			}
-		}
-	}
+        // Save MP map Description
+        if ((pos = tmpString.find ("=",0)) != (Uint32)string::npos){
+            if ((pos1 = tmpString.find (")",0)) != (Uint32)string::npos){
+                //tmpString.erase (pos, pos+3);
+                if (pos < tmpString.size()){
+                    MapDescriptions.push_back (tmpString.substr (pos+1, tmpString.size()-(pos+1)-2));
+                    //logger->debug("MP map name: %s\n", tmpString.substr (pos+1, tmpString.size()-(pos+1)-2).c_str());
+                }
+            }
+        }
+    }
 }
 
 void MultiPlayerMaps::loadMapsFolder()
 {
+    Logger::getInstance()->Debug(__FILE__, __LINE__, "Loading maps in maps folder");
 
 #ifdef __MSVC__
+    Logger::getInstance()->Debug("Loading mission maps MSVC");
 
     string path = ".\\data\\maps\\";
 
@@ -209,7 +213,9 @@ void MultiPlayerMaps::loadMapsFolder()
     //    cout << "Something went wrong during searching\n";
     //}
 #else
-#if __GNUC__
+#if 0
+    Logger::getInstance()->Debug("Loading mission maps GNUC");
+
     DIR *dpdf;
     struct dirent *epdf;
     dpdf = opendir("./data/maps/");
@@ -217,9 +223,12 @@ void MultiPlayerMaps::loadMapsFolder()
     {
         while (epdf = readdir(dpdf))
         {
-
             // Check that extenstion is ".MPR" or ".mpr"
             string fileName = string(epdf->d_name);
+            printf(" char * = %s", epdf->d_name);
+            Logger::getInstance()->Debug("Loading mission map '" + fileName + "'");
+
+            
             // Check that the file is "????"
             if (fileName.length() > 4)
             {
@@ -237,7 +246,9 @@ void MultiPlayerMaps::loadMapsFolder()
                     if (customMultiPlayerMap != 0)
                     {
                         // Logg it
-                        logger->note("Multi-Player map file %s.MPR \"%s\" was loaded successfully\n", rawName.c_str(), string(customMultiPlayerMap->readString("Basic", "Name", "CUSTOM MAP" + MapDescriptions.size())).c_str());
+                        Logger::getInstance()->Debug("Multi-Player map file '" + rawName + ".MPR' (" + 
+                            string(customMultiPlayerMap->readString("Basic", "Name", "CUSTOM MAP" + MapDescriptions.size())).c_str()
+                            + " was loaded successfully\n");
 
                         MapNames.push_back(rawName);
                         MapDescriptions.push_back(customMultiPlayerMap->readString("Basic", "Name", "CUSTOM MAP" + MapDescriptions.size()));

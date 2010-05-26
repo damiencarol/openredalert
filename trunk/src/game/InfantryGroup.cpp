@@ -22,10 +22,10 @@
 
 #include "SDL/SDL_timer.h"
 
+#include "Logger.hpp"
 #include "CnCMap.h"
 #include "weaponspool.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
 #include "PlayerPool.h"
 #include "audio/SoundEngine.h"
 #include "UnitAndStructurePool.h"
@@ -34,21 +34,19 @@
 using std::string;
 using std::vector;
 
-extern Logger * logger;
-
 InfantryGroup::InfantryGroup()
 {
-	//logger->debug("Setting up infgroup %p\n", this);
-	for (int i=0;i<5;i++){
-		positions[i] = NULL;
-	}
-	numinfantry = 0;
+    //logger->debug("Setting up infgroup %p\n", this);
+    for (int i=0;i<5;i++){
+        positions[i] = NULL;
+    }
+    numinfantry = 0;
 }
 
 InfantryGroup::~InfantryGroup()
 {
-	//logger->debug("Destructing infgroup %p\n", this);
-	// printf ("%s line %i: Destroying infgroup\n", __FILE__, __LINE__);
+    //logger->debug("Destructing infgroup %p\n", this);
+    // printf ("%s line %i: Destroying infgroup\n", __FILE__, __LINE__);
 }
 
 const Sint8 InfantryGroup::unitoffsets[10] = {
@@ -63,52 +61,52 @@ const Sint8 InfantryGroup::unitoffsets[10] = {
 bool InfantryGroup::AddInfantry(Unit* inf, Uint8 subpos)
 {
     // Check that sub-position in beetween 0 and 4
-	if (subpos > 4)
+    if (subpos > 4)
     {
-        logger->error("[InfantryGroup::AddInfantry] subpos is not 0,1,2,3 or 4");
+        Logger::getInstance()->Error("[InfantryGroup::AddInfantry] subpos is not 0,1,2,3 or 4");
         return false;
     }
     // Check that their are not already 5 infantry
     if (numinfantry > 4)
-	{
-        logger->error("[InfantryGroup::AddInfantry] numinfantry is not 0,1,2,3 or 4");
+    {
+        Logger::getInstance()->Error("[InfantryGroup::AddInfantry] numinfantry is not 0,1,2,3 or 4");
         return false;
     }
     
-	positions[subpos] = inf;
-	++numinfantry;
-	return true;
+    positions[subpos] = inf;
+    ++numinfantry;
+    return true;
 }
 
 bool InfantryGroup::RemoveInfantry(unsigned int subpos)
 {
-	// Check that sub-position in beetween 0 and 4
-	if (subpos < 0 || subpos > 4)
+    // Check that sub-position in beetween 0 and 4
+    if (subpos < 0 || subpos > 4)
     {
-        logger->error("[InfantryGroup::RemoveInfantry] subpos is not 0,1,2,3 or 4");
+        Logger::getInstance()->Error("[InfantryGroup::RemoveInfantry] subpos is not 0,1,2,3 or 4");
         return false;
     }
-	// Check that their are at least 1 infantry
+    // Check that their are at least 1 infantry
     if (!(numinfantry > 0))
-	{
-        logger->error("[InfantryGroup::RemoveInfantry] their are no infantry to remove");
+    {
+        Logger::getInstance()->Error("[InfantryGroup::RemoveInfantry] their are no infantry to remove");
         return false;
     }
-	positions[subpos] = 0;
-	--numinfantry;
-	return true;
+    positions[subpos] = 0;
+    --numinfantry;
+    return true;
 }
 
 bool InfantryGroup::IsClear(Uint8 subpos)
 {
-	// Check that sub-position in beetween 0 and 4
-	if (subpos > 4)
+    // Check that sub-position in beetween 0 and 4
+    if (subpos > 4)
     {
-        logger->error("[InfantryGroup::IsClear] subpos is not 0,1,2,3 or 4");
+        Logger::getInstance()->Error("[InfantryGroup::IsClear] subpos is not 0,1,2,3 or 4");
         return false;
     }
     
-	return (positions[subpos] == 0);
+    return (positions[subpos] == 0);
 }
 
 Uint8 InfantryGroup::GetNumInfantry() const
@@ -136,7 +134,7 @@ Unit* InfantryGroup::UnitAt(Uint8 subpos)
 	// Check that sub-position in beetween 0 and 4
 	if (subpos > 4)
     {
-        logger->error("[InfantryGroup::UnitAt] subpos is not 0,1,2,3 or 4");
+        Logger::getInstance()->Error("[InfantryGroup::UnitAt] subpos is not 0,1,2,3 or 4");
         return 0;
     }
 	return positions[subpos];

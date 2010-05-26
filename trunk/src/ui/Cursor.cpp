@@ -27,7 +27,7 @@
 #include "CursorPool.h"
 #include "CursorInfo.h"
 #include "RA_Label.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "video/Dune2Image.h"
 #include "video/TemplateImage.h"
 #include "misc/gametypes.h"
@@ -35,7 +35,6 @@
 namespace pc {
 	extern GraphicsEngine * gfxeng;
 }
-extern Logger * logger;
 
 using std::string;
 
@@ -228,11 +227,11 @@ void Cursor::setPlaceCursor(Uint8 stw, Uint8 sth, Uint8 *icn)
 				break;
 			default:
 #if _MSC_VER && _MSC_VER < 1300
-				logger->error("Possible memory corruption detected in %s(%d): icn[%i*%i+%i] = %i\n",__FILE__,__LINE__,y,stw,x,icn[y*stw+x]);
+				Logger::getInstance()->Error("Possible memory corruption detected in %s(%d): icn[%i*%i+%i] = %i\n");//,__FILE__,__LINE__,y,stw,x,icn[y*stw+x]);
 #else
-				logger->error(
-						"Possible memory corruption detected in %s: icn[%i*%i+%i] = %i\n",
-						__FUNCTION__, y, stw, x, icn[y*stw+x]);
+				Logger::getInstance()->Error(
+						"Possible memory corruption detected in %s: icn[%i*%i+%i] = %i\n");//,
+						//__FUNCTION__, y, stw, x, icn[y*stw+x]);
 #endif
 				//throw InvalidValue();
 				throw 0;

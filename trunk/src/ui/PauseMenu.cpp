@@ -28,7 +28,7 @@
 #include "game/PlayerPool.h"
 #include "misc/config.h"
 #include "video/GraphicsEngine.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "audio/SoundEngine.h"
 #include "include/sdllayer.h"
 #include "video/Dune2Image.h"
@@ -50,7 +50,6 @@ namespace pc {
     extern SoundEngine* sfxeng;
 
 }
-extern Logger * logger;
 
 /**
  *
@@ -97,7 +96,7 @@ PauseMenu::PauseMenu()
 	// Load the cursor
     cursorimg = new Dune2Image("mouse.shp", -1);
 	if (cursorimg == 0){
-		logger->error("Couldn't load cursor image\n");
+		Logger::getInstance()->Error("Couldn't load cursor image\n");
     }
 	my_cursor = cursorimg->getImage(0);
 

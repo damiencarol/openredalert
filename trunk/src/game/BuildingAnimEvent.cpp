@@ -23,15 +23,12 @@
 #include "CnCMap.h"
 #include "audio/SoundEngine.h"
 #include "BAttackAnimEvent.h"
-#include "include/Logger.h"
 #include "Structure.h"
 #include "StructureType.h"
 #include "animinfo_t.h"
 #include "misc/config.h"
 
 using Sound::SoundEngine;
-
-extern Logger *logger;
 
 namespace pc {
 	extern ConfigType Config;
@@ -113,7 +110,8 @@ void BuildingAnimEvent::run()
     {
 		strct->setImageNum(anim_data.frame0, 0);
 	} else {
-		logger->error("%s line %i: Failed to set frame %i, numb frames = %i\n",__FILE__ , __LINE__, anim_data.frame0, strct->getNumbImages (0));
+		// TODO : enable the logger 
+        // logger->error("%s line %i: Failed to set frame %i, numb frames = %i\n",__FILE__ , __LINE__, anim_data.frame0, strct->getNumbImages (0));
 	}
 	
 	if (layer2)
@@ -121,7 +119,9 @@ void BuildingAnimEvent::run()
 		if (strct->getNumbImages(1)> anim_data.frame1)
 			strct->setImageNum(anim_data.frame1,1);
 		else
-			logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.frame1);
+			// TODO : enable the logger 
+        // logger->error ("%s line %i: Failed to set frame %i\n", _ ___, _ __, anim_data.frame1);
+            ;
 	}
 	
 	if (anim_data.done)
@@ -132,13 +132,18 @@ void BuildingAnimEvent::run()
 			if (strct->getNumbImages (0)> anim_data.damagedelta)
 				strct->setImageNum(anim_data.damagedelta,0);
 			else
-				logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta);
+				// TODO : enable the logger 
+                // logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta);
+                ;
 			if (layer2)
 			{
 				if (strct->getNumbImages (1)> anim_data.damagedelta2)
 					strct->setImageNum(anim_data.damagedelta2,1);
 				else
-					logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta2);
+                {
+					// TODO : enable the logger 
+                    // logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta2);
+                }
 			}
 		}
 		if (anim_data.mode == 0)
@@ -146,7 +151,10 @@ void BuildingAnimEvent::run()
 			if (strct->getNumbImages (0)> anim_data.damagedelta + anim_data.frame0)
 				strct->setImageNum(anim_data.damagedelta + anim_data.frame0,0);
 			else
-				logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta + anim_data.frame0);
+            {
+                // TODO : enable the logger 
+                //  logger->error ("%s line %i: Failed to set frame %i\n", __FILE__, __LINE__, anim_data.damagedelta + anim_data.frame0);
+            }
 		}
 		strct->usemakeimgs = false;
 		if ((anim_data.mode == 0) || (anim_data.mode == 7) || (anim_data.mode == 8) )

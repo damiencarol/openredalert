@@ -23,9 +23,7 @@
 #include "SoundCacheCleaner.hpp"
 #include "SoundCommon.h"
 #include "SOUND_DECODE_STATE.h"
-#include "include/Logger.h"
-
-extern Logger * logger;
+#include "Logger.hpp"
 
 using std::string;
 using OpenRedAlert::Sound::SoundCacheCleaner;
@@ -50,7 +48,7 @@ SoundEngine::SoundEngine(bool disableSound) :
 
     // Warning the Mix_OpenAudio uses libmikmod witch seems to create the music.raw file
     if (Mix_OpenAudio(SOUND_FREQUENCY, SOUND_FORMAT, SOUND_CHANNELS, 1024 /*4096*/) < 0) {
-        logger->error("%s line %i: Unable to open sound: %s\n", __FILE__, __LINE__, Mix_GetError());
+        Logger::getInstance()->Error(__FILE__, __LINE__, "Unable to open sound: " + string(Mix_GetError()));
         nosound = true;
     }
 
@@ -347,7 +345,7 @@ void SoundEngine::MusicHook(void* userdata, Uint8* stream, int len)
             musicDecoder.Close();
             *musicFinishedPtr = true;
         } else if (ret == SOUND_DECODE_ERROR) {
-            logger->error("Sound: Error during music decoding, stopping playback of current track.\n");
+            Logger::getInstance()->Error(__FILE__, __LINE__, "Sound: Error during music decoding, stopping playback of current track.");
             *musicFinishedPtr = true;
             return;
         }

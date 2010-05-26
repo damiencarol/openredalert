@@ -41,7 +41,7 @@
 #include "RepairAnimEvent.h"
 #include "ProcAnimEvent.h"
 #include "Ai.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "unittypes.h"
 #include "Projectile.h"
 #include "Weapon.h"
@@ -63,12 +63,10 @@ namespace pc {
     extern Ai * ai;
     extern SoundEngine* sfxeng;
 }
-extern Logger * logger;
 
 Structure::Structure(StructureType *type, Uint16 cellpos, unsigned int owner,
         Uint16 rhealth, Uint8 facing, string trigger_name) : UnitOrStructure()
 {
-	
     targetcell = cellpos;
     this->type = type;
     imagenumbers = new Uint16[type->getNumLayers()];
@@ -212,7 +210,7 @@ void Structure::setImageNum(Uint32 num, Uint8 layer)
 	}
 	else
 	{
-		logger->error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n", __FILE__, __LINE__, num, layer, getNumbImages( layer ));
+		Logger::getInstance()->Error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n");//, __FILE__, __LINE__, num, layer, getNumbImages( layer ));
 	}
 }
 
@@ -265,7 +263,7 @@ Uint16 Structure::getBPos(Uint16 pos) const
         }
         ++dy;
         if (dy >= type->getYsize()) {
-            logger->error("ERROR: could not find anywhere to shoot at %s!\n", type->getName().c_str());
+            Logger::getInstance()->Error("ERROR: could not find anywhere to shoot at '" + type->getName() + "'");
         }
         retpos = (x+dx)+(y+dy)*mwid;
     }
@@ -454,13 +452,13 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 					if (getNumbImages( 0 ) > (unsigned)(imagenumbers[0]&0x7FF) + (unsigned)type->getAnimInfo().dmgoff)
 						setImageNum((unsigned)(imagenumbers[0]&0x7FF) + (unsigned)type->getAnimInfo().dmgoff,0);
 					else
-						logger->error ("%s line %i: FAILED imagenr = %u, type->getAnimInfo().dmgoff = %u, ImgNr == %u\n", __FILE__, __LINE__, (unsigned)(imagenumbers[0]&0x7FF), (unsigned)type->getAnimInfo().dmgoff, ImageNr);
+						Logger::getInstance()->Error ("%s line %i: FAILED imagenr = %u, type->getAnimInfo().dmgoff = %u, ImgNr == %u\n");//, __FILE__, __LINE__, (unsigned)(imagenumbers[0]&0x7FF), (unsigned)type->getAnimInfo().dmgoff, ImageNr);
 
 					if (type->getNumLayers() == 2){
 						if (getNumbImages( 1 ) > (unsigned)(imagenumbers[1]&0x7FF) + (unsigned)type->getAnimInfo().dmgoff2)
 							setImageNum((unsigned)(imagenumbers[1]&0x7FF)+ (unsigned)type->getAnimInfo().dmgoff2,1);
 						else
-							logger->error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n", __FILE__, __LINE__, (imagenumbers[1]&~0x800)+type->getAnimInfo().dmgoff2, 1, getNumbImages( 1 ));
+							Logger::getInstance()->Error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n");//, __FILE__, __LINE__, (imagenumbers[1]&~0x800)+type->getAnimInfo().dmgoff2, 1, getNumbImages( 1 ));
 					}
 				}
 			} else {
@@ -469,13 +467,13 @@ void Structure::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attack
 					if (getNumbImages( 0 ) > (unsigned)(imagenumbers[0]&0x7FF) + (unsigned)type->getAnimInfo().dmgoff){
 						setImageNum((unsigned)(imagenumbers[0]&0x7FF) + (unsigned)type->getAnimInfo().dmgoff,0);
                     } else {
-                        logger->error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n", __FILE__, __LINE__, (imagenumbers[0]&~0x800)-type->getAnimInfo().dmgoff, 0, getNumbImages( 0 ));
+                        Logger::getInstance()->Error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n");//, __FILE__, __LINE__, (imagenumbers[0]&~0x800)-type->getAnimInfo().dmgoff, 0, getNumbImages( 0 ));
                     }
 					if (type->getNumLayers() == 2){
 						if (getNumbImages( 1 ) > (unsigned)(imagenumbers[1]&0x7FF) + (unsigned)type->getAnimInfo().dmgoff)
 							setImageNum((unsigned)(imagenumbers[1]&0x7FF) + (unsigned)type->getAnimInfo().dmgoff,1);
 						else
-							logger->error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n", __FILE__, __LINE__, (imagenumbers[1]&~0x800)-type->getAnimInfo().dmgoff, 1, getNumbImages( 1 ));
+							Logger::getInstance()->Error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n");//, __FILE__, __LINE__, (imagenumbers[1]&~0x800)-type->getAnimInfo().dmgoff, 1, getNumbImages( 1 ));
 					}
 					return;
 				}
@@ -525,7 +523,7 @@ void Structure::runAnim(Uint32 mode)
 			if (getNumbImages( 0 ) > type->getAnimInfo().makenum - 1)
 				setImageNum(type->getAnimInfo().makenum - 1, 0);
 			else
-				logger->error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n", __FILE__, __LINE__, type->getAnimInfo().makenum - 1, 0, getNumbImages( 0 ));
+				Logger::getInstance()->Error ("%s line %i: Failed to set frame %i layer %i, numb frames = %i\n");//, __FILE__, __LINE__, type->getAnimInfo().makenum - 1, 0, getNumbImages( 0 ));
 			buildAnim = new BuildAnimEvent(3,this,true);
 			retry_sell = false;
 		}  else if (mode == 8) { // run repair anim at const speed
@@ -744,7 +742,7 @@ bool Structure::CreateUnitAnimation(UnitType* UnType, Uint8 owner)
     // check that player is not null
     if (player == 0)
     {
-        logger->error("[Structure::CreateUnitAnimation] player with owner = %d is null !", owner);
+        Logger::getInstance()->Error("[Structure::CreateUnitAnimation] player with owner = %d is null !");//, owner);
         return false;
     }
     

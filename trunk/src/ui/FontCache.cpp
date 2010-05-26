@@ -22,7 +22,6 @@
 
 #include "video/Renderer.h"
 #include "include/fcnc_endian.h"
-#include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "include/sdllayer.h"
 #include "TFontImage.h"

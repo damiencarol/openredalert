@@ -24,10 +24,8 @@
 #include "SDL/SDL_types.h"
 #include "SDL/SDL_endian.h"
 
-#include "include/Logger.h"
+#include "Logger.hpp"
 
-
-extern Logger * logger;
 
 /**
  * Decodes base64 data
@@ -50,7 +48,7 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, con
         varLength--;
     }
     if( bits_to_skip >= 6 ) {
-        logger->warning("Error in base64 (too many '=')\n");
+        Logger::getInstance()->Warning("Error in base64 (too many '=')\n");
         return -1;
     }
 
@@ -78,7 +76,7 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, con
         d = dtable[src[3]];
         if( a == 0x80 || b == 0x80 ||
                 c == 0x80 || d == 0x80 ) {
-            logger->warning("Illegal character\n");
+            Logger::getInstance()->Warning("Illegal character\n");
         }
         target[0] = a << 2 | b >> 4;
         target[1] = b << 4 | c >> 2;
@@ -103,8 +101,8 @@ int Compression::dec_base64(const unsigned char* src, unsigned char* target, con
             target[0] = a << 2 | b >> 4;
             target[1] = b << 4 | c >> 2;
         } else {
-            logger->warning("Error in base64. #bits to skip doesn't match length\n");
-            logger->warning("skip %d bits, %d chars left\n\"%s\"\n", bits_to_skip, varLength, src);
+            Logger::getInstance()->Warning("Error in base64. #bits to skip doesn't match length\n");
+            Logger::getInstance()->Warning("skip %d bits, %d chars left\n\"%s\"\n");//, bits_to_skip, varLength, src);
             return -1;
         }
     }

@@ -18,74 +18,72 @@
 
 #include "SDL/SDL_types.h"
 
-#include "include/Logger.h"
-
-extern Logger * logger;
+#include "Logger.hpp"
 
 void UnitOrStructure::remove()
 {
-	deleted = true;
-	if (references == 0)
-	{
-		delete this;
-	}
+    deleted = true;
+    if (references == 0)
+    {
+        delete this;
+    }
 }
 
 bool UnitOrStructure::isAlive()
 {
-	return !deleted;
+    return !deleted;
 }
 
 void UnitOrStructure::select()
 {
-	selected = true;
-	showorder_timer = 0;
+    selected = true;
+    showorder_timer = 0;
 }
 
 void UnitOrStructure::unSelect()
 {
-	selected = false;
-	showorder_timer = 0;
+    selected = false;
+    showorder_timer = 0;
 }
 
 bool UnitOrStructure::isSelected()
 {
-	return selected;
+    return selected;
 }
 
 void UnitOrStructure::unrefer()
 {
-	if (references > 0)
-	{
-		--references;
-		if (deleted && references == 0)
-		{
-			delete this;
-		}
-	}
-	else
-	{
-		logger->error("%s line %i: Unrefer while not refered \n", __FILE__ , __LINE__);
-	}
+    if (references > 0)
+    {
+        --references;
+        if (deleted && references == 0)
+        {
+            delete this;
+        }
+    }
+    else
+    {
+        Logger::getInstance()->Error("%s line %i: Unrefer while not refered \n");
+    }
 }
 
 UnitOrStructure::~UnitOrStructure()
 {
-	if (references != 0)
-	{
-		logger->error("%s line %i: References is not 0 \n", __FILE__ , __LINE__);
-	}
+    if (references != 0)
+    {
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "%s line %i: References is not 0 \n");
+    }
 }
 
 UnitOrStructure::UnitOrStructure() :
-	references(0), deleted(false), selected(false), targetcell(0),
-			target(0), showorder_timer(0)
+    references(0), deleted(false), selected(false), targetcell(0),
+            target(0), showorder_timer(0)
 {
 }
 
 UnitOrStructure * UnitOrStructure::getTarget()
 {
-	return target;
+    return target;
 }
 
 void UnitOrStructure::setYoffset(Sint8 yo)
@@ -98,27 +96,27 @@ void UnitOrStructure::setXoffset(Sint8 xo)
 
 void UnitOrStructure::referTo()
 {
-	++references;
+    ++references;
 }
 
 Uint32 UnitOrStructure::getExitCell() const
 {
-	return 0;
+    return 0;
 }
 
 Uint16 UnitOrStructure::getTargetCell() const
 {
-	return targetcell;
+    return targetcell;
 }
 
 Uint16 UnitOrStructure::getHealth() const
 {
-	return health;
+    return health;
 }
 
 void UnitOrStructure::setHealth(Uint16 health)
 {
-	this->health = health;
+    this->health = health;
 }
 
 unsigned int UnitOrStructure::getOwner() const

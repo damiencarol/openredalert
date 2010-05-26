@@ -21,7 +21,6 @@
 
 #include "CnCMap.h"
 #include "misc/common.h"
-#include "include/Logger.h"
 #include "ProjectileAnim.h"
 #include "weaponspool.h"
 #include "PlayerPool.h"

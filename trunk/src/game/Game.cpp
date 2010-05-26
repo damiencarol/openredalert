@@ -21,8 +21,8 @@
 
 #include "SDL/SDL.h"
 
+#include "Logger.hpp"
 #include "ActionEventQueue.h"
-#include "include/Logger.h"
 #include "CnCMap.h"
 #include "Dispatcher.h"
 #include "video/GraphicsEngine.h"
@@ -63,8 +63,6 @@ using Sound::SoundEngine;
 using OpenRedAlert::Sound::SoundError;
 using OpenRedAlert::Game::TriggerManager;
 using UI::MapAnimationMenu;
-
-extern Logger * logger;
 
 namespace p
 {
@@ -141,7 +139,7 @@ void Game::InitializeMap(string MapName)
 	}
 	catch (LoadMapError& ex)
 	{
-		logger->error("Game::InitializeMap:%s\n", ex.what());
+		Logger::getInstance()->Error(__FILE__, __LINE__, ex.what());
 		// loadmap will have printed the error
 		throw GameError("Error during load of the Map in Game::InitializeMap\n");
 	}
@@ -159,7 +157,7 @@ void Game::InitializeMap(string MapName)
 		// Playback
 		break;
 	default:
-		logger->error("Invalid dispatch mode: %i\n", pc::Config.dispatch_mode);
+		Logger::getInstance()->Error("Invalid dispatch mode");
 		throw GameError("Invalid dispatch mode:");
 		break;
 	}
@@ -214,18 +212,18 @@ void Game::InitializeMap(string MapName)
 	catch (SidebarError& error)
 	{
 		// Log it
-		logger->error("%s\n", error.what());
+		Logger::getInstance()->Error(error.what());
 		// Throw game error
 		throw GameError("Can't construct the Sidebar\n");
 	}
 
-	/// init the cursor
-	pc::cursor = new Cursor();
+    /// init the cursor
+    pc::cursor = new Cursor();
 
-	/// init the input functions
-	pc::input = new Input(pc::gfxeng->getWidth(),
-						  pc::gfxeng->getHeight(),
-						  pc::gfxeng->getMapArea());
+    /// init the input functions
+    pc::input = new Input(pc::gfxeng->getWidth(),
+                          pc::gfxeng->getHeight(),
+                          pc::gfxeng->getMapArea());
 }
 
 /**
@@ -236,27 +234,27 @@ void Game::InitializeGameClasses()
 	/// Initialize the Graphics Engine
 	try
 	{
-		logger->note("Initializing the graphics engine...");
+		Logger::getInstance()->Info("Initializing the graphics engine...");
 		pc::gfxeng = new GraphicsEngine();
-		logger->note("done\n");
+		Logger::getInstance()->Info("done\n");
 	}
 	catch (VideoError& ex)
 	{
-		logger->note("failed.  %s \n", ex.what());
+		Logger::getInstance()->Error(ex.what());
 		throw runtime_error("Unable to Initialize the graphics engine");
 	}
 
 	/// Initialize Sound
 	try
 	{
-		logger->note("Initializing the sound engine...");
+		Logger::getInstance()->Info("Initializing the sound engine...");
 		pc::sfxeng = new SoundEngine(pc::Config.nosound);
-		logger->note("done\n");
+		Logger::getInstance()->Info("done\n");
 	}
 	catch (SoundError& error)
 	{
-		logger->error("%s\n", error.what());
-		logger->note("failed.  exiting\n");
+		Logger::getInstance()->Error(error.what());
+		Logger::getInstance()->Info("failed.  exiting\n");
 		throw runtime_error("Unable to Initialize the sound engine");
 	}
 
@@ -277,14 +275,14 @@ void Game::InitializeGameClasses()
 	/// Init the Data Loader
 	try
 	{
-		logger->note("Initializing the RA Data loader...");
+		Logger::getInstance()->Info("Initializing the RA Data loader...");
 		p::raLoader = new RedAlertDataLoader();
 		p::raLoader->load();
-		logger->note("done\n");
+		Logger::getInstance()->Info("done\n");
 	}
 	catch (...)
 	{
-		logger->note("failed.  exiting\n");
+		Logger::getInstance()->Error("failed.  exiting\n");
 		throw runtime_error("Unable to Initialize the RA Data loader");
 	}
 
@@ -293,7 +291,7 @@ void Game::InitializeGameClasses()
 	if (pc::sfxeng->CreatePlaylist() != true)
 	{
 		//
-		logger->error("Could not create playlist!\n");
+		Logger::getInstance()->Error("Could not create playlist!\n");
 		//
 		throw GameError("Could not create playlist!\n");
 	}
@@ -447,13 +445,13 @@ void Game::FreeMemory()
  */
 void Game::play()
 {
-	bool missionWon = false;
-	MissionMapsClass* missions = NULL;
-	string missionName;
+    bool missionWon = false;
+    MissionMapsClass* missions = NULL;
+    string missionName;
 
-	// Create and load informations about maps of games
-	// (from Mix archives)
-	missions = new MissionMapsClass();
+    // Create and load informations about maps of games
+    // (from Mix archives)
+    missions = new MissionMapsClass();
 
 	do
 	{
@@ -586,27 +584,27 @@ void Game::play()
 		// Exit the game (if the user wants to)
 		if (true == lMenu->isQuit())
 		{
-			logger->note("Exit by user (game menu)\n");
+			Logger::getInstance()->Info("Exit by user (game menu)\n");
 			FreeMemory();
 			return;
 		}
 
-		if (pc::Config.gamemode == GAME_MODE_SINGLE_PLAYER)
-		{
-			if (pc::Config.mside == "gdi")
-			{
-				pc::Config.mapname = missions->getGdiMissionMap(MissionNr);
-			}
-			else if (pc::Config.mside == "nod")
-			{
-				pc::Config.mapname = missions->getNodMissionMap(MissionNr);
-			}
-			else
-			{
-				logger->note("%s line %i: Unknown mission type\n",__FILE__ , __LINE__);
-			}
-		}		
-		
+        if (pc::Config.gamemode == GAME_MODE_SINGLE_PLAYER)
+        {
+            if (pc::Config.mside == "gdi")
+            {
+                pc::Config.mapname = missions->getGdiMissionMap(MissionNr);
+            }
+            else if (pc::Config.mside == "nod")
+            {
+                pc::Config.mapname = missions->getNodMissionMap(MissionNr);
+            }
+            else
+            {
+                Logger::getInstance()->Error(__FILE__ , __LINE__, "Unknown mission type");
+            }
+        }
+
         // Initialize (load) the map
         InitializeMap(pc::Config.mapname);
 
@@ -632,8 +630,7 @@ void Game::play()
 		// Check use of Fog of War
 		if (!pc::Config.UseFogOfWar)
 		{
-			logger->note ("%s line %i: Use no fog of war?\n", __FILE__, __LINE__);
-			p::ccmap->getPlayerPool()->getLPlayer()->setVisBuild(Player::SOB_SIGHT, true);
+            p::ccmap->getPlayerPool()->getLPlayer()->setVisBuild(Player::SOB_SIGHT, true);
 		}
 
 		if (p::ccmap->getGameMode() == GAME_MODE_SINGLE_PLAYER)
@@ -829,16 +826,17 @@ void Game::dumpstats()
 	m = uptime/60;
 	s = uptime%60;
 
-	logger->renderGameMsg(false);
-	logger->gameMsg("Time wasted: %i hour%s%i minute%s%i second%s", h,
-			(h!=1 ? "s " : " "), m, (m!=1 ? "s " : " "), s, (s!=1 ? "s " : " "));
+	// TODO check this message : logger->renderGameMsg(false);
+	//logger->gameMsg("Time wasted: %i hour%s%i minute%s%i second%s", h,
+	//		(h!=1 ? "s " : " "), m, (m!=1 ? "s " : " "), s, (s!=1 ? "s " : " "));
+    
 	for (i = 0; i < p::ccmap->getPlayerPool()->getNumPlayers(); i++)
 	{
 		pl = p::ccmap->getPlayerPool()->getPlayer(i);
-		logger->gameMsg("%s\nUnit kills:  %i\n     losses: %i\n"
+		/*logger->gameMsg("%s\nUnit kills:  %i\n     losses: %i\n"
 			"Structure kills:  %i\n          losses: %i\n", pl->getName().c_str(),
 				pl->getUnitKills(), pl->getUnitLosses(),
-				pl->getStructureKills(), pl->getStructureLosses());
+				pl->getStructureKills(), pl->getStructureLosses());*/
 	}
 }
 
@@ -847,28 +845,28 @@ void Game::dumpstats()
  */
 void Game::handleAiCommands()
 {
-	for (unsigned int n = 0; n<p::uspool->getNumbUnits(); n++)
-	{
-		Unit* unit = p::uspool->getUnit(n);
-		if (unit!=0){
-		if (!unit->IsMoving() && !unit->IsAttacking() && !unit->IsHarvesting())
-		{
-			if (unit->aiCommandList.size()>0)
-			{
-				AiCommand* com = unit->aiCommandList[0];
-				//if (com->getId() == 3 || com->getId() == 8)
-				{
-					logger->debug("AICOMMAND MOVE UNIT = %s \n", unit->getType()->getName().c_str());
-					Uint32 pos = p::ccmap->getWaypoint(com->getWaypoint());
-					logger->debug("here$-1%d\n", pos);
-					unit->move(pos, true);
-					vector<AiCommand*>::iterator i = unit->aiCommandList.begin();
-					unit->aiCommandList.erase(i);
-				}
-			}
-		}
-	}
-	}
+    for (unsigned int n = 0; n<p::uspool->getNumbUnits(); n++)
+    {
+        Unit* unit = p::uspool->getUnit(n);
+        if (unit!=0)
+        {
+            if (!unit->IsMoving() && !unit->IsAttacking() && !unit->IsHarvesting())
+            {
+                if (unit->aiCommandList.size()>0)
+                {
+                    AiCommand* com = unit->aiCommandList[0];
+                    //if (com->getId() == 3 || com->getId() == 8)
+                    {
+                        Logger::getInstance()->Debug("AICOMMAND MOVE UNIT = " + unit->getType()->getName());
+                        Uint32 pos = p::ccmap->getWaypoint(com->getWaypoint());
+                        //logger->debug("here$-1%d\n", pos);
 
-
+                        unit->move(pos, true);
+                        vector<AiCommand*>::iterator i = unit->aiCommandList.begin();
+                        unit->aiCommandList.erase(i);
+                    }
+                }
+            }
+        }
+    }
 }

@@ -24,8 +24,8 @@
 
 #include "SDL/SDL_types.h"
 
+#include "Logger.hpp"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
 #include "audio/SoundEngine.h"
 #include "UnitAndStructurePool.h"
 #include "TalkbackType.h"
@@ -38,11 +38,10 @@ using std::vector;
 using Sound::SoundEngine;
 
 namespace pc {
-/** SoundEngine of the game */	
-	extern SoundEngine* sfxeng;
+    /** SoundEngine of the game */
+    extern SoundEngine* sfxeng;
     extern ConfigType Config;
 }
-extern Logger * logger;
 
 map<string, TalkbackType> Talkback::talktype;
 bool Talkback::talktype_init;
@@ -70,7 +69,7 @@ void Talkback::load(string talkback, INIFile *tbini)
     try {
         tbini->readKeyValue(talkback.c_str(), 0);
     } catch(...) {
-        logger->warning("Could not find talkback \"%s\", reverting to default\n",talkback.c_str());
+        Logger::getInstance()->Warning("Could not find talkback '" + talkback + "', reverting to default");
         talkback = "Generic";
     }
 
@@ -89,7 +88,7 @@ void Talkback::load(string talkback, INIFile *tbini)
                 } 
                 else
                 {
-                    logger->warning("skipping self-referential include in %s\n",talkback.c_str());
+                    Logger::getInstance()->Warning("skipping self-referential include in " + talkback);
                 }
             } 
             else
@@ -175,7 +174,7 @@ TalkbackType Talkback::getTypeNum(string name)
     
     TBCI tbtype = talktype.find(name);
     if (tbtype == talktype.end()) {
-        logger->error("%s line %i: Unknown type: %s\n", __FILE__, __LINE__, name.c_str());
+        Logger::getInstance()->Error(__FILE__, __LINE__, "Unknown type: " + name);
         return TB_invalid;
     }
     return tbtype->second;

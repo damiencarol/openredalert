@@ -19,7 +19,7 @@
 
 #include <cmath>
 
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "UnitOrStructure.h"
 #include "unittypes.h"
 #include "TurnAnimEvent.h"
@@ -33,10 +33,9 @@
 #include "UnitType.h"
 
 namespace p {
-	extern ActionEventQueue * aequeue;
-	extern UnitAndStructurePool* uspool;
+    extern ActionEventQueue * aequeue;
+    extern UnitAndStructurePool* uspool;
 }
-extern Logger * logger;
 
 MoveAnimEvent::MoveAnimEvent(Uint32 p, Unit* un) : UnitAnimEvent(p,un)
 {
@@ -122,12 +121,13 @@ void MoveAnimEvent::run()
     if( !moved_half && (abs(un->xoffset) >= 12 || abs(un->yoffset) >= 12) ) {
         oldsubpos = un->subpos;
         NewSubpos = p::uspool->postMove(un, newpos);
-		if (NewSubpos > 5){
-			logger->error ("%s line %i: ****************** Move failed ****************", __FILE__, __LINE__);
-			p::aequeue->scheduleEvent(this);
-			return;
-		}
-		un->subpos = NewSubpos;
+        if (NewSubpos > 5)
+        {
+            Logger::getInstance()->Error(__FILE__, __LINE__, "Move failed");
+            p::aequeue->scheduleEvent(this);
+            return;
+        }
+        un->subpos = NewSubpos;
         un->cellpos = newpos;
         un->xoffset = -un->xoffset;
         un->yoffset = -un->yoffset;
@@ -158,7 +158,7 @@ void MoveAnimEvent::run()
         un->xoffset = 0;
         un->yoffset = 0;
         moveDone();
-	//printf ("Move done, dest = %u, ourpos = %u\n", this->dest, un->getPos());
+        //printf ("Move done, dest = %u, ourpos = %u\n", this->dest, un->getPos());
         return;
     }
 
@@ -187,7 +187,7 @@ void MoveAnimEvent::startMoveOne(bool wasblocked)
 	if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() ){
 		Uint16 x, y;
 		p::ccmap->translateFromPos(newpos, &x, &y);
-		printf ("%s line %i: Newpos = %i [%i:%i]\n", __FILE__, __LINE__, newpos, x, y);
+		//printf ("%s line %i: Newpos = %i [%i:%i]\n", __FILE__, __LINE__, newpos, x, y);
 	}
 #endif
     if( newpos == 0xffff ) {
@@ -197,7 +197,7 @@ void MoveAnimEvent::startMoveOne(bool wasblocked)
         path = new Path(un, un->getPos(), dest, range);
         pathinvalid = false;
         if( path->empty() ) {
-            logger->note ("%s line %i: path is empty\n", __FILE__, __LINE__);
+            Logger::getInstance()->Info(__FILE__, __LINE__, "path is empty");
             xmod = 0;
             ymod = 0;
             p::aequeue->scheduleEvent(this);

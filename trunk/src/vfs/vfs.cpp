@@ -29,15 +29,13 @@
 #include "filesystem/externalvfs.h"
 #include "mix/mixvfs.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "misc/config.h"
 
 using std::string;
 using std::vector;
 using std::runtime_error;
 using std::stringstream;
-
-extern Logger * logger;
 
 ExternalFiles * VFSUtils::externals = 0;
 MIXFiles * VFSUtils::mixfiles = 0;
@@ -73,7 +71,7 @@ void VFSUtils::VFS_Init(const string& binpath)
     }
     catch(runtime_error&)
     {
-        logger->error("Unable to locate files.ini.\n");
+        Logger::getInstance()->Error("Unable to locate files.ini.\n");
         return;
     }
     //for (Uint32 pathnum = 1;; ++pathnum)
@@ -110,10 +108,10 @@ void VFSUtils::VFS_Init(const string& binpath)
 		}
 		catch(...)
 		{
-            logger->error("Unenable to read [GENERAL]-GAME\n");
+            Logger::getInstance()->Error("Unenable to read [GENERAL]-GAME\n");
             //break;
         }
-        logger->note("Trying to load \"%s\"...\n", key->second.c_str());
+        Logger::getInstance()->Info("Trying to load '" + key->second + "'");
 
         // Get the number of files
         int numKeys = filesini->getNumberOfKeysInSection("RedAlert");
@@ -136,8 +134,7 @@ void VFSUtils::VFS_Init(const string& binpath)
                 }
                 if (!mixfiles->loadArchive(key2->second.c_str()))
                 {
-                    logger->warning("Missing required file \"%s\"\n",
-                                    key2->second.c_str());
+                    Logger::getInstance()->Warning("Missing required file '" + key2->second + "'");
                     throw runtime_error("Missing required file" + key2->second);
                 }
 
@@ -166,8 +163,7 @@ void VFSUtils::VFS_Init(const string& binpath)
     }
 
     // Notify that the program can't load mix archives
-    logger->error("Unable to find mixes for any of the supported games!\n"
-                  "Check your configuration and try again.\n");
+    Logger::getInstance()->Error("Unable to find mixes for any of the supported games! Check your configuration and try again.\n");
 
     // Exit with an Error
     exit(1);
@@ -298,7 +294,7 @@ void VFSUtils::VFS_LoadGame(gametypes gt)
         externals->loadArchive("data/settings/ra/");
         break;
     default:
-        logger->error("Unknown gametype %i specified\n", gt);
+        Logger::getInstance()->Error("Unknown gametype specified.");
         break;
     }
 }

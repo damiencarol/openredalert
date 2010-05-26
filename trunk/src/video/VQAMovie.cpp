@@ -32,7 +32,7 @@
 #include "video/GraphicsEngine.h"
 #include "include/imageproc.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "audio/SoundCommon.h"
 #include "audio/SoundEngine.h"
 #include "audio/SoundUtils.h"
@@ -46,7 +46,6 @@ namespace pc {
 	extern GraphicsEngine * gfxeng;
 	extern Sound::SoundEngine* sfxeng;
 }
-extern Logger * logger;
 
 /**
  * @param filename the name of the vqamovie.
@@ -63,13 +62,13 @@ VQA::VQAMovie::VQAMovie(const char* filename) : vqafile(0), CBF_LookUp(0),
     }
 
     if (vqafile == 0) {
-		logger->error ("Failed to load vqa movie %s\n", fname.c_str());
+        Logger::getInstance()->Error ("Failed to load vqa movie '" + fname + "'");
         throw runtime_error("No VQA file");
     }
     // Get header information for the vqa.  If the header is corrupt, we can die now.
     vqafile->seekSet(0);
     if (!DecodeFORMChunk()) {
-        logger->error("VQA: Invalid FORM chunk\n");
+        Logger::getInstance()->Error("VQA: Invalid FORM chunk\n");
         throw runtime_error("VQA: Invalid FORM chunk\n");
     }
 
@@ -99,7 +98,7 @@ VQA::VQAMovie::VQAMovie(const char* filename) : vqafile(0), CBF_LookUp(0),
     offsets = new Uint32[header.NumFrames];
     if (!DecodeFINFChunk()) {
         delete[] offsets;
-        logger->error("VQA: Invalid FINF chunk\n");
+        Logger::getInstance()->Error("VQA: Invalid FINF chunk\n");
         throw runtime_error("VQA: Invalid FINF chunk\n");
     }
 
@@ -116,7 +115,7 @@ VQA::VQAMovie::VQAMovie(const char* filename) : vqafile(0), CBF_LookUp(0),
     //logger->debug("Video is %dfps %d %d %d\n", header.FrameRate, header.Freq, header.Channels, header.Bits);
 
     if (SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, header.Channels, header.Freq, SOUND_FORMAT, SOUND_CHANNELS, SOUND_FREQUENCY) < 0) {
-        logger->error("Could not build SDL_BuildAudioCVT filter\n");
+        Logger::getInstance()->Error("Could not build SDL_BuildAudioCVT filter");
         return;
     }
 
@@ -232,7 +231,7 @@ void VQA::VQAMovie::play()
         SDL_UnlockMutex(sndBufLock);
 
         if (!DecodeVQFRChunk(frame)) {
-            logger->error("VQA: Decoding VQA frame\n");
+            Logger::getInstance()->Error("VQA: Decoding VQA frame\n");
             break;
         }
 
@@ -310,8 +309,8 @@ bool VQA::VQAMovie::DecodeFORMChunk()
     vqafile->readByte((Uint8*)chunkid, 4);
 
     if (strncmp(chunkid, "FORM", 4)) {
-        logger->error("VQA: Decoding FORM Chunk - Expected \"FORM\", got \"%c%c%c%c\"\n",
-                chunkid[0], chunkid[1], chunkid[2], chunkid[3]);
+        Logger::getInstance()->Error("VQA: Decoding FORM Chunk - Expected \"FORM\", got \"%c%c%c%c\"\n");//,
+                //chunkid[0], chunkid[1], chunkid[2], chunkid[3]);
         return false;
     }
 
@@ -350,14 +349,14 @@ bool VQA::VQAMovie::DecodeFORMChunk()
     // readDWord probably swaps back on BE.
     header.RStartPos = SDL_Swap32(header.RStartPos);
     if (strncmp((const char*)header.Signature, "WVQAVQHD", 8) == 1) {
-        logger->error("VQA: Invalid header: Expected \"WVQAVQHD\", got \"%c%c%c%c%c%c%c%c\"\n",
+        Logger::getInstance()->Error("VQA: Invalid header: Expected \"WVQAVQHD\", got \"%c%c%c%c%c%c%c%c\"\n");/*,
                 header.Signature[0], header.Signature[1], header.Signature[2],
                 header.Signature[3], header.Signature[4], header.Signature[5],
-                header.Signature[6], header.Signature[7]);
+                header.Signature[6], header.Signature[7]);*/
         return false;
     }
     if (header.Version != 2) {
-        logger->error("VQA: Unsupported version: Expected 2, got %i\n", header.Version);
+        Logger::getInstance()->Error("VQA: Unsupported version: Expected 2, got %i\n");//, header.Version);
         return false;
     }
     // Set some constants based on the header
@@ -394,7 +393,8 @@ bool VQA::VQAMovie::DecodeFINFChunk()
 		}
 
 		if (strncmp((const char*)chunkid, "FINF", 4) ) {
-			logger->error("VQA: Decoding FINF chunk - Expected \"FINF\", got \"%c%c%c%c\"\n", chunkid[0], chunkid[1], chunkid[2], chunkid[3]);
+            Logger::getInstance()->Error("VQA: Decoding FINF chunk - Expected \"FINF\", got");
+			//logger->error("VQA: Decoding FINF chunk - Expected \"FINF\", got \"%c%c%c%c\"\n", chunkid[0], chunkid[1], chunkid[2], chunkid[3]);
 			return false;
 		}
 	}
@@ -404,7 +404,7 @@ bool VQA::VQAMovie::DecodeFINFChunk()
 	vqafile->readDWord(&chunklen, 1);
 	chunklen = SDL_Swap32(chunklen);
 	if (static_cast<Uint32>(header.NumFrames << 2) != chunklen) {
-		logger->error("VQA: Invalid chunk length (%i != %i)\n", header.NumFrames << 2, chunklen);
+		Logger::getInstance()->Error("VQA: Invalid chunk length (%i != %i)\n");//, header.NumFrames << 2, chunklen);
 		return false;
 	}
 
@@ -455,7 +455,7 @@ Uint32 VQA::VQAMovie::DecodeSNDChunk(Uint8 *outbuf)
 			vqafile->readByte(chunkid, 4);
 		}
 		if (strncmp((const char*)chunkid, "SND", 3) ) {
-			logger->error("VQA: Decoding SND chunk - Expected \"SNDX\", got \"%c%c%c%c\"\n", chunkid[0], chunkid[1], chunkid[2], chunkid[3]);
+			Logger::getInstance()->Error("VQA: Decoding SND chunk - Expected \"SNDX\", got \"%c%c%c%c\"\n");//, chunkid[0], chunkid[1], chunkid[2], chunkid[3]);
 			return 0; // Returning zero here, to set length of sound chunk to zero
 		}
 	}
@@ -473,7 +473,7 @@ Uint32 VQA::VQAMovie::DecodeSNDChunk(Uint8 *outbuf)
         break;
     case '1': // Westwoods own algorithm
         // @todo: Add support for this algorithm
-        logger->error("VQA: Decoding SND chunk - sound compressed using unsupported westwood algorithm\n");
+        Logger::getInstance()->Error("VQA: Decoding SND chunk - sound compressed using unsupported westwood algorithm\n");
         //Sound::WSADPCM_Decode(outbuf, inbuf, chunklen, uncompressed_size)
         chunklen = 0;
         break;
@@ -482,7 +482,7 @@ Uint32 VQA::VQAMovie::DecodeSNDChunk(Uint8 *outbuf)
         chunklen <<= 2; // IMA ADPCM decompresses sound to a size 4 times larger than the compressed size
         break;
     default:
-        logger->error("VQA: Decoding SND chunk - sound in unknown format\n");
+        Logger::getInstance()->Error("VQA: Decoding SND chunk - sound in unknown format\n");
         chunklen = 0;
         break;
     }
@@ -513,7 +513,7 @@ bool VQA::VQAMovie::DecodeVQFRChunk(SDL_Surface *frame)
 	Uint8 chunkid1[4];
 	vqafile->readByte(chunkid1, 4);
 	if (strncmp((const char*)chunkid1, "VQFR", 3) ) {
-		logger->error("VQA: Decoding VQFR chunk - Expected \"VQFR\", got \"%c%c%c%c\"\n", chunkid1[0], chunkid1[1], chunkid1[2], chunkid1[3]);
+		Logger::getInstance()->Error("VQA: Decoding VQFR chunk - Expected \"VQFR\", got \"%c%c%c%c\"\n");//, chunkid1[0], chunkid1[1], chunkid1[2], chunkid1[3]);
 		return 0; // Returning zero here, to set length of sound chunk to zero
 	}
 
@@ -673,7 +673,7 @@ inline void VQA::VQAMovie::DecodeUnknownChunk()
 
     vqafile->readDWord(&chunklen, 1);
     chunklen = SDL_Swap32(chunklen);
-    logger->error("Unknown chunk at %0x for %i bytes.\n", vqafile->tell(), chunklen);
+    Logger::getInstance()->Error("Unknown chunk at %0x for %i bytes.\n");//, vqafile->tell(), chunklen);
 
     vqafile->seekCur(chunklen);
 }
@@ -705,7 +705,7 @@ void VQA::VQAMovie::AudioHook(void* udata, Uint8* stream, int len)
     vqa->cvt.len = len;
 
     if (SDL_ConvertAudio(&vqa->cvt) < 0) {
-        logger->warning("Could not run conversion filter: %s\n", SDL_GetError());
+        Logger::getInstance()->Warning("Could not run conversion filter: " + string(SDL_GetError()));
         return;
     }
 

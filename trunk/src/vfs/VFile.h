@@ -50,8 +50,7 @@ public:
     Uint32 writeThree(Uint32 * databuf, Uint32 numThrees);
     Uint32 writeDWord(Uint32 * databuf, Uint32 numDWords);
     void writeLine(const char * string);
-    int vfs_printf(const char * fmt,...);
-    int vfs_vprintf(const char * fmt, va_list ap);
+    
     void flush();
 
     void seekSet(Uint32 pos);

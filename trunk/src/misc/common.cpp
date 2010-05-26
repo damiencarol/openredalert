@@ -29,7 +29,6 @@
 #include "ui/PauseMenu.h"
 #include "video/GraphicsEngine.h"
 #include "game/RedAlertDataLoader.h"
-#include "include/Logger.h"
 #include "game/Dispatcher.h"
 
 using std::cout; 
@@ -126,12 +125,6 @@ namespace pc {
 	ConfigType		Config;
 	Ai				*ai;	
 }
-
-// Server only
-namespace ps {
-}
-
-extern Logger* logger;
 
 // Server only
 std::vector<char*> splitList(const string& line, char delim)

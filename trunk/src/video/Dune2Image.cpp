@@ -26,15 +26,13 @@
 #include "include/fcnc_endian.h"
 #include "include/imageproc.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "video/ImageNotFound.h"
 
 using std::string;
 using std::runtime_error;
-
-extern Logger * logger;
 
 /**
  * Constructor loads a dune2 shpfile.
@@ -50,7 +48,7 @@ Dune2Image::Dune2Image(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
     imgfile = VFSUtils::VFS_Open(fname);
     if (imgfile == 0) 
     {
-        logger->error(" File \"%s\" not found.\n", fname);
+        Logger::getInstance()->Error("File '" + string(fname) + "' not found.");
         shpdata = 0;
         throw ImageNotFound("File \"" + string(fname) + "\" not found.");
     }
@@ -149,8 +147,8 @@ Uint32 Dune2Image::getD2Header(Uint16 imgnum)
     imgs = shpdata[0] + (shpdata[0+1] << 8);
 
     if (imgnum >= imgs) {
-        logger->error("%s: getD2Header called with invalid param: %i (>= %i)\n",
-                name.c_str(), imgnum, imgs);
+        Logger::getInstance()->Error("%s: getD2Header called with invalid param: %i (>= %i)\n");//,
+                //name.c_str(), imgnum, imgs);
         return 0;
     }
 

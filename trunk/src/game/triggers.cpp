@@ -21,7 +21,7 @@
 #include <cstring>
 #include <string>
 
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "misc/config.h"
 #include "audio/SoundEngine.h"
 #include "CnCMap.h"
@@ -45,7 +45,6 @@ namespace pc {
     extern ConfigType Config;
     extern SoundEngine* sfxeng;
 }
-extern Logger * logger;
 
 /** Global variables for triggers */
 bool GlobalVar[100];
@@ -348,13 +347,12 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
 	RA_Tiggers* AssociatedTrigger = 0;
 	//int			value = 0;
 	
-	logger->debug("HandleTriggers with event=%s param=%d\n", 
-			getTriggerEventNameByNumber(Event).c_str(), 
-			param);
+	Logger::getInstance()->Debug(__FILE__, __LINE__, "HandleTriggers with event = "
+        + getTriggerEventNameByNumber(Event) + " param = "); //param);
 	
 	// Check if there are someone behind this trigger :)
     if (UnitOrStructure == 0){
-    	logger->warning("%s line %i: No structure defined ! \n", __FILE__, __LINE__);
+    	Logger::getInstance()->Warning("%s line %i: No structure defined !");
         return;
     }
     
@@ -365,7 +363,7 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
     if (AssociatedTriggerName == "None"){
         return;
     }
-    logger->debug("Handle trigger [%s]\n", AssociatedTriggerName.c_str());
+    Logger::getInstance()->Debug("Handle trigger [" + AssociatedTriggerName + "]");
     
     //
     // Find the associated trigger in the map
@@ -409,14 +407,14 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
     {
         // Only trigger event 1 must be true
         case 0:
-        	logger->debug("case 0\n");
+            Logger::getInstance()->Debug("case 0\n");
             if (CheckEvent(AssociatedTrigger->trigger1.event,
             			   AssociatedTrigger->trigger1.param1,
             			   AssociatedTrigger->trigger1.param2,
             			   Event,
             			   param) == true)
             {
-            	logger->debug("EVENT CHECK IS OK\n");
+            	Logger::getInstance()->Debug("EVENT CHECK IS OK\n");
             	// Set that Trigger is executed
             	AssociatedTrigger->hasexecuted = true;
             	
@@ -433,7 +431,7 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
         // Triggger event one and two must be true
         //
         case 1:
-        	logger->debug("case 1\n");
+        	Logger::getInstance()->Debug("case 1\n");
         	if ((CheckEvent(AssociatedTrigger->trigger1.event,
         				   AssociatedTrigger->trigger1.param1,
         				   AssociatedTrigger->trigger1.param2,
@@ -472,7 +470,7 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
         	break;
         // Either the first or the second trigger event must be true (activate all associated action on trigger1 or trigger2)
         case 2:
-        	logger->debug("case 2\n");
+        	Logger::getInstance()->Debug("case 2\n");
         	            
         	/*
             if (AssociatedTrigger->trigger1.event == Event){
@@ -490,7 +488,7 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
             break;
         // Either the first or the second trigger event must be true (activate action 1 for trigger1, activate action2 for trigger2)
         case 3:
-        	logger->debug("case 3\n");
+        	Logger::getInstance()->Debug("case 3\n");
         	            
         	/*
             if (AssociatedTrigger->trigger1.event == Event){
@@ -574,7 +572,7 @@ void HandleGlobalTrigger(int Event, int value)
 							value))
 						continue;
 				
-				logger->debug("TRIG [%s] Event check ok \n", Trigger->name.c_str());
+				Logger::getInstance()->Debug("TRIG [" + Trigger->name + "] Event check ok");
 				Trigger->hasexecuted = true;
 										
 				ExecuteTriggerAction(Trigger->action1);
@@ -764,26 +762,26 @@ void ExecuteTriggerAction(TriggerAction* action)
 		return;
 	}
 	*/
-	if (action == 0) {
-		logger->error("action = NULL\n!!!!");
-	}
-	//printf("TRIGGER->action : %d\n", action->getAction());
-	
+	if (NULL == action) {
+        Logger::getInstance()->Error("action = NULL.");
+    }
+    //printf("TRIGGER->action : %d\n", action->getAction());
+
     switch (action->getAction())
     {
         case TRIGGER_ACTION_NO_ACTION:
-        	logger->error ("%s line %i: ***TRIGGER_ACTION_NO_ACTION***\n", __FILE__, __LINE__);
+        	Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_NO_ACTION***\n");
         	action->execute();
         	break;
         case TRIGGER_ACTION_WINNER_IS:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_WINNER_IS***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_WINNER_IS***\n");
             break;
         case TRIGGER_ACTION_LOSER_IS:
         {
         	RawTriggerAction* actTrig = 0;
         	actTrig = dynamic_cast<RawTriggerAction*>(action);
         	
-        	logger->error ("%s line %i: ***TRIGGER_ACTION_LOSER_IS = %d ***\n", __FILE__, __LINE__, actTrig->getParam3());
+        	//Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_LOSER_IS = %d ***\n", __FILE__, __LINE__, actTrig->getParam3());
         	
         	unsigned int numPlayer = p::ccmap->getPlayerPool()->getPlayerNumByHouseNum(actTrig->getParam3());
         	Player* thePlayer = p::ccmap->getPlayerPool()->getPlayer(numPlayer);
@@ -794,16 +792,16 @@ void ExecuteTriggerAction(TriggerAction* action)
         	break;
         }
         case TRIGGER_ACTION_PRODUCTION_BEGINS:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_PRODUCTION_BEGINS***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_PRODUCTION_BEGINS***\n");
             break;
         case TRIGGER_ACTION_CREATE_TEAM:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_CREATE_TEAM***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_CREATE_TEAM***\n");
             break;
         case TRIGGER_ACTION_DESTROY_TEAM:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_DESTROY_TEAM***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_DESTROY_TEAM***\n");
             break;
         case TRIGGER_ACTION_ALL_TO_HUNT:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_ALL_TO_HUNT***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_ALL_TO_HUNT***\n");
             break;
         case TRIGGER_ACTION_REINFORCEMENTS:
         	{
@@ -817,7 +815,7 @@ void ExecuteTriggerAction(TriggerAction* action)
         		Team = p::ccmap->getTeamtypeByNumb(TeamNr);
         		if (Team != NULL)
         		{
-        			logger->warning ("Reinforcement team = %s\n", Team->tname.c_str());
+        			Logger::getInstance()->Warning("Reinforcement team = " + Team->tname);
         			p::uspool->createReinforcements(Team);
         		}
         		// Play the reinforcements have arrived tune
@@ -825,43 +823,43 @@ void ExecuteTriggerAction(TriggerAction* action)
 			}
         	break;            
         case TRIGGER_ACTION_DROP_ZONE_FLARE:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_DROP_ZONE_FLARE***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_DROP_ZONE_FLARE***\n");
             break;
         case TRIGGER_ACTION_FIRE_SALE:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_FIRE_SALE***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_FIRE_SALE***\n");
             break;
         case TRIGGER_ACTION_PLAY_MOVIE:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_PLAY_MOVIE***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_PLAY_MOVIE***\n");
             break;
         case TRIGGER_ACTION_TEXT:
         	// Log it
-        	logger->error ("%s line %i: ***TRIGGER_ACTION_TEXT***\n", __FILE__, __LINE__);
+        	Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_TEXT***\n");
         	// Execute the action
         	action->execute();
             break;
         case TRIGGER_ACTION_DESTROY_TRIGGER:
-            logger->error ("%s line %i: ***RIGGER_ACTION_DESTROY_TRIGGER***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***RIGGER_ACTION_DESTROY_TRIGGER***\n");
             break;
         case TRIGGER_ACTION_AUTOCREATE_BEGINS:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_AUTOCREATE_BEGINS***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_AUTOCREATE_BEGINS***\n");
             break;
         case TRIGGER_ACTION_ALLOW_WIN:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_ALLOW_WIN***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_ALLOW_WIN***\n");
             break;
         case TRIGGER_ACTION_REVEAL_MAP:
-        	//logger->error ("%s line %i: ***TRIGGER_ACTION_REVEAL_MAP***\n", __FILE__, __LINE__);
+        	//Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_REVEAL_MAP***\n", __FILE__, __LINE__);
         	//ppool->getLPlayer()->revealAroundWaypoint(Uint32 Waypoint);
         	p::ccmap->getPlayerPool()->getLPlayer()->setVisBuild(Player::SOB_SIGHT, true);
         	break;
         case TRIGGER_ACTION_REVEAL_AROUND_WAYPOINT:
         {
-        	logger->error ("%s line %i: ***TRIGGER_ACTION_REVEAL_AROUND_WAYPOINT***\n", __FILE__, __LINE__);
+        	Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_REVEAL_AROUND_WAYPOINT***\n");
         	        	
         	// The action to execute
         	RawTriggerAction* actionTrig = 0;
         	actionTrig = dynamic_cast<RawTriggerAction*>(action);
         	int Waypoint = actionTrig->getParam3();
-        	logger->error ("%s line %i: ***TRIGGER_ACTION_REVEAL_AROUND_WAYPOINT***, waypoint1 == %u\n", __FILE__, __LINE__, Waypoint);
+        	Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_REVEAL_AROUND_WAYPOINT***, waypoint1 == %u\n");
         	p::ccmap->getPlayerPool()->getLPlayer()->revealAroundWaypoint(Waypoint);
         	break;
         }
@@ -875,20 +873,20 @@ void ExecuteTriggerAction(TriggerAction* action)
         	 * 			Waypoint = Trigger->action2->param3;
         	 * 		}
         	 * 		p::ccmap->getPlayerPool()->getLPlayer()->revealAroundWaypoint(Waypoint);*/
-        	logger->error ("%s line %i: ***TRIGGER_ACTION_REVEAL_ZONE_OF_WAYPOINT***\n", __FILE__, __LINE__);
+        	Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_REVEAL_ZONE_OF_WAYPOINT***\n");
         	break;
         case TRIGGER_ACTION_PLAY_SOUND:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_PLAY_SOUND***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_PLAY_SOUND***\n");
             break;
         case TRIGGER_ACTION_PLAY_MUSIC:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_PLAY_MUSIC***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_PLAY_MUSIC***\n");
             break;
         case TRIGGER_ACTION_PLAY_SPEECH:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_PLAY_SPEECH***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_PLAY_SPEECH***\n");
             break;
         case TRIGGER_ACTION_FORCE_TRIGGER:
         {
-        	logger->error("%s line %i: ***TRIGGER_ACTION_FORCE_TRIGGER***\n", __FILE__, __LINE__);
+        	Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_FORCE_TRIGGER***\n");
         	
         	RawTriggerAction* actTrig = 0;
         	actTrig = dynamic_cast<RawTriggerAction*>(action);
@@ -906,46 +904,46 @@ void ExecuteTriggerAction(TriggerAction* action)
         	if (Trig->actions == 1){
         		ExecuteTriggerAction(Trig->action2);
         	}
-            logger->warning("%s line %i: Force trigger %s\n", __FILE__, __LINE__, Trig->name.c_str());
+            //logger->warning("%s line %i: Force trigger %s\n", __FILE__, __LINE__, Trig->name.c_str());
             break;
         }
         case TRIGGER_ACTION_TIMER_START:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_TIMER_START***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_TIMER_START***\n");
             break;
         case TRIGGER_ACTION_TIMER_STOP:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_TIMER_STOP***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_TIMER_STOP***\n");
             break;
         case TRIGGER_ACTION_TIMER_EXTEND:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_TIMER_EXTEND***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_TIMER_EXTEND***\n");
             break;
         case TRIGGER_ACTION_TIMER_SHORTEN:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_TIMER_SHORTEN***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_TIMER_SHORTEN***\n");
             break;
         case TRIGGER_ACTION_TIMER_SET:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_TIMER_SET***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_TIMER_SET***\n");
             break;
         case TRIGGER_ACTION_GLOBAL_SET:
         {
-        	// Log it
-        	logger->debug("%s line %i: ***TRIGGER_ACTION_GLOBAL_SET***\n", __FILE__, __LINE__);
-        	// Executed the action
-        	action->execute();        	
+            // Log it
+            Logger::getInstance()->Debug(__FILE__, __LINE__, "***TRIGGER_ACTION_GLOBAL_SET***");
+            // Executed the action
+            action->execute();
             break;
         }
         // Trigger to clear a global variable
         case TRIGGER_ACTION_GLOBAL_CLEAR:
         {
-        	// Log it
-        	logger->debug("%s line %i: ***TRIGGER_ACTION_GLOBAL_CLEAR***\n", __FILE__, __LINE__);
-        	// Execute the action
-        	action->execute();
-        	break;
+            // Log it
+            Logger::getInstance()->Debug(__FILE__, __LINE__, "***TRIGGER_ACTION_GLOBAL_CLEAR***");
+            // Execute the action
+            action->execute();
+            break;
         }
         case TRIGGER_ACTION_AUTO_BASE_BUILDING:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_AUTO_BASE_BUILDING***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_AUTO_BASE_BUILDING***\n");
             break;
         case TRIGGER_ACTION_GROW_SHROUD_ONE_STEP:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_GROW_SHROUD_ONE_STEP***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_GROW_SHROUD_ONE_STEP***\n");
             break;
         case TRIGGER_ACTION_DESTROY_BUILDING:
         	//break;
@@ -968,22 +966,22 @@ void ExecuteTriggerAction(TriggerAction* action)
 					str->applyDamage(255, NULL, NULL);
 				}
 			}*/
-            //logger->error ("%s line %i: **********************Unhandled trigger action**********************\n", __FILE__, __LINE__);
+            //Logger::getInstance()->Error("%s line %i: **********************Unhandled trigger action**********************\n", __FILE__, __LINE__);
             break;
         case TRIGGER_ACTION_ADD_1TIME_SPEC_WEAPON:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_ADD_1TIME_SPEC_WEAPON***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_ADD_1TIME_SPEC_WEAPON***\n");
             break;
         case TRIGGER_ACTION_ADD_SPEC_WEAPON:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_ADD_SPEC_WEAPON***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_ADD_SPEC_WEAPON***\n");
             break;
         case TRIGGER_ACTION_PREFERRED_TARGET:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_PREFERRED_TARGET****\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_PREFERRED_TARGET****\n");
             break;
         case TRIGGER_ACTION_LAUNCH_NUKES:
-            logger->error ("%s line %i: ***TRIGGER_ACTION_LAUNCH_NUKES***\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: ***TRIGGER_ACTION_LAUNCH_NUKES***\n");
             break;
         default:
-            logger->error ("%s line %i: BIG ERROR unkown trigger\n", __FILE__, __LINE__);
+            Logger::getInstance()->Error("%s line %i: BIG ERROR unkown trigger\n");
             break;
     }
 }

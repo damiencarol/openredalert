@@ -30,7 +30,7 @@
 #include "game/MissionData.h"
 #include "game/CnCMap.h"
 #include "game/Dispatcher.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "game/PlayerPool.h"
 #include "audio/SoundEngine.h"
 #include "game/Unit.hpp"
@@ -74,7 +74,6 @@ namespace pc {
     extern SoundEngine* sfxeng;
 
 }
-extern Logger * logger;
 extern bool GlobalVar[100];
 
 /**
@@ -107,25 +106,27 @@ Input::Input(Uint16 screenwidth, Uint16 screenheight, SDL_Rect *maparea) :
 	// Add a message for Single player game (Missions)
 	if (pc::Config.gamemode == GAME_MODE_SINGLE_PLAYER)
 	{
-		logger->gameMsg("MISSIONS ARE NOT FULLY IMPLEMENTED YOU CAN CHEAT NOW.");
-		logger->gameMsg("PRESS F9 TO GO TO THE NEXT MISSION.");		
+        // TODO : Render in-game message
+		//logger->gameMsg("MISSIONS ARE NOT FULLY IMPLEMENTED YOU CAN CHEAT NOW.");
+		//logger->gameMsg("PRESS F9 TO GO TO THE NEXT MISSION.");
 	}
 	
 	
 	
+	// TODO : Render in-game message
 	//logger->gameMsg("LOCAL PLAYER = %s.", lplayer->getName().c_str());
-	logger->gameMsg("Input PLAYER = %s.", lplayer->getName().c_str());
-	logger->gameMsg("map local PLAYER = %s.", p::ccmap->getMissionData().player.c_str());
-		
-		
-	
+	//logger->gameMsg("Input PLAYER = %s.", lplayer->getName().c_str());
+	//logger->gameMsg("map local PLAYER = %s.", p::ccmap->getMissionData().player.c_str());
+
+
 
 
 
     if (lplayer->isDefeated()) {
-        logger->gameMsg("%s line %i: TEMPORARY FEATURE: Free MCV because of no initial", __FILE__, __LINE__);
-        logger->gameMsg("units or structures.  Fixing involves adding triggers.");
-        logger->gameMsg("Don't right click :-)");
+        // TODO : Render in-game message
+        //logger->gameMsg("%s line %i: TEMPORARY FEATURE: Free MCV because of no initial", __FILE__, __LINE__);
+        //logger->gameMsg("units or structures.  Fixing involves adding triggers.");
+        //logger->gameMsg("Don't right click :-)");
         currentaction = a_place;
         placeposvalid = true;
         temporary_place_unit = true;
@@ -275,10 +276,12 @@ void Input::handle()
                     break;
                 }
                 if (lplayer->allyWithPlayer(tplayer)) {
-                    logger->gameMsg("%s allied with player %s",lplayer->getName().c_str(),tplayer->getName().c_str());
+                    // TODO : Render in-game message
+                    //logger->gameMsg("%s allied with player %s",lplayer->getName().c_str(),tplayer->getName().c_str());
                 } else {
                     if (lplayer->unallyWithPlayer(tplayer)) {
-                        logger->gameMsg("%s declared war on player %s",lplayer->getName().c_str(),tplayer->getName().c_str());
+                        // TODO : Render in-game message
+                        //logger->gameMsg("%s declared war on player %s",lplayer->getName().c_str(),tplayer->getName().c_str());
                     } else {
                         // tried to unally with self
                     }
@@ -318,9 +321,11 @@ void Input::handle()
                     Uint8 groupnum = event.key.keysym.sym-48;
                     if (kbdmod == k_ctrl) {
                         if (selected->saveSelection(groupnum)) {
-                            logger->gameMsg("Saved group %i",groupnum);
+                            // TODO : Render in-game message
+                            //logger->gameMsg("Saved group %i",groupnum);
                         } else {
-                            logger->gameMsg("Not saved group %i",groupnum);
+                            // TODO : Render in-game message
+                            //logger->gameMsg("Not saved group %i",groupnum);
                         }
                     } else if (kbdmod != k_alt) { // shift or none
                         bool success;
@@ -330,7 +335,8 @@ void Input::handle()
                             success = selected->mergeSelection(groupnum);
                         }
                         if (success) {
-                            logger->gameMsg("Group %i selected",event.key.keysym.sym-48);
+                            // TODO : Render in-game message
+                            //logger->gameMsg("Group %i selected",event.key.keysym.sym-48);
                             Unit* tmpunit = selected->getRandomUnit();
                             if (tmpunit != 0) {
                                 UnitType* utype = static_cast<UnitType*>(tmpunit->getType());
@@ -357,10 +363,10 @@ void Input::handle()
                 	{
                 		if (selected->getStructure(0)->isBombing() == true)
                 		{
-                			logger->debug("Structure stop bombing\n");
+                			Logger::getInstance()->Debug("Structure stop bombing\n");
                 			selected->getStructure(0)->bombingDone();
                 		} else {
-                			logger->debug("Structure bombing !!!\n");
+                			Logger::getInstance()->Debug("Structure bombing !!!\n");
                 			selected->getStructure(0)->bomb();
                 			//Uint32 num = pc::imgcache->loadImage("fire1.shp");
                 			//new ExplosionAnim(1, selected->getStructure(0)->getPos(),
@@ -368,13 +374,13 @@ void Input::handle()
                 			//static_cast<Uint8>(p::ccmap->getMoveFlash()->getNumImg()), 0, 0);
                 		}
                 	} else {
-                		logger->debug("Structure 0 = NULL\n");
+                		Logger::getInstance()->Debug("Structure 0 = NULL\n");
                 	}
                 	break;
                 }
                 case SDLK_F7:
-                    logger->gameMsg("MARK @ %i",SDL_GetTicks());
-                    logger->debug("Mark placed at %i\n",SDL_GetTicks());
+                    //logger->gameMsg("MARK @ %i",SDL_GetTicks());
+                    Logger::getInstance()->Debug("Mark placed at %i\n");//,SDL_GetTicks());
                     break;
                 case SDLK_F8:
                     p::uspool->showMoves();
@@ -389,14 +395,14 @@ void Input::handle()
                 // Debug for blobals variables
                 case SDLK_F11:
                 	radarstat = 1;
-                	logger->gameMsg("radarstat = %i", radarstat);
+                	Logger::getInstance()->Debug("radarstat = %i");//, radarstat);
                     //GlobalVar[2]=1;
                 	//GlobalVar[3]=1;
                 	break;
                 // Debug for blobals variables
                 case SDLK_F12:
                 	radarstat = 2;
-                	logger->gameMsg("radarstat = %i", radarstat);
+                	Logger::getInstance()->Debug("radarstat = %i");//, radarstat);
                     //GlobalVar[2]=0;
                 	//GlobalVar[3]=0;
                 	break;
@@ -404,13 +410,13 @@ void Input::handle()
                 case SDLK_v:
                     if (!lplayer->canSeeAll()) {
                         lplayer->setVisBuild(Player::SOB_SIGHT, true);
-                        logger->gameMsg("Map revealed");
+                        //logger->gameMsg("Map revealed");
                     }
                     break;
                 case SDLK_c:
                     if (!lplayer->canBuildAny()) {
                         lplayer->setVisBuild(Player::SOB_BUILD, true);
-                        logger->gameMsg("Build (nearly) anywhere");
+                        //logger->gameMsg("Build (nearly) anywhere");
                     }
                     break;
                 case SDLK_b:
@@ -420,22 +426,22 @@ void Input::handle()
                         lplayer->enableBuildAll();
                         pc::sidebar->UpdateSidebar();
 			//printf ("%s line %i: update sidebar\n", __FILE__, __LINE__);
-                        logger->gameMsg("Prerequisites disabled");
+                        //logger->gameMsg("Prerequisites disabled");
                     }
                     break;
                 case SDLK_m:
                     if (!lplayer->hasInfMoney()) {
                         lplayer->enableInfMoney();
-                        logger->gameMsg("Money check disabled");
+                        //logger->gameMsg("Money check disabled");
                     }
                     break;
                 case SDLK_g:
                     if (SDL_WM_GrabInput(SDL_GRAB_QUERY) == SDL_GRAB_ON) {
                         SDL_WM_GrabInput(SDL_GRAB_OFF);
-                        logger->gameMsg("Mouse grab disabled");
+                        //logger->gameMsg("Mouse grab disabled");
                     } else {
                         SDL_WM_GrabInput(SDL_GRAB_ON);
-                        logger->gameMsg("Mouse grab enabled");
+                        //logger->gameMsg("Mouse grab enabled");
                     }
                     break;
                 default:
@@ -473,13 +479,12 @@ void Input::handle()
         case SDL_ACTIVEEVENT:
             if ((event.active.state & SDL_APPACTIVE)) {
                 if (event.active.gain == 1) {
-                    logger->error("%s line %i: focus restored\n", __FILE__, __LINE__);
+                    Logger::getInstance()->Error(__FILE__, __LINE__, "focus restored");
 
-                    /* Sometimes when the app is restored the video memory is
-                       lost, and then causes SDL_BlitSurface to return -2. To
-                       fix this we must flush all our SDL_Surfaces and reload
-                       them
-                    */
+                    // Sometimes when the app is restored the video memory is
+                    // lost, and then causes SDL_BlitSurface to return -2. To
+                    // fix this we must flush all our SDL_Surfaces and reload
+                    // them
 
                     //Clear the image cache of .shp files (units and structs)
                     pc::imgcache->flush();
@@ -497,7 +502,7 @@ void Input::handle()
                     pc::msg->refresh();
 
                 } else {
-                    logger->error("%s line %i: focus lost\n", __FILE__, __LINE__);
+                    Logger::getInstance()->Error("%s line %i: focus lost\n");
                 }
             }
             break;
@@ -559,7 +564,7 @@ void Input::handle()
 		pc::sidebar->UpdateSidebar();
 		break;
     default:
-        logger->error("BUG: unexpected value returned from PlayerPool::statRadar: %i\n", radarstat);
+        Logger::getInstance()->Error("BUG: unexpected value returned from PlayerPool::statRadar: %i\n");//, radarstat);
         break;
     }
 
@@ -796,7 +801,7 @@ void Input::clickMap(int mx, int my)
 			if (p::uspool->getStructureAt(pos) != 0)
 			{
 				selected->getUnit(0)->doRandTalk(TB_ack);
-				logger->debug("Infiltrate !!!\n");
+				Logger::getInstance()->Debug("Infiltrate !!!\n");
 				selected->getUnit(0)->Infiltrate(
 						p::uspool->getStructureAt(pos));
 				return;
@@ -1471,7 +1476,7 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
         } else if (BQ_CANCELLED == status) {
         	pc::sfxeng->PlaySound(pc::Config.BuildingCanceled);
         } else {
-            logger->error("Recieved an unknown status from stopBuilding: %i\n", status);
+            Logger::getInstance()->Error("Recieved an unknown status from stopBuilding: %i\n");//, status);
         }
         return;
     }
