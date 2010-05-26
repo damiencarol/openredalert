@@ -21,7 +21,6 @@
 #include "ActionEventQueue.h"
 #include "CnCMap.h"
 #include "misc/common.h"
-#include "include/Logger.h"
 #include "PlayerPool.h"
 #include "Unit.hpp"
 #include "UnitAndStructurePool.h"

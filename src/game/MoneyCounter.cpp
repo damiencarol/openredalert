@@ -21,7 +21,6 @@
 #include "audio/SoundEngine.h"
 #include "misc/config.h"
 #include "misc/common.h"
-#include "include/Logger.h"
 #include "Player.h"
 #include "PlayerPool.h"
 #include "ActionEventQueue.h"

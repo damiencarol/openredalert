@@ -25,7 +25,6 @@
 #include "include/fcnc_endian.h"
 #include "include/imageproc.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "video/ImageNotFound.h"
 #include "video/headerformats.h"
@@ -59,6 +58,9 @@ SHPBase::~SHPBase()
 	delete scaler;
 }
 
+/**
+ *
+ */
 void SHPBase::setPalette(SDL_Color *pal) 
 {
 	memcpy(palette[0], pal, 256*sizeof(SDL_Color));

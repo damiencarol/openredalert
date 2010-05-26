@@ -23,13 +23,11 @@
 
 #include "misc/common.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
 
 
 using std::cout;
 using std::endl;
 
-extern Logger *logger;
 
 ProjectileData::ProjectileData(){
 	// by defaut "none" indicates no image
@@ -216,79 +214,79 @@ void ProjectileData::setUnderWater(int underWater)
 
 ProjectileData* ProjectileData::loadProjectileData(INIFile * file, string name)
 {
-	ProjectileData* lProjectileData;
+    ProjectileData* lProjectileData;
 
-	// Create the ProjectileData object
-	lProjectileData = new ProjectileData();
-		
-	// AA = Can this weapon fire upon flying aircraft (def=no)?
-	lProjectileData->setAA(file->readYesNo(name.c_str(), "AA", 0));
-			
-	// AG = Can this weapon fire upon ground objects (def=yes)?
-	lProjectileData->setAG(file->readYesNo(name.c_str(), "AG", 1));
-	
-	// ASW = Is this an Anti-Submarine-Warfare projectile (def=no)?
-	lProjectileData->setASW(file->readYesNo(name.c_str(), "ASW", 0));
-	
-	// Animates = Does it animate [this means smoke puffs] (def=no)?
-	lProjectileData->setAnimates(file->readYesNo(name.c_str(), "Animates", 0));
-		
-	// Arcing = Does it have a ballistic trajectory (def=no)?
-	lProjectileData->setArcing(file->readYesNo(name.c_str(), "Arcing", 0));
-		
-	// Arm = arming delay (def=0)
-	lProjectileData->setArm(file->readInt(name.c_str(), "Arm", 0));
-	
-	// Degenerates = Does the bullet strength weaken as it travels (def=no)?
-	lProjectileData->setDegenerates(file->readYesNo(name.c_str(), "Degenerates", 0));
-	
-	// Dropping = Does it fall from a starting height (def=no)?
-	lProjectileData->setDropping(file->readYesNo(name.c_str(), "Dropping", 0));
-		
-	// Frames = number of image frames for animation purposes (def=1)
-	lProjectileData->setFrames(file->readInt(name.c_str(), "Frames", 1));
-		
-	// Gigundo = Is the projectile larger than normal (def=no)?
-	lProjectileData->setGigundo(file->readYesNo(name.c_str(), "Gigundo", 0));
-		
-	// High = Can it fly over walls (def=no)?
-	lProjectileData->setHigh(file->readYesNo(name.c_str(), "High", 0));
-		
-	// Image = image to use during flight
-	lProjectileData->setImage(file->readString(name.c_str(), "Image", "none"));
-	
-	// Inaccurate = Is it inherently inaccurate (def=no)?
-	lProjectileData->setInaccurate(file->readYesNo(name.c_str(), "Inaccurate", 0));
+    // Create the ProjectileData object
+    lProjectileData = new ProjectileData();
+        
+    // AA = Can this weapon fire upon flying aircraft (def=no)?
+    lProjectileData->setAA(file->readYesNo(name.c_str(), "AA", 0));
+            
+    // AG = Can this weapon fire upon ground objects (def=yes)?
+    lProjectileData->setAG(file->readYesNo(name.c_str(), "AG", 1));
+    
+    // ASW = Is this an Anti-Submarine-Warfare projectile (def=no)?
+    lProjectileData->setASW(file->readYesNo(name.c_str(), "ASW", 0));
+    
+    // Animates = Does it animate [this means smoke puffs] (def=no)?
+    lProjectileData->setAnimates(file->readYesNo(name.c_str(), "Animates", 0));
+        
+    // Arcing = Does it have a ballistic trajectory (def=no)?
+    lProjectileData->setArcing(file->readYesNo(name.c_str(), "Arcing", 0));
+        
+    // Arm = arming delay (def=0)
+    lProjectileData->setArm(file->readInt(name.c_str(), "Arm", 0));
+    
+    // Degenerates = Does the bullet strength weaken as it travels (def=no)?
+    lProjectileData->setDegenerates(file->readYesNo(name.c_str(), "Degenerates", 0));
+    
+    // Dropping = Does it fall from a starting height (def=no)?
+    lProjectileData->setDropping(file->readYesNo(name.c_str(), "Dropping", 0));
+        
+    // Frames = number of image frames for animation purposes (def=1)
+    lProjectileData->setFrames(file->readInt(name.c_str(), "Frames", 1));
+        
+    // Gigundo = Is the projectile larger than normal (def=no)?
+    lProjectileData->setGigundo(file->readYesNo(name.c_str(), "Gigundo", 0));
+        
+    // High = Can it fly over walls (def=no)?
+    lProjectileData->setHigh(file->readYesNo(name.c_str(), "High", 0));
+    
+    // Image = image to use during flight
+    lProjectileData->setImage(file->readString(name.c_str(), "Image", "none"));
+    
+    // Inaccurate = Is it inherently inaccurate (def=no)?
+    lProjectileData->setInaccurate(file->readYesNo(name.c_str(), "Inaccurate", 0));
 
-	// Inviso = Is the projectile invisible as it travels (def=no)?
-	lProjectileData->setInviso(file->readYesNo(name.c_str(), "Inviso", 0));
+    // Inviso = Is the projectile invisible as it travels (def=no)?
+    lProjectileData->setInviso(file->readYesNo(name.c_str(), "Inviso", 0));
 
-	// Parachuted = Equipped with a parachute for dropping from plane (def=no)?
-	lProjectileData->setParachuted(file->readYesNo(name.c_str(), "Parachuted", 0));
+    // Parachuted = Equipped with a parachute for dropping from plane (def=no)?
+    lProjectileData->setParachuted(file->readYesNo(name.c_str(), "Parachuted", 0));
 
-	// Proximity = Does it blow up when near its target (def=no)?
-	lProjectileData->setProximity(file->readYesNo(name.c_str(), "Proximity", 0));
+    // Proximity = Does it blow up when near its target (def=no)?
+    lProjectileData->setProximity(file->readYesNo(name.c_str(), "Proximity", 0));
 
-	// ROT = Rate Of Turn [non zero implies homing] (def=0)
-	lProjectileData->setROT(file->readInt(name.c_str(), "ROT", 0));
+    // ROT = Rate Of Turn [non zero implies homing] (def=0)
+    lProjectileData->setROT(file->readInt(name.c_str(), "ROT", 0));
 
-	// Ranged = Can it run out of fuel (def=no)?
-	lProjectileData->setRanged(file->readYesNo(name.c_str(), "Ranged", 0));
+    // Ranged = Can it run out of fuel (def=no)?
+    lProjectileData->setRanged(file->readYesNo(name.c_str(), "Ranged", 0));
 
-	// Rotates = Does the projectile have rotation specific imagery (def=no)?
-	lProjectileData->setRotates(file->readYesNo(name.c_str(), "Rotates", 0));
+    // Rotates = Does the projectile have rotation specific imagery (def=no)?
+    lProjectileData->setRotates(file->readYesNo(name.c_str(), "Rotates", 0));
 
-	// Shadow = If High, does this bullet need to have a shadow drawn? (def = yes)
-	lProjectileData->setShadow(file->readYesNo(name.c_str(), "Shadow", 1));
+    // Shadow = If High, does this bullet need to have a shadow drawn? (def = yes)
+    lProjectileData->setShadow(file->readYesNo(name.c_str(), "Shadow", 1));
 
-	// Translucent = Are translucent colors used in artwork (def=no)?
-	lProjectileData->setTranslucent(file->readYesNo(name.c_str(), "Translucent", 0));
+    // Translucent = Are translucent colors used in artwork (def=no)?
+    lProjectileData->setTranslucent(file->readYesNo(name.c_str(), "Translucent", 0));
 
-	// UnderWater = Does the projectile travel under water?
-	lProjectileData->setUnderWater(file->readYesNo(name.c_str(), "UnderWater", 0));
+    // UnderWater = Does the projectile travel under water?
+    lProjectileData->setUnderWater(file->readYesNo(name.c_str(), "UnderWater", 0));
 
-	// Returns the constructed object
-	return lProjectileData;
+    // Returns the constructed object
+    return lProjectileData;
 }
 
 /**

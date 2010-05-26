@@ -23,11 +23,11 @@
 
 #include "SDL/SDL_video.h"
 
+#include "Logger.hpp"
 #include "misc/Compression.hpp"
 #include "include/fcnc_endian.h"
 #include "include/imageproc.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "headerformats.h"
@@ -37,8 +37,6 @@
 using std::runtime_error;
 using std::string;
 
-extern Logger * logger;
-
 /**
  * Constructor, loads a shpfile.
  *
@@ -47,24 +45,23 @@ extern Logger * logger;
  */
 SHPImage::SHPImage(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
 {
-    int i; // variable use for loop
-    int j; // variable use for loop
-    VFile *imgfile; // link to the file in mix archives
-
     // Create the header
     lnkHeader = new SHPHeader();
 
     // Set to 0 before reading of the header
     lnkHeader->NumImages = 0;
 
-	// Open the file in archive
-    imgfile = VFSUtils::VFS_Open(fname);
+    // Open the file in archive
+    string filenameUpperCase = string(fname);
+    // explicit cast needed to resolve ambiguity
+    std::transform(filenameUpperCase.begin(), filenameUpperCase.end(), filenameUpperCase.begin(), (int(*)(int)) std::toupper);
+    VFile *imgfile = VFSUtils::VFS_Open(filenameUpperCase.c_str()); // link to the file in mix archives
     // Check that file is loaded
     if (imgfile == NULL) {
     	// Log it
-    	logger->error("failed to load %s (SHPImage)\n", fname);
+    	Logger::getInstance()->Error(__FILE__, __LINE__, "failed to load '" + filenameUpperCase + "' (SHPImage)");
     	// Throw an Exception
-        throw ImageNotFound("failed to load (SHPImage) " + string(fname));
+        throw ImageNotFound("failed to load (SHPImage) " + filenameUpperCase);
     }
 
     // Allocate data for the data
@@ -87,8 +84,8 @@ SHPImage::SHPImage(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
     lnkHeader->RefFormat = new Uint8[lnkHeader->NumImages + 2];
 
     // "Offsets"
-    j = 14;
-    for (i = 0; i < lnkHeader->NumImages + 2; i++)
+    unsigned int j = 14;
+    for (unsigned int i = 0; i < lnkHeader->NumImages + 2; i++)
     {
         lnkHeader->Offset[i] = shpdata[j] + (shpdata[j+1] << 8) + (shpdata[j+2] << 16) + (0 << 24);
         j += 3;
@@ -147,7 +144,7 @@ void SHPImage::getImage(Uint16 imgnum, SDL_Surface **img, SDL_Surface **shadow, 
 
 	if (imgnum >= lnkHeader->NumImages)
 	{
-		logger->error("%s line %i: Error want imgnum %i but only %i images availeble, image name = %s\n", __FILE__, __LINE__, imgnum, lnkHeader->NumImages, name.c_str());
+		Logger::getInstance()->Error("%s line %i: Error want imgnum %i but only %i images availeble, image name = %s\n");//, __FILE__, __LINE__, imgnum, lnkHeader->NumImages, name.c_str());
 		*img = 0;
 		*shadow = 0;
 		return;
@@ -345,7 +342,7 @@ void SHPImage::DecodeSprite(Uint8 *imgdst, Uint16 imgnum)
 	// Check if imgnum to decompress is <= images in SHP
     if (imgnum >= lnkHeader->NumImages)
     {
-        logger->error("%s: Invalid SHP imagenumber (%i >= %i)\n", name.c_str(), imgnum, lnkHeader->NumImages);
+        Logger::getInstance()->Error("%s: Invalid SHP imagenumber (%i >= %i)\n");//, name.c_str(), imgnum, lnkHeader->NumImages);
         return;
     }
 
@@ -380,7 +377,7 @@ void SHPImage::DecodeSprite(Uint8 *imgdst, Uint16 imgnum)
             Compression::decode40(imgsrc, imgdst);
             break;
         default:
-            logger->error("Possible memory corruption detected: unknown lnkHeader format in %s at frame %i/%i.\n", name.c_str(), imgnum, lnkHeader->NumImages);
+            Logger::getInstance()->Error("Possible memory corruption detected: unknown lnkHeader format in %s at frame %i/%i.\n");//, name.c_str(), imgnum, lnkHeader->NumImages);
             return;
     }
     delete[] imgsrc;

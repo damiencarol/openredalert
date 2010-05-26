@@ -19,13 +19,12 @@
 
 #include <cmath>
 
+#include "Logger.hpp"
 #include "anim_nfo.h"
 #include "Structure.h"
-#include "include/Logger.h"
 #include "UnitAndStructurePool.h"
 #include "UnitType.h"
 
-extern Logger * logger;
 namespace p {
 	extern UnitAndStructurePool* uspool;
 }
@@ -73,7 +72,8 @@ void DoorAnimEvent::anim_func(anim_nfo* data)
                     // (256 = FULLHEALTH)
                     p::uspool->createUnit(strct->CreateUnitType, pos, subpos, strct->CreateUnitOwner, 255, 16, 0, "None");
                 } else {
-                    logger->error("%s line %i: No free position for %s\n", __FILE__, __LINE__, strct->CreateUnitType->getName().c_str());
+                    Logger::getInstance()->Error(__FILE__, __LINE__, 
+                        "No free position for" + strct->CreateUnitType->getName());
                 }
             }
             

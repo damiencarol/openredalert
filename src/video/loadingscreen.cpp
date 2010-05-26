@@ -21,7 +21,7 @@
 
 #include "video/CPSImage.h"
 #include "video/GraphicsEngine.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "CPSImage.h"
 #include "video/ImageNotFound.h"
 #include "video/MessagePool.h"
@@ -32,7 +32,6 @@ namespace pc {
     extern GraphicsEngine * gfxeng;
     extern MessagePool* msg;
 }
-extern Logger * logger;
 
 
 /** @todo Abstract away the dependencies on video stuff so we can use
@@ -47,7 +46,7 @@ LoadingScreen::LoadingScreen()
         logo = new CPSImage(string("title.cps"), 1);
         pc::msg->setWidth(logo->getImage()->w / 4);
     } catch (ImageNotFound&) {
-        logger->error("Couldn't load startup graphic\n");
+        Logger::getInstance()->Error("Couldn't load startup graphic\n");
         logo = 0;
     }
 //    renderThread = SDL_CreateThread(LoadingScreen::runRenderThread, this);
@@ -57,13 +56,13 @@ LoadingScreen::~LoadingScreen()
 {
 //    int stat;
     while(SDL_mutexP(lsmutex)==-1) {
-        logger->warning("Couldn't lock mutex\n");
+        Logger::getInstance()->Warning("Couldn't lock mutex\n");
     }
 
     done = true;
 
     while(SDL_mutexV(lsmutex)==-1) {
-        logger->warning("Couldn't unlock mutex\n");
+        Logger::getInstance()->Warning("Couldn't unlock mutex\n");
     }
 //    SDL_WaitThread(renderThread, &stat);
     SDL_DestroyMutex(lsmutex);
@@ -74,11 +73,11 @@ LoadingScreen::~LoadingScreen()
 void LoadingScreen::setCurrentTask(const string& task)
 {
     while(SDL_mutexP(lsmutex)==-1) {
-        logger->warning("Couldn't lock mutex\n");
+        Logger::getInstance()->Warning("Couldn't lock mutex\n");
     }
     task_ = task;
     while(SDL_mutexV(lsmutex)==-1) {
-        logger->warning("Couldn't unlock mutex\n");
+        Logger::getInstance()->Warning("Couldn't unlock mutex\n");
     }
 }
 int LoadingScreen::runRenderThread(void* inst)
@@ -89,7 +88,7 @@ int LoadingScreen::runRenderThread(void* inst)
 
     while( !isDone ) {
         while(SDL_mutexP(instance->lsmutex)==-1) {
-            logger->warning("Couldn't lock mutex\n");
+            Logger::getInstance()->Warning("Couldn't lock mutex\n");
         }
 
         //render the frame here
@@ -102,7 +101,7 @@ int LoadingScreen::runRenderThread(void* inst)
         isDone = instance->done;
 
         while(SDL_mutexV(instance->lsmutex)==-1) {
-            logger->warning("Couldn't unlock mutex\n");
+            Logger::getInstance()->Warning("Couldn't unlock mutex\n");
         }
         // Limit fps to ~10
         while ( SDL_PollEvent(&event) ) {}

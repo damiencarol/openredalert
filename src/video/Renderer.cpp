@@ -22,10 +22,8 @@
 
 #include "include/sdllayer.h"
 #include "misc/config.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "VideoError.h"
-
-extern Logger * logger;
 
 /**
  * Constructor
@@ -84,7 +82,7 @@ void Renderer::InitializeScreen()
 	screen = SDL_SetVideoMode(width, height, config.bpp, config.videoflags);
 	if (screen == 0)
 	{
-		logger->error("Unable to set %dx%d video: %s\n", width, height,	SDL_GetError());
+		Logger::getInstance()->Error("Unable to set %dx%d video: %s\n");//, width, height,	SDL_GetError());
 		throw VideoError("Unable to set video mode");
 	}
 }

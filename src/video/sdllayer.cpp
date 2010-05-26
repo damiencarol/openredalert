@@ -17,12 +17,10 @@
 
 #include "include/sdllayer.h"
 
-#include "include/Logger.h"
+#include "Logger.hpp"
 
 //#define _15BIT(r,g,b) (((r&248)<<7) + ((g&248)<<2) + (b>>3))
 //#define _16BIT(r,g,b) (((r&248)<<8) + ((g&252)<<3) + (b>>3))
-
-extern Logger * logger;
 
 /**
  * Get a pixel from a SDL surface
@@ -82,7 +80,7 @@ void SDLLayer::get_pixel ( SDL_Surface* Surface, Uint32 &color, Uint32 x, Uint32
 			break;
 
 		default:
-			logger->error("Error: Unknown color depth in surface\n");
+			Logger::getInstance()->Error("Error: Unknown color depth in surface\n");
 	}
 //	return color;
 }

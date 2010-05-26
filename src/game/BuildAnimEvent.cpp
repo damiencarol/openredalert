@@ -29,8 +29,8 @@
 #include "StructureType.h"
 
 namespace p {
-	extern UnitAndStructurePool* uspool;
-	extern CnCMap* ccmap;
+    extern UnitAndStructurePool* uspool;
+    extern CnCMap* ccmap;
 }
 
 /**

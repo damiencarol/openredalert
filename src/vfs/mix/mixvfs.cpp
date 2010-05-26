@@ -22,7 +22,7 @@
 
 #include "blowfish.h"
 #include "ws-key.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "include/fcnc_endian.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
@@ -34,15 +34,16 @@ using std::min;
 
 using namespace MIXPriv;
 
-extern Logger * logger;
-
+/**
+ *
+ */
 MIXFiles::MIXFiles()
 {
 }
 
 MIXFiles::~MIXFiles()
 {
-	// Unload all MIX archives
+    // Unload all MIX archives
     unloadArchives();
 }
 
@@ -72,7 +73,7 @@ bool MIXFiles::loadArchive(const char *fname)
 void MIXFiles::unloadArchives() {
     Uint32 i;
     for (i = 0; i < mixfiles.size(); ++i) {
-    	VFSUtils::VFS_Close(mixfiles[i]);
+        VFSUtils::VFS_Close(mixfiles[i]);
     }
     mixfiles.resize(0);
     mixheaders.clear();
@@ -103,7 +104,7 @@ Uint32 MIXFiles::getFile(const char *fname)
 
     openfiles_t::const_iterator ofe = openfiles.end();
     do {
-    	// @todo Rewrite this loop.
+        // @todo Rewrite this loop.
         of = openfiles.find(id++);
     } while (ofe != of);
     id--;
@@ -118,7 +119,7 @@ Uint32 MIXFiles::getFile(const char *fname)
  */
 void MIXFiles::releaseFile(Uint32 file)
 {
-	// Remove 'file' in the archive
+    // Remove 'file' in the archive
     openfiles.erase(file);
 }
 
@@ -403,7 +404,7 @@ char* MIXFiles::readLine(Uint32 file, char *databuf, Uint32 buflen)
 
     numRead = min(buflen-1, me.size-pos);
     if( numRead == 0 ) {
-        return NULL;			
+        return NULL;
     }
     retval = mixfiles[me.filenum]->getLine(databuf, numRead+1);
     openfiles[file].pos += strlen(databuf);
@@ -462,5 +463,5 @@ const char* MIXFiles::getPath(Uint32 file) const
 
 const char* MIXFiles::getArchiveType() const
 {
-	return "mix archive";
+    return "mix archive";
 }

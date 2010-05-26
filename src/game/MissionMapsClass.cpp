@@ -21,14 +21,11 @@
 
 #include "SDL/SDL_types.h"
 
-#include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "misc/config.h"
 
 using std::string;
-
-extern Logger * logger;
 
 MissionMapsClass::MissionMapsClass()
 {
@@ -76,7 +73,6 @@ void MissionMapsClass::readMissionData()
 
 	// Check if the file exist
 	if (MapFile == 0) {
-		logger->error("Unable to locate mission.ini file!\n");
 		return;
 	}
 

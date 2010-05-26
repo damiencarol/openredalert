@@ -21,6 +21,7 @@
 
 #include "SDL/SDL_types.h"
 
+#include "Logger.hpp"
 #include "UnitOrStructure.h"
 #include "ExplosionAnim.h"
 #include "L2Overlay.h"
@@ -34,13 +35,11 @@
 #include "CnCMap.h"
 
 #include "misc/common.h"
-#include "include/Logger.h"
 #include "audio/SoundEngine.h"
 #include "video/ImageNotFound.h"
 #include "video/ImageCache.h"
 #include "video/Renderer.h"
 
-extern Logger * logger;
 namespace pc {
 	extern ImageCache* imgcache;
 }
@@ -78,7 +77,8 @@ ProjectileAnim::ProjectileAnim(Uint32 p, Weapon *weap, UnitOrStructure* owner,
     }
     if (seekfuel == 0 && heatseek) {
         // Specifying seekfuel is mandatory if you want a projectile to heatseek.
-        logger->warning("Zero fuel specified for seekfuel for \"%s\", disabling heatseeking.\n",weap->getName());
+        Logger::getInstance()->Warning("Zero fuel specified for seekfuel for '" +
+            string(weap->getName()) + "', disabling heatseeking.");
         heatseek = false;
     }
 

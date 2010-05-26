@@ -40,7 +40,7 @@
 #include "UnitAndStructurePool.h"
 #include "audio/SoundEngine.h"
 #include "PlayerPool.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "misc/config.h"
 #include "TalkbackType.h"
 #include "UInfiltrateAnimEvent.h"
@@ -57,7 +57,6 @@ namespace pc {
     extern Ai * ai;
     extern Sound::SoundEngine* sfxeng;
 }
-extern Logger * logger;
 
 using std::string;
 using std::vector;
@@ -114,14 +113,14 @@ Unit::Unit(UnitType *type, Uint16 cellpos, Uint8 subpos, InfantryGroup *group,
     attackanim = 0;
     walkanim = 0;
     harvestanim = 0;
-	repairanim = 0;
+    repairanim = 0;
     turnanim1 = 0;
     turnanim2 = 0;
     deployed = false;
     
     if (type->getName() == "HARV")
     {
-	   this->Harvest(0, 0);
+        this->Harvest(0, 0);
     }
     
     AI_Mission = 1;
@@ -245,7 +244,7 @@ void Unit::setImageNum(Uint32 num, Uint8 layer)
     }
 	else
     {
-		logger->error("%s line %i: FAILED to set imagenumb %i, numb images = %i\n", __FILE__, __LINE__, num, getNumbImages( layer ));
+		//logger->error("%s line %i: FAILED to set imagenumb %i, numb images = %i\n", __FILE__, __LINE__, num, getNumbImages( layer ));
     }
 }
 
@@ -497,7 +496,7 @@ void Unit::turn(Uint8 facing, Uint8 layer)
         t = &turnanim2;
         break;
     default:
-        logger->error("invalid arg of %i to Unit::turn\n",layer);
+        Logger::getInstance()->Error("invalid arg of %i to Unit::turn\n");//,layer);
         return;
         break;
     }
@@ -556,12 +555,12 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 
     if ((getHealth()-amount) <= 0)
     {
-    	// Throw the event
-    	logger->debug("TRIGGER_EVENT_DESTROYED unit\n");
-    	// (-1 means nothing)
-    	HandleTriggers((UnitOrStructure*)this, TRIGGER_EVENT_DESTROYED, -1);
+        // Throw the event
+        Logger::getInstance()->Debug("TRIGGER_EVENT_DESTROYED unit\n");
+        // (-1 means nothing)
+        HandleTriggers((UnitOrStructure*)this, TRIGGER_EVENT_DESTROYED, -1);
 
-		doRandTalk(TB_die);
+        doRandTalk(TB_die);
 
         // Add a death for stats
         if (attacker != 0){

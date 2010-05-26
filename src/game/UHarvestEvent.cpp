@@ -29,47 +29,43 @@
 #include "ActionEventQueue.h"
 #include "Player.h"
 #include "PlayerPool.h"
-#include "include/Logger.h"
 #include "Unit.hpp"
 
 namespace p {
-	extern ActionEventQueue * aequeue;
-	extern CnCMap* ccmap;
-	extern UnitAndStructurePool* uspool;
+    extern ActionEventQueue * aequeue;
+    extern CnCMap* ccmap;
+    extern UnitAndStructurePool* uspool;
 }
-extern Logger * logger;
 
 UHarvestEvent::UHarvestEvent(Uint32 p, Unit *un) : UnitAnimEvent(p,un)
 {
-	ForceEmpty			= false;
-	this->un			= un;
-	stopping			= false;
-	index				= 0;
-	delay				= 0;
-	facing				= 0;
-	MoveTargePos		= un->FindTiberium ();
-	manual_pauze		= false;
-	NumbResources		= un->GetNumResources ();
-	new_orgimage		= false;
-	OrgImage			= un->getImageNum(0)&0xff;
-	RetryMoveCounter	= 0;
-	ReturnStep			= 1;
+    ForceEmpty			= false;
+    this->un			= un;
+    stopping			= false;
+    index				= 0;
+    delay				= 0;
+    facing				= 0;
+    MoveTargePos		= un->FindTiberium ();
+    manual_pauze		= false;
+    NumbResources		= un->GetNumResources ();
+    new_orgimage		= false;
+    OrgImage			= un->getImageNum(0)&0xff;
+    RetryMoveCounter	= 0;
+    ReturnStep			= 1;
 
-	// Get the resources whe harvested previously from the unit
-	for (int i = 0; i < NumbResources; i++)
-	{
-		un->GetResourceType (i, &ResourceTypes[i]);
-	}
+    // Get the resources whe harvested previously from the unit
+    for (int i = 0; i < NumbResources; i++)
+    {
+        un->GetResourceType (i, &ResourceTypes[i]);
+    }
 }
 
 /**
  */
 UHarvestEvent::~UHarvestEvent()
 {
-	logger->debug("UHarvest destructor\n");
-
-	if (this->un->harvestanim == this)
-		this->un->harvestanim = NULL;
+    if (this->un->harvestanim == this)
+        this->un->harvestanim = NULL;
 }
 
 /**
@@ -91,26 +87,26 @@ void UHarvestEvent::stop()
  */
 void UHarvestEvent::setHarvestingPos(Uint32 pos)
 {
-	MoveTargePos = pos;
+    MoveTargePos = pos;
 
-	if ( p::uspool->getStructureAt(pos) != NULL){
- 		if (p::uspool->getStructureAt(pos)->isRefinery ()){
-			manual_pauze = false;
-			if (NumbResources > 0){
-				ReturnStep	= 1;
-				ForceEmpty	= true;
-			}
-			return;
-		}
-	}
+    if ( p::uspool->getStructureAt(pos) != NULL){
+        if (p::uspool->getStructureAt(pos)->isRefinery ()){
+            manual_pauze = false;
+            if (NumbResources > 0){
+                ReturnStep	= 1;
+                ForceEmpty	= true;
+            }
+            return;
+        }
+    }
 
-	// Pauze harvesting if the player sends us to a place where there is no resource
-	if (p::ccmap->getResourceFrame(pos) == 0){
-		manual_pauze = true;
-		return;
-	}
+    // Pauze harvesting if the player sends us to a place where there is no resource
+    if (p::ccmap->getResourceFrame(pos) == 0){
+        manual_pauze = true;
+        return;
+    }
 
-	manual_pauze = false;
+    manual_pauze = false;
 }
 
 /**
@@ -125,92 +121,92 @@ void UHarvestEvent::update()
 void UHarvestEvent::run()
 {
 #ifdef DEBUG_HARVEST_ANIM
-	if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() ){
-		printf ("%s line %i: Run harvest animation\n", __FILE__, __LINE__);
-	}
+    if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() ){
+        printf ("%s line %i: Run harvest animation\n", __FILE__, __LINE__);
+    }
 #endif
 
-	if( !un->isAlive() || stopping ) {
+    if( !un->isAlive() || stopping ) {
 #ifdef DEBUG_HARVEST_ANIM
-		if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() ){
-			printf ("%s line %i: Stopping harvest animation\n", __FILE__, __LINE__);
-		}
+        if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() ){
+            printf ("%s line %i: Stopping harvest animation\n", __FILE__, __LINE__);
+        }
 #endif
-		delete this;
-		return;
-	}
+        delete this;
+        return;
+    }
 
-	if (RetryMoveCounter > 5){
-		stop();
-		setDelay(14);
-		p::aequeue->scheduleEvent(this);
-		return;
-	}
+    if (RetryMoveCounter > 5){
+        stop();
+        setDelay(14);
+        p::aequeue->scheduleEvent(this);
+        return;
+    }
 
 
-	if (un->GetBaseRefinery() != NULL){
-		if (!un->GetBaseRefinery()->isAlive())
-			un->SetBaseRefinery(NULL);
-	}
+    if (un->GetBaseRefinery() != NULL){
+        if (!un->GetBaseRefinery()->isAlive())
+            un->SetBaseRefinery(NULL);
+    }
 
-	if (manual_pauze){
+    if (manual_pauze){
 #ifdef DEBUG_HARVEST_ANIM
-		if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() )
-			printf ("%s line %i: Manual pauze harvest animation\n", __FILE__, __LINE__);
+        if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() )
+            printf ("%s line %i: Manual pauze harvest animation\n", __FILE__, __LINE__);
 #endif
-		un->setImageNum(OrgImage, 0);
-		new_orgimage = true;
-       	if (un->getPos() == MoveTargePos){
-			stop();
-			setDelay(14);
-			p::aequeue->scheduleEvent(this);
-			return;
-		}
-		un->move(MoveTargePos, false);
-		if (RetryMoveCounter == 0){
-			un->moveanim->setSchedule(this);
-		}else{
-			setDelay(14);
-			p::aequeue->scheduleEvent(this);
-		}
-		RetryMoveCounter++;
-		return;
-	}
+        un->setImageNum(OrgImage, 0);
+        new_orgimage = true;
+        if (un->getPos() == MoveTargePos){
+            stop();
+            setDelay(14);
+            p::aequeue->scheduleEvent(this);
+            return;
+        }
+        un->move(MoveTargePos, false);
+        if (RetryMoveCounter == 0){
+            un->moveanim->setSchedule(this);
+        }else{
+            setDelay(14);
+            p::aequeue->scheduleEvent(this);
+        }
+        RetryMoveCounter++;
+        return;
+    }
 
-	if (new_orgimage){
-		OrgImage = un->getImageNum(0)&0xff;
-		OrgImage -= OrgImage%4;
-		if (OrgImage > 32)
-			OrgImage = 8;
-		//facing = (Uint32) OrgImage;
-		new_orgimage = false;
-		//printf ("New org image\n");
-	}
+    if (new_orgimage){
+        OrgImage = un->getImageNum(0)&0xff;
+        OrgImage -= OrgImage%4;
+        if (OrgImage > 32)
+            OrgImage = 8;
+        //facing = (Uint32) OrgImage;
+        new_orgimage = false;
+        //printf ("New org image\n");
+    }
 
-	if (NumbResources < 5 && !ForceEmpty/*&& !un->EmptyHarvester*/){
+    if (NumbResources < 5 && !ForceEmpty/*&& !un->EmptyHarvester*/){
 #ifdef DEBUG_HARVEST_ANIM
-		if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() )
-			printf ("%s line %i: Harvest\n", __FILE__, __LINE__);
+        if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() )
+            printf ("%s line %i: Harvest\n", __FILE__, __LINE__);
 #endif
-		if (un->getPos() != MoveTargePos){
-			// If there is something occupying our position move to a diffirent pos...
+        if (un->getPos() != MoveTargePos){
+            // If there is something occupying our position move to a diffirent pos...
 //			if (p::uspool->getUnitOrStructureAt(MoveTargePos) != NULL && un->getPos() != MoveTargePos || RetryMoveCounter > 2){
-			if (p::uspool->cellOccupied(MoveTargePos) && un->getPos() != MoveTargePos || RetryMoveCounter > 2){
-				MoveTargePos = un->FindTiberium ();
-			}
-			un->setImageNum(OrgImage, 0);
-			un->move(MoveTargePos, false);
-			new_orgimage = true;
-			if (RetryMoveCounter == 0){
-				un->moveanim->setSchedule(this);
-			}else{
-				setDelay(14);
-				p::aequeue->scheduleEvent(this);
-			}
-			RetryMoveCounter++;
-			return;
-		}
-		RetryMoveCounter = 0;
+            if (p::uspool->cellOccupied(MoveTargePos) && un->getPos() != MoveTargePos || RetryMoveCounter > 2){
+                MoveTargePos = un->FindTiberium ();
+            }
+            un->setImageNum(OrgImage, 0);
+            un->move(MoveTargePos, false);
+            new_orgimage = true;
+            if (RetryMoveCounter == 0){
+                un->moveanim->setSchedule(this);
+            }else{
+                setDelay(14);
+                p::aequeue->scheduleEvent(this);
+            }
+            RetryMoveCounter++;
+            return;
+        }
+        RetryMoveCounter = 0;
 
         if (p::ccmap->getResourceFrame(un->getPos()) == 0){
             MoveTargePos = un->FindTiberium ();
@@ -244,75 +240,75 @@ void UHarvestEvent::run()
         }
     }else if (un->GetBaseRefinery() != NULL){
 #ifdef DEBUG_HARVEST_ANIM
-		if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() )
-			printf ("%s line %i: Empty, step = %i \n", __FILE__, __LINE__, ReturnStep);
+        if ( un->getOwner() == p::ccmap->getPlayerPool()->getLPlayerNum() )
+            printf ("%s line %i: Empty, step = %i \n", __FILE__, __LINE__, ReturnStep);
 #endif
-		// We are full --> move back to our base and dump our content there
-		//int MoveToPos = this->GetBaseRefineryPos ();
-		if (ReturnStep == 1){
-			if (this->GetBaseRefineryPos () != un->getPos()){
-				un->setImageNum(OrgImage, 0);
-		        un->move(this->GetBaseRefineryPos (), false);
-				new_orgimage = true;
-				if (RetryMoveCounter == 0){
-					un->moveanim->setSchedule(this);
-				}else{
-					setDelay(14);
-					p::aequeue->scheduleEvent(this);
-				}
-				RetryMoveCounter++;
-				return;
-			}else{
-				RetryMoveCounter = 0;
-				ReturnStep = 2;
-			}
+        // We are full --> move back to our base and dump our content there
+        //int MoveToPos = this->GetBaseRefineryPos ();
+        if (ReturnStep == 1){
+            if (this->GetBaseRefineryPos () != un->getPos()){
+                un->setImageNum(OrgImage, 0);
+                un->move(this->GetBaseRefineryPos (), false);
+                new_orgimage = true;
+                if (RetryMoveCounter == 0){
+                    un->moveanim->setSchedule(this);
+                }else{
+                    setDelay(14);
+                    p::aequeue->scheduleEvent(this);
+                }
+                RetryMoveCounter++;
+                return;
+            }else{
+                RetryMoveCounter = 0;
+                ReturnStep = 2;
+            }
 
-		}else if (ReturnStep == 2){ //un->getImageNum(0)&0xff != 8){
-                	un->turn(8,0);
-                	un->turnanim1->setSchedule(this);
-			new_orgimage = true;
-			ReturnStep = 3;
-			return;
-		}else if (ReturnStep == 3){
-			// We are back at the refinery, start dump animation
-			int NumbLayers = un->getType()->getNumLayers();
+        }else if (ReturnStep == 2){ //un->getImageNum(0)&0xff != 8){
+                    un->turn(8,0);
+                    un->turnanim1->setSchedule(this);
+            new_orgimage = true;
+            ReturnStep = 3;
+            return;
+        }else if (ReturnStep == 3){
+            // We are back at the refinery, start dump animation
+            int NumbLayers = un->getType()->getNumLayers();
 
-			if (index < 8){
-				un->setImageNum(32+(8*8) + index, NumbLayers - 1);
-				index++;
-			}else{
+            if (index < 8){
+                un->setImageNum(32+(8*8) + index, NumbLayers - 1);
+                index++;
+            }else{
 
-				un->setImageNum(OrgImage, NumbLayers - 1);
+                un->setImageNum(OrgImage, NumbLayers - 1);
 
 //			if (index > 8){
-				// Start new annimation
-				index = 0;
+                // Start new annimation
+                index = 0;
 
-				int Value = 0;
-				for (int i = 0; i < NumbResources; i++)
-					Value += (10 - ResourceTypes[i])*50;
+                int Value = 0;
+                for (int i = 0; i < NumbResources; i++)
+                    Value += (10 - ResourceTypes[i])*50;
 
-				NumbResources = 0;
+                NumbResources = 0;
 
-				un->EmptyResources ();
+                un->EmptyResources ();
 
-				ReturnStep = 1;
+                ReturnStep = 1;
 
-				ForceEmpty = false;
+                ForceEmpty = false;
 
-				p::ccmap->getPlayerPool()->getPlayer(un->getOwner())->changeMoney(Value);
+                p::ccmap->getPlayerPool()->getPlayer(un->getOwner())->changeMoney(Value);
 
-				if (un->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
-					MoveTargePos = un->FindTiberium ();
-			}
-		}else{
-			// Hmm, we should never get here --> make returnstep 1
-			ReturnStep = 1;
-		}
-	}
-	// Reschedule this..
-	setDelay(10);
-	p::aequeue->scheduleEvent(this);
+                if (un->getOwner() != p::ccmap->getPlayerPool()->getLPlayerNum())
+                    MoveTargePos = un->FindTiberium ();
+            }
+        }else{
+            // Hmm, we should never get here --> make returnstep 1
+            ReturnStep = 1;
+        }
+    }
+    // Reschedule this..
+    setDelay(10);
+    p::aequeue->scheduleEvent(this);
 
 }
 
@@ -320,31 +316,31 @@ void UHarvestEvent::run()
  */
 int UHarvestEvent::GetBaseRefineryPos (void)
 {
-	Uint16 x, y, xdiv;
-	int temppos;
+    Uint16 x, y, xdiv;
+    int temppos;
 
-	if (un->GetBaseRefinery() == NULL)
-		return 0;
+    if (un->GetBaseRefinery() == NULL)
+        return 0;
 
-	xdiv = 1;
+    xdiv = 1;
 
-	p::ccmap->translateFromPos(un->GetBaseRefinery()->getPos(), &x, &y);
-	y += 2;
-	temppos = p::ccmap->translateToPos(x+xdiv, y);
+    p::ccmap->translateFromPos(un->GetBaseRefinery()->getPos(), &x, &y);
+    y += 2;
+    temppos = p::ccmap->translateToPos(x+xdiv, y);
 
 //	while ( !p::ccmap->isBuildableAt(un->getOwner(), temppos) && y < p::ccmap->getHeight() && un->getPos() != temppos ){
-	while ( p::ccmap->getCost(temppos, un) > 4 && y < p::ccmap->getHeight() && un->getPos() != temppos ){
-		if ( xdiv < 10 && x + xdiv < p::ccmap->getWidth())
-			xdiv++;
-		else{
-			y += 1;
-			xdiv = 0;
-		}
-		//printf ("xdiv is %i\n", xdiv);
-		temppos = p::ccmap->translateToPos(x+xdiv, y);
-	}
+    while ( p::ccmap->getCost(temppos, un) > 4 && y < p::ccmap->getHeight() && un->getPos() != temppos ){
+        if ( xdiv < 10 && x + xdiv < p::ccmap->getWidth())
+            xdiv++;
+        else{
+            y += 1;
+            xdiv = 0;
+        }
+        //printf ("xdiv is %i\n", xdiv);
+        temppos = p::ccmap->translateToPos(x+xdiv, y);
+    }
 
 //	printf ("UNITANIMATIONS x = %i, y = %i, temppos = %i\n", x, y, temppos);
 
-	return temppos;
+    return temppos;
 }

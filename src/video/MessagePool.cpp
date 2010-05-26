@@ -17,12 +17,6 @@
 
 #include "MessagePool.h"
 
-
-#ifdef _WIN32
-#include <algorithm>
-#endif
-
-
 #include <list>
 #include <functional>
 #include <algorithm>
@@ -32,7 +26,6 @@
 #include "SDL/SDL_timer.h"
 
 #include "video/Renderer.h"
-#include "include/Logger.h"
 #include "ui/RA_Label.h"
 #include "video/drawmessage.h"
 #include "Message.h"

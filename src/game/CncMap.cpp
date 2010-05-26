@@ -24,6 +24,7 @@
 
 #include "SDL/SDL_endian.h" // For use of SDL_SwapLE16()
 
+#include "Logger.hpp"
 #include "Player.h"
 #include "UnitAndStructurePool.h"
 #include "MissionData.h"
@@ -51,7 +52,6 @@
 #include "misc/common.h"
 #include "misc/config.h"
 #include "include/imageproc.h"
-#include "include/Logger.h"
 #include "PlayerPool.h"
 #include "triggers.h"
 #include "AiCommand.h"
@@ -69,13 +69,11 @@ using INI::KeyNotFound;
 
 namespace pc
 {
-	extern ImageCache* imgcache;
-	extern ConfigType Config;
-	extern vector<SHPImage*>* imagepool;
-	extern MessagePool* msg;
+    extern ImageCache* imgcache;
+    extern ConfigType Config;
+    extern vector<SHPImage*>* imagepool;
+    extern MessagePool* msg;
 }
-
-extern Logger * logger;
 
 //-----------------------------------------------------------------------------
 // Functors
@@ -261,35 +259,35 @@ CnCMap::~CnCMap()
  */
 void CnCMap::loadMap(const string& mapname, LoadingScreen* lscreen)
 {
-	// Copy the map name
-	missionData->mapname = mapname;
+    // Copy the map name
+    missionData->mapname = mapname;
 
-	// Log the map loading
-	string message = "Reading ";
-	message += mapname;
-	message += ".ini";
-	logger->debug("%s\n", message.c_str());
+    // Log the map loading
+    string message = "Reading ";
+    message += mapname;
+    message += ".ini";
+    Logger::getInstance()->Debug(__FILE__ , __LINE__, message);
 
-	loading = true;
-	// Load the ini part of the map
-	if (lscreen != 0)
-	{
-		lscreen->setCurrentTask(message);
-	}
+    loading = true;
+    // Load the ini part of the map
+    if (lscreen != 0)
+    {
+        lscreen->setCurrentTask(message);
+    }
 
-	string ini = mapname + ".INI";
+    string ini = mapname + ".INI";
 
-	INIFile* iniFileOfMap = new INIFile(ini);
-	
-	// Load the ini part of the map
-	loadIni(iniFileOfMap);
+    INIFile* iniFileOfMap = new INIFile(ini);
 
-	// Free the inifile
-	delete iniFileOfMap;
+    // Load the ini part of the map
+    loadIni(iniFileOfMap);
 
-	// End of loading
-	loading = false;
-	loaded = true;
+    // Free the inifile
+    delete iniFileOfMap;
+
+    // End of loading
+    loading = false;
+    loaded = true;
 }
 
 /**
@@ -905,8 +903,8 @@ SDL_Surface* CnCMap::getMiniMap(Uint8 pixsize)
 	SDL_Surface *cminitile;
 	if (pixsize == 0)
 	{
-		// Argh
-		logger->error("CnCMap::getMiniMap: pixsize is zero, resetting to one\n");
+        // Argh
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "CnCMap::getMiniMap: pixsize is zero, resetting to one");
 		pixsize = 1;
 	}
 	if (minimap != NULL)
@@ -1184,12 +1182,12 @@ bool CnCMap::validCoord(Uint16 tx, Uint16 ty) const
 
 Uint32 CnCMap::getWaypoint(Uint8 pointnr)
 {
-	if (pointnr > 99)
-	{
-		logger->error("%s line %i ERROR: invalid pointnr\n",__FILE__ , __LINE__);
-		return 0;
-	}
-	return waypoints[pointnr];
+    if (pointnr > 99)
+    {
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "ERROR: invalid pointnr");
+        return 0;
+    }
+    return waypoints[pointnr];
 }
 
 unsigned int CnCMap::normaliseCoord(unsigned int linenum) const
@@ -1483,46 +1481,46 @@ Uint16 CnCMap::getY() const
  */
 void CnCMap::loadIni(INIFile* inifile)
 {
-	// Check that inifile is not NULL
-	if (inifile == 0)
-	{
-		// Log the error
-		logger->error("Map ini not found.  Check your installation.\n");
-		// Throw an error
-		throw LoadMapError("Error in loading the ini file");
-	}
-	
-	// WARN if the ini format is not supported
-	if (inifile->readInt("Basic", "NewINIFormat", 0) != 3)
-	{
-		// Log the error
-		logger->error("Only Red Alert maps are fully supported\nThe format of this Map is not supported\n");
-		// Trow an error
-		throw LoadMapError("Error in loading the ini file [" + inifile->getFileName() + "], the version of the ini (NewINIFormat) is not equal to 3");
-	}
+    // Check that inifile is not NULL
+    if (inifile == 0)
+    {
+        // Log the error
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "Map ini not found.  Check your installation.");
+        // Throw an error
+        throw LoadMapError("Error in loading the ini file");
+    }
+    
+    // WARN if the ini format is not supported
+    if (inifile->readInt("Basic", "NewINIFormat", 0) != 3)
+    {
+        // Log the error
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "Only Red Alert maps are fully supported\nThe format of this Map is not supported.");
+        // Trow an error
+        throw LoadMapError("Error in loading the ini file [" + inifile->getFileName() + "], the version of the ini (NewINIFormat) is not equal to 3");
+    }
 
-	// Build the player list
-	this->playerPool->LoadIni(inifile);
-	
-	
-	
+    // Build the player list
+    this->playerPool->LoadIni(inifile);
 
-	// Read simple ini section
-	simpleSections(inifile);
+    
+    
+    
+    // Read simple ini section
+    simpleSections(inifile);
 
-	// Try to create UnitAndStructurePool
-	try
-	{
-		// Create the UnitAndStructurePool
-		p::uspool = new UnitAndStructurePool(this->missionData->theater.c_str());
-	}
-	catch (...)
-	{
-		// Log it
-		logger->error("Error in creating UnitAndStructurePool (p::uspool)\n");
-		// Throw error
-		throw LoadMapError("Error in creating UnitAndStructurePool (p::uspool)\n");
-	}
+    // Try to create UnitAndStructurePool
+    try
+    {
+        // Create the UnitAndStructurePool
+        p::uspool = new UnitAndStructurePool(this->missionData->theater.c_str());
+    }
+    catch (...)
+    {
+        // Log it
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "Error in creating UnitAndStructurePool (p::uspool)\n");
+        // Throw error
+        throw LoadMapError("Error in creating UnitAndStructurePool (p::uspool)\n");
+    }
 
 
 	if (gamemode == GAME_MODE_SINGLE_PLAYER)
@@ -1667,12 +1665,13 @@ void CnCMap::simpleSections(INIFile *inifile)
 	}
 	catch (KeyNotFound& ex)
 	{
-		logger->error("Error loading map: %s\n", ex.what());
+		Logger::getInstance()->Error(__FILE__ , __LINE__, "Error loading map");
+        Logger::getInstance()->Error(__FILE__ , __LINE__, ex.what());
 		throw LoadMapError("Error loading map: " + string (ex.what()));
 	}
 	catch(...)
 	{
-		logger->error("Error loading map\n");
+		Logger::getInstance()->Error(__FILE__ , __LINE__, "Error loading map");
 		throw LoadMapError("Error loading map");
 	}
 }
@@ -1849,8 +1848,8 @@ void CnCMap::advancedSections(INIFile *inifile)
 	catch(...)
 	{}
 
-	// Log it (end of waypoint decode
-	logger->note("Waypoint loaded...\n");
+    // Log end of waypoint decode
+    Logger::getInstance()->Info("Waypoint loaded.");
 
 
 	// set player start locations
@@ -1859,34 +1858,34 @@ void CnCMap::advancedSections(INIFile *inifile)
 		playerPool->setPlayerStarts(k, getWaypoint(k));
 	}
 
-	// load the shadowimages
-	try
-	{
-		image = new SHPImage("shadow.shp", -1);
-		numShadowImg = image->getNumImg();
-		shadowimages.resize(numShadowImg);
-		for(int i = 0; i < 48; i++)
-		{
-			// decode the SHP and get a SDL_Surface
-			image->getImageAsAlpha(i, &shadowimages[i]);
-		}
-		if (image != 0){
-			delete image;
-		}
-		image = 0;
-	}
-	catch(ImageNotFound&)
-	{
-		logger->warning("Unable to load \"shadow.shp\"\n");
-		numShadowImg = 0;
-	}
-	// Log it (end of Shadow decode
-	logger->note("Shadow images loaded...\n");
+    // load the shadowimages
+    try
+    {
+        image = new SHPImage("shadow.shp", -1);
+        numShadowImg = image->getNumImg();
+        shadowimages.resize(numShadowImg);
+        for(int i = 0; i < 48; i++)
+        {
+            // decode the SHP and get a SDL_Surface
+            image->getImageAsAlpha(i, &shadowimages[i]);
+        }
+        if (image != 0){
+            delete image;
+        }
+        image = 0;
+    }
+    catch(ImageNotFound&)
+    {
+        Logger::getInstance()->Warning(__FILE__ , __LINE__, "Unable to load 'shadow.shp'");
+        numShadowImg = 0;
+    }
+    // Log it (end of Shadow decode
+    Logger::getInstance()->Info(__FILE__ , __LINE__, "Shadow images loaded...");
 
     // load the smudge marks and the tiberium to the imagepool
     if (string(missionData->theater).substr(0, 3) != "INT")
     {
-        logger->note("smudge marks and the tiberium loading...\n");
+        Logger::getInstance()->Info(__FILE__ , __LINE__, "smudge marks and the tiberium loading...\n");
 
         string sname;
         //if (maptype == GAME_TD)
@@ -1900,7 +1899,7 @@ void CnCMap::advancedSections(INIFile *inifile)
         }
         else
         {
-            logger->error("Unsuported maptype\n");
+            Logger::getInstance()->Error(__FILE__ , __LINE__, "Unsuported maptype");
             throw LoadMapError("Unsuported maptype\n");
         }
 
@@ -1914,7 +1913,7 @@ void CnCMap::advancedSections(INIFile *inifile)
         }
         catch (ImageNotFound&)
         {
-            logger->error("Could not load \"%s\"\n", sname.c_str());
+            Logger::getInstance()->Error(__FILE__ , __LINE__, "Could not load " + sname);
             throw LoadMapError("Could not load " + sname);
         }
 
@@ -1960,7 +1959,7 @@ void CnCMap::advancedSections(INIFile *inifile)
         }
         
         // Log it (end of waypoint decode
-        logger->note("smudge images loaded...\n");
+        Logger::getInstance()->Info("smudge images loaded...");
     }
 
     // Resize overlaymatrix (use in TERRAIN loading)
@@ -2034,7 +2033,7 @@ void CnCMap::advancedSections(INIFile *inifile)
         {
             if (linenum == 0)
             {
-                logger->error("BUG: Could not find an entry in art.ini for %s\n", nameTerrain.c_str());
+                Logger::getInstance()->Error(__FILE__ , __LINE__, "BUG: Could not find an entry in art.ini for " + nameTerrain);
                 bad = true;
                 break;
             }
@@ -2101,15 +2100,15 @@ void CnCMap::advancedSections(INIFile *inifile)
                 image = new SHPImage(shpnameTerrain.c_str(), -1);
             }
             catch (ImageNotFound&)
-                {
-                logger->error("Could not load \"%s\"\n", shpnameTerrain.c_str());
+            {
+                Logger::getInstance()->Error(__FILE__ , __LINE__, "Could not load " + shpnameTerrain);
                 throw LoadMapError("Could not load " + shpnameTerrain);
             }
             pc::imagepool->push_back(image);
         }
     }
     // Log it (end of TERRAIN decode
-    logger->note("Terrain loaded...\n");
+    Logger::getInstance()->Info("Terrain loaded.");
 
 
     // decode OverlayPack section
@@ -2122,7 +2121,7 @@ void CnCMap::advancedSections(INIFile *inifile)
         loadOverlay(inifile);
     }
     // Log it (end of waypoint decode
-    logger->note("OverlayPack loaded...\n");
+    Logger::getInstance()->Info("OverlayPack loaded.");
 
 
     // Try to set SMUDGE
@@ -2172,10 +2171,10 @@ void CnCMap::advancedSections(INIFile *inifile)
     }
     catch (...)
     {
-        logger->debug("Error during preloadUnitAndStructures() in [advancedSections()]");
+        Logger::getInstance()->Error("Error during preloadUnitAndStructures() in [advancedSections()]");
     }
     // Log it
-    logger->note("UnitAndStructurePool::preloadUnitAndStructures() ok\n");
+    Logger::getInstance()->Info("UnitAndStructurePool::preloadUnitAndStructures() ok\n");
 
     // Try to read techs levels
     try
@@ -2184,10 +2183,10 @@ void CnCMap::advancedSections(INIFile *inifile)
     }
     catch (...)
     {
-        logger->debug("Error during generateProductionGroups() in [advancedSections()]");
+        Logger::getInstance()->Debug("Error during generateProductionGroups() in [advancedSections()]");
     }
     // Log it
-    logger->note("UnitAndStructurePool::generateProductionGroups() ok\n");
+    Logger::getInstance()->Info("UnitAndStructurePool::generateProductionGroups() ok\n");
 
     //
     // STRUCTURES
@@ -2231,7 +2230,7 @@ void CnCMap::advancedSections(INIFile *inifile)
                         }
                         else
                         {
-                            logger->error("[cncmap::advancedscetion::STRUCTURES The owner %s is not found !!!!!!\n", owner);
+                            Logger::getInstance()->Error("[cncmap::advancedscetion::STRUCTURES The owner  is not found !!!!!!\n");
                         }
                     }
                 }
@@ -2262,10 +2261,10 @@ void CnCMap::advancedSections(INIFile *inifile)
         catch (...)
         {
             // Log it
-            logger->error("error in CncMap::advanced...STRUCTURES ok\n");
+            Logger::getInstance()->Error("error in CncMap::advanced...STRUCTURES ok\n");
         }
         // Log it
-        logger->note("CncMap::advanced...STRUCTURES ok\n");
+        Logger::getInstance()->Info("CncMap::advanced...STRUCTURES ok\n");
     }
 
 
@@ -2307,11 +2306,11 @@ void CnCMap::advancedSections(INIFile *inifile)
                                         }
                                         else
                                         {
-                                           	logger->error("ERROR DURING DECODE owner = %s\n", owner); 
+                                            Logger::getInstance()->Error("ERROR DURING DECODE owner = "); 
                                         }
 			//printf ("%s line %i: createUnit UNIT %s, trigger = %s\n", __FILE__, __LINE__, key->first.c_str(), trigger);
 				} else {
-					logger->error("ERROR DURING DECODE Line read in UNIT = %s\n", key->second.c_str());
+					Logger::getInstance()->Error("ERROR DURING DECODE Line read in UNIT = " + key->second);
 				}
 			}
 		}
@@ -2319,7 +2318,7 @@ void CnCMap::advancedSections(INIFile *inifile)
 		{}
 	}
 	// Log it
-	logger->note("CncMap::advanced...UNIT ok\n");
+	Logger::getInstance()->Info("CncMap::advanced...UNIT ok\n");
 
 
 	//
@@ -2356,7 +2355,7 @@ void CnCMap::advancedSections(INIFile *inifile)
                                 }
                                 else
                                 {
-                                    logger->error("cncmap::advanced   Infantry   owner = %s", owner);
+                                    Logger::getInstance()->Info("cncmap::advanced   Infantry   owner = %s");
                                 }
                              }
 	}
@@ -2424,7 +2423,7 @@ void CnCMap::advancedSections(INIFile *inifile)
                 // check that the line had 18 param
                 if (triggsData.size() != 18)
                 {
-                    logger->warning("error in reading trigger [%s]\n", key->first.c_str());
+                    Logger::getInstance()->Warning("error in reading trigger '" + key->first + "'");
                 }
                 else
                 {
@@ -2740,7 +2739,7 @@ void CnCMap::unMapPack(INIFile *inifile)
 		if (Compression::decode80((Uint8 *)mapdata2+4+curpos, mapdata1+8192
 				*tmpval) != 8192)
 		{
-			logger->warning("A format80 chunk in the \"MapPack\" was of wrong size\n");
+			Logger::getInstance()->Warning(__FILE__ , __LINE__, "A format80 chunk in the '[MapPack]' section was of wrong size");
 		}
 		curpos = curpos + 4 + mapdata2[curpos] + (mapdata2[curpos+1]<<8)
 				+ (mapdata2[curpos+2]<<16);
@@ -2815,10 +2814,10 @@ void CnCMap::parseBin(TileList* bindata)
         terrainoverlay[i] = 0;
     }
 
-	// Pallet name is missionData.theater
-	loadPal(missionData->theater, palette);
-	SHPBase::setPalette(palette);
-	SHPBase::calculatePalettes();
+    // Pallet name is missionData.theater
+    loadPal(missionData->theater, palette);
+    SHPBase::setPalette(palette);
+    SHPBase::calculatePalettes();
 
     // Load the templates.ini
     //templini = GetConfig("templates.ini");
@@ -2866,7 +2865,7 @@ void CnCMap::parseBin(TileList* bindata)
 				tileimg = loadTile(templini, templ, tile, &tiletype);
 				if (tileimg == 0)
 				{
-					logger->error("Error loading tiles\n");
+					Logger::getInstance()->Error("Error loading tiles");
 					throw LoadMapError("Error loading tiles\n");
 				}
 
@@ -2962,7 +2961,7 @@ void CnCMap::unOverlayPack(INIFile *inifile)
 	if (inifile->isSection("OVERLAYPACK") == false)
 	{
 		// Log it
-		logger->warning("No \"OverlayPack\" section found for this map.\n");
+		Logger::getInstance()->Warning("No '[OverlayPack]' section found for this map.");
 		// zap the overlay loading
 		return;
 	}
@@ -3000,7 +2999,7 @@ void CnCMap::unOverlayPack(INIFile *inifile)
 		if (Compression::decode80((Uint8 *)temp+4+curpos, mapdata+8192*tmpval)
 				!= 8192)
 		{
-			logger->warning("A format80 chunk in the \"OverlayPack\" was of wrong size\n");
+			Logger::getInstance()->Warning("A format80 chunk in the \"OverlayPack\" was of wrong size.");
 		}
 		curpos = curpos + 4 + temp[curpos] + (temp[curpos+1]<<8)
 				+ (temp[curpos+2]<<16);
@@ -3061,8 +3060,7 @@ void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 		}
 		catch (ImageNotFound&)
 		{
-			logger->error("Unable to load overlay \"%s\" (or \"%s.SHP\")\n",
-					shpname.c_str(), name.c_str());
+			Logger::getInstance()->Error("Unable to load overlay " + shpname + " " + name);
 			throw LoadMapError("Unable to load overlay " + shpname + " (or " + name + ".SHP)");
 		}
 	}
@@ -3086,7 +3084,7 @@ void CnCMap::parseOverlay(const Uint32& linenum, const string& name)
 		}
 		if (0 == i)
 		{
-			logger->error("Resource hack for \"%s\" failed.", name.c_str());
+			Logger::getInstance()->Error("Resource hack for failed." + name);
 			throw LoadMapError("Resource hack for " + name + " failed.");
 		}
 		map<string, Uint8>::iterator t = resourcenames.find(name);
@@ -3144,10 +3142,10 @@ void CnCMap::loadPal(const string& paln, SDL_Color *palette)
 	// Seek the palette file in the mix
 	palfile = VFSUtils::VFS_Open(palname.c_str());
 	if (palfile == NULL)
-	{
-		logger->error("Unable to locate palette (\"%s\").\n", palname.c_str());
-		throw LoadMapError("Unable to locate palette (" + palname + ")");
-	}
+    {
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "Unable to locate palette " + palname);
+        throw LoadMapError("Unable to locate palette (" + palname + ")");
+    }
 
 	// Load the palette
 	//for (int j = 0; j < 2; j++){
@@ -3249,17 +3247,19 @@ SDL_Surface* CnCMap::loadTile(INIFile* templini, Uint16 templ, Uint8 tile, Uint3
         }
         catch (ImageNotFound&)
         {
-            logger->warning("Unable to locate template %d, %d (\"%s\") in mix! using tile 0, 0 instead\n", templ, tile, tilefilename.str().c_str());
-          		if (templ == 0 && tile == 0)
-			{
-				logger->error("Unable to load tile 0,0.  Can't proceed\n");
-				return NULL;
-			}
-			return loadTile( templini, 0, 0, tiletype );
-		}
+            stringstream message;
+            message << "Unable to locate template " << templ << ", " << tile << ", '" << tilefilename << "' in mix! using tile 0, 0 instead";
+            Logger::getInstance()->Warning(message.str());
+            if (templ == 0 && tile == 0)
+            {
+                Logger::getInstance()->Error("Unable to load tile 0,0.  Can't proceed");
+                return NULL;
+            }
+            return loadTile( templini, 0, 0, tiletype );
+        }
 
-		// Store this TemplateImage for later use
-		templateCache[tilefilename.str().c_str()] = theaterfile;
+        // Store this TemplateImage for later use
+        templateCache[tilefilename.str().c_str()] = theaterfile;
 	}
 	else
 	{
@@ -3270,9 +3270,10 @@ SDL_Surface* CnCMap::loadTile(INIFile* templini, Uint16 templ, Uint8 tile, Uint3
 	retimage = theaterfile->getImage(tile);
 	if (retimage == NULL)
 	{
-		logger->warning(
-				"Illegal template %d, %d (\"%s\")! using tile 0, 0 instead\n",
-				templ, tile, tilefilename.str().c_str());
+        stringstream message;
+        message << "Illegal template " << templ << ", " << tile << " ('" << tilefilename << "')! using tile 0, 0 instead\n",
+        Logger::getInstance()->Warning(message.str());
+        
 		if (templ == 0 && tile == 0)
 			return NULL;
 		return loadTile(templini, 0, 0, tiletype);
@@ -3333,14 +3334,14 @@ void CnCMap::loadTeamTypes(INIFile* fileIni)
     // Checks that fileIni exist
     if (fileIni == 0)
     {
-        logger->error("[CnCMap::loadTeamTypes] fileIni == NULL !!!\n");
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "[CnCMap::loadTeamTypes] fileIni == NULL !!!\n");
         return;
     }
 
     // Check if the "[TeamTypes]" section exist
     if (fileIni->isSection("TeamTypes") == false)
     {
-        logger->error("[CnCMap::loadTeamTypes] section [TeamTypes] was not found in ini file.\n");
+        Logger::getInstance()->Error(__FILE__ , __LINE__, "[CnCMap::loadTeamTypes] section [TeamTypes] was not found in ini file.\n");
         return;
     }
 

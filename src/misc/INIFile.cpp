@@ -27,7 +27,7 @@
 
 #include "KeyNotFound.h"
 #include "misc/common.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 
@@ -38,8 +38,6 @@ using std::runtime_error;
 
 using INI::KeyNotFound;
 
-extern Logger * logger;
-
 /**
  * Constructor, opens the file
  *
@@ -47,103 +45,103 @@ extern Logger * logger;
  */
 INIFile::INIFile(const string& filename)
 {
-	char line[1024];
-	char key[1024];
-	char value[1024];
-	char* str;
+    char line[1024];
+    char key[1024];
+    char value[1024];
+    char* str;
 
-	VFile* inifile;
-	string cursectionName;
-	//    INISection cursection;
-	INISection newSection;
-	IniEntry Entry;
+    VFile* inifile;
+    string cursectionName;
+    //    INISection cursection;
+    INISection newSection;
+    IniEntry Entry;
 
-	//int MAXLINELENGTH = 1024;
-	//int MAXSTRINGLENGTH = 128;
+    //int MAXLINELENGTH = 1024;
+    //int MAXSTRINGLENGTH = 128;
 
 
-	// Open the File
-	inifile = VFSUtils::VFS_Open(filename.c_str());
-	if (inifile == 0) {
-		string s = "Unable to open ";
-		s += filename;
-		logger->error("%s\n", s.c_str());
+    // Open the File
+    inifile = VFSUtils::VFS_Open(filename.c_str());
+    if (inifile == 0) {
+        string s = "Unable to open ";
+        s += filename;
+        Logger::getInstance()->Error(s);
 
-		throw runtime_error(s);
-	}
+        throw runtime_error(s);
+    }
 
-	cursectionName = "";
+    cursectionName = "";
 
-	// parse the inifile and write data to inidata
-	while (inifile->getLine(line, 1024) != 0) {
-		str = line;
+    // parse the inifile and write data to inidata
+    while (inifile->getLine(line, 1024) != 0) {
+        str = line;
 
-		while ((*str) == ' ' || (*str) == '\t') {
-			str++;
-		}
-		if ((*str) == ';') {
-			continue;
-		}
-		if (sscanf(str, "[%[^]]]", key) == 1) {
-			if (cursectionName != "") {
-				//inidata[cursectionName] = cursection;
-				Inidata[cursectionName] = newSection;
-				//                cursection.clear();
-				newSection.clear();
-			}
+        while ((*str) == ' ' || (*str) == '\t') {
+            str++;
+        }
+        if ((*str) == ';') {
+            continue;
+        }
+        if (sscanf(str, "[%[^]]]", key) == 1) {
+            if (cursectionName != "") {
+                //inidata[cursectionName] = cursection;
+                Inidata[cursectionName] = newSection;
+                //                cursection.clear();
+                newSection.clear();
+            }
             for (unsigned int i = 0; key[i] != '\0'; i++) 
             {
                 key[i] = toupper(key[i]);
             }
             cursectionName = key;
-		} else if (cursectionName != "" && sscanf(str, "%[^=]=%[^\r\n;]", key,
-				value) == 2) {
-			for (unsigned int i = 0; key[i] != '\0'; i++) {
-				key[i] = toupper(key[i]);
-			}
-			if (strlen(key) > 0) {
-				str = key + strlen(key) - 1;
-				while ((*str) == ' ' || (*str) == '\t') {
-					(*str) = '\0';
-					if (str == key) {
-						break;
-					}
-					str--;
-				}
-			}
-			if (strlen(value) > 0) {
-				str = value + strlen(value) - 1;
-				while ((*str) == ' ' || (*str) == '\t') {
-					(*str) = '\0';
-					if (str == value) {
-						break;
-					}
-					str--;
-				}
-			}
-			str = value;
-			while ((*str) == ' ' || (*str) == '\t') {
-				str++;
-			}
-			//cursection[(string)key] = (string)str;
-			Entry.first = (string) key;
-			Entry.second = (string) str;
-			//newSection.push_back(Entry);
-			//            std::pair entry ((string)key, (string)str);
-			//            newSection.push_back (key, str);
+        } else if (cursectionName != "" && sscanf(str, "%[^=]=%[^\r\n;]", key,
+                value) == 2) {
+            for (unsigned int i = 0; key[i] != '\0'; i++) {
+                key[i] = toupper(key[i]);
+            }
+            if (strlen(key) > 0) {
+                str = key + strlen(key) - 1;
+                while ((*str) == ' ' || (*str) == '\t') {
+                    (*str) = '\0';
+                    if (str == key) {
+                        break;
+                    }
+                    str--;
+                }
+            }
+            if (strlen(value) > 0) {
+                str = value + strlen(value) - 1;
+                while ((*str) == ' ' || (*str) == '\t') {
+                    (*str) = '\0';
+                    if (str == value) {
+                        break;
+                    }
+                    str--;
+                }
+            }
+            str = value;
+            while ((*str) == ' ' || (*str) == '\t') {
+                str++;
+            }
+            //cursection[(string)key] = (string)str;
+            Entry.first = (string) key;
+            Entry.second = (string) str;
+            //newSection.push_back(Entry);
+            //            std::pair entry ((string)key, (string)str);
+            //            newSection.push_back (key, str);
                         
                         newSection[key] = str;
-		}
-	}
-	if (cursectionName != "") {
-		//inidata[cursectionName] = cursection;
-		Inidata[cursectionName] = newSection;
-		//        cursection.clear();
-		newSection.clear();
-	}
+        }
+    }
+    if (cursectionName != "") {
+        //inidata[cursectionName] = cursection;
+        Inidata[cursectionName] = newSection;
+        //        cursection.clear();
+        newSection.clear();
+    }
 
-	// Close the file
-	VFSUtils::VFS_Close(inifile);
+    // Close the file
+    VFSUtils::VFS_Close(inifile);
 }
 
 /**
@@ -165,39 +163,39 @@ INIFile::~INIFile()
  */
 string INIFile::readString(const string& section, const string& value) const
 {
-	char* retval = 0; // Return value
+    char* retval = 0; // Return value
 
-	string s = section;
-	transform(s.begin(), s.end(), s.begin(), toupper);
-	string v = value;
-	transform(v.begin(), v.end(), v.begin(), toupper);
+    string s = section;
+    transform(s.begin(), s.end(), s.begin(), toupper);
+    string v = value;
+    transform(v.begin(), v.end(), v.begin(), toupper);
 
-	// Try to find the key
-	map<string, INISection>::const_iterator sec = Inidata.find(s);
+    // Try to find the key
+    map<string, INISection>::const_iterator sec = Inidata.find(s);
         
-	if (sec == Inidata.end()) {
-		return 0;
-	}
+    if (sec == Inidata.end()) {
+        return 0;
+    }
 
-	// get a const iterator
-	INISection::const_iterator key = sec->second.begin();
+    // get a const iterator
+    INISection::const_iterator key = sec->second.begin();
 
-	for (unsigned int i = 0; i < sec->second.size(); i++) {
-		if (key->first == v) {
-			break;
-		}
-		key++;
-	}
+    for (unsigned int i = 0; i < sec->second.size(); i++) {
+        if (key->first == v) {
+            break;
+        }
+        key++;
+    }
 
-	if (key == sec->second.end()) {
-		return 0;
-	}
-	// allocate a new string
-	retval = new char[key->second.length() + 1];
-	// copy value
-	strcpy(retval, key->second.c_str());
-	// return the good one
-	return retval;
+    if (key == sec->second.end()) {
+        return 0;
+    }
+    // allocate a new string
+    retval = new char[key->second.length() + 1];
+    // copy value
+    strcpy(retval, key->second.c_str());
+    // return the good one
+    return retval;
 }
 
 /**
@@ -267,31 +265,31 @@ int INIFile::readInt(const string& section, const string& key) const
     
     
     map<string, INISection>::const_iterator sec = Inidata.find(s);
-	if (sec == Inidata.end()) {
-		throw KeyNotFound("Can't find the section [" + string(section)
-				+ "] in ini file.");
-	}
+    if (sec == Inidata.end()) {
+        throw KeyNotFound("Can't find the section [" + string(section)
+                + "] in ini file.");
+    }
 
     
     //map<string, string>::const_iterator keyIt = sec.find(k);
     INISection::const_iterator keyIt = sec->second.find(k);
-	//    key = sec->second.find(v);
-	//key = sec->second.begin();
+    //    key = sec->second.find(v);
+    //key = sec->second.begin();
      //   key.find(k);
-	//for (unsigned int i = 0; i < sec->second.size(); i++) {
-	//	if (key->first == v) {
-	//		break;
-	//	}
-	//	key++;
-	//}
+    //for (unsigned int i = 0; i < sec->second.size(); i++) {
+    //	if (key->first == v) {
+    //		break;
+    //	}
+    //	key++;
+    //}
 
-	if (keyIt == sec->second.end()) {
-		throw KeyNotFound("Can't Find the key [" + k
-				+ "] in the section [" + s + "] of ini file.");
-	}
-	//if (sscanf(key->second.c_str(), "%d", &retval) != 1) {
-	//	throw runtime_error("Unable to cast to int.");
-	//}
+    if (keyIt == sec->second.end()) {
+        throw KeyNotFound("Can't Find the key [" + k
+                + "] in the section [" + s + "] of ini file.");
+    }
+    //if (sscanf(key->second.c_str(), "%d", &retval) != 1) {
+    //	throw runtime_error("Unable to cast to int.");
+    //}
     stringstream convStr;
     convStr << keyIt->second;
     int ret;
@@ -309,44 +307,44 @@ int INIFile::readInt(const string& section, const string& key) const
  */
 float INIFile::readFloat(const string& sectionString, const string& keyString) 
 {
-	float retval;
-	
-	// Get the "UPPER" strings
-	string s = sectionString;
-	transform(s.begin(), s.end(), s.begin(), toupper);
-	string v = keyString;
-	transform(v.begin(), v.end(), v.begin(), toupper);
+    float retval;
+    
+    // Get the "UPPER" strings
+    string s = sectionString;
+    transform(s.begin(), s.end(), s.begin(), toupper);
+    string v = keyString;
+    transform(v.begin(), v.end(), v.begin(), toupper);
 
-	// Check if the section is in the file
-	map<string, INISection>::const_iterator sec = Inidata.find(s);
-	if (sec == Inidata.end()) {
-		throw new KeyNotFound("The section [" + sectionString
-				+ "] was not found in the file.");
-	}
+    // Check if the section is in the file
+    map<string, INISection>::const_iterator sec = Inidata.find(s);
+    if (sec == Inidata.end()) {
+        throw new KeyNotFound("The section [" + sectionString
+                + "] was not found in the file.");
+    }
 
-	// Try to find the section (by iterations)
-	INISection::const_iterator key = sec->second.begin();
-	for (unsigned int i = 0; i < sec->second.size(); i++) {
-		if (key->first == v) {
-			break;
-		}
-		key++;
-	}
+    // Try to find the section (by iterations)
+    INISection::const_iterator key = sec->second.begin();
+    for (unsigned int i = 0; i < sec->second.size(); i++) {
+        if (key->first == v) {
+            break;
+        }
+        key++;
+    }
 
-	// If the key was not found throw an INI::KeyNotFound exception
-	if (key == sec->second.end()) {
-		throw new KeyNotFound("Key " + sectionString + ":" + keyString
-				+ " was not found in the ini file.");
-	}
-	// If we can't "sscan" in float
-	if (sscanf(key->second.c_str(), "%f", &retval) != 1) {
-		throw new runtime_error("Key " + sectionString + ":" + keyString
-				+ "=" + string(key->second.c_str())
-				+ " can't be cast in float.");
-	}
+    // If the key was not found throw an INI::KeyNotFound exception
+    if (key == sec->second.end()) {
+        throw new KeyNotFound("Key " + sectionString + ":" + keyString
+                + " was not found in the ini file.");
+    }
+    // If we can't "sscan" in float
+    if (sscanf(key->second.c_str(), "%f", &retval) != 1) {
+        throw new runtime_error("Key " + sectionString + ":" + keyString
+                + "=" + string(key->second.c_str())
+                + " can't be cast in float.");
+    }
 
-	// success return the value
-	return retval;
+    // success return the value
+    return retval;
 }
 
 /**
@@ -384,22 +382,22 @@ float INIFile::readFloat(const string& section, const string& key, const float d
  */
 int INIFile::getNumberOfKeysInSection(const string& section) const
 {
-	
-	string s;
+    
+    string s;
 
-	// get the string from (char*) section
-	s = string(section);
+    // get the string from (char*) section
+    s = string(section);
 
-	// Upper the section string
-	transform(s.begin(), s.end(), s.begin(), toupper);
+    // Upper the section string
+    transform(s.begin(), s.end(), s.begin(), toupper);
 
-	map<string, INISection>::const_iterator sec_new = Inidata.find(s);
-	if (sec_new == Inidata.end()) {
-		//throw KeyNotFound("Section [" + string(section) + "] not found in .ini file.");
-		return 0;
-	}
+    map<string, INISection>::const_iterator sec_new = Inidata.find(s);
+    if (sec_new == Inidata.end()) {
+        //throw KeyNotFound("Section [" + string(section) + "] not found in .ini file.");
+        return 0;
+    }
 
-	return sec_new->second.size();
+    return sec_new->second.size();
 }
 
 /**
@@ -412,36 +410,36 @@ int INIFile::getNumberOfKeysInSection(const string& section) const
  */
 INISection::const_iterator INIFile::readKeyValue(const char* section, unsigned int keynum) 
 {
-	map<string, INISection>::iterator sec_new;
-	string s;
+    map<string, INISection>::iterator sec_new;
+    string s;
 
-	// get the string from (char*) section
-	s = string(section);
+    // get the string from (char*) section
+    s = string(section);
 
-	// Upper the section string
-	transform(s.begin(), s.end(), s.begin(), toupper);
+    // Upper the section string
+    transform(s.begin(), s.end(), s.begin(), toupper);
 
-	sec_new = Inidata.find(s);
-	if (sec_new == Inidata.end()) {
-		throw KeyNotFound("Section [" + string(section)
-				+ "] not found in .ini file.");
-	}
+    sec_new = Inidata.find(s);
+    if (sec_new == Inidata.end()) {
+        throw KeyNotFound("Section [" + string(section)
+                + "] not found in .ini file.");
+    }
 
-	if (keynum >= sec_new->second.size()) {
-		throw KeyNotFound("Key number [???] in Section [" + string(section)
-				+ "] not found in .ini file.");
-	}
+    if (keynum >= sec_new->second.size()) {
+        throw KeyNotFound("Key number [???] in Section [" + string(section)
+                + "] not found in .ini file.");
+    }
 
-	INISection::iterator Key = sec_new->second.begin();
-	for (Uint32 i = 0; i < keynum; ++i) {
-		Key++;
-	}
-	if (Key == sec_new->second.end()) {
-		logger->error("throw 0 in INIFile::readKeyValue()\n");
-		throw KeyNotFound("Key number [????] in Section [" + string(section)
-				+ "] not found in .ini file.");
-	}
-	return Key;
+    INISection::iterator Key = sec_new->second.begin();
+    for (Uint32 i = 0; i < keynum; ++i) {
+        Key++;
+    }
+    if (Key == sec_new->second.end()) {
+        Logger::getInstance()->Error("throw 0 in INIFile::readKeyValue()\n");
+        throw KeyNotFound("Key number [????] in Section [" + string(section)
+                + "] not found in .ini file.");
+    }
+    return Key;
 }
 
 /**
@@ -451,39 +449,39 @@ INISection::const_iterator INIFile::readIndexedKeyValue(const char* section, uns
     string s = section;
     transform(s.begin(), s.end(), s.begin(), toupper);
 
-	map<string, INISection>::iterator sec = Inidata.find(s);
-	if (sec == Inidata.end()) {
-		throw 0;
-	}
+    map<string, INISection>::iterator sec = Inidata.find(s);
+    if (sec == Inidata.end()) {
+        throw 0;
+    }
 
-	if (index > sec->second.size()) {
-		throw 0;
-	}
+    if (index > sec->second.size()) {
+        throw 0;
+    }
 
-	string keyval;
-	if (prefix)
-		keyval = prefix;
-	//keyval += lexical_cast<string>(index);
+    string keyval;
+    if (prefix)
+        keyval = prefix;
+    //keyval += lexical_cast<string>(index);
 
-	stringstream TempStr;
-	TempStr << (unsigned int) index;
-	//	sprintf (TempString, "%u", index);
-	//	keyval += TempString;
-	keyval += TempStr.str();
+    stringstream TempStr;
+    TempStr << (unsigned int) index;
+    //	sprintf (TempString, "%u", index);
+    //	keyval += TempString;
+    keyval += TempStr.str();
 
-	INISection::const_iterator key = sec->second.begin();
+    INISection::const_iterator key = sec->second.begin();
 
-	for (unsigned int i = 0; i < sec->second.size(); i++) {
-		if (key->first == keyval) {
-			return key;
-		}
-		key++;
-	}
-	if (key == sec->second.end()) {
-		throw 0;
-	}
-	// we should never get here
-	return key;
+    for (unsigned int i = 0; i < sec->second.size(); i++) {
+        if (key->first == keyval) {
+            return key;
+        }
+        key++;
+    }
+    if (key == sec->second.end()) {
+        throw 0;
+    }
+    // we should never get here
+    return key;
 
 }
 
@@ -528,43 +526,43 @@ bool INIFile::isSection(const string& section) const
  */
 bool INIFile::isKeyInSection(const string& section, const string& keyString) const
 {
-	// Upper version of the section
-	string s = section;
-	// Upper the section string
-	transform(s.begin(), s.end(), s.begin(), toupper);
+    // Upper version of the section
+    string s = section;
+    // Upper the section string
+    transform(s.begin(), s.end(), s.begin(), toupper);
 
-	// Try to get the section
-	map<string, INISection>::const_iterator sec = Inidata.find(s);
+    // Try to get the section
+    map<string, INISection>::const_iterator sec = Inidata.find(s);
 
-	// If the section was not found
-	if (sec == Inidata.end())
-	{
-		// Return false
-		return false;
-	}
-	else
-	{
-		// Upper version of the key string
-		string k = keyString;
-		// Upper the key string
-		transform(k.begin(), k.end(), k.begin(), toupper);
+    // If the section was not found
+    if (sec == Inidata.end())
+    {
+        // Return false
+        return false;
+    }
+    else
+    {
+        // Upper version of the key string
+        string k = keyString;
+        // Upper the key string
+        transform(k.begin(), k.end(), k.begin(), toupper);
 
-		// Get an iterator
-		INISection::const_iterator sec_key = sec->second.begin();
-		while (sec_key!=sec->second.end())
-		{
-			// If the Key was found
-			if (sec_key->first == k)
-			{
-				// Return true
-				return true;
-			}
-			// Continue
-			sec_key++;
-		}
-	}
-	// Nothing found, return false
-	return false;
+        // Get an iterator
+        INISection::const_iterator sec_key = sec->second.begin();
+        while (sec_key!=sec->second.end())
+        {
+            // If the Key was found
+            if (sec_key->first == k)
+            {
+                // Return true
+                return true;
+            }
+            // Continue
+            sec_key++;
+        }
+    }
+    // Nothing found, return false
+    return false;
 }
 
 int INIFile::readYesNo(const string& section, const string& value, const int defaut) const
@@ -594,5 +592,5 @@ int INIFile::readYesNo(const string& section, const string& value, const int def
  */
 string INIFile::getFileName() const
 {
-	return this->filename;
+    return this->filename;
 }

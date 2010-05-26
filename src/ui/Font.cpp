@@ -23,7 +23,6 @@
 #include "ui/FontCache.h"
 #include "video/Renderer.h"
 #include "include/fcnc_endian.h"
-#include "include/Logger.h"
 #include "include/sdllayer.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
@@ -39,13 +38,14 @@ using std::vector;
 
 #ifdef USE_FONTCACHE
 //vector <TFontImage> fontcache;
-FontCache		fontCache;
+FontCache fontCache;
 #endif
 
-Font::~Font() {
+Font::~Font()
+{
 #ifndef USE_FONTCACHE
-	if (fontimg != NULL){
-		SDL_FreeSurface(fontimg);
+    if (fontimg != NULL){
+        SDL_FreeSurface(fontimg);
     }
 #endif
 }

@@ -30,18 +30,14 @@
 #include "video/GraphicsEngine.h"
 #include "include/imageproc.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
 #include "WSAError.h"
 #include "WSAHeader.h"
-#include "include/Logger.h"
 #include "GraphicsEngine.h"
 
 using std::string;
 using std::runtime_error;
-
-extern Logger * logger;
 
 /**
  */
@@ -137,10 +133,9 @@ WSAMovie::WSAMovie(const string& movieFileName)
     
     // Load the animation file from mix archives
     VFile* wfile = VFSUtils::VFS_Open(fname.c_str());
-    // Test if their no file
-    if (wfile == 0)
+    // Test if their no file throw a WSA error
+    if (NULL == wfile)
     {
-    	// Throw a WSA error
         throw WSAError("WSA Animation file not found");
     }
     // copy data of the file

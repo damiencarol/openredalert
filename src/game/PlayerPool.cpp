@@ -19,10 +19,10 @@
 
 #include <vector>
 
+#include "Logger.hpp"
 #include "ActionEventQueue.h"
 #include "Player.h"
 #include "misc/config.h"
-#include "include/Logger.h"
 #include "misc/INIFile.h"
 #include "GameMode.h"
 
@@ -30,9 +30,8 @@ using std::vector;
 
 namespace pc
 {
-	extern ConfigType Config;
+    extern ConfigType Config;
 }
-extern Logger* logger;
 
 /**
  */
@@ -181,7 +180,9 @@ void PlayerPool::setLPlayer(const string& pname)
         }
     }
     
-    logger->warning("Tried to set local player to non-existing player '%s'\n", pname.c_str());
+    Logger::getInstance()->Warning("Tried to set local player to non-existing player "
+        + pname);
+
     /*playerpool.push_back(new Player(pname.c_str(), mapini));
     localPlayer = static_cast<Uint8>(playerpool.size()-1);
     playerpool[localPlayer]->setPlayerNum(localPlayer);*/

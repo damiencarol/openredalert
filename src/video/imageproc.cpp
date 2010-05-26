@@ -19,19 +19,18 @@
 #include <cstring>
 #include "video/Renderer.h"
 #include "include/imageproc.h"
-#include "include/Logger.h"
 
 /** Constructor, empty
  *
  */
 ImageProc::ImageProc()
-{}
-
-
+{
+}
 
 /** Destructor, empty */
 ImageProc::~ImageProc()
-{}
+{
+}
 
 void ImageProc::scaleInterlace( SDL_Surface *src, SDL_Surface *dest)
 {

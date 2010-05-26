@@ -27,7 +27,7 @@
 
 #include "misc/common.h"
 #include "misc/config.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "game/CnCMap.h"
 #include "game/PlayerPool.h"
 #include "game/Player.h"
@@ -62,7 +62,6 @@ namespace pc {
     extern MessagePool* msg;
     extern Sidebar* sidebar;
 }
-extern Logger * logger;
 
 
 /**
@@ -105,12 +104,12 @@ GraphicsEngine::GraphicsEngine()
 	screen = SDL_SetVideoMode(width, height, config.bpp, config.videoflags);
 
 	if (screen == 0) {
-		logger->error("Unable to set %dx%d video: %s\n", width, height, SDL_GetError());
+		Logger::getInstance()->Error("Unable to set %dx%d video: %s\n");//, width, height, SDL_GetError());
 		//@todo throw VideoError("Unable to set " + width + "x" + height + " video: " );//+ SDL_GetError());
 	}
 
 	if ( (screen->flags & 0x00004000	/* Surface is RLE encoded */) == 0x00004000	/* Surface is RLE encoded */ ) {
-		printf("Sprite blit uses RLE acceleration\n");
+		Logger::getInstance()->Debug("Sprite blit uses RLE acceleration\n");
 	}
 
 	// Indicates where is the screen mem
@@ -143,10 +142,10 @@ GraphicsEngine::GraphicsEngine()
 		pc::msg = new MessagePool();
 		pc::msg->setWidth(width);
 	} catch(...) {
-		logger->error("Unable to create message pool (missing font?)\n");
+		Logger::getInstance()->Error("Unable to create message pool (missing font?)\n");
 		throw VideoError("Unable to create message pool (missing font?)");
 	}
-	logger->renderGameMsg(true);
+	// TODO : enable game message logger->renderGameMsg(true);
 
 
 	firstframe = SDL_GetTicks();
@@ -189,7 +188,7 @@ GraphicsEngine::~GraphicsEngine()
 	}
 	pc::imgcache = 0;
 
-    logger->renderGameMsg(false);
+    // TODO : logger->renderGameMsg(false);
 
 	if (pc::msg != 0)
 		delete pc::msg;
@@ -890,7 +889,7 @@ void GraphicsEngine::DrawBombing()
 		bombImage = bombing_icon->getImage(numImage);
 
 		if (bombImage == 0){
-			logger->error("bombimage = 0 \n");
+			Logger::getInstance()->Error("bombimage = 0 \n");
 			continue;
 		}
 

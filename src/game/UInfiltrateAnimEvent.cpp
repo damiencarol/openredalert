@@ -21,6 +21,7 @@
 
 #include "SDL/SDL_types.h"
 
+#include "Logger.hpp"
 #include "ActionEventQueue.h"
 #include "UnitOrStructure.h"
 #include "TurnAnimEvent.h"
@@ -31,7 +32,6 @@
 #include "PlayerPool.h"
 #include "game/Unit.hpp"
 #include "CnCMap.h"
-#include "include/Logger.h"
 #include "Unit.hpp"
 #include "UnitOrStructureType.h"
 
@@ -40,7 +40,6 @@ namespace p {
 	extern ActionEventQueue * aequeue;
 	extern CnCMap * ccmap;
 }
-extern Logger * logger;
 
 UInfiltrateAnimEvent::UInfiltrateAnimEvent(Uint32 p, Unit *un) : 
 	UnitAnimEvent(p, un)
@@ -123,7 +122,7 @@ UInfiltrateAnimEvent::~UInfiltrateAnimEvent()
 void UInfiltrateAnimEvent::stop()
 {
     if (un == 0) {
-        logger->error("UAttackAnimEvent::stop: un is NULL!?\n");
+        Logger::getInstance()->Error("UAttackAnimEvent::stop: un is NULL!?\n");
         abort();
     }
     stopping = true;
@@ -149,7 +148,7 @@ void UInfiltrateAnimEvent::run()
     //Uint8 loopend2=((UnitType*)un->getType())->getAnimInfo().loopend2;
 #endif
 
-    logger->debug("Infiltrate run t%p u%p\n",this,un);
+    Logger::getInstance()->Debug("Infiltrate run t%p u%p\n");//,this,un);
     
     waiting = 0;
     if( !un->isAlive() || stopping ) {
@@ -177,7 +176,7 @@ void UInfiltrateAnimEvent::run()
     //if( distance > un->type->getWeapon(UsePrimaryWeapon)->getRange() /* weapons range */ ) {
     if (xtiles<=1 && ytiles<=1)
     {
-    	logger->debug("Infiltrate MOVE !!\n");
+    	Logger::getInstance()->Debug("Infiltrate MOVE !!\n");
     	    
     
     	setDelay(0);
@@ -265,7 +264,7 @@ void UInfiltrateAnimEvent::run()
     //p::aequeue->scheduleEvent(this);
 	//done = 1;
 	
-	logger->debug("END INFILTRATE !!!\n");
+	Logger::getInstance()->Debug("END INFILTRATE !!!\n");
 	delete this;
 	return;
 }

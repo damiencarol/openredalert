@@ -22,12 +22,12 @@
 #include <cstring>
 #include <map>
 
+#include "Logger.hpp"
 #include "CnCMap.h"
 #include "misc/config.h"
 #include "Dispatcher.h"
 #include "misc/INIFile.h"
 #include "PlayerPool.h"
-#include "include/Logger.h"
 #include "MoneyCounter.h"
 #include "UnitAndStructurePool.h"
 #include "StructureType.h"
@@ -47,10 +47,9 @@ namespace pc {
     extern ConfigType Config;
 }
 namespace p {
-	extern UnitAndStructurePool* uspool;
-	extern CnCMap* ccmap;
+    extern UnitAndStructurePool* uspool;
+    extern CnCMap* ccmap;
 }
-extern Logger * logger;
 
 /**
  * @todo Make hardcoded side names customisable (Needed to make RA support
@@ -167,7 +166,7 @@ Player::Player(const string& pname)
 	} */
     else 
 	{
-        logger->warning("Player Side \"%s\" not recognised, using gdi instead\n", playername.c_str());
+        Logger::getInstance()->Warning("Player Side '" + playername + "' not recognised, using PS_GOOD instead");
         playerside = PS_GOOD;
         unitpalnum = 0;
         structpalnum = 0;
@@ -476,8 +475,8 @@ ConStatus Player::stopBuilding(UnitOrStructureType *type)
     BQueue* queue = getQueue(type->getPQueue());
     if (0 == queue) 
     {
-        logger->error("Didn't find build queue for \"%s\" (pqueue: %i)\n",
-                type->getName().c_str(), type->getPQueue());
+        Logger::getInstance()->Error("Didn't find build queue for type "
+            + type->getName());
         return BQ_EMPTY;
     }
     return queue->PauseCancel(type);
@@ -607,7 +606,7 @@ void Player::builtStruct(Structure* str)
     if (str == 0)
     {
         // Log it
-        logger->error("Player::builtStruct !!!!! Structure = null !!!!! Player = %s \n", this->playername.c_str());   
+        Logger::getInstance()->Error(__FILE__, __LINE__, "Structure = null !!!!! Player = " + this->playername);   
         return;
     }
  
@@ -723,7 +722,7 @@ void Player::lostStruct(Structure* str)
 
     if( unitpool.empty() && structurepool->size() <= 1 ) 
     {
-        logger->gameMsg("Player \"%s\" defeated", playername.c_str());
+        // TODO : manage game message logger->gameMsg("Player \"%s\" defeated", playername.c_str());
         defeated = true;
         //p::ccmap->getPlayerPool()->playerDefeated(this);
     } 

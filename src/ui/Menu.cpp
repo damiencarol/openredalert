@@ -26,7 +26,7 @@
 #include "TCheckBox.h"
 
 #include "misc/config.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "game/MissionMapsClass.h"
 #include "game/MultiPlayerMaps.h"
 #include "game/GameMode.h"
@@ -46,7 +46,6 @@ namespace pc {
 	extern ConfigType Config;
 	extern GraphicsEngine * gfxeng;
 }
-extern Logger * logger;
 
 /**
  *
@@ -85,10 +84,11 @@ Menu::Menu() : StartNewGameButton()
 	SHPBase::setPalette(palette);
 	SHPBase::calculatePalettes();
 
+    Logger::getInstance()->Debug("Loading background graphics.");
 	try {
 		win95_logo = new PCXImage("title.pcx",-1);
 	} catch (ImageNotFound&) {
-		logger->error("Couldn't load startup graphic\n");
+		Logger::getInstance()->Error("Couldn't load startup graphic\n");
 		win95_logo = NULL;
 	}
 
@@ -97,7 +97,7 @@ Menu::Menu() : StartNewGameButton()
 		try {
 			dos_logo = new CPSImage(string("title.cps"), 1);
 		} catch (ImageNotFound&) {
-			logger->error("Couldn't load startup graphic\n");
+			Logger::getInstance()->Error("Couldn't load startup graphic\n");
 			dos_logo = NULL;
 		}
 	}
@@ -125,13 +125,13 @@ Menu::Menu() : StartNewGameButton()
 	// Load the cursor
 	cursorimg = new Dune2Image("mouse.shp", -1);
 	if (cursorimg == NULL)
-		logger->error("Couldn't load cursor image\n");
+		Logger::getInstance()->Error("Couldn't load cursor image\n");
 
 	my_cursor = cursorimg->getImage(0);
 
 	if (my_cursor == 0)
 	{
-		logger->error("Couldn't get cursor sld surface\n");
+		Logger::getInstance()->Error("Couldn't get cursor sld surface\n");
 	}
 
 	// Free cursorimg
@@ -149,7 +149,7 @@ Menu::Menu() : StartNewGameButton()
 	int ButtonXpos	= display->w/2 - button_width/2;
 	int ButtonYpos	= int(200 * scale_factor);
 
-
+    Logger::getInstance()->Debug("Configure buttons.");
 	// Set pos and label (the string 17 is "new game" but located)
 	StartNewGameButton.CreateSurface(strFile->getString(17), ButtonXpos, ButtonYpos, button_width, button_height);
 	// Add a space
@@ -375,9 +375,11 @@ Menu::Menu() : StartNewGameButton()
 //	DebugTest.drawCHAR('G');
 
 	// Load mission maps data
+    Logger::getInstance()->Debug("Loading mission maps");
 	missionList = new MissionMapsClass();
 
 	// Load multiPlayer maps
+	Logger::getInstance()->Debug("Loading multi-players maps");
 	multiPlayerMaps = new MultiPlayerMaps();
 
 	// Build Lisbox with mission multi
@@ -727,7 +729,8 @@ int Menu::HandleMenu()
     StringTableFile* strFile;
 
     // Load located strings
-    strFile = new StringTableFile("conquer.eng");
+    Logger::getInstance()->Debug(__FILE__, __LINE__, "Loading string from conquer.eng");
+	strFile = new StringTableFile("conquer.eng");
 
 	// Setup the multi player listbox with all the multiplayer maps
 	i = 0;
@@ -805,12 +808,15 @@ int Menu::HandleMenu()
     return 0;
 }
 
+/**
+ * Loading of palette in mix files.
+ */
 void Menu::loadPal(const string& paln, SDL_Color *palette)
 {
     // string palname = missionData.theater;
     std::string palname = paln;
 
-    logger->debug("Loading pallete: %s\n", palname.c_str());
+    Logger::getInstance()->Debug(__FILE__, __LINE__, "Loading palette: '" + palname + "'");
 
     if (palname.length() > 8)
     {
@@ -822,10 +828,11 @@ void Menu::loadPal(const string& paln, SDL_Color *palette)
     }
 
     // Seek the palette file in the mix
+    Logger::getInstance()->Debug(__FILE__, __LINE__, "Try to loading file in VFS '" + palname + "'");
     VFile* palfile = VFSUtils::VFS_Open(palname.c_str());
     if (palfile == NULL)
     {
-        logger->error("%s line %i: Unable to open palette file (\"%s\").\n", __FILE__, __LINE__, palname.c_str());
+        Logger::getInstance()->Error("%s line %i: Unable to open palette file '" + palname + "'");
         return;
     }
 

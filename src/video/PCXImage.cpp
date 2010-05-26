@@ -25,10 +25,8 @@
 #include "misc/INIFile.h"
 #include "vfs/vfs.h"
 #include "vfs/VFile.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "video/ImageNotFound.h"
-
-extern Logger * logger;
 
 PCXImage::PCXImage(const char* fname, int scaleq) : pcxdata(0), image(0) 
 {
@@ -40,7 +38,7 @@ PCXImage::PCXImage(const char* fname, int scaleq) : pcxdata(0), image(0)
 	this->scaleq = scaleq;
 	imgfile = VFSUtils::VFS_Open(fname);
 	if (imgfile == NULL) {
-		logger->error ("%s line %i: Image not found %s\n", __FILE__, __LINE__, fname);
+		Logger::getInstance()->Error (__FILE__, __LINE__, "Image not found '" + string(fname) + "'");
 		throw ImageNotFound("Image [" + string(fname) + "] not found");
 	}
 	imgsize = imgfile->fileSize();
@@ -48,7 +46,7 @@ PCXImage::PCXImage(const char* fname, int scaleq) : pcxdata(0), image(0)
 	// The image should at least be bigger that the header
 	if (imgsize  < 129){
 		VFSUtils::VFS_Close(imgfile);
-		logger->error ("%s line %i: Not an pcx image %s\n", __FILE__, __LINE__, fname);
+		Logger::getInstance()->Error ("Size of PCX image is not valid.");
 		HeaderError = true;
 		return;
 	}
@@ -70,7 +68,7 @@ PCXImage::PCXImage(const char* fname, int scaleq) : pcxdata(0), image(0)
 	// The image should at least be bigger that the header
 	if (header.Signature !=  10){
 		VFSUtils::VFS_Close(imgfile);
-		logger->error ("%s line %i: Not an pcx image %s\n", __FILE__, __LINE__, fname);
+		Logger::getInstance()->Error ("Signature of PCX image is not valid.");
 		HeaderError = true;
 		return;
 	}

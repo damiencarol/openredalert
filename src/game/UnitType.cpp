@@ -26,7 +26,7 @@
 #include "misc/common.h"
 #include "CnCMap.h"
 #include "misc/INIFile.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "PlayerPool.h"
 #include "audio/SoundEngine.h"
 #include "Unit.hpp"
@@ -48,36 +48,35 @@ using std::string;
 using std::vector;
 
 namespace pc {
-	extern ImageCache* imgcache;
-	extern vector<SHPImage*>* imagepool;
+    extern ImageCache* imgcache;
+    extern vector<SHPImage*>* imagepool;
 }
 namespace p {
-	extern UnitAndStructurePool* uspool;
-	extern WeaponsPool* weappool;
+    extern UnitAndStructurePool* uspool;
+    extern WeaponsPool* weappool;
 }
-extern Logger * logger;
 
 /**
  */
 UnitType::UnitType(const string& typeName, INIFile* unitini) :
-	UnitOrStructureType(),
-	shpnums(0),
-	c4(false)
+    UnitOrStructureType(),
+    shpnums(0),
+    c4(false)
 {
     string tname = typeName;
     SHPImage* shpimage = 0;
 
     string shpname;
 
-	Uint32 shpnum;
-	Uint32 tmpspeed;
+    Uint32 shpnum;
+    Uint32 tmpspeed;
 
 
     // Ensure that there is a section in the ini file
     if (unitini->isSection(typeName) == false)
     {
-    	// Log it
-    	logger->error("%s line %i: Unknown type: %s\n", __FILE__, __LINE__, typeName.c_str());
+        // Log it
+        Logger::getInstance()->Error("%s line %i: Unknown type: " + typeName);
 
         shpnums = 0;
         shptnum = 0;
@@ -89,149 +88,149 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
 
 
 
-	string tmp = unitini->readString(tname, "prerequisites", "");
-	Split(prereqs, tmp, ',');
+    string tmp = unitini->readString(tname, "prerequisites", "");
+    Split(prereqs, tmp, ',');
 
-	unittype = unitini->readInt(tname, "unittype", 0);
-	if (0 == unittype)
-	{
-		logger->warning("No unit type specified for \"%s\"\n", tname.c_str());
-	}
+    unittype = unitini->readInt(tname, "unittype", 0);
+    if (0 == unittype)
+    {
+        Logger::getInstance()->Warning("No unit type specified for '" + tname + "'");
+    }
 
-	numlayers = unitini->readInt(tname, "layers", 1);
+    numlayers = unitini->readInt(tname, "layers", 1);
 
-	shpnums = new Uint32[numlayers];
-	shptnum = new Uint16[numlayers];
+    shpnums = new Uint32[numlayers];
+    shptnum = new Uint16[numlayers];
 
-	// get string with this name
-	shpname = string(typeName);
-	shpname += ".shp";
-	// @todo TRY THIS !!!
-	try
-	{
-		shpimage = new SHPImage(shpname.c_str(), -1);
-	} catch (ImageNotFound&) {
-		logger->error("Image not found: \"%s\"\n", shpname.c_str());
-		numlayers = 0;
-		return;
-	}
-	shpnum = static_cast<Uint32>(pc::imagepool->size());
-	pc::imagepool->push_back(shpimage);
-	shpnum <<= 16;
+    // get string with this name
+    shpname = string(typeName);
+    shpname += ".shp";
+    // @todo TRY THIS !!!
+    try
+    {
+        shpimage = new SHPImage(shpname.c_str(), -1);
+    } catch (ImageNotFound&) {
+        Logger::getInstance()->Error("Image not found: '" + shpname + "'");
+        numlayers = 0;
+        return;
+    }
+    shpnum = static_cast<Uint32>(pc::imagepool->size());
+    pc::imagepool->push_back(shpimage);
+    shpnum <<= 16;
 
-	for(unsigned int i = 0; i < numlayers; i++)
-	{
-		// get layer offsets from inifile
-		//shpnums[i] = pc::imagepool->size();
-		shpnums[i] = shpnum;
-		shptnum[i] = shpimage->getNumImg();
-		shpnum += 32;
-	}
-	// @todo REFACTOR TO IT !!!
-	 /*
-	// Load the SHPimage
-	Uint32 numSHP = pc::imgcache->loadImage(shpname.c_str());
-	for (i = 0; i < numlayers; i++)
-	{
-		// get layer offsets from inifile
-		shpnums[i] = numSHP;
-		shptnum[i] = pc::imgcache->getImage(numSHP).NumbImages;
-		shpnum += 32;
-	}
+    for(unsigned int i = 0; i < numlayers; i++)
+    {
+        // get layer offsets from inifile
+        //shpnums[i] = pc::imagepool->size();
+        shpnums[i] = shpnum;
+        shptnum[i] = shpimage->getNumImg();
+        shpnum += 32;
+    }
+    // @todo REFACTOR TO IT !!!
+     /*
+    // Load the SHPimage
+    Uint32 numSHP = pc::imgcache->loadImage(shpname.c_str());
+    for (i = 0; i < numlayers; i++)
+    {
+        // get layer offsets from inifile
+        shpnums[i] = numSHP;
+        shptnum[i] = pc::imgcache->getImage(numSHP).NumbImages;
+        shpnum += 32;
+    }
 */
-	is_infantry = false;
+    is_infantry = false;
 
-	//buildlevel = unitini->readInt(tname, "buildlevel", 99);
-	techLevel = unitini->readInt(tname, "TechLevel", -1);
+    //buildlevel = unitini->readInt(tname, "buildlevel", 99);
+    techLevel = unitini->readInt(tname, "TechLevel", -1);
 
-	tmp = unitini->readString(tname, "owners");
-	Split(owners, tmp, ',');
+    tmp = unitini->readString(tname, "owners");
+    Split(owners, tmp, ',');
 
-	if (unittype == 1)
-	{
-		is_infantry = true;
-	}
+    if (unittype == 1)
+    {
+        is_infantry = true;
+    }
 
-	tmpspeed = unitini->readInt(tname, "speed");
-	if (is_infantry)
-	{
-		if (tmpspeed == 0x7fffffff)
-		{
-			speed = 4; // default for infantry is slower
-			movemod = 1;
-		}
-		else
-		{
-			speed = (tmpspeed>4) ? 2 : (7-tmpspeed);
-			movemod = (tmpspeed>4) ? (tmpspeed-4) : 1;
-		}
-	}
-	else
-	{
-		if (tmpspeed == 0x7fffffff)
-		{
-			speed = 2;
-			movemod = 1;
-		}
-		else
-		{
-			speed = (tmpspeed>4) ? 2 : (7-tmpspeed);
-			movemod = (tmpspeed>4) ? (tmpspeed-4) : 1;
-		}
-	}
+    tmpspeed = unitini->readInt(tname, "speed");
+    if (is_infantry)
+    {
+        if (tmpspeed == 0x7fffffff)
+        {
+            speed = 4; // default for infantry is slower
+            movemod = 1;
+        }
+        else
+        {
+            speed = (tmpspeed>4) ? 2 : (7-tmpspeed);
+            movemod = (tmpspeed>4) ? (tmpspeed-4) : 1;
+        }
+    }
+    else
+    {
+        if (tmpspeed == 0x7fffffff)
+        {
+            speed = 2;
+            movemod = 1;
+        }
+        else
+        {
+            speed = (tmpspeed>4) ? 2 : (7-tmpspeed);
+            movemod = (tmpspeed>4) ? (tmpspeed-4) : 1;
+        }
+    }
 
 
-	string talkmode;
-	if (is_infantry)
-	{
-		talkmode = unitini->readString(tname, "talkback", "Generic");
-		sight = unitini->readInt(tname, "sight", 3);
-	}
-	else
-	{
-		talkmode = unitini->readString(tname, "talkback", "Generic-Vehicle");
-		sight = unitini->readInt(tname, "sight", 5);
-	}
-	talkback = p::uspool->getTalkback(talkmode.c_str());
-	
+    string talkmode;
+    if (is_infantry)
+    {
+        talkmode = unitini->readString(tname, "talkback", "Generic");
+        sight = unitini->readInt(tname, "sight", 3);
+    }
+    else
+    {
+        talkmode = unitini->readString(tname, "talkback", "Generic-Vehicle");
+        sight = unitini->readInt(tname, "sight", 5);
+    }
+    talkback = p::uspool->getTalkback(talkmode.c_str());
+    
     maxhealth = unitini->readInt(tname, "health", 50);
 
     setCost(unitini->readInt(tname, "cost", 0));
     if (0 == getCost())
     {
-        logger->error("\"%s\" has no cost, setting to 1\n", tname.c_str());
-	setCost(1);
+        Logger::getInstance()->Error(tname + "' has no cost, setting to 1");
+        setCost(1);
     }
 
-	// Set the turn speed
-	try
-	{
-		tmpspeed = unitini->readInt(tname, "turnspeed");
+    // Set the turn speed
+    try
+    {
+        tmpspeed = unitini->readInt(tname, "turnspeed");
 
-		// ok
-		turnspeed = (tmpspeed>4)?2:(7-tmpspeed);
-		turnmod = (tmpspeed>4)?(tmpspeed-4):1;
-	}
-	catch(...)
-	{
-		turnspeed = 2;
-		turnmod = 1;
-	}
+        // ok
+        turnspeed = (tmpspeed>4)?2:(7-tmpspeed);
+        turnmod = (tmpspeed>4)?(tmpspeed-4):1;
+    }
+    catch(...)
+    {
+        turnspeed = 2;
+        turnmod = 1;
+    }
 
-	if (is_infantry)
-	{
-		//      size = 1;
-		offset = 0;
-	}
-	else
-	{
-		//size = shpimage->getWidth();
-		offset = (shpimage->getWidth()-24)>>1;
-	}
+    if (is_infantry)
+    {
+        //      size = 1;
+        offset = 0;
+    }
+    else
+    {
+        //size = shpimage->getWidth();
+        offset = (shpimage->getWidth()-24)>>1;
+    }
 
     
     doubleowned = (unitini->readYesNo(tname, "DoubleOwned", 0) == 1);
-	
+    
 
     // Read primary weapon
     string priStr = unitini->readString(tname, "Primary", "");
@@ -288,21 +287,21 @@ UnitType::UnitType(const string& typeName, INIFile* unitini) :
     }
     
     
-	valid = true;
+    valid = true;
 
 #ifdef LOOPEND_TURN
-	animinfo.loopend = unitini->readInt(typeName, "loopend", 31);
-	animinfo.loopend2 = unitini->readInt(typeName, "loopend2", 0);
+    animinfo.loopend = unitini->readInt(typeName, "loopend", 31);
+    animinfo.loopend2 = unitini->readInt(typeName, "loopend2", 0);
 
-	animinfo.animspeed = unitini->readInt(typeName, "animspeed", 3);
-	animinfo.animspeed = abs(animinfo.animspeed);
-	animinfo.animspeed = (animinfo.animspeed>1 ? animinfo.animspeed : 2);
-	animinfo.animdelay = unitini->readInt(typeName, "delay", 0);
+    animinfo.animspeed = unitini->readInt(typeName, "animspeed", 3);
+    animinfo.animspeed = abs(animinfo.animspeed);
+    animinfo.animspeed = (animinfo.animspeed>1 ? animinfo.animspeed : 2);
+    animinfo.animdelay = unitini->readInt(typeName, "delay", 0);
 
-	animinfo.animtype = unitini->readInt(typeName, "animtype", 0);
-	animinfo.sectype = unitini->readInt(typeName, "sectype", 0);
+    animinfo.animtype = unitini->readInt(typeName, "animtype", 0);
+    animinfo.sectype = unitini->readInt(typeName, "sectype", 0);
 
-	animinfo.dmgoff = unitini->readInt(typeName, "dmgoff", ((shptnum[0]-1)>>1));
+    animinfo.dmgoff = unitini->readInt(typeName, "dmgoff", ((shptnum[0]-1)>>1));
 #endif
 
     // Read the C4 caract
@@ -341,56 +340,56 @@ UnitType::~UnitType()
 
 const char* UnitType::getRandTalk(TalkbackType type) const
 {
-	// If talkback != 0
-	if (talkback != 0)
-	{
-		return talkback->getRandTalk(type);
-	}
-	return 0;
+    // If talkback != 0
+    if (talkback != 0)
+    {
+        return talkback->getRandTalk(type);
+    }
+    return 0;
 }
 
 bool UnitType::isInfantry() const
 {
-	return is_infantry;
+    return is_infantry;
 }
 
 bool UnitType::isWall() const
 {
-	return false;
+    return false;
 }
 
 bool UnitType::canDeploy() const
 {
-	return deployable;
+    return deployable;
 }
 
 bool UnitType::isStructure() const
 {
-	return false;
+    return false;
 }
 
 Uint8 UnitType::getType() const
 {
-	return unittype;
+    return unittype;
 }
 
 bool UnitType::isDoubleOwned()
 {
-	if (doubleowned)
-	{
-		return true;
-	}
-	return false;
+    if (doubleowned)
+    {
+        return true;
+    }
+    return false;
 }
 
 Uint32 *UnitType::getSHPNums()
 {
-	return shpnums;
+    return shpnums;
 }
 
 Uint8 UnitType::getNumLayers() const
 {
-	return numlayers;
+    return numlayers;
 }
 
 Uint16* UnitType::getSHPTNum()
@@ -400,7 +399,7 @@ Uint16* UnitType::getSHPTNum()
 
 vector<string> UnitType::getOwners() const
 {
-	return owners;
+    return owners;
 }
 
 Uint8 UnitType::getOffset() const
@@ -410,52 +409,52 @@ Uint8 UnitType::getOffset() const
 
 Uint8 UnitType::getROT() const
 {
-	return turnspeed;
+    return turnspeed;
 }
 
 Sint8 UnitType::getMoveMod() const
 {
-	return movemod;
+    return movemod;
 }
 
 Uint8 UnitType::getTurnMod() const
 {
-	return turnmod;
+    return turnmod;
 }
 
 Uint8 UnitType::getTurnspeed() const
 {
-	return turnspeed;
+    return turnspeed;
 }
 
 armor_t UnitType::getArmor() const
 {
-	return armour;
+    return armour;
 }
 
 StructureType* UnitType::getDeployType() const
 {
-	return deploytype;
+    return deploytype;
 }
 
 Uint8 UnitType::getPipColour() const
 {
-	return pipcolour;
+    return pipcolour;
 }
 
 Uint8 UnitType::getMaxPassengers() const
 {
-	return maxpassengers;
+    return maxpassengers;
 }
 
 vector<Uint8> UnitType::getPassengerAllow() const
 {
-	return passengerAllow;
+    return passengerAllow;
 }
 
 vector<UnitType*> UnitType::getSpecificTypeAllow() const
 {
-	return specificTypeAllow;
+    return specificTypeAllow;
 }
 
 Uint8 UnitType::getPQueue() const
@@ -466,15 +465,15 @@ Uint8 UnitType::getPQueue() const
 
 bool UnitType::isC4() const
 {
-	return c4;
+    return c4;
 }
 
 bool UnitType::isInfiltrate()
 {
-	return infiltrate;
+    return infiltrate;
 }
 
 void UnitType::setInfiltrate(bool infiltrate)
 {
-	this->infiltrate = infiltrate;
+    this->infiltrate = infiltrate;
 }

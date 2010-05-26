@@ -33,7 +33,7 @@
 #include "game/RadarAnimEvent.h"
 #include "createmode_t.h"
 #include "SidebarError.h"
-#include "include/Logger.h"
+#include "Logger.hpp"
 #include "video/SHPImage.h"
 #include "video/ImageCache.h"
 #include "video/ImageCacheEntry.h"
@@ -72,7 +72,6 @@ using std::stringstream;
 
 using Sound::SoundEngine;
 
-extern Logger * logger;
 namespace pc {
 	//extern ConfigType Config;
 	extern ImageCache* imgcache;
@@ -193,7 +192,7 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
     } catch (ImageNotFound&) {
         /// @todo This problem should ripple up to the "game detection" layer
         // so it can try again from scratch with a different set of data files.
-        logger->error("Hmm.. managed to misdetect sidebar type\n");
+        Logger::getInstance()->Error("Hmm.. managed to misdetect sidebar type\n");
         try {
             // Switch between Gold and DOS
             if (side < 3) {
@@ -205,7 +204,7 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
             radarlogo = pc::imgcache->loadImage(radarname, scaleq);
             isoriginaltype = !isoriginaltype;
         } catch (ImageNotFound&) {
-            logger->error("Unable to load the radar-image!\n");
+            Logger::getInstance()->Error("Unable to load the radar-image!\n");
             throw SidebarError("Unable to load the radar-image!");
         }
     }
@@ -591,7 +590,7 @@ void Sidebar::ClickButton(Uint8 index, string& unitname, createmode_t* createmod
         ScrollBuildList((f&sbo_up), (f&sbo_unit));
         break;
     default:
-        logger->error("Sidebar::ClickButton. This should not happen (%i)\n",f&0x3);
+        Logger::getInstance()->Error("Sidebar::ClickButton. This should not happen (%i)\n");//,f&0x3);
         break;
     }
 }
@@ -961,13 +960,13 @@ void Sidebar::SetupButtons(Uint16 height)
 
 	const char* tmpname = VFSUtils::VFS_getFirstExisting(3, "stripna.shp", "hstrip.shp", "strip.shp");
 	if (tmpname == 0) {
-		logger->error("Unable to find strip images for sidebar, exiting\n");
+		Logger::getInstance()->Error("Unable to find strip images for sidebar, exiting\n");
 		throw SidebarError("Unable to find strip images for sidebar, exiting");
 	}
 	try {
 		strip = new SHPImage(tmpname, -1);
 	} catch (ImageNotFound&) {
-		logger->error("Unable to load strip images for sidebar, exiting\n");
+		Logger::getInstance()->Error("Unable to load strip images for sidebar, exiting\n");
 		throw SidebarError("Unable to find strip images for sidebar, exiting");
 	}
 
@@ -1445,7 +1444,7 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
             num = pc::imgcache->loadImage("hclock.shp");
         }
     } catch (ImageNotFound& e) {
-        logger->error("Unable to load clock image!\n");
+        Logger::getInstance()->Error("Unable to load clock image!\n");
         return;
     }
     num += imgnum;
@@ -1479,7 +1478,7 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
 			//	num = pc::imgcache->loadImage("hclock.shp");
 			//}
 		} catch (ImageNotFound& e) {
-			logger->error("Unable to load clock image!\n");
+			Logger::getInstance()->Error("Unable to load clock image!\n");
 			return;
 		}
 		num += imgnum;
@@ -1534,7 +1533,7 @@ void Sidebar::DrawClock(Uint8 index, Uint8 imgnum)
 		try {
 			clockImages = new SHPImage("clock.shp", -1);
 		} catch (ImageNotFound& e) {
-			logger->error("Unable to load clock image!\n");
+			Logger::getInstance()->Error("Unable to load clock image!\n");
 			return;
 		}
 		//num += imgnum;
