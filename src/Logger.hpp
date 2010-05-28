@@ -24,6 +24,10 @@
 using std::string;
 using std::fstream;
 
+
+#define MACRO_LOG_DEBUG(ARG) Logger::getInstance()->Debug(__FILE__, __LINE__, ARG );
+
+
 /** Logger class */
 class Logger
 {
