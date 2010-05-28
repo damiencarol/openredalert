@@ -27,7 +27,6 @@
 #include "misc/common.h"
 #include "video/GraphicsEngine.h"
 #include "video/ImageCache.h"
-#include "include/sdllayer.h"
 #include "RaWindow.h"
 
 using std::string;

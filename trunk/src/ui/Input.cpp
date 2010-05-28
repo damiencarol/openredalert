@@ -363,10 +363,13 @@ void Input::handle()
                 	{
                 		if (selected->getStructure(0)->isBombing() == true)
                 		{
-                			Logger::getInstance()->Debug("Structure stop bombing\n");
-                			selected->getStructure(0)->bombingDone();
-                		} else {
-                			Logger::getInstance()->Debug("Structure bombing !!!\n");
+                            MACRO_LOG_DEBUG("Structure stop bombing.")
+                            selected->getStructure(0)->bombingDone();
+                		}
+                        else 
+                        {
+                            MACRO_LOG_DEBUG("Structure bombing !!!")
+                            
                 			selected->getStructure(0)->bomb();
                 			//Uint32 num = pc::imgcache->loadImage("fire1.shp");
                 			//new ExplosionAnim(1, selected->getStructure(0)->getPos(),
@@ -374,13 +377,13 @@ void Input::handle()
                 			//static_cast<Uint8>(p::ccmap->getMoveFlash()->getNumImg()), 0, 0);
                 		}
                 	} else {
-                		Logger::getInstance()->Debug("Structure 0 = NULL\n");
+                        MACRO_LOG_DEBUG("Structure 0 = NULL")
                 	}
                 	break;
                 }
                 case SDLK_F7:
                     //logger->gameMsg("MARK @ %i",SDL_GetTicks());
-                    Logger::getInstance()->Debug("Mark placed at %i\n");//,SDL_GetTicks());
+                    MACRO_LOG_DEBUG("Mark placed at %i\n") //,SDL_GetTicks());
                     break;
                 case SDLK_F8:
                     p::uspool->showMoves();
@@ -395,17 +398,17 @@ void Input::handle()
                 // Debug for blobals variables
                 case SDLK_F11:
                 	radarstat = 1;
-                	Logger::getInstance()->Debug("radarstat = %i");//, radarstat);
+                    MACRO_LOG_DEBUG("radarstat = %i") //, radarstat);
                     //GlobalVar[2]=1;
                 	//GlobalVar[3]=1;
                 	break;
                 // Debug for blobals variables
                 case SDLK_F12:
                 	radarstat = 2;
-                	Logger::getInstance()->Debug("radarstat = %i");//, radarstat);
+                    MACRO_LOG_DEBUG("radarstat = %i") //, radarstat);
                     //GlobalVar[2]=0;
-                	//GlobalVar[3]=0;
-                	break;
+                    //GlobalVar[3]=0;
+                    break;
 
                 case SDLK_v:
                     if (!lplayer->canSeeAll()) {
@@ -793,18 +796,18 @@ void Input::clickMap(int mx, int my)
 
 
 
-		// Check if this unit can infiltrate
-                UnitType* theType = static_cast<UnitType*>(selected->getUnit(0)->getType());
-		if (theType->isInfiltrate() == true)
-		{
-			// If their are a structure at this position
-			if (p::uspool->getStructureAt(pos) != 0)
-			{
-				selected->getUnit(0)->doRandTalk(TB_ack);
-				Logger::getInstance()->Debug("Infiltrate !!!\n");
-				selected->getUnit(0)->Infiltrate(
-						p::uspool->getStructureAt(pos));
-				return;
+        // Check if this unit can infiltrate
+        UnitType* theType = static_cast<UnitType*>(selected->getUnit(0)->getType());
+        if (theType->isInfiltrate() == true)
+        {
+            // If their are a structure at this position
+            if (p::uspool->getStructureAt(pos) != 0)
+            {
+                selected->getUnit(0)->doRandTalk(TB_ack);
+
+                MACRO_LOG_DEBUG("Infiltrate !!!\n")
+                selected->getUnit(0)->Infiltrate(p::uspool->getStructureAt(pos));
+                return;
 			}
 		}
 	}
@@ -1454,6 +1457,13 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
         currentaction = a_none;
         return;
     }
+    
+    
+    MACRO_LOG_DEBUG("Click under '" + placename + "' detected")
+    
+    // HACK : !!!!
+    // TODO : analyse why there are ICON.SHP
+    placename = placename.substr(0,4);
 
     UnitOrStructureType* type;
     if (createmode != CM_STRUCT) {
@@ -1461,6 +1471,12 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
     } else {
         type = p::uspool->getStructureTypeByName(placename);
     }
+    if (NULL == type) { 
+        MACRO_LOG_DEBUG("type is NULL !!!! ERROR")
+        return;
+    }
+    
+    
     ConStatus status;
     Uint8 dummy;
     // Always stopping building with a right click
@@ -1474,13 +1490,14 @@ void Input::clickSidebar(int mx, int my, bool rightbutton)
         if (BQ_PAUSED == status) {
             pc::sfxeng->PlaySound(pc::Config.BuildingOnHold);
         } else if (BQ_CANCELLED == status) {
-        	pc::sfxeng->PlaySound(pc::Config.BuildingCanceled);
+            pc::sfxeng->PlaySound(pc::Config.BuildingCanceled);
         } else {
             Logger::getInstance()->Error("Recieved an unknown status from stopBuilding: %i\n");//, status);
         }
         return;
     }
 
+    
     status = lplayer->getStatus(type, &dummy, &dummy);
 
     if ((BQ_READY == status) && (lplayer->getQueue(type->getPQueue())->getCurrentType() == type)) {
