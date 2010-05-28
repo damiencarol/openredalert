@@ -35,7 +35,6 @@
 #include "game/UnitAndStructurePool.h"
 #include "game/StructureType.h"
 #include "audio/SoundEngine.h"
-#include "include/sdllayer.h"
 #include "misc/StringTableFile.h"
 #include "ui/Cursor.h"
 #include "ui/RA_Label.h"
@@ -101,16 +100,18 @@ GraphicsEngine::GraphicsEngine()
 
 	//config.videoflags = SDL_SWSURFACE|SDL_ANYFORMAT|SDL_GLSDL|SDL_DOUBLEBUF;
 
-	screen = SDL_SetVideoMode(width, height, config.bpp, config.videoflags);
+    screen = SDL_SetVideoMode(width, height, config.bpp, config.videoflags);
 
 	if (screen == 0) {
 		Logger::getInstance()->Error("Unable to set %dx%d video: %s\n");//, width, height, SDL_GetError());
 		//@todo throw VideoError("Unable to set " + width + "x" + height + " video: " );//+ SDL_GetError());
 	}
-
-	if ( (screen->flags & 0x00004000	/* Surface is RLE encoded */) == 0x00004000	/* Surface is RLE encoded */ ) {
-		Logger::getInstance()->Debug("Sprite blit uses RLE acceleration\n");
-	}
+    
+    // If surface is RLE encoded
+    if ( (screen->flags & 0x00004000	) == 0x00004000) 
+    {
+        MACRO_LOG_DEBUG("Sprite blit uses RLE acceleration")
+    }
 
 	// Indicates where is the screen mem
 	/*

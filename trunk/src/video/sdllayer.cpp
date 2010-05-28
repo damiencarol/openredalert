@@ -132,8 +132,8 @@ void SDLLayer::set_pixel ( SDL_Surface* Surface, Uint32 color, Uint32 x, Uint32 
  */
 void SDLLayer::set_pixel ( SDL_Surface* Surface, SDL_Color RGBcolor, Uint32 x, Uint32 y )
 {
-	Uint32 color = SDL_MapRGB( Surface->format, RGBcolor.r, RGBcolor.g, RGBcolor.b );
-	set_pixel ( Surface, color, x, y );
+    Uint32 color = SDL_MapRGB( Surface->format, RGBcolor.r, RGBcolor.g, RGBcolor.b );
+    set_pixel ( Surface, color, x, y );
 }
 
 
