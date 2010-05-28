@@ -100,6 +100,8 @@ Sidebar::Sidebar(Player *pl, Uint16 height, const char *theatre)
     vischanged(true), theatre(theatre), buttondown(0), bd(false),
     radaranimating(false), unitoff(0), structoff(0), player(pl), scaleq(-1)
 {
+    MACRO_LOG_DEBUG("Sidebar constructor")
+
     //const char* tmpname;
     Uint8 side = 0;
     SDL_Surface *tmp;
@@ -574,6 +576,11 @@ Uint8 Sidebar::getButton(Uint16 x, Uint16 y)
  */
 void Sidebar::ClickButton(Uint8 index, string& unitname, createmode_t* createmode)
 {
+    MACRO_LOG_DEBUG("Type '" + unitname + "'")
+    MACRO_LOG_DEBUG("Type substr '" + unitname.substr (0,4) + "'")
+    
+    
+    
     unsigned int f = buttons[index]->getFunction();
     *createmode = CM_INVALID;
 

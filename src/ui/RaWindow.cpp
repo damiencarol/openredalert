@@ -26,7 +26,6 @@
 #include "misc/common.h"
 #include "video/GraphicsEngine.h"
 #include "video/ImageCache.h"
-#include "include/sdllayer.h"
 #include "RA_ProgressBar.h"
 #include "video/ImageNotFound.h"
 
