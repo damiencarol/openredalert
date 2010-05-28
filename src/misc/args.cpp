@@ -20,8 +20,6 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "include/sdllayer.h"
-
 #include "video/Renderer.h"
 #include "config.h"
 #include "misc/INIFile.h"
