@@ -85,7 +85,7 @@ void MultiPlayerMaps::readMapData()
     loadMapsFolder();
 
     // Test the ABANDON1.mpr file
-    Logger::getInstance()->Debug("Loading ABANDON1.INI maps");
+    MACRO_LOG_DEBUG("Loading ABANDON1.INI maps")
     VFile* MapFile = VFSUtils::VFS_Open("ABANDON1.INI");
     // Return with error
     if (MapFile == 0) 
@@ -99,7 +99,7 @@ void MultiPlayerMaps::readMapData()
         MapNames.push_back(string("ABANDON1"));
         MapDescriptions.push_back(string("Abandoned Battlefield (Med)"));
     }
-    Logger::getInstance()->Debug("OK");
+    MACRO_LOG_DEBUG("OK")
 
 
     // Open the MP map description file "missions.pkt"
@@ -114,7 +114,7 @@ void MultiPlayerMaps::readMapData()
     // While there are lines Read one and save
     while (MapFile->getLine(Line, sizeof (Line)))
     {
-        Logger::getInstance()->Debug("Line = " + string(Line));
+        MACRO_LOG_DEBUG("Line = " + string(Line))
 
         // Copy the line
         tmpString = Line; 
