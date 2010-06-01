@@ -28,10 +28,18 @@ namespace OpenRedAlert
 namespace Game
 {
 
+/**
+ * Trigger of maps in game.
+ */
 class Trigger
 {
 public:
+    /** Set name of the Trigger */
     void setName(const string& pName);
+    /** 
+     * Return name of the Trigger
+     * @return name
+     */
     string getName() const;
 
 private:

@@ -109,7 +109,7 @@ bool BQueue::Add(const UnitOrStructureType * type)
                 } 
                 else 
                 {
-                    Logger::getInstance()->Debug("Didn't spawn " + type->getName());
+                    MACRO_LOG_DEBUG("Didn't spawn " + string(type->getName()))
                 }
             }
             return false;

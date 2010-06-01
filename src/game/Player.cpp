@@ -457,8 +457,13 @@ Sint32 Player::getMoney() const
 	return money;
 }
 
+/**
+ * Start building operation for a type.
+ */
 bool Player::startBuilding(UnitOrStructureType *type)
 {
+    MACRO_LOG_DEBUG("Start building for " + type->getName());
+
     BQueue* queue = getQueue(type->getPQueue());    
     if (0 == queue) 
     {
