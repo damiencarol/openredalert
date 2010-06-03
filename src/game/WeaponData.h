@@ -33,10 +33,12 @@ using std::string;
 class WeaponData
 {
 public:
+    /** Return animation to display as a firing effect. */
     string getAnim();
 
     void setAnim(string anim);
 
+    /** Return number of rapid succession shots from this weapon (def=1)*/
     int getBurst();
 
     void setBurst(int burst);
@@ -81,40 +83,41 @@ public:
 
     void setCharges(int charges);
 
+    /** Reveals area around firer (def=no)?*/
     int getCamera();
 
     void setCamera(int camera);
 
     static WeaponData* loadWeaponData(INIFile* file, const string& name);
     void print();
-    	
+        
 private:
-	/** animation to display as a firing effect */
-	string anim;
-	/** number of rapid succession shots from this weapon (def=1)*/
-	int burst;
-	/** Reveals area around firer (def=no)?*/
-	int camera;
-	/** Does it have charge-up-before-firing logic (def=no)?*/
-	int charges;
-	/** the amount of damage (unattenuated) dealt with every bullet*/
-	int damage;
-	/** projectile characteristic to use */
-	string projectile;
-	/** delay between shots [15 = 1 second at middle speed setting] */
-	int rof;
-	/** maximum cell range */
-	int range;
-	/** sound to play when firing */
-	string report;
-	/** speed of projectile to target (100 is maximum) */
-	int speed;
-	/** warhead to attach to projectile */
-	string warhead;
-	/** Should nearby friendly buildings be scanned for and if found, discourage firing on target (def=no)?*/
-	int supress;
-	/** Should the weapon get a boosted speed bonus when firing upon aircraft? */
-	int turboBoost;
+    /** animation to display as a firing effect */
+    string anim;
+    /** number of rapid succession shots from this weapon (def=1)*/
+    int burst;
+    /** Reveals area around firer (def=no)?*/
+    int camera;
+    /** Does it have charge-up-before-firing logic (def=no)?*/
+    int charges;
+    /** the amount of damage (unattenuated) dealt with every bullet*/
+    int damage;
+    /** projectile characteristic to use */
+    string projectile;
+    /** delay between shots [15 = 1 second at middle speed setting] */
+    int rof;
+    /** maximum cell range */
+    int range;
+    /** sound to play when firing */
+    string report;
+    /** speed of projectile to target (100 is maximum) */
+    int speed;
+    /** warhead to attach to projectile */
+    string warhead;
+    /** Should nearby friendly buildings be scanned for and if found, discourage firing on target (def=no)?*/
+    int supress;
+    /** Should the weapon get a boosted speed bonus when firing upon aircraft? */
+    int turboBoost;
 };
 
 #endif //WEAPONDATA_H
