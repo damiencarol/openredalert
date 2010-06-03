@@ -84,7 +84,6 @@ namespace pc
     extern Sidebar* sidebar;
     extern SoundEngine* sfxeng;
 }
-extern MIXFiles * mixfiles;
 
 /**
  * Constructor, loads the map, sidebar and such.
