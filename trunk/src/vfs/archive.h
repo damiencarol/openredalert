@@ -20,8 +20,6 @@
 
 #include "SDL/SDL_types.h"
 
-class VFile;
-
 /**
  * Abstract interface to manipulate VFile in archives
  */
