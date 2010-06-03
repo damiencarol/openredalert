@@ -101,7 +101,7 @@ public:
 	/** Sight range, in cells (def=1). */
 	Uint8 getSight() const;
 
-    /** Return the internal name of the structure/unit type */
+    /** Return the internal name of the structure/unit type like 'TSLA', 'PWR' ... */
     string getName() const;
 
 
