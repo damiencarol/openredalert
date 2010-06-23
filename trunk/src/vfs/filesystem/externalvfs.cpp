@@ -20,9 +20,9 @@
 #include <cctype>
 #include <cerrno>
 #include <string>
+
+// Includes specifics to plateforms
 #ifdef _MSC_VER
-#define WIN32_LEAN_AND_MEAN
-//why is lean_mean needed???
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -110,6 +110,9 @@ bool ExternalFiles::loadArchive(const char *fname)
     return true;
 }
 
+/**
+ *
+ */
 Uint32 ExternalFiles::getFile(const char *fname, const char* mode)
 {
     ExtPriv::OpenFile newFile;
@@ -390,7 +393,7 @@ namespace ExtPriv {
 
 FILE* fcaseopen(string* name, const char* mode, Uint32 caseoffset) throw()
 {
-FILE* ret;
+    FILE* ret;
 
 	if (name == NULL || mode == NULL)
 		return NULL;
@@ -401,7 +404,7 @@ FILE* ret;
     if (NULL != ret) {
         return ret;
     }
-#if defined (_WIN32) || defined (__MORPHOS__)
+#if defined (_MSC_VER) || defined (__MORPHOS__)
     return NULL;
 #else
     string& fname = *name;
