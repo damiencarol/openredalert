@@ -20,7 +20,7 @@
 #include <cctype>
 #include <cerrno>
 #include <string>
-#ifdef MSVC
+#ifdef _MSC_VER
 #define WIN32_LEAN_AND_MEAN
 //why is lean_mean needed???
 #include <windows.h>
@@ -433,7 +433,7 @@ bool isdir(const string& path)
 {
 #ifdef _MSC_VER
     DWORD length = GetCurrentDirectory(0, 0);
-    LPWSTR orig_path = new WCHAR[length];
+    LPSTR orig_path = new CHAR[length];
     GetCurrentDirectory(length, orig_path);
     /*if (!SetCurrentDirectory(path.c_str())) {
 		if (orig_path != 0)
