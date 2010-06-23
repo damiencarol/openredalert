@@ -390,7 +390,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\ui\logger.cpp"
+				RelativePath=".\src\Logger.cpp"
 				>
 			</File>
 			<File
@@ -1033,6 +1033,10 @@
 			</File>
 			<File
 				RelativePath=".\src\include\Logger.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\Logger.hpp"
 				>
 			</File>
 			<File
