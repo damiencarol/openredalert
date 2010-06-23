@@ -16,6 +16,8 @@
 
 #include "SHPImage.h"
 
+#include <algorithm>
+#include <locale>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
@@ -54,7 +56,8 @@ SHPImage::SHPImage(const char *fname, Sint8 scaleq) : SHPBase(fname, scaleq)
     // Open the file in archive
     string filenameUpperCase = string(fname);
     // explicit cast needed to resolve ambiguity
-    std::transform(filenameUpperCase.begin(), filenameUpperCase.end(), filenameUpperCase.begin(), (int(*)(int)) std::toupper);
+    transform(filenameUpperCase.begin(), filenameUpperCase.end(), filenameUpperCase.begin(), toupper);
+
     VFile *imgfile = VFSUtils::VFS_Open(filenameUpperCase.c_str()); // link to the file in mix archives
     // Check that file is loaded
     if (imgfile == NULL) {

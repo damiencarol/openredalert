@@ -31,7 +31,11 @@ using std::string;
 
 class ExternalFiles;
 class MIXFiles;
+class VFile;
 
+/**
+ *
+ */
 class VFSUtils
 {
 public:
