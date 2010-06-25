@@ -1264,6 +1264,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\audio\SoundCacheCleaner.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\audio\SoundCommon.h"
 				>
 			</File>
