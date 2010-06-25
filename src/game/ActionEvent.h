@@ -20,8 +20,6 @@
 
 #include "SDL/SDL_types.h"
 
-class Comp;
-
 /** 
  * An abstract class which all actionevents must extend.
  *  
@@ -30,7 +28,6 @@ class Comp;
 class ActionEvent 
 {
 public:
-    friend class Comp;
     ActionEvent(Uint32 p);
 
     void addCurtick(Uint32 curtick);
