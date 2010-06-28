@@ -21,5 +21,5 @@
 
 bool Comp::operator() (ActionEvent * x, ActionEvent * y)
 {
-    return x->prio > y->prio;
+    return x->getPrio() > y->getPrio();
 }

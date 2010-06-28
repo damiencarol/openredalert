@@ -323,7 +323,7 @@ openredalert_SOURCES= \
     src/video/WSAMovie.h
     
 openredalert_LDFLAGS = $(SDL_CFLAGS)
-openredalert_LDADD = $(SDL_LIBS) -lSDL_Mixer
+openredalert_LDADD = $(SDL_LIBS)
 
 INCLUDES = -Isrc/
 
