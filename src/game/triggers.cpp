@@ -363,7 +363,7 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
     if (AssociatedTriggerName == "None"){
         return;
     }
-    Logger::getInstance()->Debug("Handle trigger [" + AssociatedTriggerName + "]");
+    MACRO_LOG_DEBUG("Handle trigger [" + AssociatedTriggerName + "]")
     
     //
     // Find the associated trigger in the map
@@ -407,14 +407,16 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
     {
         // Only trigger event 1 must be true
         case 0:
-            Logger::getInstance()->Debug("case 0\n");
+            MACRO_LOG_DEBUG("case 0")
+            
             if (CheckEvent(AssociatedTrigger->trigger1.event,
             			   AssociatedTrigger->trigger1.param1,
             			   AssociatedTrigger->trigger1.param2,
             			   Event,
             			   param) == true)
             {
-            	Logger::getInstance()->Debug("EVENT CHECK IS OK\n");
+                MACRO_LOG_DEBUG("EVENT CHECK IS OK")
+                
             	// Set that Trigger is executed
             	AssociatedTrigger->hasexecuted = true;
             	
@@ -431,22 +433,23 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
         // Triggger event one and two must be true
         //
         case 1:
-        	Logger::getInstance()->Debug("case 1\n");
-        	if ((CheckEvent(AssociatedTrigger->trigger1.event,
-        				   AssociatedTrigger->trigger1.param1,
-        				   AssociatedTrigger->trigger1.param2,
-        				   Event,
-        				   param) == true) &&
-        		(CheckEvent(AssociatedTrigger->trigger2.event,
-        				   AssociatedTrigger->trigger2.param1,
-        				   AssociatedTrigger->trigger2.param2,
-        				   Event,
-        				   param) == true))
-        	{
-        	
-        				               
-        	            
-			/*if (AssociatedTrigger->trigger1.event == Event){
+            MACRO_LOG_DEBUG("case 1")
+            
+            if ((CheckEvent(AssociatedTrigger->trigger1.event,
+                           AssociatedTrigger->trigger1.param1,
+                           AssociatedTrigger->trigger1.param2,
+                           Event,
+                           param) == true) &&
+                (CheckEvent(AssociatedTrigger->trigger2.event,
+                           AssociatedTrigger->trigger2.param1,
+                           AssociatedTrigger->trigger2.param2,
+                           Event,
+                           param) == true))
+            {
+
+
+
+            /*if (AssociatedTrigger->trigger1.event == Event){
 				// Trigger 1 is already oke, check trigger 2
 				if (CheckpaSecondTriggerEvent (2, AssociatedTrigger)){
 					ExecuteTriggerAction (Event, 1, AssociatedTrigger );
@@ -470,9 +473,9 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
         	break;
         // Either the first or the second trigger event must be true (activate all associated action on trigger1 or trigger2)
         case 2:
-        	Logger::getInstance()->Debug("case 2\n");
-        	            
-        	/*
+            MACRO_LOG_DEBUG("case 2")
+
+            /*
             if (AssociatedTrigger->trigger1.event == Event){
                 ExecuteTriggerAction (Event, 1, AssociatedTrigger );
                 if (AssociatedTrigger->actions == 1){
@@ -488,19 +491,19 @@ void HandleTriggers(UnitOrStructure* UnitOrStructure, int Event, int param)
             break;
         // Either the first or the second trigger event must be true (activate action 1 for trigger1, activate action2 for trigger2)
         case 3:
-        	Logger::getInstance()->Debug("case 3\n");
-        	            
-        	/*
+            MACRO_LOG_DEBUG("case 3\n")
+                        
+            /*
             if (AssociatedTrigger->trigger1.event == Event){
                 ExecuteTriggerAction (Event, 1, AssociatedTrigger );
             }
             if (AssociatedTrigger->trigger2.event == Event){
                 ExecuteTriggerAction (Event, 2, AssociatedTrigger );
             }
-*/
+            */
             break;
         default:
-            printf ("%s line %i: Invalid trigger activation\n", __FILE__, __LINE__);
+            MACRO_LOG_DEBUG("Invalid trigger activation")
             break;
     }
 }
@@ -572,7 +575,8 @@ void HandleGlobalTrigger(int Event, int value)
 							value))
 						continue;
 				
-				Logger::getInstance()->Debug("TRIG [" + Trigger->name + "] Event check ok");
+				MACRO_LOG_DEBUG("TRIG [" + Trigger->name + "] Event check ok")
+
 				Trigger->hasexecuted = true;
 										
 				ExecuteTriggerAction(Trigger->action1);

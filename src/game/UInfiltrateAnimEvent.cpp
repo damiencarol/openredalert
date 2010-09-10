@@ -42,15 +42,14 @@ namespace p {
 }
 
 UInfiltrateAnimEvent::UInfiltrateAnimEvent(Uint32 p, Unit *un) : 
-	UnitAnimEvent(p, un)
+    UnitAnimEvent(p, un)
 {
-    //logger->debug("UAttack cons\n");
     this->un = un;
     this->target = un->getTarget();
     stopping = false;
     waiting = 0;
     target->referTo();
-	//Weapon *Weap;
+    //Weapon *Weap;
 
 	/*
 	UsePrimaryWeapon = true;
@@ -148,7 +147,7 @@ void UInfiltrateAnimEvent::run()
     //Uint8 loopend2=((UnitType*)un->getType())->getAnimInfo().loopend2;
 #endif
 
-    Logger::getInstance()->Debug("Infiltrate run t%p u%p\n");//,this,un);
+    MACRO_LOG_DEBUG("Infiltrate run t%p u%p\n")//,this,un);
     
     waiting = 0;
     if( !un->isAlive() || stopping ) {
@@ -176,10 +175,10 @@ void UInfiltrateAnimEvent::run()
     //if( distance > un->type->getWeapon(UsePrimaryWeapon)->getRange() /* weapons range */ ) {
     if (xtiles<=1 && ytiles<=1)
     {
-    	Logger::getInstance()->Debug("Infiltrate MOVE !!\n");
-    	    
-    
-    	setDelay(0);
+        MACRO_LOG_DEBUG("Infiltrate MOVE !!")
+
+
+        setDelay(0);
         waiting = 3;
         un->move(atkpos, false);
         un->moveanim->setRange(1);//un->type->getWeapon(UsePrimaryWeapon)->getRange());
@@ -264,7 +263,8 @@ void UInfiltrateAnimEvent::run()
     //p::aequeue->scheduleEvent(this);
 	//done = 1;
 	
-	Logger::getInstance()->Debug("END INFILTRATE !!!\n");
-	delete this;
-	return;
+	MACRO_LOG_DEBUG("END INFILTRATE !!!")
+
+    delete this;
+    return;
 }

@@ -556,7 +556,8 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
     if ((getHealth()-amount) <= 0)
     {
         // Throw the event
-        Logger::getInstance()->Debug("TRIGGER_EVENT_DESTROYED unit\n");
+        MACRO_LOG_DEBUG("TRIGGER_EVENT_DESTROYED unit")
+
         // (-1 means nothing)
         HandleTriggers((UnitOrStructure*)this, TRIGGER_EVENT_DESTROYED, -1);
 
@@ -564,7 +565,7 @@ void Unit::applyDamage(Sint16 amount, Weapon* weap, UnitOrStructure* attacker)
 
         // Add a death for stats
         if (attacker != 0){
-        	p::ccmap->getPlayerPool()->getPlayer(attacker->getOwner())->addUnitKill();
+            p::ccmap->getPlayerPool()->getPlayer(attacker->getOwner())->addUnitKill();
         }
 
         // todo: add infantry death animation here
