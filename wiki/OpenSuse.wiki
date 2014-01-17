@@ -1,4 +1,4 @@
-#summary Details who to install and run the game in OpenSuse.
+#summary Details how to install and run the game in OpenSuse.
 #labels Phase-Support,Featured
 
 = Installation =
